@@ -407,7 +407,7 @@ models = {
     'mbt2018': JointAutoregressiveHierarchicalPriors,
 }
 
-root_url = ''
+root_url = 'https://compressai.s3.amazonaws.com/models/v1'
 model_urls = {
     'bmshj2018_factorized': {
         'mse': {
