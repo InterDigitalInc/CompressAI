@@ -16,8 +16,10 @@ We try to follow PEP 8 recommendations. Automatic formatting is performed via
 We use [pytest](https://docs.pytest.org/en/5.4.3/getting-started.html). To run
 all the tests:
 
-* `pip install .[tests]`
-* `python -m pytest -s`
+* `pip install pytest pytest-cov coverage`
+* `python -m pytest --cov=compressai -s`
+* run `coverage report` or `coverage html` to visualize the tests coverage
+  analysis
 
 
 ## Licence
