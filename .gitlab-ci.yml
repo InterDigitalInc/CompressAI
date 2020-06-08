@@ -1,0 +1,60 @@
+image:
+    name: pytorch/pytorch:1.4-cuda10.1-cudnn7-runtime
+
+stages:
+    - build
+    - static-analysis
+    - test
+    - doc
+
+build:compressai:
+    stage: build
+    before_script:
+        - python --version
+    script:
+        - python setup.py bdist_wheel --dist-dir $CI_PROJECT_DIR/dist
+    artifacts:
+        paths:
+            - dist/
+        expire_in: 1 week
+    tags:
+        - docker
+
+pylint:compressai:
+    stage: static-analysis
+    before_script:
+        - python --version
+        - pip install compressai --find-links=dist/
+        - pip install pylint
+    script:
+        - pylint compressai examples
+    tags:
+        - docker
+
+test:compressai:pytorch-1.4:
+    stage: test
+    before_script:
+        - python --version
+        - pip install compressai --find-links=dist/
+        - pip install click pytest codecov pytest-cov
+    script:
+        - pytest --cov=compressai -s tests
+    tags:
+        - docker
+
+test:compressai:pytorch-1.5:
+    extends: test:compressai:pytorch-1.4
+    image: pytorch/pytorch:1.5-cuda10.1-cudnn7-runtime
+
+doc:compressai:
+    stage: doc
+    before_script:
+        - python --version
+        - pip install compressai --find-links=dist/
+        - cd docs
+    script:
+        - pip install -r requirements.txt
+        - make html
+    tags:
+        - docker
+    # TODO: copy the generated doc to a public webserver

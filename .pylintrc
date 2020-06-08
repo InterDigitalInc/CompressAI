@@ -1,0 +1,9 @@
+[TYPECHECK]
+ignored-modules=torch
+extension-pkg-whitelist=compressai.ans,compressai._CXX,range_coder
+
+[MESSAGES CONTROL]
+disable=C0103,W0221,R0902,R0914,C0114,W0511,C0116,W0201,C0415,R0401,R0201,R0913,R0903,R0801
+
+[DESIGN]
+max-line-length=120

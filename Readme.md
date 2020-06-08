@@ -1,0 +1,117 @@
+# CompressAI
+
+CompressAI provides custom operations, layers, models and tools to research,
+develop and evaluate end-to-end image and video compression codecs.
+
+CompressAI is built on top of PyTorch and provides:
+* a partial port of the official [TensorFlow
+  implementation](https://github.com/tensorflow/compression) of _Ballé et al._
+  research
+* pre-trained end-to-end compression models from the learned image compression
+  state-of-the-art 
+* evaluation scripts to compare learned models against classical image/video compression codecs
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+	- [Quickstart](#quickstart)
+	- [Evaluation](#evaluation)
+	- [Training](#training)
+- [License](#license)
+- [Contributing](#contributing)
+- [Citation](#citation)
+
+## Installation
+
+### Requirements
+
+* python packages: `numpy`, `scipy`, `torch`, `torchvision`
+* a `C++17` compiler
+
+### Using pip
+
+* (create a virtual environment `python -m venv _venv`)
+* `git clone https://github.com/InterDigitalInc/CompressAI`
+* `pip install CompressAI`
+
+You can also build your own pip package:
+
+* `git clone https://github.com/InterDigitalInc/CompressAI`
+* `cd CompressAI`
+* `pip install CompressAI`
+* `python setup.py bdist_wheel --dist-dir dist/`
+* `pip install dist/CompressAI-*.whl`
+
+
+We are also planning to provide a Docker image in the future.
+
+## Usage
+
+`import compressai`
+
+### Quickstart
+
+Take a look at the examples:
+
+* an example training script `examples/train.py`
+* an example codec pipeline `examples/codec.py`
+
+### Evaluation
+
+`python -m compressai.utils.bench --help`
+
+### Training
+
+An example training script is provided in the `examples` directory.
+
+```python examples/train.py --help```
+
+Training usually take between one or two weeks, depending on the model, the
+number of channels and the GPU architecture used.
+
+Pretrained models were learned with a batch size of 16 or 32, a learning rate
+of 1e-4, for approximately 1-2M steps. The learning rate is divided by 2 when
+the loss reaches a plateau (we use a patience of 20 epochs).
+
+## License
+
+CompressAI is licensed under under the Apache License, Version 2.0
+
+## Contributing
+
+See CONTRIBUTING.md
+
+## Authors
+* Jean Bégaint
+* Fabien Racapé
+* Simon Feltman
+
+InterDigital, AI Lab.
+
+*Contact*: firstname.lastname@interdigital.com
+
+## Citation
+
+If you use this project, please cite the relevant publications for the
+original models and datasets, and cite this project as:
+
+```
+@misc{CompressAI,
+	title = {{CompressAI}: A ML library for end-to-end data compression research},
+	author = "{Jean Bégaint, Fabien Racapé, Simon Feltman}",
+	howpublished = {\url{https://github.com/InterDigitalInc/CompressAI}},
+	url = "https://github.com/InterDigitalInc/CompressAI",
+	year = 2020,
+	note = "[Online; accessed 20-June-2020]"
+}
+
+```
+
+## Related links
+ * Original tensorflow compression library by _Ballé et al._: https://github.com/tensorflow/compression
+ * Range Asymmetric Numeral System code from _Fabian 'ryg' Giesen_: https://github.com/rygorous/ryg_rans (public domain)
+ * BPG image format by _Fabrice Bellard_: https://bellard.org/bpg
+ * HEVC HM reference software: https://hevc.hhi.fraunhofer.de
+ * VVC VTM reference software: https://vcgit.hhi.fraunhofer.de/jvet/VVCSoftware_VTM
+ * Kodak image dataset: http://r0k.us/graphics/kodak/

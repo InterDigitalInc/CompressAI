@@ -1,0 +1,128 @@
+This is a public-domain implementation of several rANS variants. rANS is an
+entropy coder from the ANS family, as described in Jarek Duda's paper
+"Asymmetric numeral systems" (http://arxiv.org/abs/1311.2540).
+
+- "rans_byte.h" has a byte-aligned rANS encoder/decoder and some comments on
+  how to use it. This implementation should work on all 32-bit architectures.
+  "main.cpp" is an example program that shows how to use it.
+- "rans64.h" is a 64-bit version that emits entire 32-bit words at a time. It
+  is (usually) a good deal faster than rans_byte on 64-bit architectures, and
+  also makes for a very precise arithmetic coder (i.e. it gets quite close
+  to entropy). The trade-off is that this version will be slower on 32-bit
+  machines, and the output bitstream is not endian-neutral. "main64.cpp" is
+  the corresponding example.
+- "rans_word_sse41.h" has a SIMD decoder (SSE 4.1 to be precise) that does IO
+  in units of 16-bit words. It has less precision than either rans_byte or
+  rans64 (meaning that it doesn't get as close to entropy) and requires
+  at least 4 independent streams of data to be useful; however, it is also a
+  good deal faster. "main_simd.cpp" shows how to use it.
+
+See my blog http://fgiesen.wordpress.com/ for some notes on the design.
+
+I've also written a paper on interleaving output streams from multiple entropy
+coders:
+
+  http://arxiv.org/abs/1402.3392
+
+this documents the underlying design for "rans_word_sse41", and also shows how
+the same approach generalizes to e.g. GPU implementations, provided there are
+enough independent contexts coded at the same time to fill up a warp/wavefront
+or whatever your favorite GPU's terminology for its native SIMD width is.
+
+Finally, there's also "main_alias.cpp", which shows how to combine rANS with
+the alias method to get O(1) symbol lookup with table size proportional to the
+number of symbols. I presented an overview of the underlying idea here:
+
+  http://fgiesen.wordpress.com/2014/02/18/rans-with-static-probability-distributions/
+
+Results on my machine (Sandy Bridge i7-2600K) with rans_byte in 64-bit mode:
+
+----
+
+rANS encode:
+12896496 clocks, 16.8 clocks/symbol (192.8MiB/s)
+12486912 clocks, 16.2 clocks/symbol (199.2MiB/s)
+12511975 clocks, 16.3 clocks/symbol (198.8MiB/s)
+12660765 clocks, 16.5 clocks/symbol (196.4MiB/s)
+12550285 clocks, 16.3 clocks/symbol (198.2MiB/s)
+rANS: 435113 bytes
+17023550 clocks, 22.1 clocks/symbol (146.1MiB/s)
+18081509 clocks, 23.5 clocks/symbol (137.5MiB/s)
+16901632 clocks, 22.0 clocks/symbol (147.1MiB/s)
+17166188 clocks, 22.3 clocks/symbol (144.9MiB/s)
+17235859 clocks, 22.4 clocks/symbol (144.3MiB/s)
+decode ok!
+
+interleaved rANS encode:
+9618004 clocks, 12.5 clocks/symbol (258.6MiB/s)
+9488277 clocks, 12.3 clocks/symbol (262.1MiB/s)
+9460194 clocks, 12.3 clocks/symbol (262.9MiB/s)
+9582025 clocks, 12.5 clocks/symbol (259.5MiB/s)
+9332017 clocks, 12.1 clocks/symbol (266.5MiB/s)
+interleaved rANS: 435117 bytes
+10687601 clocks, 13.9 clocks/symbol (232.7MB/s)
+10637918 clocks, 13.8 clocks/symbol (233.8MB/s)
+10909652 clocks, 14.2 clocks/symbol (227.9MB/s)
+10947637 clocks, 14.2 clocks/symbol (227.2MB/s)
+10529464 clocks, 13.7 clocks/symbol (236.2MB/s)
+decode ok!
+
+----
+
+And here's rans64 in 64-bit mode:
+
+----
+
+rANS encode:
+10256075 clocks, 13.3 clocks/symbol (242.3MiB/s)
+10620132 clocks, 13.8 clocks/symbol (234.1MiB/s)
+10043080 clocks, 13.1 clocks/symbol (247.6MiB/s)
+9878205 clocks, 12.8 clocks/symbol (251.8MiB/s)
+10122645 clocks, 13.2 clocks/symbol (245.7MiB/s)
+rANS: 435116 bytes
+14244155 clocks, 18.5 clocks/symbol (174.6MiB/s)
+15072524 clocks, 19.6 clocks/symbol (165.0MiB/s)
+14787604 clocks, 19.2 clocks/symbol (168.2MiB/s)
+14736556 clocks, 19.2 clocks/symbol (168.8MiB/s)
+14686129 clocks, 19.1 clocks/symbol (169.3MiB/s)
+decode ok!
+
+interleaved rANS encode:
+7691159 clocks, 10.0 clocks/symbol (323.3MiB/s)
+7182692 clocks, 9.3 clocks/symbol (346.2MiB/s)
+7060804 clocks, 9.2 clocks/symbol (352.2MiB/s)
+6949201 clocks, 9.0 clocks/symbol (357.9MiB/s)
+6876415 clocks, 8.9 clocks/symbol (361.6MiB/s)
+interleaved rANS: 435120 bytes
+8133574 clocks, 10.6 clocks/symbol (305.7MB/s)
+8631618 clocks, 11.2 clocks/symbol (288.1MB/s)
+8643790 clocks, 11.2 clocks/symbol (287.7MB/s)
+8449364 clocks, 11.0 clocks/symbol (294.3MB/s)
+8331444 clocks, 10.8 clocks/symbol (298.5MB/s)
+decode ok!
+
+----
+
+Finally, here's the rans_word_sse41 decoder on an 8-way interleaved stream:
+
+----
+
+SIMD rANS: 435626 bytes
+4597641 clocks, 6.0 clocks/symbol (540.8MB/s)
+4514356 clocks, 5.9 clocks/symbol (550.8MB/s)
+4780918 clocks, 6.2 clocks/symbol (520.1MB/s)
+4532913 clocks, 5.9 clocks/symbol (548.5MB/s)
+4554527 clocks, 5.9 clocks/symbol (545.9MB/s)
+decode ok!
+
+----
+
+There's also an experimental 16-way interleaved AVX2 version that hits
+faster rates still, developed by my colleague Won Chun; I will post it
+soon.
+
+Note that this is running "book1" which is a relatively short test, and
+the measurement setup is not great, so take the results with a grain
+of salt.
+
+-Fabian "ryg" Giesen, Feb 2014.
