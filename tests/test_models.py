@@ -239,6 +239,18 @@ class TestBmshj2018Hyperprior:
             bmshj2018_hyperprior(1, metric='ssim')
 
 
+    def test_bmshj2018_factorized_pretrained(self):
+        for i in range(1, 6):
+            net = bmshj2018_factorized(i, metric='mse', pretrained=True)
+            assert net.state_dict()['g_a.0.weight'].size(0) == 128
+            assert net.state_dict()['g_a.6.weight'].size(0) == 192
+
+        for i in range(6, 9):
+            net = bmshj2018_factorized(i, metric='mse', pretrained=True)
+            assert net.state_dict()['g_a.0.weight'].size(0) == 192
+            assert net.state_dict()['g_a.6.weight'].size(0) == 320
+
+
 class TestMbt2018Mean:
     def test_mbt2018_mean(self):
         for i in range(1, 6):
