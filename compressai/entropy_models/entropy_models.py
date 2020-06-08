@@ -77,6 +77,11 @@ class EntropyModel(nn.Module):
         if self.use_likelihood_bound:
             self.likelihood_lower_bound = LowerBound(likelihood_bound)
 
+        # to be filled on update()
+        self.register_buffer('_offset', torch.IntTensor())
+        self.register_buffer('_quantized_cdf', torch.IntTensor())
+        self.register_buffer('_cdf_length', torch.IntTensor())
+
     def forward(self, *args):
         raise NotImplementedError()
 
@@ -136,6 +141,21 @@ class EntropyModel(nn.Module):
             cdf[i, :_cdf.size(0)] = _cdf
         return cdf
 
+    def _check_cdf_size(self, C):
+        if len(self._quantized_cdf.size()) != 2 or \
+                self._quantized_cdf.size(0) != C:
+            raise ValueError(f'Invalid CDF size {self._quantized_cdf.size()}')
+
+    def _check_offsets_size(self, C):
+        if len(self._offset.size()) != 1 or \
+                self._offset.size(0) != C:
+            raise ValueError(f'Invalid offsets size {self._offset.size()}')
+
+    def _check_cdf_length(self, C):
+        if len(self._cdf_length.size()) != 1 or \
+                self._cdf_length.size(0) != C:
+            raise ValueError(f'Invalid offsets size {self._cdf_length.size()}')
+
     def compress(self, inputs, indexes, means=None):
         """
         Compress input tensors to char strings.
@@ -146,6 +166,18 @@ class EntropyModel(nn.Module):
             means (torch.Tensor, optional): optional tensor means
         """
         symbols = self._quantize(inputs, 'symbols', means)
+
+        if len(inputs.size()) != 4:
+            raise ValueError('Invalid `inputs` size. Expected a 4-D tensor.')
+
+        if inputs.size() != indexes.size():
+            raise ValueError(
+                '`inputs` and `indexes` should have the same size.')
+
+        C = inputs.size(1)
+        self._check_cdf_size(C)
+        self._check_cdf_length(C)
+        self._check_offsets_size(C)
 
         strings = []
         for i in range(symbols.size(0)):
@@ -173,6 +205,14 @@ class EntropyModel(nn.Module):
 
         if not len(strings) == indexes.size(0):
             raise ValueError('Invalid strings or indexes parameters')
+
+        if len(indexes.size()) != 4:
+            raise ValueError('Invalid `indexes` size. Expected a 4-D tensor.')
+
+        C = indexes.size(1)
+        self._check_cdf_size(C)
+        self._check_cdf_length(C)
+        self._check_offsets_size(C)
 
         if means is not None:
             if means.size()[:-2] != indexes.size()[:-2]:
@@ -243,11 +283,6 @@ class EntropyBottleneck(EntropyModel):
 
         target = np.log(2 / self.tail_mass - 1)
         self.register_buffer('target', torch.Tensor([-target, 0, target]))
-
-        # to be filled on update()
-        self.register_buffer('_offset', torch.IntTensor())
-        self.register_buffer('_quantized_cdf', torch.IntTensor())
-        self.register_buffer('_cdf_length', torch.IntTensor())
 
     def _medians(self):
         medians = self.quantiles[:, :, 1:2]
@@ -426,11 +461,6 @@ class GaussianConditional(EntropyModel):
             self.lower_bound_scale = LowerBound(scale_bound)
         else:
             raise ValueError('Invalid parameters')
-
-        # to be filled on update()
-        self.register_buffer('_offset', torch.IntTensor())
-        self.register_buffer('_cdf_length', torch.IntTensor())
-        self.register_buffer('_quantized_cdf', torch.IntTensor())
 
     @staticmethod
     def _prepare_scale_table(scale_table):
