@@ -26,12 +26,21 @@ CompressAI is built on top of PyTorch and provides:
 
 ### Requirements
 
-* python packages: `numpy`, `scipy`, `torch`, `torchvision`
+* python 3.6 or later (`python3-dev`, `python3-pip`, `python3-venv`)
+* pip 19.0 or later
 * a `C++17` compiler
+* python packages: `numpy`, `scipy`, `torch`, `torchvision`
+
+### Virtual environment
+
+We recommend using a virtual environment to isolate project packages
+installation from the base system:
+
+* `python -m venv venv`
+* `source ./venv/bin/activate`
 
 ### Using pip
 
-* (create a virtual environment `python -m venv _venv`)
 * `git clone https://github.com/InterDigitalInc/CompressAI`
 * `pip install CompressAI`
 
@@ -42,7 +51,6 @@ You can also build your own pip package:
 * `pip install CompressAI`
 * `python setup.py bdist_wheel --dist-dir dist/`
 * `pip install dist/CompressAI-*.whl`
-
 
 We are also planning to provide a Docker image in the future.
 
@@ -109,8 +117,8 @@ original models and datasets, and cite this project as:
 ```
 
 ## Related links
- * Original tensorflow compression library by _Ballé et al._: https://github.com/tensorflow/compression
- * Range Asymmetric Numeral System code from _Fabian 'ryg' Giesen_: https://github.com/rygorous/ryg_rans (public domain)
+ * Tensorflow compression library by _Ballé et al._: https://github.com/tensorflow/compression
+ * Range Asymmetric Numeral System code from _Fabian 'ryg' Giesen_: https://github.com/rygorous/ryg_rans
  * BPG image format by _Fabrice Bellard_: https://bellard.org/bpg
  * HEVC HM reference software: https://hevc.hhi.fraunhofer.de
  * VVC VTM reference software: https://vcgit.hhi.fraunhofer.de/jvet/VVCSoftware_VTM
