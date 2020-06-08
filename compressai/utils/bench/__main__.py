@@ -1,3 +1,5 @@
+from typing import Union, Tuple
+
 import argparse
 import io
 import json
@@ -14,6 +16,9 @@ import PIL
 import PIL.Image as Image
 
 import numpy as np
+
+import torch
+from pytorch_msssim import ms_ssim
 
 # from torchvision.datasets.folder
 IMG_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif',
@@ -34,21 +39,25 @@ def read_image(filepath: str, mode: str = 'RGB') -> np.array:
     return Image.open(filepath).convert(mode)
 
 
-def psnr_np(a: np.array, b: np.array, max_val: float = 255.) -> float:
-    if not a.shape == b.shape:
-        raise ValueError('Invalid input image shapes')
+def compute_metrics(a: Union[np.array, Image.Image],
+                    b: Union[np.array, Image.Image],
+                    max_val: float = 255.) -> Tuple[float, float]:
+    if isinstance(a, Image.Image):
+        a = np.asarray(a)
+    if isinstance(b, Image.Image):
+        b = np.asarray(b)
 
-    a = a.astype(np.float32)
-    b = b.astype(np.float32)
+    a = torch.from_numpy(a.copy()).float().unsqueeze(0)
+    if a.size(3) == 3:
+        a = a.permute(0, 3, 1, 2)
+    b = torch.from_numpy(b.copy()).float().unsqueeze(0)
+    if b.size(3) == 3:
+        b = b.permute(0, 3, 1, 2)
 
-    mse = np.mean(np.square(a - b))
-    return 20 * np.log10(max_val) - 10. * np.log10(mse)
-
-
-def psnr_pil(a: PIL.Image.Image,
-             b: PIL.Image.Image,
-             max_val: float = 255.) -> float:
-    return psnr_np(np.asarray(a), np.asarray(b), max_val)
+    mse = torch.mean((a - b)**2).item()
+    p = 20 * np.log10(max_val) - 10 * np.log10(mse)
+    m = ms_ssim(a, b, data_range=max_val).item()
+    return p, m
 
 
 def rgb2ycbcr(rgb: np.array, bitdepth: int = 8) -> np.array:
@@ -113,12 +122,12 @@ def run_command(cmd, ignore_returncodes=None):
 
 def _get_ffmpeg_version():
     rv = run_command(['ffmpeg', '-version'])
-    return rv.decode('ascii').split()[2]
+    return rv.split()[2]
 
 
 def _get_bpg_version(encoder_path):
     rv = run_command([encoder_path, '-h'], ignore_returncodes=[1])
-    return rv.decode('ascii').split()[4]
+    return rv.split()[4]
 
 
 class Codec:
@@ -179,20 +188,22 @@ class Codec:
             sys.exit(1)
 
         results = defaultdict(list)
-        for q in self.qualities:
+        for i, q in enumerate(self.qualities):
             metrics = defaultdict(float)
-            for f in filepaths:
+            for j, f in enumerate(filepaths):
                 rv = self.run(f, q)
                 for k, v in rv.items():
                     metrics[k] += v
+                sys.stderr.write(f'\r{self.name}'
+                                 f' | quality: {i+1:d}/{len(self.qualities):d}'
+                                 f' | file: {j+1:d}/{len(filepaths):d}')
+                sys.stderr.flush()
             for k, v in metrics.items():
                 metrics[k] = v / len(filepaths)
                 results[k].append(metrics[k])
-
+        sys.stderr.write('\n')
+        sys.stderr.flush()
         return results
-
-    def _psnr(self, a, b):
-        return psnr_pil(a, b)
 
 
 class PillowCodec(Codec):
@@ -219,11 +230,12 @@ class PillowCodec(Codec):
         rec.load()
         dec_time = time.time() - start
 
-        psnr_val = self._psnr(rec, img)
+        psnr_val, msssim_val = compute_metrics(rec, img)
         bpp_val = float(size) * 8 / (img.size[0] * img.size[1])
 
         return {
             'psnr': psnr_val,
+            'msssim': msssim_val,
             'bpp': bpp_val,
             'encoding_time': enc_time,
             'decoding_time': dec_time,
@@ -277,11 +289,12 @@ class BinaryCodec(Codec):
         os.close(fd1)
         os.remove(out_filepath)
 
-        psnr_val = self._psnr(rec, img)
+        psnr_val, msssim_val = compute_metrics(rec, img)
         bpp_val = float(size) * 8 / (img.size[0] * img.size[1])
 
         return {
             'psnr': psnr_val,
+            'msssim': msssim_val,
             'bpp': bpp_val,
             'encoding_time': enc_time,
             'decoding_time': dec_time,
@@ -596,7 +609,7 @@ class VTM(Codec):
         if not self.rgb:
             arr = ycbcr2rgb(arr)
             rec_arr = ycbcr2rgb(rec_arr)
-        p = psnr_np(arr, rec_arr, max_val=1.)
+        psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.)
 
         bpp = filesize(out_filepath) * 8. / (height * width)
 
@@ -605,7 +618,8 @@ class VTM(Codec):
         os.unlink(out_filepath)
 
         return {
-            'psnr': p,
+            'psnr': psnr_val,
+            'msssim': msssim_val,
             'bpp': bpp,
             'encoding_time': enc_time,
             'decoding_time': dec_time
