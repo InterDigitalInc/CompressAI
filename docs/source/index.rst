@@ -25,6 +25,14 @@ CompressAI is built on top of PyTorch and provides:
 
 .. toctree::
    :maxdepth: 1
+   :caption: Tutorials
+
+   tutorial_quickstart
+   tutorial_train
+
+
+.. toctree::
+   :maxdepth: 1
    :caption: Library API
 
    compressai
