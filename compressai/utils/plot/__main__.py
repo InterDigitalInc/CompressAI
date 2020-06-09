@@ -3,6 +3,7 @@ import json
 
 from pathlib import Path
 
+import numpy as np
 import matplotlib.pyplot as plt
 
 _backend = 'matplotlib'
@@ -29,6 +30,11 @@ def parse_json_file(filepath, metric):
         raise ValueError(
             f'Error: metric "{metric}" not available.'
             f' Available metrics: {", ".join(data["results"].keys())}')
+
+    if metric == 'msssim':
+        # Convert to db
+        values = np.array(data['results'][metric])
+        data['results'][metric] = -10 * np.log10(1 - values)
 
     return {
         'name': data.get('name', name),
