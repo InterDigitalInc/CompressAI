@@ -73,6 +73,7 @@ setup(
         'matplotlib',
         'torch>=1.4.0',
         'torchvision>=0.5.0',
+        'pytorch-msssim==0.2.0',
     ],
     extras_require=get_extra_requirements(),
     license='Apache-2',

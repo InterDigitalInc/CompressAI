@@ -13,6 +13,8 @@ from torchvision import transforms
 
 from PIL import Image
 
+from pytorch_msssim import ms_ssim
+
 import compressai
 
 from compressai.models import (bmshj2018_factorized, bmshj2018_hyperprior,
@@ -32,9 +34,7 @@ IMG_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif',
 
 def psnr(a: torch.Tensor, b: torch.Tensor) -> float:
     mse = F.mse_loss(a, b).item()
-    if mse == 0:
-        return float('inf')
-    return 10 * math.log10(1. / mse)
+    return -10 * math.log10(mse)
 
 
 def read_image(filepath: str) -> torch.Tensor:
@@ -60,6 +60,7 @@ def inference(model, x):
 
     return {
         'psnr': psnr(x, out_dec['x_hat']),
+        'msssim': ms_ssim(x, out_dec['x_hat'], data_range=1.).item(),
         'bpp': bpp,
         'encoding_time': enc_time,
         'decoding_time': dec_time,
@@ -124,12 +125,11 @@ def setup_args():
                         default='mse',
                         help='metric trained against (default: %(default)s)')
     parser.add_argument('dataset', type=str, help='dataset path')
-    parser.add_argument(
-        '-c',
-        '--entropy-coder',
-        choices=compressai.available_entropy_coders(),
-        default=compressai.available_entropy_coders()[0],
-        help='Entropy coder (default: %(default)s)')
+    parser.add_argument('-c',
+                        '--entropy-coder',
+                        choices=compressai.available_entropy_coders(),
+                        default=compressai.available_entropy_coders()[0],
+                        help='Entropy coder (default: %(default)s)')
     parser.add_argument(
         '--entropy-estimation',
         action='store_true',
@@ -145,16 +145,22 @@ def main():
     n = 8
     results = defaultdict(list)
     for q in range(1, n + 1):
+        sys.stderr.write(f'\r{args.model} | quality: {q:d}')
+        sys.stderr.flush()
         model = models[args.model](quality=q,
                                    metric=args.metric,
                                    pretrained=True).eval()
         metrics = run_model(model, args.dataset, args.entropy_estimation)
         for k, v in metrics.items():
             results[k].append(v)
+    sys.stderr.write('\n')
+    sys.stderr.flush()
 
+    description = 'entropy estimation' \
+        if args.entropy_estimation else args.entropy_coder
     output = {
         'name': args.model,
-        'description': f'Inference ({args.entropy_coder})',
+        'description': f'Inference ({description})',
         'results': results,
     }
 
