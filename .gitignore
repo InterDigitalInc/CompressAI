@@ -1,3 +1,4 @@
+*.inc
 *.bin
 compressai/version.py
 venv-*/
