@@ -6,12 +6,12 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 
-_backend = 'matplotlib'
+_backends = ['matplotlib']
 
 try:
     import plotly.graph_objs as go
     import plotly.offline
-    _backend = 'plotly'
+    _backends.append('plotly')
 except ImportError:
     pass
 
@@ -20,11 +20,15 @@ def parse_json_file(filepath, metric):
     filepath = Path(filepath)
     name = filepath.name.split('.')[0]
     with filepath.open('r') as f:
-        data = json.load(f)
+        try:
+            data = json.load(f)
+        except json.decoder.JSONDecodeError as err:
+            print(f'Error reading file "{filepath}"')
+            raise err
 
     if 'results' not in data or \
             'bpp' not in data['results']:
-        raise ValueError('Invalid file')
+        raise ValueError(f'Invalid file "{filepath}"')
 
     if metric not in data['results']:
         raise ValueError(
@@ -127,7 +131,8 @@ def setup_args():
     parser.add_argument('--backend',
                         type=str,
                         metavar='',
-                        default=_backend,
+                        default=_backends[0],
+                        choices=_backends,
                         help='Change plot backend (default: %(default)s)')
     return parser
 
