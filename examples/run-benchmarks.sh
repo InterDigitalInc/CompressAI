@@ -2,6 +2,8 @@
 
 set -e
 
+NJOBS=${NJOBS:-4}
+
 BPGENC="$(which bpgenc)"
 BPGDEC="$(which bpgdec)"
 TFCI_SCRIPT="$(locate tfci.py)"
@@ -15,38 +17,38 @@ usage() {
 }
 
 jpeg() {
-    python -m compressai.utils.bench jpeg "$dataset"     \
-        -q $(seq 5 5 95) > results/jpeg.json
+    python -m compressai.utils.bench jpeg "$dataset"        \
+        -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/jpeg.json
 }
 
 jpeg2000() {
-    python -m compressai.utils.bench jpeg2000 "$dataset" \
-        -q $(seq 5 5 95) > results/jpeg2000.json
+    python -m compressai.utils.bench jpeg2000 "$dataset"    \
+        -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/jpeg2000.json
 }
 
 webp() {
-    python -m compressai.utils.bench webp "$dataset"     \
-        -q $(seq 5 5 95) > results/webp.json
+    python -m compressai.utils.bench webp "$dataset"        \
+        -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/webp.json
 }
 
 bpg() {
-    python -m compressai.utils.bench bpg "$dataset"      \
-        -q $(seq 47 -5 2) -m "$1" -e "$2" -c "$3"                 \
-        --encoder-path "$BPGENC"                                  \
-        --decoder-path "$BPGDEC"                                  \
-        > "results/$4"
+    python -m compressai.utils.bench bpg "$dataset"         \
+        -q $(seq 47 -5 2) -m "$1" -e "$2" -c "$3"           \
+        --encoder-path "$BPGENC"                            \
+        --decoder-path "$BPGDEC"                            \
+        -j "$NJOBS" > "benchmarks/$4"
 }
 
 vtm() {
-    python -m compressai.utils.bench vtm "$dataset"      \
+    python -m compressai.utils.bench vtm "$dataset"         \
         -q $(seq 47 -5 2) -b "$VTM_BUILD_DIR" -c "$VTM_CFG" \
-        > "results/vtm.json"
+        -j "$NJOBS" > "benchmarks/vtm.json"
 }
 
 tfci() {
-    python -m compressai.utils.bench tfci "$dataset"     \
-        --path "$TFCI_SCRIPT" --model "$1"                        \
-        -q $(seq 1 8) > "results/$1.json"
+    python -m compressai.utils.bench tfci "$dataset"        \
+        --path "$TFCI_SCRIPT" --model "$1"                  \
+        -q $(seq 1 8) -j "$NJOBS" > "benchmarks/tfci_$1.json"
 }
 
 if [[ $# -lt 2 ]]; then
@@ -58,7 +60,7 @@ fi
 dataset="$1"
 shift
 
-mkdir -p "results"
+mkdir -p "benchmarks"
 
 for i in "$@"; do
     case $i in
