@@ -615,14 +615,18 @@ class VTM(Codec):
 codecs = [JPEG, WebP, JPEG2000, BPG, TFCI, VTM]
 
 
-def main():
+def setup_args():
     description = 'Collect codec metrics and performances.'
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('codec',
                         type=str,
                         choices=[c.__name__.lower() for c in codecs])
     parser.add_argument('dataset', type=str)
-    args = parser.parse_args(sys.argv[1:3])
+    return parser
+
+
+def main():
+    args = setup_args().parse_args(sys.argv[1:3])
 
     codec_cls = next(c for c in codecs if c.__name__.lower() == args.codec)
     codec = codec_cls()

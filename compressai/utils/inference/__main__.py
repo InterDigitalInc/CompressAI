@@ -111,7 +111,7 @@ def run_model(model, dataset, entropy_estimation=False):
     return metrics
 
 
-def parse_args():
+def setup_args():
     parser = argparse.ArgumentParser(description='Run model on image dataset')
     parser.add_argument('model',
                         type=str,
@@ -134,12 +134,11 @@ def parse_args():
         '--entropy-estimation',
         action='store_true',
         help='Use evaluated entropy estimation (no entropy coding)')
-    args = parser.parse_args()
-    return args
+    return parser
 
 
 def main():
-    args = parse_args()
+    args = setup_args().parse_args()
 
     compressai.set_entropy_coder(args.entropy_coder)
 

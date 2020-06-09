@@ -86,7 +86,7 @@ def plotly_plt(scatters, title, ylabel, output_file, limits=None):
         filename=output_file or 'plot.html')
 
 
-def parse_args():
+def setup_args():
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-f',
                         '--results-file',
@@ -123,12 +123,11 @@ def parse_args():
                         metavar='',
                         default=_backend,
                         help='Change plot backend (default: %(default)s)')
-    args = parser.parse_args()
-    return args
+    return parser
 
 
 def main():
-    args = parse_args()
+    args = setup_args().parse_args()
 
     scatters = []
     for f in args.results_file:

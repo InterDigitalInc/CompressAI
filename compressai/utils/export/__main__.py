@@ -52,7 +52,7 @@ models = {
 }
 
 
-def parse_args() -> argparse.Namespace:
+def setup_args():
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('filepath',
                         type=str,
@@ -70,11 +70,11 @@ def parse_args() -> argparse.Namespace:
                         default='scale-hyperprior',
                         choices=models.keys(),
                         help='Set model architecture (default: %(default)s).')
-    return parser.parse_args()
+    return parser
 
 
 def main():
-    args = parse_args()
+    args = setup_args().parse_args()
 
     filepath = Path(args.filepath).resolve()
     if not filepath.is_file():
