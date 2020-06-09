@@ -1,2 +1,14 @@
-Training your own model with CompressAI
-=======================================
+Training with CompressAI
+========================
+
+
+Defining a model
+----------------
+
+
+Loss functions
+--------------
+
+
+Updating the model
+------------------
