@@ -35,6 +35,8 @@ def main():
         fout.write('.. code-block:: text\n\n')
         capture = io.StringIO()
         parser = m.setup_args()
+        if isinstance(parser, tuple):
+            parser = parser[0]
         parser.prog = f'python -m compression.utils.{p.name}'
         parser.print_help(capture)
 
