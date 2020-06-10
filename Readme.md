@@ -42,14 +42,14 @@ installation from the base system:
 ### Using pip
 
 * `git clone https://github.com/InterDigitalInc/CompressAI`
-* `pip install CompressAI`
+* `pip install ./compressai`
 
 You can also build your own pip package:
 
 * `git clone https://github.com/InterDigitalInc/CompressAI`
-* `cd CompressAI`
+* `cd compressai`
 * `python3 setup.py bdist_wheel --dist-dir dist/`
-* `pip install dist/CompressAI-*.whl`
+* `pip install dist/compressai-*.whl`
 
 We are also planning to provide a Docker image in the future.
 
