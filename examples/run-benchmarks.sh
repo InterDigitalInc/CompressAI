@@ -15,22 +15,22 @@ usage() {
 }
 
 jpeg() {
-    python -m compressai.utils.bench jpeg "$dataset"     \
+    python3 -m compressai.utils.bench jpeg "$dataset"     \
         -q $(seq 5 5 95) > results/jpeg.json
 }
 
 jpeg2000() {
-    python -m compressai.utils.bench jpeg2000 "$dataset" \
+    python3 -m compressai.utils.bench jpeg2000 "$dataset" \
         -q $(seq 5 5 95) > results/jpeg2000.json
 }
 
 webp() {
-    python -m compressai.utils.bench webp "$dataset"     \
+    python3 -m compressai.utils.bench webp "$dataset"     \
         -q $(seq 5 5 95) > results/webp.json
 }
 
 bpg() {
-    python -m compressai.utils.bench bpg "$dataset"      \
+    python3 -m compressai.utils.bench bpg "$dataset"      \
         -q $(seq 47 -5 2) -m "$1" -e "$2" -c "$3"                 \
         --encoder-path "$BPGENC"                                  \
         --decoder-path "$BPGDEC"                                  \
@@ -38,13 +38,13 @@ bpg() {
 }
 
 vtm() {
-    python -m compressai.utils.bench vtm "$dataset"      \
+    python3 -m compressai.utils.bench vtm "$dataset"      \
         -q $(seq 47 -5 2) -b "$VTM_BUILD_DIR" -c "$VTM_CFG" \
         > "results/vtm.json"
 }
 
 tfci() {
-    python -m compressai.utils.bench tfci "$dataset"     \
+    python3 -m compressai.utils.bench tfci "$dataset"     \
         --path "$TFCI_SCRIPT" --model "$1"                        \
         -q $(seq 1 8) > "results/$1.json"
 }
