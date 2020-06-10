@@ -1,6 +1,7 @@
-import subprocess
-import sys
+import importlib.util
+import io
 
+from contextlib import redirect_stdout
 from pathlib import Path
 
 
@@ -8,11 +9,14 @@ def test_train_example():
     cwd = Path(__file__).resolve().parent
     rootdir = cwd.parent
 
-    rv = subprocess.check_output([
-        sys.executable,
-        rootdir / 'examples/train.py',
+    spec = importlib.util.spec_from_file_location(
+        'examples.train', rootdir / 'examples/train.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    argv = [
         '-d',
-        rootdir / 'tests/assets/fakedata/imagefolder',
+        str(rootdir / 'tests/assets/fakedata/imagefolder'),
         '-e',
         '10',
         '--batch-size',
@@ -22,10 +26,15 @@ def test_train_example():
         '128',
         '--seed',
         '3.14',
-    ])
+    ]
+
+    f = io.StringIO()
+    with redirect_stdout(f):
+        module.main(argv)
+    log = f.getvalue()
 
     logpath = cwd / 'expected' / 'train_log_3.14.txt'
     with logpath.open('r') as f:
-        reflog = f.read()
+        expected = f.read()
 
-    assert rv.decode('utf-8') == reflog
+    assert log == expected
