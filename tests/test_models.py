@@ -3,13 +3,15 @@ import torch.nn as nn
 
 import pytest
 
-from compressai.models import (bmshj2018_factorized, bmshj2018_hyperprior,
-                               mbt2018_mean, mbt2018)
+from compressai.zoo import (bmshj2018_factorized, bmshj2018_hyperprior,
+                            mbt2018_mean, mbt2018)
+from compressai.zoo.image import _load_model
+
 from compressai.models.priors import (SCALES_LEVELS, SCALES_MAX, SCALES_MIN,
                                       CompressionModel, FactorizedPrior,
                                       MeanScaleHyperprior, ScaleHyperprior,
                                       JointAutoregressiveHierarchicalPriors,
-                                      get_scale_table, _load_model)
+                                      get_scale_table)
 
 from compressai.models.utils import (find_named_module,
                                      update_registered_buffers,
@@ -237,7 +239,6 @@ class TestBmshj2018Hyperprior:
 
         with pytest.raises(ValueError):
             bmshj2018_hyperprior(1, metric='ssim')
-
 
     def test_bmshj2018_factorized_pretrained(self):
         for i in range(1, 6):

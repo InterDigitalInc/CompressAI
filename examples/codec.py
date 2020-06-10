@@ -12,27 +12,13 @@ from torchvision.transforms import ToPILImage, ToTensor
 from PIL import Image
 
 import compressai
-from compressai.models import (bmshj2018_factorized, bmshj2018_hyperprior,
-                               mbt2018_mean, mbt2018)
+from compressai.zoo import models
 
-models = {
-    'bmshj2018-factorized': bmshj2018_factorized,
-    'bmshj2018-hyperprior': bmshj2018_hyperprior,
-    'mbt2018': mbt2018,
-    'mbt2018-mean': mbt2018_mean,
-}
-
-model_ids = {
-    'bmshj2018-factorized': 0,
-    'bmshj2018-hyperprior': 1,
-    'mbt2018': 2,
-    'mbt2018-mean': 3,
-}
+model_ids = {k: i for i, k in enumerate(models.keys())}
 
 metric_ids = {
     'mse': 0,
 }
-
 
 def inverse_dict(d):
     # We assume dict values are unique...
