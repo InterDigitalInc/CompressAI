@@ -17,15 +17,7 @@ from pytorch_msssim import ms_ssim
 
 import compressai
 
-from compressai.models import (bmshj2018_factorized, bmshj2018_hyperprior,
-                               mbt2018_mean, mbt2018)
-
-models = {
-    'bmshj2018-factorized': bmshj2018_factorized,
-    'bmshj2018-hyperprior': bmshj2018_hyperprior,
-    'mbt2018': mbt2018,
-    'mbt2018-mean': mbt2018_mean,
-}
+from compressai.zoo import models
 
 # from torchvision.datasets.folder
 IMG_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif',
