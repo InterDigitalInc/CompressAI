@@ -48,7 +48,6 @@ You can also build your own pip package:
 
 * `git clone https://github.com/InterDigitalInc/CompressAI`
 * `cd CompressAI`
-* `pip install CompressAI`
 * `python setup.py bdist_wheel --dist-dir dist/`
 * `pip install dist/CompressAI-*.whl`
 
