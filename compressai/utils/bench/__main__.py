@@ -639,8 +639,8 @@ def setup_args():
     return parser
 
 
-def main():
-    args = setup_args().parse_args(sys.argv[1:3])
+def main(argv):
+    args = setup_args().parse_args(argv[1:3])
 
     codec_cls = next(c for c in codecs if c.__name__.lower() == args.codec)
     codec = codec_cls()
@@ -656,4 +656,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

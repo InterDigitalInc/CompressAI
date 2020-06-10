@@ -137,8 +137,8 @@ def setup_args():
     return parser
 
 
-def main():
-    args = setup_args().parse_args()
+def main(argv):
+    args = setup_args().parse_args(argv)
 
     compressai.set_entropy_coder(args.entropy_coder)
 
@@ -168,4 +168,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

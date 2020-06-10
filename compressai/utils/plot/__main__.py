@@ -1,5 +1,6 @@
 import argparse
 import json
+import sys
 
 from pathlib import Path
 
@@ -137,8 +138,8 @@ def setup_args():
     return parser
 
 
-def main():
-    args = setup_args().parse_args()
+def main(argv):
+    args = setup_args().parse_args(argv)
 
     scatters = []
     for f in args.results_file:
@@ -158,4 +159,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

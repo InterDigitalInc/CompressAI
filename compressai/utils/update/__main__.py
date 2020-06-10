@@ -2,6 +2,7 @@ from typing import Dict
 
 import argparse
 import hashlib
+import sys
 
 from pathlib import Path
 
@@ -73,8 +74,8 @@ def setup_args():
     return parser
 
 
-def main():
-    args = setup_args().parse_args()
+def main(argv):
+    args = setup_args().parse_args(argv)
 
     filepath = Path(args.filepath).resolve()
     if not filepath.is_file():
@@ -112,4 +113,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
