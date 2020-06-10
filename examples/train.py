@@ -1,7 +1,8 @@
-import random
-import math
-import shutil
 import argparse
+import math
+import random
+import shutil
+import sys
 
 import torch
 import torch.optim as optim
@@ -152,7 +153,7 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
         shutil.copyfile(filename, 'checkpoint_best_loss.pth.tar')
 
 
-def parse_args():
+def parse_args(argv):
     parser = argparse.ArgumentParser(description='Example training script')
     # yapf: disable
     parser.add_argument(
@@ -217,12 +218,12 @@ def parse_args():
         type=float,
         help='Set random seed for reproducibility')
     # yapf: enable
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     return args
 
 
-def main():
-    args = parse_args()
+def main(argv):
+    args = parse_args(argv)
 
     if args.seed is not None:
         torch.manual_seed(args.seed)
@@ -283,4 +284,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()  # pylint: disable=no-value-for-parameter
+    main(sys.argv)

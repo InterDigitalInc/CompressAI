@@ -168,7 +168,7 @@ def show_image(img: Image.Image):
     plt.show()
 
 
-def encode():
+def encode(argv):
     parser = argparse.ArgumentParser(description='Encode image to bit-stream')
     parser.add_argument('image', type=str)
     parser.add_argument('--model',
@@ -192,14 +192,14 @@ def encode():
                         default=compressai.available_entropy_coders()[0],
                         help='Entropy coder (default: %(default)s)')
     parser.add_argument('-o', '--output', help='Output path')
-    args = parser.parse_args(sys.argv[2:])
+    args = parser.parse_args(argv)
     if not args.output:
         args.output = Path(Path(args.image).resolve().name).with_suffix('.bin')
     _encode(args.image, args.model, args.metric, args.quality, args.coder,
             args.output)
 
 
-def decode():
+def decode(argv):
     parser = argparse.ArgumentParser(description='Decode bit-stream to imager')
     parser.add_argument('input', type=str)
     parser.add_argument('-c',
@@ -209,25 +209,26 @@ def decode():
                         help='Entropy coder (default: %(default)s)')
     parser.add_argument('--show', action='store_true')
     parser.add_argument('-o', '--output', help='Output path')
-    args = parser.parse_args(sys.argv[2:])
+    args = parser.parse_args(argv)
     _decode(args.input, args.coder, args.show, args.output)
 
 
-def parse_args():
+def parse_args(argv):
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('command', choices=['encode', 'decode'])
-    args = parser.parse_args(sys.argv[1:2])
+    args = parser.parse_args(argv)
     return args
 
 
-def main():
-    args = parse_args()
+def main(argv):
+    args = parse_args(argv[1:2])
+    argv = argv[2:]
     torch.set_num_threads(1)  # just to be sure
     if args.command == 'encode':
-        encode()
+        encode(argv)
     elif args.command == 'decode':
-        decode()
+        decode(argv)
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
