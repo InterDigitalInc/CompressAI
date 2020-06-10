@@ -17,6 +17,12 @@ research
    ops
 
 .. toctree::
+   :maxdepth: 1
+   :caption: Model Zoo
+
+   zoo
+
+.. toctree::
   :maxdepth: 2
   :caption: Utils
 
