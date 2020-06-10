@@ -12,7 +12,7 @@ from compressai.models.priors import FactorizedPrior
 
 class TestUpdate:
     def _run_update(self, *args, timeout=16):
-        cmd = [sys.executable, '-m', 'compressai.utils.update']
+        cmd = [sys.executable, '-m', 'compressai.utils.update_model']
         cmd += list(args)
         p = Popen(cmd,
                   stdout=subprocess.PIPE,
