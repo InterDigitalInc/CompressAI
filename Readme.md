@@ -36,7 +36,7 @@ CompressAI is built on top of PyTorch and provides:
 We recommend using a virtual environment to isolate project packages
 installation from the base system:
 
-* `python -m venv venv`
+* `python3 -m venv venv`
 * `source ./venv/bin/activate`
 
 ### Using pip
@@ -48,7 +48,7 @@ You can also build your own pip package:
 
 * `git clone https://github.com/InterDigitalInc/CompressAI`
 * `cd CompressAI`
-* `python setup.py bdist_wheel --dist-dir dist/`
+* `python3 setup.py bdist_wheel --dist-dir dist/`
 * `pip install dist/CompressAI-*.whl`
 
 We are also planning to provide a Docker image in the future.
@@ -66,13 +66,13 @@ Take a look at the examples:
 
 ### Evaluation
 
-`python -m compressai.utils.bench --help`
+`python3 -m compressai.utils.bench --help`
 
 ### Training
 
 An example training script is provided in the `examples` directory.
 
-```python examples/train.py --help```
+```python3 examples/train.py --help```
 
 Training usually take between one or two weeks, depending on the model, the
 number of channels and the GPU architecture used.
