@@ -21,7 +21,7 @@ __all__ = [
 
 class CompressionModel(nn.Module):
     """Base class for constructing an auto-encoder with at least one entropy
-    bottleneck modules.
+    bottleneck module.
 
     Args:
         entropy_bottleneck_channels (int): Number of channels of the entropy
