@@ -21,7 +21,7 @@ __all__ = [
 
 class CompressionModel(nn.Module):
     """Base class for constructing an auto-encoder with at least one entropy
-    bottleneck modules.
+    bottleneck module.
 
     Args:
         entropy_bottleneck_channels (int): Number of channels of the entropy
@@ -83,8 +83,10 @@ class CompressionModel(nn.Module):
 
 
 class FactorizedPrior(CompressionModel):
-    r"""Factorized Prior model from `"Variational image compression with a scale
-    hyperprior" <https://arxiv.org/abs/1802.01436>`_
+    r"""Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
+    N. Johnston: `"Variational Image Compression with a Scale Hyperprior"
+    <https://arxiv.org/abs/1802.01436>`_, Int Conf. on Learning Representations
+    (ICLR), 2018.
 
     Args:
         N (int): Number of channels
@@ -166,8 +168,10 @@ def get_scale_table(min=SCALES_MIN, max=SCALES_MAX, levels=SCALES_LEVELS):  # py
 
 
 class ScaleHyperprior(CompressionModel):
-    r"""Scale Hyperprior model from `"Variational image compression with a scale
-    hyperprior" <https://arxiv.org/abs/1802.01436>`_
+    r"""Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
+    N. Johnston: `"Variational Image Compression with a Scale Hyperprior"
+    <https://arxiv.org/abs/1802.01436>`_ Int. Conf. on Learning Representations
+    (ICLR), 2018.
 
     Args:
         N (int): Number of channels
@@ -251,8 +255,10 @@ class ScaleHyperprior(CompressionModel):
 
 
 class MeanScaleHyperprior(ScaleHyperprior):
-    r"""Mean Scale Hyperprior model from `"Joint Autoregressive and Hierarchical
-    Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_
+    r"""Scale Hyperprior with non zero-mean Gaussian conditionals from D.
+    Minnen, J. Balle, G.D. Toderici: `"Joint Autoregressive and Hierarchical
+    Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_,
+     Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).
 
     Args:
         N (int): Number of channels
@@ -299,9 +305,10 @@ class MeanScaleHyperprior(ScaleHyperprior):
 
 
 class JointAutoregressiveHierarchicalPriors(CompressionModel):
-    r"""Joint Autoregressive Hierarchical Priors model from `"Joint
-    Autoregressive and Hierarchical Priors for Learned Image Compression"
-    <https://arxiv.org/abs/1809.02736>`_
+    r"""Joint Autoregressive Hierarchical Priors model from D.
+    Minnen, J. Balle, G.D. Toderici: `"Joint Autoregressive and Hierarchical
+    Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_,
+     Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).
 
     Args:
         N (int): Number of channels
@@ -509,8 +516,9 @@ def bmshj2018_factorized(quality,
                          progress=True,
                          **kwargs):
     r"""Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
-    N. Johnston: `"Variational Image Compression with a Scale Hyperprior"` Int.
-    Conf. on Learning Representations (ICLR), 2018
+    N. Johnston: `"Variational Image Compression with a Scale Hyperprior"
+    <https://arxiv.org/abs/1802.01436>`_, Int Conf. on Learning Representations
+    (ICLR), 2018.
 
     Args:
         quality (int): Quality levels (1: lowest, highest: 8)
@@ -535,8 +543,9 @@ def bmshj2018_hyperprior(quality,
                          progress=True,
                          **kwargs):
     r"""Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
-    N. Johnston: `"Variational Image Compression with a Scale Hyperprior"` Int.
-    Conf. on Learning Representations (ICLR), 2018
+    N. Johnston: `"Variational Image Compression with a Scale Hyperprior"
+    <https://arxiv.org/abs/1802.01436>`_ Int. Conf. on Learning Representations
+    (ICLR), 2018.
 
     Args:
         quality (int): Quality levels (1: lowest, highest: 8)
@@ -561,9 +570,9 @@ def mbt2018_mean(quality,
                  progress=True,
                  **kwargs):
     r"""Scale Hyperprior with non zero-mean Gaussian conditionals from D.
-    Minnen, J. Balle G.D. Toderici: `"Joint Autoregressive and Hierarchical
-    Priors for Learned Image Compression"`, Adv. in Neural Information
-    Processing Systems 31 (NeurIPS 2018)
+    Minnen, J. Balle, G.D. Toderici: `"Joint Autoregressive and Hierarchical
+    Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_,
+    Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).
 
     Args:
         quality (int): Quality levels (1: lowest, highest: 8)
@@ -583,9 +592,10 @@ def mbt2018_mean(quality,
 
 
 def mbt2018(quality, metric='mse', pretrained=False, progress=True, **kwargs):
-    r"""Joint Autoregressive Hierarchical Priors model from `"Joint
-    Autoregressive and Hierarchical Priors for Learned Image Compression"
-    <https://arxiv.org/abs/1809.02736>`_
+    r"""Joint Autoregressive Hierarchical Priors model from D.
+    Minnen, J. Balle, G.D. Toderici: `"Joint Autoregressive and Hierarchical
+    Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_,
+    Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).
 
     Args:
         quality (int): Quality levels (1: lowest, highest: 8)
