@@ -14,7 +14,8 @@ BPGDEC="$(which bpgdec)"
 TFCI_SCRIPT="$(locate tfci.py)"
 
 _VTM_SRC_DIR="$(locate '*VVCSoftware_VTM')"
-VTM_BUILD_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
+
+VTM_BIN_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
 VTM_CFG="$(locate encoder_intra_vtm.cfg | grep "$_VTM_SRC_DIR")"
 
 usage() {
@@ -46,7 +47,7 @@ bpg() {
 
 vtm() {
     python -m compressai.utils.bench vtm "$dataset"         \
-        -q $(seq 47 -5 2) -b "$VTM_BUILD_DIR" -c "$VTM_CFG" \
+        -q $(seq 47 -5 2) -b "$VTM_BIN_DIR" -c "$VTM_CFG" \
         -j "$NJOBS" > "benchmarks/vtm.json"
 }
 
