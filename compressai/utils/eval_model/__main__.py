@@ -102,7 +102,7 @@ def run_model(model, dataset, entropy_estimation=False):
             rv = inference_entropy_estimation(model, x)
         for k, v in rv.items():
             metrics[k] += v
-    for k, v in rv.items():
+    for k, v in metrics.items():
         metrics[k] = v / len(filepaths)
     return metrics
 
