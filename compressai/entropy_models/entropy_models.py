@@ -141,19 +141,16 @@ class EntropyModel(nn.Module):
             cdf[i, :_cdf.size(0)] = _cdf
         return cdf
 
-    def _check_cdf_size(self, C):
-        if len(self._quantized_cdf.size()) != 2 or \
-                self._quantized_cdf.size(0) != C:
+    def _check_cdf_size(self):
+        if len(self._quantized_cdf.size()) != 2:
             raise ValueError(f'Invalid CDF size {self._quantized_cdf.size()}')
 
-    def _check_offsets_size(self, C):
-        if len(self._offset.size()) != 1 or \
-                self._offset.size(0) != C:
+    def _check_offsets_size(self):
+        if len(self._offset.size()) != 1:
             raise ValueError(f'Invalid offsets size {self._offset.size()}')
 
-    def _check_cdf_length(self, C):
-        if len(self._cdf_length.size()) != 1 or \
-                self._cdf_length.size(0) != C:
+    def _check_cdf_length(self):
+        if len(self._cdf_length.size()) != 1:
             raise ValueError(f'Invalid offsets size {self._cdf_length.size()}')
 
     def compress(self, inputs, indexes, means=None):
@@ -174,10 +171,9 @@ class EntropyModel(nn.Module):
             raise ValueError(
                 '`inputs` and `indexes` should have the same size.')
 
-        C = inputs.size(1)
-        self._check_cdf_size(C)
-        self._check_cdf_length(C)
-        self._check_offsets_size(C)
+        self._check_cdf_size()
+        self._check_cdf_length()
+        self._check_offsets_size()
 
         strings = []
         for i in range(symbols.size(0)):
@@ -209,10 +205,9 @@ class EntropyModel(nn.Module):
         if len(indexes.size()) != 4:
             raise ValueError('Invalid `indexes` size. Expected a 4-D tensor.')
 
-        C = indexes.size(1)
-        self._check_cdf_size(C)
-        self._check_cdf_length(C)
-        self._check_offsets_size(C)
+        self._check_cdf_size()
+        self._check_cdf_length()
+        self._check_offsets_size()
 
         if means is not None:
             if means.size()[:-2] != indexes.size()[:-2]:
