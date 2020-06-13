@@ -61,7 +61,7 @@ def inference(model, x):
         enc_time = time.time() - start
 
         start = time.time()
-        out_dec = model.decompress(out_enc['shape'], out_enc['strings'])
+        out_dec = model.decompress(out_enc['strings'], out_enc['shape'])
         dec_time = time.time() - start
 
     num_pixels = x.size(0) * x.size(2) * x.size(3)

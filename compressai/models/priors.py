@@ -162,7 +162,7 @@ class FactorizedPrior(CompressionModel):
         y_strings = self.entropy_bottleneck.compress(y)
         return {'strings': [y_strings], 'shape': y.size()[-2:]}
 
-    def decompress(self, shape, strings):
+    def decompress(self, strings, shape):
         assert isinstance(strings, list) and len(strings) == 1
         y_hat = self.entropy_bottleneck.decompress(strings[0], shape)
         x_hat = self.g_s(y_hat)
@@ -250,6 +250,18 @@ class ScaleHyperprior(CompressionModel):
             },
         }
 
+    def load_state_dict(self, state_dict):
+        # Dynamically update the entropy bottleneck buffers related to the CDFs
+        update_registered_buffers(self.entropy_bottleneck,
+                                  'entropy_bottleneck',
+                                  ['_quantized_cdf', '_offset', '_cdf_length'],
+                                  state_dict)
+        update_registered_buffers(
+            self.gaussian_conditional, 'gaussian_conditional',
+            ['_quantized_cdf', '_offset', '_cdf_length', 'scale_table'],
+            state_dict)
+        super().load_state_dict(state_dict)
+
     @classmethod
     def from_state_dict(cls, state_dict):
         """Return a new model instance from `state_dict`."""
@@ -264,6 +276,28 @@ class ScaleHyperprior(CompressionModel):
             scale_table = get_scale_table()
         self.gaussian_conditional.update_scale_table(scale_table, force=force)
         super().update(force=force)
+
+    def compress(self, x):
+        y = self.g_a(x)
+        z = self.h_a(torch.abs(y))
+
+        z_strings = self.entropy_bottleneck.compress(z)
+        z_hat = self.entropy_bottleneck.decompress(z_strings, z.size()[-2:])
+
+        scales_hat = self.h_s(z_hat)
+        indexes = self.gaussian_conditional.build_indexes(scales_hat)
+        y_strings = self.gaussian_conditional.compress(y, indexes)
+
+        return {'strings': [y_strings, z_strings], 'shape': z.size()[-2:]}
+
+    def decompress(self, strings, shape):
+        assert isinstance(strings, list) and len(strings) == 2
+        z_hat = self.entropy_bottleneck.decompress(strings[1], shape)
+        scales_hat = self.h_s(z_hat)
+        indexes = self.gaussian_conditional.build_indexes(scales_hat)
+        y_hat = self.gaussian_conditional.decompress(strings[0], indexes)
+        x_hat = self.g_s(y_hat).clamp_(0, 1)
+        return {'x_hat': x_hat}
 
 
 class MeanScaleHyperprior(ScaleHyperprior):
@@ -314,6 +348,33 @@ class MeanScaleHyperprior(ScaleHyperprior):
                 'z': z_likelihoods
             },
         }
+
+    def compress(self, x):
+        y = self.g_a(x)
+        z = self.h_a(y)
+
+        z_strings = self.entropy_bottleneck.compress(z)
+        z_hat = self.entropy_bottleneck.decompress(z_strings, z.size()[-2:])
+
+        gaussian_params = self.h_s(z_hat)
+        scales_hat, means_hat = gaussian_params.chunk(2, 1)
+        indexes = self.gaussian_conditional.build_indexes(scales_hat)
+        y_strings = self.gaussian_conditional.compress(y,
+                                                       indexes,
+                                                       means=means_hat)
+        return {'strings': [y_strings, z_strings], 'shape': z.size()[-2:]}
+
+    def decompress(self, strings, shape):
+        assert isinstance(strings, list) and len(strings) == 2
+        z_hat = self.entropy_bottleneck.decompress(strings[1], shape)
+        gaussian_params = self.h_s(z_hat)
+        scales_hat, means_hat = gaussian_params.chunk(2, 1)
+        indexes = self.gaussian_conditional.build_indexes(scales_hat)
+        y_hat = self.gaussian_conditional.decompress(strings[0],
+                                                     indexes,
+                                                     means=means_hat)
+        x_hat = self.g_s(y_hat).clamp_(0, 1)
+        return {'x_hat': x_hat}
 
 
 class JointAutoregressiveHierarchicalPriors(CompressionModel):
