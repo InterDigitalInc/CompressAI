@@ -125,6 +125,12 @@ def setup_args():
                         choices=compressai.available_entropy_coders(),
                         default=compressai.available_entropy_coders()[0],
                         help='Entropy coder (default: %(default)s)')
+    parser.add_argument('-q',
+                        '--quality',
+                        dest='qualities',
+                        nargs='+',
+                        type=int,
+                        default=range(1, 9))
     parser.add_argument(
         '--entropy-estimation',
         action='store_true',
@@ -137,9 +143,8 @@ def main(argv):
 
     compressai.set_entropy_coder(args.entropy_coder)
 
-    n = 8
     results = defaultdict(list)
-    for q in range(1, n + 1):
+    for q in args.qualities:
         sys.stderr.write(f'\r{args.model} | quality: {q:d}')
         sys.stderr.flush()
         model = models[args.model](quality=q,
