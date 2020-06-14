@@ -534,7 +534,6 @@ class VTM(Codec):
             '1',
             '--InputChromaFormat=444',
             '--InputBitDepth=8',
-            '--BDPCM=2',
         ]
 
         if self.rgb:
