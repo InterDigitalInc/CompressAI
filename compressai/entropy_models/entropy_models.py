@@ -142,15 +142,24 @@ class EntropyModel(nn.Module):
         return cdf
 
     def _check_cdf_size(self):
+        if self._quantized_cdf.numel() == 0:
+            raise ValueError('Uninitialized CDFs. Run update() first')
+
         if len(self._quantized_cdf.size()) != 2:
             raise ValueError(f'Invalid CDF size {self._quantized_cdf.size()}')
 
     def _check_offsets_size(self):
-        if len(self._offset.size()) != 1:
+        if self._offset.numel() == 0:
+            raise ValueError('Uninitialized offsets. Run update() first')
+
+        if len(self._offset.size()) != 1 or self._offset.numel() == 0:
             raise ValueError(f'Invalid offsets size {self._offset.size()}')
 
     def _check_cdf_length(self):
-        if len(self._cdf_length.size()) != 1:
+        if self._cdf_length.numel() == 0:
+            raise ValueError('Uninitialized CDF lengths. Run update() first')
+
+        if len(self._cdf_length.size()) != 1 or self._cdf_length.numel() == 0:
             raise ValueError(f'Invalid offsets size {self._cdf_length.size()}')
 
     def compress(self, inputs, indexes, means=None):
