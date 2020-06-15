@@ -51,8 +51,8 @@ You can also build your own pip package:
 * `python3 setup.py bdist_wheel --dist-dir dist/`
 * `pip install dist/compressai-*.whl`
 
-> **Note**: on MacOS use `CC=clang CXX=clang++ pip install ...` to compile with 
-clang instead of gcc
+> **Note**: on MacOS you might want to use `CC=clang CXX=clang++ pip install...`
+to compile with clang instead of gcc
 
 We are also planning to provide a Docker image in the future.
 
