@@ -4,19 +4,33 @@ set -e
 
 err_report() {
     echo "Error on line $1"
+    echo "check codec path"
 }
 trap 'err_report $LINENO' ERR
 
 NJOBS=${NJOBS:-4}
 
+# libpng
 BPGENC="$(which bpgenc)"
 BPGDEC="$(which bpgdec)"
-TFCI_SCRIPT="$(locate tfci.py)"
 
+# Tensorflow Compression script
+# https://github.com/tensorflow/compression
+TFCI_SCRIPT="$(locate tfci.py)"
+# if not found, uncomment and edit path below
+#TFCI_SCRIPT="~/tensorflow-compression/compression/examples/tfci.py"
+TFCI_SCRIPT="/Users/racapef/myenv/deepcomp/tfci/compression/examples/tfci.py"
+
+
+# VTM directory
 _VTM_SRC_DIR="$(locate '*VVCSoftware_VTM')"
+# uncomment below to provide the path to the chosen version of VTM
+#_VTM_SRC_DIR="~/vvc/vtm-8.2"
+_VTM_SRC_DIR="/Users/racapef/myenv/vvc/vtm-8.2"
 
 VTM_BIN_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
 VTM_CFG="$(locate encoder_intra_vtm.cfg | grep "$_VTM_SRC_DIR")"
+
 
 usage() {
     echo "usage: $(basename $0) dataset CODECS"
