@@ -118,3 +118,17 @@ Original paper: [mbt2018]_
             year={2019},
             publisher={Springer}
         }
+
+....
+
+Performances
+~~~~~~~~~~~~
+
+bmshj2018 factorized
+--------------------
+.. image:: media/images/factorized.png
+
+
+bmshj2018 hyperprior
+--------------------
+.. image:: media/images/hyperprior.png
