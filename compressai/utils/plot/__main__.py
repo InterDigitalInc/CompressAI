@@ -73,6 +73,7 @@ def matplotlib_plt(scatters, title, ylabel, output_file, limits=None):
 
     ax.set_xlabel('Bit-rate [bpp]')
     ax.set_ylabel(ylabel)
+    ax.grid()
     if limits is not None:
         ax.axis(limits)
     ax.legend(loc='lower right')
