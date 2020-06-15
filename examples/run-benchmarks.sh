@@ -30,7 +30,8 @@ _VTM_SRC_DIR="/Users/racapef/myenv/vvc/vtm-8.2"
 
 VTM_BIN_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
 VTM_CFG="$(locate encoder_intra_vtm.cfg | grep "$_VTM_SRC_DIR")"
-
+VTM_VERSION_FILE="$(locate version.h | grep "$_VTM_SRC_DIR")"
+VTM_VERSION="$(sed -n -e 's/^#define VTM_VERSION //p' ${VTM_VERSION_FILE})"
 
 usage() {
     echo "usage: $(basename $0) dataset CODECS"
@@ -60,6 +61,7 @@ bpg() {
 }
 
 vtm() {
+    echo "using VTM version $VTM_VERSION"
     python -m compressai.utils.bench vtm "$dataset"         \
         -q $(seq 47 -5 2) -b "$VTM_BIN_DIR" -c "$VTM_CFG" \
         -j "$NJOBS" > "benchmarks/vtm.json"
