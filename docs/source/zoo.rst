@@ -5,6 +5,9 @@ Image compression
 
 This is the list of the pre-trained models available in CompressAI.
 
+.. contents:: Table of content
+   :local:
+
 Training
 ~~~~~~~~
 
