@@ -253,9 +253,15 @@ class EntropyModel(nn.Module):
 
 
 class EntropyBottleneck(EntropyModel):
-    r"""Entropy bottleneck model.
+    r"""Entropy bottleneck layer, introduced by J. Ballé, D. Minnen, S. Singh,
+    S. J. Hwang, N. Johnston, in `"Variational image compression with a scale
+    hyperprior" <https://arxiv.org/abs/1802.01436>`_.
 
-    Introduced in `"Variational image compression with a scale hyperprior" <https://arxiv.org/abs/1802.01436>`_
+    This is a re-implementation of the entropy bottleneck layer in
+    *tensorflow/compression*. See the original paper and the `tensorflow
+    documentation
+    <https://tensorflow.github.io/compression/docs/entropy_bottleneck.html>`_
+    for an introduction.
     """
     def __init__(self,
                  channels,
@@ -438,9 +444,13 @@ class EntropyBottleneck(EntropyModel):
 
 
 class GaussianConditional(EntropyModel):
-    r"""Gaussian Conditional model.
+    r"""Gaussian conditional layer, introduced by J. Ballé, D. Minnen, S. Singh,
+    S. J. Hwang, N. Johnston, in `"Variational image compression with a scale
+    hyperprior" <https://arxiv.org/abs/1802.01436>`_.
 
-    Introduced in `"Variational image compression with a scale hyperprior" <https://arxiv.org/abs/1802.01436>`_
+    This is a re-implementation of the gaussian conditional layer in
+    *tensorflow/compression*. See the `tensorflow documentation
+    <https://tensorflow.github.io/compression/docs/api_docs/python/tfc/GaussianConditional.html>`_.
     """
     def __init__(self,
                  scale_table,
