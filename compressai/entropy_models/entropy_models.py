@@ -448,7 +448,7 @@ class GaussianConditional(EntropyModel):
     S. J. Hwang, N. Johnston, in `"Variational image compression with a scale
     hyperprior" <https://arxiv.org/abs/1802.01436>`_.
 
-    This is a re-implementation of the gaussian conditional layer in
+    This is a re-implementation of the Gaussian conditional layer in
     *tensorflow/compression*. See the `tensorflow documentation
     <https://tensorflow.github.io/compression/docs/api_docs/python/tfc/GaussianConditional.html>`_.
     """

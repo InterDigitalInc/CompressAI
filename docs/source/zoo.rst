@@ -3,21 +3,27 @@ Image compression
 
 .. currentmodule:: compressai.zoo
 
-This is the list of the pre-trained models available in CompressAI.
+This is the list of the pre-trained models for end-to-end image compression
+available in CompressAI.
+
+Currently, only models optimized w.r.t to the mean square error (*mse*) computed
+on the RGB channels are available. We expect to release models fine-tuned with
+other metrics in the future.
 
 Training
 ~~~~~~~~
 
-Unless specified otherwise, networks were the trained for 4-5M steps on images 
-extracted from the `Vime90K <http://toflow.csail.mit.edu/>`_ dataset 
-[xue2019video]_.
+Unless specified otherwise, networks were trained for 4-5M steps on *256x256*
+image patches randomly cropped and extracted from the `Vime90K
+<http://toflow.csail.mit.edu/>`_ dataset [xue2019video]_.
 
 Models are trained with a batch size of 16 or 32, and an initial learning rate
 of 1e-4 for approximately 1-2M steps. The learning rate is then divided by 2
 when the evaluation loss reaches a plateau (we use a patience of 20 epochs).
 
-Training usually take between one or two weeks, depending on the model, the
-number of channels and the GPU architecture used.
+Training usually take between one or two weeks to reach state-of-the-art
+performances, depending on the model, the number of channels and the GPU
+architecture used.
 
 ....
 
