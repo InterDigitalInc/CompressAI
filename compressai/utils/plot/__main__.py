@@ -80,7 +80,7 @@ def matplotlib_plt(scatters, title, ylabel, output_file, limits=None):
     if title:
         ax.title.set_text(title)
     if output_file:
-        fig.savefig(output_file)
+        fig.savefig(output_file, dpi=300)
 
     plt.show()
 
