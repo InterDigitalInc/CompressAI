@@ -1,6 +1,6 @@
 # CompressAI
 
-CompressAI provides custom operations, layers, models and tools to research,
+CompressAI (_compress-ay_) provides custom operations, layers, models and tools to research,
 develop and evaluate end-to-end image and video compression codecs.
 
 CompressAI is built on top of PyTorch and provides:
@@ -50,6 +50,9 @@ You can also build your own pip package:
 * `cd compressai`
 * `python3 setup.py bdist_wheel --dist-dir dist/`
 * `pip install dist/compressai-*.whl`
+
+> **Note**: on MacOS use `CC=clang CXX=clang++ pip install ...` to compile with 
+clang instead of gcc
 
 We are also planning to provide a Docker image in the future.
 
