@@ -144,7 +144,7 @@ def setup_args():
     parser.add_argument(
         '--axes',
         metavar='',
-        type=int,
+        type=float,
         nargs=4,
         default=(0, 2, 28, 43),
         help='Axes limit (xmin, xmax, ymin, ymax), default: %(default)s')
