@@ -42,7 +42,7 @@ installation from the base system:
 ### Using pip
 
 * `git clone https://github.com/InterDigitalInc/CompressAI`
-* `pip install ./compressai`
+* `pip install -e ./compressai`
 
 You can also build your own pip package:
 
