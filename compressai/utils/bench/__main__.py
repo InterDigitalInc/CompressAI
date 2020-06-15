@@ -1,3 +1,7 @@
+"""
+Collect performance metrics of published, traditional and end-to-end, image
+codecs.
+"""
 from typing import Union, Tuple
 
 import argparse

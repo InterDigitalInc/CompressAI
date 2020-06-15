@@ -32,6 +32,11 @@ def main():
         fout.write('-' * len(p.name))
         fout.write('\n')
 
+        doc = m.__doc__
+        if doc:
+            fout.write(doc)
+            fout.write('\n')
+
         fout.write('.. code-block:: text\n\n')
         capture = io.StringIO()
         parser = m.setup_args()
