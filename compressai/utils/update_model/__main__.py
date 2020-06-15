@@ -1,3 +1,9 @@
+"""
+Update the CDFs parameters of a trained model.
+
+To be called on a model checkpoint after training to update the internal CDFs
+related buffers required for entropy coding.
+"""
 from typing import Dict
 
 import argparse
