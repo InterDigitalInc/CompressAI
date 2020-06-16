@@ -126,9 +126,13 @@ Performances
 
 bmshj2018 factorized
 --------------------
-.. image:: media/images/factorized.png
+.. image:: media/images/bmshj2018-factorized-mse.png
 
 
 bmshj2018 hyperprior
 --------------------
-.. image:: media/images/hyperprior.png
+.. image:: media/images/bmshj2018-hyperprior-mse.png
+
+mbt2018 mean
+------------
+.. image:: media/images/mbt2018-mean-mse.png
