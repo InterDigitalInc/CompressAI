@@ -30,10 +30,10 @@ supported.
 
 ## Documentation
 
-* [Quick start]()
 * [Installation]()
-* [List of available models (Model Zoo)]()
-* [API]()
+* [CompressAI API]()
+* [Training your own model]()
+* [List of available models (model zoo)]()
 
 
 ## Usage
