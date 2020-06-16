@@ -1,2 +1,0 @@
-CompressAI quick-start
-======================

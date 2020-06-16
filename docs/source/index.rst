@@ -1,21 +1,8 @@
 CompressAI
 ==========
 
-:mod:`CompressAI` (*compress-ay*) is a machine learning library for end-to-end
+CompressAI (*compress-ay*) is a machine learning library for end-to-end
 data compression research.
-
-CompressAI is built on top of PyTorch and provides:
-
-* custom operations, layers and models for deep learning based data compression
-
-* a partial port of the official `TensorFlow compression
-  <https://github.com/tensorflow/compression>`_ library
-
-* pre-trained end-to-end compression models for learned image compression
-
-* evaluation scripts to compare learned models against classical image/video
-  compression codecs
-
 
 .. toctree::
    :hidden:
@@ -27,7 +14,8 @@ CompressAI is built on top of PyTorch and provides:
    :maxdepth: 1
    :caption: Tutorials
 
-   tutorial_quickstart
+   tutorial_intro
+   tutorial_installation
    tutorial_train
 
 
