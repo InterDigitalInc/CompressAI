@@ -103,7 +103,7 @@ Before contributing, please read the CONTRIBUTING.md file.
 
 ## Authors
 
-* Jean Bégaint, Fabien Racapé and Simon Feltman, from the InterDigital AI Lab.
+* Jean Bégaint, Fabien Racapé, Simon Feltman and Akshay Pushparaja, from the InterDigital AI Lab.
 * *Contact*: firstname.lastname@interdigital.com
 
 ## Citation
@@ -114,7 +114,7 @@ original models and datasets, and cite this project as:
 ```
 @misc{CompressAI,
 	title = {{CompressAI}: A ML library for end-to-end data compression research},
-	author = "{Jean Bégaint, Fabien Racapé, Simon Feltman}",
+	author = "{Jean Bégaint, Fabien Racapé, Simon Feltman, Akshay Pushparaja}",
 	howpublished = {\url{https://github.com/InterDigitalInc/CompressAI}},
 	url = "https://github.com/InterDigitalInc/CompressAI",
 	year = 2020,
