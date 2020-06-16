@@ -1,10 +1,8 @@
 # Contributing
 
-We welcome feedback and contributions. Please open a GitHub issue to report
-bugs or request enhancements. If you want to contribute bug-fixes please
-directly file a pull-request. If you plan to introduce new features or expand
-CompressAI, please first open an issue to start a public discussion or
-contact us directly.
+If you want to contribute bug-fixes please directly file a pull-request. If you
+plan to introduce new features or extend CompressAI, please first open an issue
+to start a public discussion or contact us directly.
 
 ## Coding style
 
@@ -21,6 +19,9 @@ all the tests:
 * run `coverage report` or `coverage html` to visualize the tests coverage
   analysis
 
+## Documentation
+
+See `docs/Readme.md` for more information.
 
 ## Licence
 

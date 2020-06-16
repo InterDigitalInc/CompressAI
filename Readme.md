@@ -1,88 +1,88 @@
 # CompressAI
 
-CompressAI (_compress-ay_) provides custom operations, layers, models and tools to research,
-develop and evaluate end-to-end image and video compression codecs.
+CompressAI (_compress-ay_) is built on top of PyTorch and provides:
 
-CompressAI is built on top of PyTorch and provides:
-* a partial port of the official [TensorFlow
-  implementation](https://github.com/tensorflow/compression) of _Ballé et al._
-  research
-* pre-trained end-to-end compression models from the learned image compression
-  state-of-the-art 
-* evaluation scripts to compare learned models against classical image/video compression codecs
-
-## Table of Contents
-
-- [Installation](#installation)
-- [Usage](#usage)
-	- [Quickstart](#quickstart)
-	- [Evaluation](#evaluation)
-	- [Training](#training)
-- [License](#license)
-- [Contributing](#contributing)
-- [Citation](#citation)
+* custom operations, layers and models for deep learning based data compression
+* a partial port of the official [TensorFlow compression
+  ](https://github.com/tensorflow/compression>) library
+* pre-trained end-to-end compression models for learned image compression
+* evaluation scripts to compare learned models against classical image/video
+  compression codecs
 
 ## Installation
 
-### Requirements
+CompressAI only supports python 3.6+ and pytorch 1.4+. A C++17 compiler, a
+recent version of pip (19.0+), and some python dependencies (see `setup.py`)
+are also required.
 
-* python 3.6 or later (`python3-dev`, `python3-pip`, `python3-venv`)
-* pip 19.0 or later
-* a `C++17` compiler
-* python packages: `numpy`, `scipy`, `torch`, `torchvision`
+To get started and install CompressAI, run the following commands in a virtual
+environment:
 
-### Virtual environment
+```bash
+    git clone https://github.com/InterDigitalInc/CompressAI
+    pip install -e ./compressai
+```
 
-We recommend using a virtual environment to isolate project packages
-installation from the base system:
+This is the currently recommended installation method. Docker images and pypi
+packages will be released in the future. Conda environments are not officially
+supported.
 
-* `python3 -m venv venv`
-* `source ./venv/bin/activate`
 
-### Using pip
+## Documentation
 
-* `git clone https://github.com/InterDigitalInc/CompressAI`
-* `pip install -e ./compressai`
+* [Quick start]()
+* [Installation]()
+* [List of available models (Model Zoo)]()
+* [API]()
 
-You can also build your own pip package:
-
-* `git clone https://github.com/InterDigitalInc/CompressAI`
-* `cd compressai`
-* `python3 setup.py bdist_wheel --dist-dir dist/`
-* `pip install dist/compressai-*.whl`
-
-> **Note**: on MacOS you might want to use `CC=clang CXX=clang++ pip install...`
-to compile with clang instead of gcc
-
-We are also planning to provide a Docker image in the future.
 
 ## Usage
 
-`import compressai`
+### Examples
 
-### Quickstart
+Scripts and notebooks examples can be found in the `examples/` directory.
 
-Take a look at the examples:
+To encode/decode images with the provided pre-trained models, run the
+`codec.py` example:
 
-* an example training script `examples/train.py`
-* an example codec pipeline `examples/codec.py`
+```bash
+    python examples/codec.py --help
+```
+
+An example training script with a rate-distortion loss is provided in
+`examples/train.py`. You can replace the example model in the training script
+with your own model implemented with CompressAI, and then run the script for a
+simple training pipeline:
+
+```bash
+    python example/train.py -d /path/to/my/image/dataset/ --epochs 300 -lr 1e-4 --batch-size 16 --cuda --save
+```
+
+A jupyter notebook illustrating a pre-trained model for learned image
+compression is also provided in the `examples` directory:
+
+```bash
+pip install -U ipython jupyter ipywidgets matplotlib`
+jupyter notebook examples/
+```
 
 ### Evaluation
 
-`python3 -m compressai.utils.bench --help`
+To evaluate a pre-trained model on your own dataset, CompressAI provides an
+evaluation script:
 
-### Training
+```bash
+    python -m compressai.utils.eval_model MODEL_NAME /path/to/images/folder/
+```
 
-An example training script is provided in the `examples` directory.
+To evaluate published classical or machine-learning based image/video
+codec solutions:
 
-```python3 examples/train.py --help```
-
-Training usually take between one or two weeks, depending on the model, the
-number of channels and the GPU architecture used.
-
-Pretrained models were learned with a batch size of 16 or 32, a learning rate
-of 1e-4, for approximately 1-2M steps. The learning rate is divided by 2 when
-the loss reaches a plateau (we use a patience of 20 epochs).
+```bash
+    python3 -m compressai.utils.bench --help
+    python3 -m compressai.utils.bench bpg --help
+    python3 -m compressai.utils.bench vtm --help
+```
 
 ## License
 
@@ -90,16 +90,15 @@ CompressAI is licensed under under the Apache License, Version 2.0
 
 ## Contributing
 
-See CONTRIBUTING.md
+We welcome feedback and contributions. Please open a GitHub issue to report
+bugs, request enhancements or if you have questions. 
+
+Before contributing, please read the CONTRIBUTING.md file.
 
 ## Authors
-* Jean Bégaint
-* Fabien Racapé
-* Simon Feltman
 
-InterDigital, AI Lab.
-
-*Contact*: firstname.lastname@interdigital.com
+* Jean Bégaint, Fabien Racapé and Simon Feltman, from the InterDigital AI Lab.
+* *Contact*: firstname.lastname@interdigital.com
 
 ## Citation
 
