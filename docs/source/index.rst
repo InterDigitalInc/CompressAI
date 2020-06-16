@@ -6,11 +6,12 @@ data compression research.
 
 CompressAI is built on top of PyTorch and provides:
 
-* a partial port of the official `TensorFlow implementation
-  <https://github.com/tensorflow/compression>`_ of *Ballé et al.* research
+* custom operations, layers and models for deep learning based data compression
 
-* pre-trained, state-of-the-art, end-to-end compression models for learned image
-  compression
+* a partial port of the official `TensorFlow compression
+  <https://github.com/tensorflow/compression>`_ library
+
+* pre-trained end-to-end compression models for learned image compression
 
 * evaluation scripts to compare learned models against classical image/video
   compression codecs
