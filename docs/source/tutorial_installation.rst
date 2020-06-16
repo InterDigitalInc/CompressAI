@@ -36,7 +36,16 @@ Using pip
 
 .. code-block:: bash
 
-  pip install -e ./compressai
+  cd compressai
+  pip install -e .
+
+3. Custom installation
+
+You can also run one of the following commands:
+
+* :code:`pip install -e '.[dev]'`: install the packages required for development (testing, linting, docs)
+* :code:`pip install -e '.[tutorials]'`: install the packages required for the tutorials (notebooks)
+* :code:`pip install -e '.[all]'`: install all the optional packages
 
 
 Building your own package

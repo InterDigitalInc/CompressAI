@@ -20,8 +20,14 @@ environment:
 
 ```bash
 git clone https://github.com/InterDigitalInc/CompressAI
-pip install -e ./compressai
+cd compressai
+pip install -e .
 ```
+
+For a custom installation, you can also run one of the following commands:
+* `pip install -e '.[dev]'`: install the packages required for development (testing, linting, docs)
+* `pip install -e '.[tutorials]'`: install the packages required for the tutorials (notebooks)
+* `pip install -e '.[all]'`: install all the optional packages
 
 This is the currently recommended installation method. Docker images and pypi
 packages will be released in the future. Conda environments are not officially
