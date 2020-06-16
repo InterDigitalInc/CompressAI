@@ -62,7 +62,7 @@ A jupyter notebook illustrating a pre-trained model for learned image
 compression is also provided in the `examples` directory:
 
 ```bash
-pip install -U ipython jupyter ipywidgets matplotlib`
+pip install -U ipython jupyter ipywidgets matplotlib
 jupyter notebook examples/
 ```
 

@@ -7,7 +7,7 @@ to start a public discussion or contact us directly.
 ## Coding style
 
 We try to follow PEP 8 recommendations. Automatic formatting is performed via
-[YAPF](https://github.com/google/yapf/)
+[YAPF](https://github.com/google/yapf/).
 
 ## Testing
 
@@ -16,8 +16,8 @@ all the tests:
 
 * `pip install pytest pytest-cov coverage`
 * `python -m pytest --cov=compressai -s`
-* run `coverage report` or `coverage html` to visualize the tests coverage
-  analysis
+* You can run `coverage report` or `coverage html` to visualize the tests
+  coverage analysis
 
 ## Documentation
 
