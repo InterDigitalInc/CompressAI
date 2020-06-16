@@ -1,7 +1,7 @@
 Installation
 ============
 
-CompressAI only supports python3 . We also recommend to using a virtual 
+CompressAI only supports python3. We also recommend to using a virtual
 environment to isolate project packages from the base system installation.
 
 
