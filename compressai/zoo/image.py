@@ -65,7 +65,7 @@ model_urls = {
             2: f'{root_url}/mbt2018-mean-2-e54a039d.pth.tar',
             3: f'{root_url}/mbt2018-mean-3-723404a8.pth.tar',
             4: f'{root_url}/mbt2018-mean-4-6dba02a3.pth.tar',
-            5: f'{root_url}/mbt2018-mean-5-ee025a97.pth.tar',
+            5: f'{root_url}/mbt2018-mean-5-d504e8eb.pth.tar',
             6: f'{root_url}/mbt2018-mean-6-a19628ab.pth.tar',
             7: f'{root_url}/mbt2018-mean-7-d5d441d1.pth.tar',
             8: f'{root_url}/mbt2018-mean-8-8089ae3e.pth.tar',
