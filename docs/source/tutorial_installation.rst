@@ -1,21 +1,24 @@
 Installation
 ============
 
-CompressAI only supports python3. We also recommend to using a virtual
+CompressAI only supports python3. We also recommend to use a virtual
 environment to isolate project packages from the base system installation.
 
 
+Python package
+~~~~~~~~~~~~~~
+
 Requirements
-~~~~~~~~~~~~
+------------
 
 * python 3.6 or later (`python3-dev`, `python3-pip`, `python3-venv`)
 * pip 19.0 or later
-* a `C++17` compiler
+* a C++17 compiler (tested with `gcc` and `clang`)
 * python packages: `numpy`, `scipy`, `torch`, `torchvision`
 
 
 Virtual environment
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 .. code-block:: bash
 
@@ -48,8 +51,8 @@ You can also run one of the following commands:
 * :code:`pip install -e '.[all]'`: install all the optional packages
 
 
-Building your own package
--------------------------
+Build your own package
+----------------------
 
 You can also build your own pip package:
 
@@ -66,6 +69,6 @@ You can also build your own pip package:
 
 
 Docker
-------
+~~~~~~
 
 We are planning to provide docker images in the future.

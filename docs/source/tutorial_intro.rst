@@ -26,7 +26,8 @@ Model Zoo
 ~~~~~~~~~
 
 CompressAI includes some pre-trained models for compression tasks. See the Model 
-Zoo section for more documentation. The list of available models, trained for 
-multiple bit-rate distortion points and with different metrics, is expected to 
-grow in the future.
+Zoo section for more documentation.
+
+The list of available models, trained at different bit-rate distortion points
+and with different metrics, is expected to grow in the future.
 
