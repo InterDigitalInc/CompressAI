@@ -113,7 +113,7 @@ original models and datasets, and cite this project as:
 
 ```
 @misc{CompressAI,
-	title = {{CompressAI}: A ML library for end-to-end data compression research},
+	title = {{CompressAI}: A PyTorch library and evaluation platform for end-to-end compression research},
 	author = "{Jean Bégaint, Fabien Racapé, Simon Feltman, Akshay Pushparaja}",
 	howpublished = {\url{https://github.com/InterDigitalInc/CompressAI}},
 	url = "https://github.com/InterDigitalInc/CompressAI",
