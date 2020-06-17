@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Collect performance metrics of published, traditional and end-to-end, image
+Collect performance metrics of published traditional or end-to-end image
 codecs.
 """
 from typing import Union, Tuple

@@ -245,9 +245,11 @@ PYBIND11_MODULE(ans, m) {
 
   py::class_<rANSEncoderInterface>(m, "RangeEncoder")
       .def(py::init<>())
-      .def("encode_with_indexes", &rANSEncoderInterface::encode_with_indexes);
+      .def("encode_with_indexes", &rANSEncoderInterface::encode_with_indexes,
+              "Encode a list of symbols to a string");
 
   py::class_<rANSDecoderInterface>(m, "RangeDecoder")
       .def(py::init<>())
-      .def("decode_with_indexes", &rANSDecoderInterface::decode_with_indexes);
+      .def("decode_with_indexes", &rANSDecoderInterface::decode_with_indexes,
+              "Decode a string to a list of symbols");
 }

@@ -65,9 +65,14 @@ def get_extensions():
     return ext_modules
 
 
+TEST_REQUIRES = ['pytest', 'pytest-cov']
+DEV_REQUIRES = TEST_REQUIRES + ['pylint', 'yapf', 'sphinx']
+
 def get_extra_requirements():
     extras_require = {
-        'tests': ['pytest', 'pytest-cov', 'coverage'],
+        'test': TEST_REQUIRES,
+        'dev': DEV_REQUIRES,
+        'tutorials': ['jupyter', 'ipywidgets'],
     }
     extras_require['all'] = set(req for reqs in extras_require.values()
                                 for req in reqs)

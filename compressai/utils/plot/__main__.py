@@ -73,6 +73,7 @@ def matplotlib_plt(scatters, title, ylabel, output_file, limits=None):
 
     ax.set_xlabel('Bit-rate [bpp]')
     ax.set_ylabel(ylabel)
+    ax.grid()
     if limits is not None:
         ax.axis(limits)
     ax.legend(loc='lower right')
@@ -80,7 +81,7 @@ def matplotlib_plt(scatters, title, ylabel, output_file, limits=None):
     if title:
         ax.title.set_text(title)
     if output_file:
-        fig.savefig(output_file)
+        fig.savefig(output_file, dpi=300)
 
     plt.show()
 
@@ -143,7 +144,7 @@ def setup_args():
     parser.add_argument(
         '--axes',
         metavar='',
-        type=int,
+        type=float,
         nargs=4,
         default=(0, 2, 28, 43),
         help='Axes limit (xmin, xmax, ymin, ymax), default: %(default)s')

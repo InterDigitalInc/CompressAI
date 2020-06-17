@@ -66,7 +66,7 @@ class AutoEncoder(CompressionModel):
 
 
 class RateDistortionLoss(nn.Module):
-    """Custom rate distortion loss with a lagrangian parameter."""
+    """Custom rate distortion loss with a Lagrangian parameter."""
     def __init__(self, lmbda=1e-2):
         super().__init__()
         self.mse = nn.MSELoss()
