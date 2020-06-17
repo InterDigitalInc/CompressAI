@@ -31,7 +31,7 @@ except ImportError:
 
 def set_entropy_coder(entropy_coder):
     """
-    Specifies the entropy coder used to encode the bit-streams.
+    Specifies the default entropy coder used to encode the bit-streams.
 
     Use :mod:`available_entropy_coders` to list the possible values.
 
@@ -48,7 +48,7 @@ def set_entropy_coder(entropy_coder):
 
 def get_entropy_coder():
     """
-    Return the name of the entropy coder used to encode the bit-streams.
+    Return the name of the default entropy coder used to encode the bit-streams.
     """
     return _entropy_coder
 
