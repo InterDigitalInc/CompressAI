@@ -120,6 +120,7 @@ def run_command(cmd, ignore_returncodes=None):
         if ignore_returncodes is not None and \
                 err.returncode in ignore_returncodes:
             return err.output
+        print(err.output.decode("utf-8"))
         sys.exit(1)
 
 
