@@ -721,7 +721,6 @@ def collect(codec: Codec,
     args = [(f, q, i) for i, q in enumerate(qualities) for f in filepaths]
 
     if pool:
-        print(args)
         rv = pool.starmap(codec.run, args)
     else:
         rv = list(starmap(codec.run, args))
