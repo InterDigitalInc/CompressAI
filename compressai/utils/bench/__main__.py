@@ -584,6 +584,7 @@ class VTM(Codec):
             'decoding_time': dec_time
         }
 
+
 class HM(Codec):
     """HM: H.265/HEVC reference software"""
 
@@ -618,7 +619,7 @@ class HM(Codec):
 
     def _set_args(self, args):
         args = super()._set_args(args)
-        self.encoder_path = os.path.join(args.build_dir, "TAppEncoderStatic") 
+        self.encoder_path = os.path.join(args.build_dir, "TAppEncoderStatic")
         self.decoder_path = os.path.join(args.build_dir, "TAppDecoderStatic")
         self.config_path = args.config
         self.rgb = args.rgb
@@ -637,33 +638,14 @@ class HM(Codec):
 
         with open(yuv_path, 'wb') as f:
             f.write(arr.tobytes())
-            
+
         # Encode
         height, width = arr.shape[1:]
         cmd = [
-            self.encoder_path,
-            '-i',
-            yuv_path,
-            '-c',
-            self.config_path,
-            '-q',
-            quality,
-            '-o',
-            '/dev/null',
-            '-b',
-            out_filepath,
-            '-wdt',
-            width,
-            '-hgt',
-            height,
-            '-fr',
-            '1',
-            '-f',
-            '1',
-            '--InputChromaFormat=444',
-            '--InputBitDepth=8',
-            '--SEIDecodedPictureHash',
-            '--Level=5.1',
+            self.encoder_path, '-i', yuv_path, '-c', self.config_path, '-q',
+            quality, '-o', '/dev/null', '-b', out_filepath, '-wdt', width,
+            '-hgt', height, '-fr', '1', '-f', '1', '--InputChromaFormat=444',
+            '--InputBitDepth=8', '--SEIDecodedPictureHash', '--Level=5.1',
             '--CUNoSplitIntraACT=0'
         ]
 
