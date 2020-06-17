@@ -85,8 +85,14 @@ class CompressionModel(nn.Module):
                 yield p
 
     def update(self, force=False):
-        """Updates the entropy bottleneck(s) CDF values. Needs to be called once
-        after training.
+        """Updates the entropy bottleneck(s) CDF values.
+
+        Needs to be called once after training to be able to later perform the
+        evaluation with an actual entropy coder.
+
+        Args:
+            force (bool): overwrite previous values (default: False)
+
         """
         for m in self.children():
             if not isinstance(m, EntropyBottleneck):
