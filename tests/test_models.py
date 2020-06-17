@@ -227,19 +227,32 @@ class TestBmshj2018Factorized:
         with pytest.raises(ValueError):
             bmshj2018_factorized(1, metric='ssim')
 
+    def test_pretrained(self):
+        # test we can load the correct models from the urls
+        for i in range(1, 6):
+            net = bmshj2018_factorized(i, metric='mse', pretrained=True)
+            assert net.state_dict()['g_a.0.weight'].size(0) == 128
+            assert net.state_dict()['g_a.6.weight'].size(0) == 192
+
+        for i in range(6, 9):
+            net = bmshj2018_factorized(i, metric='mse', pretrained=True)
+            assert net.state_dict()['g_a.0.weight'].size(0) == 192
+            assert net.state_dict()['g_a.6.weight'].size(0) == 320
+
 
 class TestBmshj2018Hyperprior:
     def test_params(self):
-        for i in range(1, 5):
+        for i in range(1, 6):
             net = bmshj2018_hyperprior(i, metric='mse')
             assert isinstance(net, ScaleHyperprior)
             assert net.state_dict()['g_a.0.weight'].size(0) == 128
             assert net.state_dict()['g_a.6.weight'].size(0) == 192
 
-        for i in range(5, 9):
+        for i in range(6, 9):
             net = bmshj2018_hyperprior(i, metric='mse')
             assert isinstance(net, ScaleHyperprior)
             assert net.state_dict()['g_a.0.weight'].size(0) == 192
+            assert net.state_dict()['g_a.6.weight'].size(0) == 320
 
     def test_invalid_params(self):
         with pytest.raises(ValueError):
@@ -254,16 +267,17 @@ class TestBmshj2018Hyperprior:
         with pytest.raises(ValueError):
             bmshj2018_hyperprior(1, metric='ssim')
 
-    # def test_pretrained(self):
-    #     for i in range(1, 5):
-    #         net = bmshj2018_factorized(i, metric='mse', pretrained=True)
-    #         assert net.state_dict()['g_a.0.weight'].size(0) == 128
-    #         assert net.state_dict()['g_a.6.weight'].size(0) == 192
+    def test_pretrained(self):
+        # test we can load the correct models from the urls
+        for i in range(1, 6):
+            net = bmshj2018_factorized(i, metric='mse', pretrained=True)
+            assert net.state_dict()['g_a.0.weight'].size(0) == 128
+            assert net.state_dict()['g_a.6.weight'].size(0) == 192
 
-    #     for i in range(5, 9):
-    #         net = bmshj2018_factorized(i, metric='mse', pretrained=True)
-    #         assert net.state_dict()['g_a.0.weight'].size(0) == 192
-    #         assert net.state_dict()['g_a.6.weight'].size(0) == 320
+        for i in range(6, 9):
+            net = bmshj2018_factorized(i, metric='mse', pretrained=True)
+            assert net.state_dict()['g_a.0.weight'].size(0) == 192
+            assert net.state_dict()['g_a.6.weight'].size(0) == 320
 
 
 class TestMbt2018Mean:
@@ -292,6 +306,18 @@ class TestMbt2018Mean:
 
         with pytest.raises(ValueError):
             mbt2018_mean(1, metric='ssim')
+
+    def test_pretrained(self):
+        # test we can load the correct models from the urls
+        for i in range(1, 5):
+            net = mbt2018_mean(i, metric='mse', pretrained=True)
+            assert net.state_dict()['g_a.0.weight'].size(0) == 128
+            assert net.state_dict()['g_a.6.weight'].size(0) == 192
+
+        for i in range(5, 9):
+            net = mbt2018_mean(i, metric='mse', pretrained=True)
+            assert net.state_dict()['g_a.0.weight'].size(0) == 192
+            assert net.state_dict()['g_a.6.weight'].size(0) == 320
 
 
 class TestMbt2018:
