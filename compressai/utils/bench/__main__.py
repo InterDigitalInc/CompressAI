@@ -584,23 +584,6 @@ class VTM(Codec):
             'decoding_time': dec_time
         }
 
-def get_hm_encoder_path(build_dir):
-    system = platform.system()
-    try:
-        elfnames = {'Darwin': 'TAppEncoderStatic', 'Linux': 'TAppEncoderStatic'}
-        return os.path.join(build_dir, elfnames[system])
-    except KeyError:
-        raise RuntimeError(f'Unsupported platform "{system}"')
-
-
-def get_hm_decoder_path(build_dir):
-    system = platform.system()
-    try:
-        elfnames = {'Darwin': 'TAppDecoderStatic', 'Linux': 'TAppDecoderStatic'}
-        return os.path.join(build_dir, elfnames[system])
-    except KeyError:
-        raise RuntimeError(f'Unsupported platform "{system}"')
-
 class HM(Codec):
     """HM: H.265/HEVC reference software"""
 
@@ -635,8 +618,8 @@ class HM(Codec):
 
     def _set_args(self, args):
         args = super()._set_args(args)
-        self.encoder_path = get_hm_encoder_path(args.build_dir)
-        self.decoder_path = get_hm_decoder_path(args.build_dir)
+        self.encoder_path = os.path.join(args.build_dir, "TAppEncoderStatic") 
+        self.decoder_path = os.path.join(args.build_dir, "TAppDecoderStatic")
         self.config_path = args.config
         self.rgb = args.rgb
         return args
