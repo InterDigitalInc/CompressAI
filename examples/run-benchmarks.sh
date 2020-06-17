@@ -16,22 +16,21 @@ BPGDEC="$(which bpgdec)"
 
 # Tensorflow Compression script
 # https://github.com/tensorflow/compression
-TFCI_SCRIPT="$(locate tfci.py)"
-# if not found, uncomment and edit path below
-#TFCI_SCRIPT="~/tensorflow-compression/compression/examples/tfci.py"
-TFCI_SCRIPT="/Users/racapef/myenv/deepcomp/tfci/compression/examples/tfci.py"
+# edit path below or uncoment locate function
+TFCI_SCRIPT="~/tensorflow-compression/compression/examples/tfci.py"
+# TFCI_SCRIPT="$(locate tfci.py)"
 
 
 # VTM directory
-_VTM_SRC_DIR="$(locate '*VVCSoftware_VTM')"
-# uncomment below to provide the path to the chosen version of VTM
-#_VTM_SRC_DIR="~/vvc/vtm-8.2"
-_VTM_SRC_DIR="/Users/racapef/myenv/vvc/vtm-8.2"
-
+# edit below to provide the path to the chosen version of VTM
+_VTM_SRC_DIR="~/vvc/vtm-8.2"
+# uncomment below to locate source dir
+#_VTM_SRC_DIR="$(locate '*VVCSoftware_VTM')"
 VTM_BIN_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
 VTM_CFG="$(locate encoder_intra_vtm.cfg | grep "$_VTM_SRC_DIR")"
 VTM_VERSION_FILE="$(locate version.h | grep "$_VTM_SRC_DIR")"
 VTM_VERSION="$(sed -n -e 's/^#define VTM_VERSION //p' ${VTM_VERSION_FILE})"
+
 
 usage() {
     echo "usage: $(basename $0) dataset CODECS"
