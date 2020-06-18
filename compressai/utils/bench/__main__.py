@@ -762,8 +762,8 @@ def setup_args():
     description = 'Collect codec metrics.'
     parser = argparse.ArgumentParser(description=description)
     subparsers = parser.add_subparsers(dest='codec',
-                                       help='Select codec',
-                                       required=True)
+                                       help='Select codec')
+    subparsers.required = True
     return parser, subparsers
 
 
