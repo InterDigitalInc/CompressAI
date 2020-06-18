@@ -135,6 +135,7 @@ def run_command(cmd, ignore_returncodes=None):
         if ignore_returncodes is not None and \
                 err.returncode in ignore_returncodes:
             return err.output
+        print(err.output.decode("utf-8"))
         sys.exit(1)
 
 
@@ -440,7 +441,7 @@ class BPG(BinaryCodec):
 
 
 class TFCI(BinaryCodec):
-    """Tensorflow image compression format from tensorflow/comprression"""
+    """Tensorflow image compression format from tensorflow/compression"""
 
     fmt = '.tfci'
     _models = [
@@ -592,7 +593,6 @@ class VTM(Codec):
             '1',
             '--InputChromaFormat=444',
             '--InputBitDepth=8',
-            '--BDPCM=2',
         ]
 
         if self.rgb:
@@ -644,7 +644,121 @@ class VTM(Codec):
         }
 
 
-codecs = [JPEG, WebP, JPEG2000, BPG, TFCI, VTM]
+class HM(Codec):
+    """HM: H.265/HEVC reference software"""
+
+    fmt = '.bin'
+
+    @property
+    def description(self):
+        return 'HM'
+
+    @property
+    def name(self):
+        return 'HM'
+
+    def _get_parser(self):
+        parser = super()._get_parser()
+        parser.add_argument('-b',
+                            '--build-dir',
+                            metavar='',
+                            type=str,
+                            required=True,
+                            help='HM build dir')
+        parser.add_argument('-c',
+                            '--config',
+                            metavar='',
+                            type=str,
+                            required=True,
+                            help='HM config file')
+        parser.add_argument('--rgb',
+                            action='store_true',
+                            help='Use RGB color space (over YCbCr)')
+        return parser
+
+    def _parse_args(self):
+        args = super()._parse_args()
+        self.encoder_path = os.path.join(args.build_dir, "TAppEncoderStatic")
+        self.decoder_path = os.path.join(args.build_dir, "TAppDecoderStatic")
+        self.config_path = args.config
+        self.rgb = args.rgb
+        return args
+
+    def _run(self, img, quality):
+        # Convert input image to yuv 444 file
+        arr = np.asarray(read_image(img))
+        fd, yuv_path = mkstemp(suffix='.yuv')
+        out_filepath = os.path.splitext(yuv_path)[0] + '.bin'
+
+        arr = arr.transpose((2, 0, 1))  # color channel first
+
+        if not self.rgb:
+            arr = rgb2ycbcr(arr)
+
+        with open(yuv_path, 'wb') as f:
+            f.write(arr.tobytes())
+
+        # Encode
+        height, width = arr.shape[1:]
+        cmd = [
+            self.encoder_path, '-i', yuv_path, '-c', self.config_path, '-q',
+            quality, '-o', '/dev/null', '-b', out_filepath, '-wdt', width,
+            '-hgt', height, '-fr', '1', '-f', '1', '--InputChromaFormat=444',
+            '--InputBitDepth=8', '--SEIDecodedPictureHash', '--Level=5.1',
+            '--CUNoSplitIntraACT=0'
+        ]
+
+        if self.rgb:
+            cmd += [
+                '--InputColourSpaceConvert=RGBtoGBR',
+                '--SNRInternalColourSpace=1',
+                '--OutputInternalColourSpace=0',
+            ]
+        start = time.time()
+
+        run_command(cmd)
+        enc_time = time.time() - start
+
+        # cleanup encoder input
+        os.close(fd)
+        os.unlink(yuv_path)
+
+        # Decode
+        cmd = [self.decoder_path, '-b', out_filepath, '-o', yuv_path, '-d', 8]
+
+        if self.rgb:
+            cmd.append('--OutputInternalColourSpace=GBRtoRGB')
+
+        start = time.time()
+        run_command(cmd)
+        dec_time = time.time() - start
+        # Compute PSNR
+        rec_arr = np.fromfile(yuv_path, dtype=np.uint8)
+        rec_arr = rec_arr.reshape(arr.shape)
+        bitdepth = 8
+        arr = arr.astype(np.float32) / (2**bitdepth - 1)
+        rec_arr = rec_arr.astype(np.float32) / (2**bitdepth - 1)
+        if not self.rgb:
+            arr = ycbcr2rgb(arr)
+            rec_arr = ycbcr2rgb(rec_arr)
+        psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.)
+
+        bpp = filesize(out_filepath) * 8. / (height * width)
+
+        # Cleanup
+        os.unlink(yuv_path)
+        os.unlink(out_filepath)
+
+        return {
+            'psnr': psnr_val,
+            'msssim': msssim_val,
+            'bpp': bpp,
+            'encoding_time': enc_time,
+            'decoding_time': dec_time
+        }
+
+
+codecs = [JPEG, WebP, JPEG2000, BPG, TFCI, VTM, HM]
 
 
 def setup_args():

@@ -14,15 +14,46 @@
 
 #!/usr/bin/env bash
 
+# Do not forget to 
+# - set paths to codec bins and sources below
+# - activate the virtual environment containing compressAI
+
 set -e
 
+err_report() {
+    echo "Error on line $1"
+    echo "check codec path"
+}
+trap 'err_report $LINENO' ERR
+
+NJOBS=${NJOBS:-4}
+
+# libpng
 BPGENC="$(which bpgenc)"
 BPGDEC="$(which bpgdec)"
-TFCI_SCRIPT="$(locate tfci.py)"
 
-_VTM_SRC_DIR="$(locate '*VVCSoftware_VTM')"
-VTM_BUILD_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
+# Tensorflow Compression script
+# https://github.com/tensorflow/compression
+# edit path below or uncoment locate function
+TFCI_SCRIPT="~/tensorflow-compression/compression/examples/tfci.py"
+# TFCI_SCRIPT="$(locate tfci.py)"
+
+# VTM
+# edit below to provide the path to the chosen version of VTM
+_VTM_SRC_DIR="~/vvc/vtm-8.2"
+# uncomment below to locate source dir
+# _VTM_SRC_DIR="$(locate '*VVCSoftware_VTM')"
+VTM_BIN_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
 VTM_CFG="$(locate encoder_intra_vtm.cfg | grep "$_VTM_SRC_DIR")"
+VTM_VERSION_FILE="$(locate version.h | grep "$_VTM_SRC_DIR")"
+VTM_VERSION="$(sed -n -e 's/^#define VTM_VERSION //p' ${VTM_VERSION_FILE})"
+
+# HM
+# edit below to provide the path to the chosen version of HM
+_HM_SRC_DIR="~/hevc/HM-16.19+SCM-8.8"
+HM_BIN_DIR="${_HM_SRC_DIR}/bin/"
+HM_CFG="${_HM_SRC_DIR}/cfg/encoder_intra_main_rext.cfg"
+HM_VERSION="$(sed -n -e 's/^#define NV_VERSION        \(.*\)\/\/\/< Current software version/\1/p' "${_HM_SRC_DIR}/source/Lib/TLibCommon/CommonDef.h")"
 
 usage() {
     echo "usage: $(basename $0) dataset CODECS"
@@ -51,9 +82,17 @@ bpg() {
         > "results/$4"
 }
 
+hm() {
+    echo "using HM version $HM_VERSION"
+    python3 -m compressai.utils.bench hm "$dataset"     \
+        -q $(seq 47 -5 2) -b "$HM_BIN_DIR" -c "$HM_CFG" \
+        > "results/hm.json"
+}
+
 vtm() {
+    echo "using VTM version $VTM_VERSION"
     python3 -m compressai.utils.bench vtm "$dataset"      \
-        -q $(seq 47 -5 2) -b "$VTM_BUILD_DIR" -c "$VTM_CFG" \
+        -q $(seq 47 -5 2) -b "$VTM_BIN_DIR" -c "$VTM_CFG" \
         > "results/vtm.json"
 }
 
@@ -95,6 +134,9 @@ for i in "$@"; do
             # bpg "420" "jctvc" "ycbcr" bpg_420_jctvc_ycbcr.json
             # bpg "444" "jctvc" "rgb" bpg_444_jctvc_rgb.json
             # bpg "444" "jctvc" "ycbcr" bpg_444_jctvc_ycbcr.json
+            ;;
+        "hm")
+            hm
             ;;
         "vtm")
             vtm
