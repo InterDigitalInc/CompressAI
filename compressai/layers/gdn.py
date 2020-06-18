@@ -20,7 +20,7 @@ from compressai.ops.parametrizers import NonNegativeParametrizer
 
 
 class GDN(nn.Module):
-    r"""Generalized Division Normalization layer.
+    r"""Generalized Divisive Normalization layer.
 
     Introduced in `"Density Modeling of Images Using a Generalized Normalization
     Transformation" <https://arxiv.org/abs/1511.06281>`_,
