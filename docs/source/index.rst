@@ -1,8 +1,23 @@
 CompressAI
 ==========
 
-:mod:`CompressAI` is a machine learning library for end-to-end data compression
-research
+CompressAI (*compress-ay*) is a PyTorch library and evaluation platform for
+end-to-end compression research.
+
+.. toctree::
+   :hidden:
+
+   self
+
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Tutorials
+
+   tutorial_intro
+   tutorial_installation
+   tutorial_train
+
 
 .. toctree::
    :maxdepth: 1
@@ -15,6 +30,12 @@ research
    layers
    models
    ops
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Model Zoo
+
+   zoo
 
 .. toctree::
   :maxdepth: 2

@@ -1,15 +1,31 @@
+# Copyright 2020 InterDigital Communications, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import torch
 import torch.nn as nn
 
 import pytest
 
-from compressai.models import (bmshj2018_factorized, bmshj2018_hyperprior,
-                               mbt2018_mean, mbt2018)
+from compressai.zoo import (bmshj2018_factorized, bmshj2018_hyperprior,
+                            mbt2018_mean, mbt2018)
+from compressai.zoo.image import _load_model
+
 from compressai.models.priors import (SCALES_LEVELS, SCALES_MAX, SCALES_MIN,
                                       CompressionModel, FactorizedPrior,
                                       MeanScaleHyperprior, ScaleHyperprior,
                                       JointAutoregressiveHierarchicalPriors,
-                                      get_scale_table, _load_model)
+                                      get_scale_table)
 
 from compressai.models.utils import (find_named_module,
                                      update_registered_buffers,
@@ -237,7 +253,6 @@ class TestBmshj2018Hyperprior:
 
         with pytest.raises(ValueError):
             bmshj2018_hyperprior(1, metric='ssim')
-
 
     def test_bmshj2018_factorized_pretrained(self):
         for i in range(1, 6):

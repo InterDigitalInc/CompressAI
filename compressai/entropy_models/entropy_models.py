@@ -1,3 +1,17 @@
+# Copyright 2020 InterDigital Communications, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import numpy as np
 import scipy.stats
 
@@ -141,19 +155,25 @@ class EntropyModel(nn.Module):
             cdf[i, :_cdf.size(0)] = _cdf
         return cdf
 
-    def _check_cdf_size(self, C):
-        if len(self._quantized_cdf.size()) != 2 or \
-                self._quantized_cdf.size(0) != C:
+    def _check_cdf_size(self):
+        if self._quantized_cdf.numel() == 0:
+            raise ValueError('Uninitialized CDFs. Run update() first')
+
+        if len(self._quantized_cdf.size()) != 2:
             raise ValueError(f'Invalid CDF size {self._quantized_cdf.size()}')
 
-    def _check_offsets_size(self, C):
-        if len(self._offset.size()) != 1 or \
-                self._offset.size(0) != C:
+    def _check_offsets_size(self):
+        if self._offset.numel() == 0:
+            raise ValueError('Uninitialized offsets. Run update() first')
+
+        if len(self._offset.size()) != 1 or self._offset.numel() == 0:
             raise ValueError(f'Invalid offsets size {self._offset.size()}')
 
-    def _check_cdf_length(self, C):
-        if len(self._cdf_length.size()) != 1 or \
-                self._cdf_length.size(0) != C:
+    def _check_cdf_length(self):
+        if self._cdf_length.numel() == 0:
+            raise ValueError('Uninitialized CDF lengths. Run update() first')
+
+        if len(self._cdf_length.size()) != 1 or self._cdf_length.numel() == 0:
             raise ValueError(f'Invalid offsets size {self._cdf_length.size()}')
 
     def compress(self, inputs, indexes, means=None):
@@ -174,10 +194,9 @@ class EntropyModel(nn.Module):
             raise ValueError(
                 '`inputs` and `indexes` should have the same size.')
 
-        C = inputs.size(1)
-        self._check_cdf_size(C)
-        self._check_cdf_length(C)
-        self._check_offsets_size(C)
+        self._check_cdf_size()
+        self._check_cdf_length()
+        self._check_offsets_size()
 
         strings = []
         for i in range(symbols.size(0)):
@@ -209,10 +228,9 @@ class EntropyModel(nn.Module):
         if len(indexes.size()) != 4:
             raise ValueError('Invalid `indexes` size. Expected a 4-D tensor.')
 
-        C = indexes.size(1)
-        self._check_cdf_size(C)
-        self._check_cdf_length(C)
-        self._check_offsets_size(C)
+        self._check_cdf_size()
+        self._check_cdf_length()
+        self._check_offsets_size()
 
         if means is not None:
             if means.size()[:-2] != indexes.size()[:-2]:
@@ -235,9 +253,15 @@ class EntropyModel(nn.Module):
 
 
 class EntropyBottleneck(EntropyModel):
-    r"""Entropy bottleneck model.
+    r"""Entropy bottleneck layer, introduced by J. Ballé, D. Minnen, S. Singh,
+    S. J. Hwang, N. Johnston, in `"Variational image compression with a scale
+    hyperprior" <https://arxiv.org/abs/1802.01436>`_.
 
-    Introduced in `"Variational image compression with a scale hyperprior" <https://arxiv.org/abs/1802.01436>`_
+    This is a re-implementation of the entropy bottleneck layer in
+    *tensorflow/compression*. See the original paper and the `tensorflow
+    documentation
+    <https://tensorflow.github.io/compression/docs/entropy_bottleneck.html>`_
+    for an introduction.
     """
     def __init__(self,
                  channels,
@@ -420,9 +444,13 @@ class EntropyBottleneck(EntropyModel):
 
 
 class GaussianConditional(EntropyModel):
-    r"""Gaussian Conditional model.
+    r"""Gaussian conditional layer, introduced by J. Ballé, D. Minnen, S. Singh,
+    S. J. Hwang, N. Johnston, in `"Variational image compression with a scale
+    hyperprior" <https://arxiv.org/abs/1802.01436>`_.
 
-    Introduced in `"Variational image compression with a scale hyperprior" <https://arxiv.org/abs/1802.01436>`_
+    This is a re-implementation of the Gaussian conditional layer in
+    *tensorflow/compression*. See the `tensorflow documentation
+    <https://tensorflow.github.io/compression/docs/api_docs/python/tfc/GaussianConditional.html>`_.
     """
     def __init__(self,
                  scale_table,

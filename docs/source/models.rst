@@ -10,19 +10,25 @@ CompressionModel
     :members:
 
 
-bmshj2018_factorized
---------------------
-.. autofunction:: bmshj2018_factorized
+FactorizedPrior
+----------------
+.. autoclass:: FactorizedPrior
+    :members:
 
 
-bmshj2018_hyperprior
---------------------
-.. autofunction:: bmshj2018_hyperprior
+ScaleHyperprior
+---------------
+.. autoclass:: ScaleHyperprior
+    :members:
 
-mbt2018_mean
-------------
-.. autofunction:: mbt2018_mean
 
-mbt2018
-------------
-.. autofunction:: mbt2018
+MeanScaleHyperprior
+-------------------
+.. autoclass:: MeanScaleHyperprior
+    :members:
+
+
+JointAutoregressiveHierarchicalPriors
+-------------------------------------
+.. autoclass:: JointAutoregressiveHierarchicalPriors
+    :members:

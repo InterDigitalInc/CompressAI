@@ -1,3 +1,17 @@
+# Copyright 2020 InterDigital Communications, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from compressai import datasets, entropy_models, layers, models, ops
 
 try:
@@ -17,7 +31,7 @@ except ImportError:
 
 def set_entropy_coder(entropy_coder):
     """
-    Specifies the entropy coder used to encode the bit-streams.
+    Specifies the default entropy coder used to encode the bit-streams.
 
     Use :mod:`available_entropy_coders` to list the possible values.
 
@@ -34,7 +48,7 @@ def set_entropy_coder(entropy_coder):
 
 def get_entropy_coder():
     """
-    Return the name of the entropy coder used to encode the bit-streams.
+    Return the name of the default entropy coder used to encode the bit-streams.
     """
     return _entropy_coder
 

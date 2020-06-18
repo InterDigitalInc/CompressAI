@@ -1,7 +1,22 @@
-import random
-import math
-import shutil
+# Copyright 2020 InterDigital Communications, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import argparse
+import math
+import random
+import shutil
+import sys
 
 import torch
 import torch.optim as optim
@@ -51,7 +66,7 @@ class AutoEncoder(CompressionModel):
 
 
 class RateDistortionLoss(nn.Module):
-    """Custom rate distortion loss with a lagrangian parameter."""
+    """Custom rate distortion loss with a Lagrangian parameter."""
     def __init__(self, lmbda=1e-2):
         super().__init__()
         self.mse = nn.MSELoss()
@@ -152,7 +167,7 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
         shutil.copyfile(filename, 'checkpoint_best_loss.pth.tar')
 
 
-def parse_args():
+def parse_args(argv):
     parser = argparse.ArgumentParser(description='Example training script')
     # yapf: disable
     parser.add_argument(
@@ -217,12 +232,12 @@ def parse_args():
         type=float,
         help='Set random seed for reproducibility')
     # yapf: enable
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     return args
 
 
-def main():
-    args = parse_args()
+def main(argv):
+    args = parse_args(argv)
 
     if args.seed is not None:
         torch.manual_seed(args.seed)
@@ -283,4 +298,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()  # pylint: disable=no-value-for-parameter
+    main(sys.argv[1:])

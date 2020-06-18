@@ -1,4 +1,22 @@
-from typing import Union, Tuple, List
+# Copyright 2020 InterDigital Communications, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""
+Collect performance metrics of published traditional or end-to-end image
+codecs.
+"""
+from typing import Union, Tuple
 
 import argparse
 import io
@@ -9,11 +27,8 @@ import subprocess
 import sys
 import time
 
-import multiprocessing as mp
-
-from collections import defaultdict
-from itertools import starmap
 from tempfile import mkstemp
+from collections import defaultdict
 
 import PIL
 import PIL.Image as Image
@@ -138,15 +153,21 @@ class Codec:
     """Abstract base class"""
     _description = None
 
-    def __init__(self, args):
-        self._set_args(args)
+    def __init__(self):
+        self.qualities = []
+        self._parse_args()
 
-    def _set_args(self, args):
-        return args
-
-    @classmethod
-    def setup_args(cls, parser):
-        setup_common_args(parser)
+    def _get_parser(self):
+        description = f'{self.__class__.__name__} codec'
+        parser = argparse.ArgumentParser(description=description)
+        parser.add_argument('-q',
+                            '--quality',
+                            metavar='',
+                            default=75,
+                            nargs='*',
+                            type=int,
+                            help='quality parameter (default: %(default)s)')
+        return parser
 
     @property
     def description(self):
@@ -156,15 +177,52 @@ class Codec:
     def name(self):
         raise NotImplementedError()
 
+    def _parse_args(self):
+        parser = self._get_parser()
+        args = parser.parse_args(sys.argv[3:])
+        if isinstance(args.quality, list):
+            self.qualities = args.quality
+        else:
+            self.qualities = [args.quality]
+        return args
+
     def _load_img(self, img):
         return os.path.abspath(img)
 
     def _run(self, img, quality, *args, **kwargs):
         raise NotImplementedError()
 
-    def run(self, img, quality, index, *args, **kwargs):
+    def run(self, img, quality, *args, **kwargs):
         img = self._load_img(img)
-        return (index, self._run(img, quality, *args, **kwargs))
+        return self._run(img, quality, *args, **kwargs)
+
+    def collect(self, dataset):
+        filepaths = [
+            os.path.join(dataset, f) for f in os.listdir(dataset)
+            if os.path.splitext(f)[-1].lower() in IMG_EXTENSIONS
+        ]
+
+        if len(filepaths) == 0:
+            print('No images found in the dataset directory')
+            sys.exit(1)
+
+        results = defaultdict(list)
+        for i, q in enumerate(self.qualities):
+            metrics = defaultdict(float)
+            for j, f in enumerate(filepaths):
+                rv = self.run(f, q)
+                for k, v in rv.items():
+                    metrics[k] += v
+                sys.stderr.write(f'\r{self.name}'
+                                 f' | quality: {i+1:d}/{len(self.qualities):d}'
+                                 f' | file: {j+1:d}/{len(filepaths):d}')
+                sys.stderr.flush()
+            for k, v in metrics.items():
+                metrics[k] = v / len(filepaths)
+                results[k].append(metrics[k])
+        sys.stderr.write('\n')
+        sys.stderr.flush()
+        return results
 
 
 class PillowCodec(Codec):
@@ -322,9 +380,8 @@ class BPG(BinaryCodec):
     def description(self):
         return f'BPG. BPG version {_get_bpg_version(self.encoder_path)}'
 
-    @classmethod
-    def setup_args(cls, parser):
-        super().setup_args(parser)
+    def _get_parser(self):
+        parser = super()._get_parser()
         parser.add_argument('-m',
                             choices=['420', '444'],
                             default='444',
@@ -347,9 +404,10 @@ class BPG(BinaryCodec):
         parser.add_argument('--decoder-path',
                             default='bpgdec',
                             help='BPG decoder path')
+        return parser
 
-    def _set_args(self, args):
-        args = super()._set_args(args)
+    def _parse_args(self):
+        args = super()._parse_args()
         self.color_mode = args.c
         self.encoder = args.e
         self.subsampling_mode = args.m
@@ -400,22 +458,22 @@ class TFCI(BinaryCodec):
     def name(self):
         return f'{self.model}'
 
-    @classmethod
-    def setup_args(cls, parser):
-        super().setup_args(parser)
+    def _get_parser(self):
+        parser = super()._get_parser()
         parser.add_argument('-m',
                             '--model',
-                            choices=cls._models,
-                            default=cls._models[0],
+                            choices=self._models,
+                            default=self._models[0],
                             help='model architecture (default: %(default)s)')
         parser.add_argument(
             '-p',
             '--path',
             required=True,
             help='tfci python script path (default: %(default)s)')
+        return parser
 
-    def _set_args(self, args):
-        args = super()._set_args(args)
+    def _parse_args(self):
+        args = super()._parse_args()
         self.model = args.model
         self.tfci_path = args.path
         return args
@@ -470,9 +528,8 @@ class VTM(Codec):
     def name(self):
         return 'VTM'
 
-    @classmethod
-    def setup_args(cls, parser):
-        super().setup_args(parser)
+    def _get_parser(self):
+        parser = super()._get_parser()
         parser.add_argument('-b',
                             '--build-dir',
                             metavar='',
@@ -488,9 +545,10 @@ class VTM(Codec):
         parser.add_argument('--rgb',
                             action='store_true',
                             help='Use RGB color space (over YCbCr)')
+        return parser
 
-    def _set_args(self, args):
-        args = super()._set_args(args)
+    def _parse_args(self):
+        args = super()._parse_args()
         self.encoder_path = get_vtm_encoder_path(args.build_dir)
         self.decoder_path = get_vtm_decoder_path(args.build_dir)
         self.config_path = args.config
@@ -599,9 +657,8 @@ class HM(Codec):
     def name(self):
         return 'HM'
 
-    @classmethod
-    def setup_args(cls, parser):
-        super().setup_args(parser)
+    def _get_parser(self):
+        parser = super()._get_parser()
         parser.add_argument('-b',
                             '--build-dir',
                             metavar='',
@@ -617,9 +674,10 @@ class HM(Codec):
         parser.add_argument('--rgb',
                             action='store_true',
                             help='Use RGB color space (over YCbCr)')
+        return parser
 
-    def _set_args(self, args):
-        args = super()._set_args(args)
+    def _parse_args(self):
+        args = super()._parse_args()
         self.encoder_path = os.path.join(args.build_dir, "TAppEncoderStatic")
         self.decoder_path = os.path.join(args.build_dir, "TAppDecoderStatic")
         self.config_path = args.config
@@ -703,82 +761,22 @@ class HM(Codec):
 codecs = [JPEG, WebP, JPEG2000, BPG, TFCI, VTM, HM]
 
 
-def collect(codec: Codec,
-            dataset: str,
-            qualities: List[int],
-            num_jobs: int = 1):
-    filepaths = [
-        os.path.join(dataset, f) for f in os.listdir(dataset)
-        if os.path.splitext(f)[-1].lower() in IMG_EXTENSIONS
-    ]
-
-    pool = mp.Pool(num_jobs) if num_jobs > 1 else None
-
-    if len(filepaths) == 0:
-        print('No images found in the dataset directory')
-        sys.exit(1)
-
-    args = [(f, q, i) for i, q in enumerate(qualities) for f in filepaths]
-
-    if pool:
-        rv = pool.starmap(codec.run, args)
-    else:
-        rv = list(starmap(codec.run, args))
-
-    results = [defaultdict(float) for _ in range(len(qualities))]
-    for i, metrics in rv:
-        for k, v in metrics.items():
-            results[i][k] += v
-    for i, _ in enumerate(results):
-        for k, v in results[i].items():
-            results[i][k] = v / len(filepaths)
-
-    # list of dict -> dict of list
-    out = defaultdict(list)
-    for r in results:
-        for k, v in r.items():
-            out[k].append(v)
-    return out
-
-
 def setup_args():
-    description = 'Collect codec metrics.'
+    description = 'Collect codec metrics and performances.'
     parser = argparse.ArgumentParser(description=description)
-    subparsers = parser.add_subparsers(dest='codec',
-                                       help='Select codec',
-                                       required=True)
-    return parser, subparsers
-
-
-def setup_common_args(parser):
+    parser.add_argument('codec',
+                        type=str,
+                        choices=[c.__name__.lower() for c in codecs])
     parser.add_argument('dataset', type=str)
-    parser.add_argument('-j',
-                        '--num-jobs',
-                        type=int,
-                        metavar='N',
-                        default=1,
-                        help='Number of parallel jobs (default: %(default)s)')
-    parser.add_argument('-q',
-                        '--quality',
-                        dest='qualities',
-                        metavar='',
-                        default=[75],
-                        nargs='*',
-                        type=int,
-                        help='quality parameter (default: %(default)s)')
+    return parser
 
 
-def main():
-    parser, subparsers = setup_args()
-    for c in codecs:
-        cparser = subparsers.add_parser(c.__name__.lower(),
-                                        help=f'{c.__name__}')
-        c.setup_args(cparser)
-    args = parser.parse_args()
+def main(argv):
+    args = setup_args().parse_args(argv[1:3])
 
     codec_cls = next(c for c in codecs if c.__name__.lower() == args.codec)
-    codec = codec_cls(args)
-    results = collect(codec, args.dataset, args.qualities, args.num_jobs)
+    codec = codec_cls()
+    results = codec.collect(args.dataset)
 
     output = {
         'name': codec.name,
@@ -790,4 +788,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

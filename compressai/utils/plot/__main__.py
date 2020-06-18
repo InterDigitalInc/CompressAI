@@ -1,17 +1,36 @@
+# Copyright 2020 InterDigital Communications, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""
+Simple plotting utility to display Rate-Distortion curves (RD) comparison
+between codecs.
+"""
 import argparse
 import json
+import sys
 
 from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-_backend = 'matplotlib'
+_backends = ['matplotlib']
 
 try:
     import plotly.graph_objs as go
     import plotly.offline
-    _backend = 'plotly'
+    _backends.append('plotly')
 except ImportError:
     pass
 
@@ -20,11 +39,15 @@ def parse_json_file(filepath, metric):
     filepath = Path(filepath)
     name = filepath.name.split('.')[0]
     with filepath.open('r') as f:
-        data = json.load(f)
+        try:
+            data = json.load(f)
+        except json.decoder.JSONDecodeError as err:
+            print(f'Error reading file "{filepath}"')
+            raise err
 
     if 'results' not in data or \
             'bpp' not in data['results']:
-        raise ValueError('Invalid file')
+        raise ValueError(f'Invalid file "{filepath}"')
 
     if metric not in data['results']:
         raise ValueError(
@@ -50,6 +73,7 @@ def matplotlib_plt(scatters, title, ylabel, output_file, limits=None):
 
     ax.set_xlabel('Bit-rate [bpp]')
     ax.set_ylabel(ylabel)
+    ax.grid()
     if limits is not None:
         ax.axis(limits)
     ax.legend(loc='lower right')
@@ -57,7 +81,7 @@ def matplotlib_plt(scatters, title, ylabel, output_file, limits=None):
     if title:
         ax.title.set_text(title)
     if output_file:
-        fig.savefig(output_file)
+        fig.savefig(output_file, dpi=300)
 
     plt.show()
 
@@ -120,20 +144,21 @@ def setup_args():
     parser.add_argument(
         '--axes',
         metavar='',
-        type=int,
+        type=float,
         nargs=4,
         default=(0, 2, 28, 43),
         help='Axes limit (xmin, xmax, ymin, ymax), default: %(default)s')
     parser.add_argument('--backend',
                         type=str,
                         metavar='',
-                        default=_backend,
+                        default=_backends[0],
+                        choices=_backends,
                         help='Change plot backend (default: %(default)s)')
     return parser
 
 
-def main():
-    args = setup_args().parse_args()
+def main(argv):
+    args = setup_args().parse_args(argv)
 
     scatters = []
     for f in args.results_file:
@@ -153,4 +178,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

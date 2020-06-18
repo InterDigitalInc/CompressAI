@@ -1,9 +1,21 @@
+# Copyright 2020 InterDigital Communications, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import math
 
 import torch
 import torch.nn as nn
-
-from torch.hub import load_state_dict_from_url
 
 from compressai.entropy_models import (EntropyBottleneck, GaussianConditional)
 from compressai.layers import GDN, MaskedConv2d
@@ -12,16 +24,16 @@ from .utils import update_registered_buffers, conv, deconv
 
 __all__ = [
     'CompressionModel',
-    'bmshj2018_factorized',
-    'bmshj2018_hyperprior',
-    'mbt2018_mean',
-    'mbt2018',
+    'FactorizedPrior',
+    'ScaleHyperprior',
+    'MeanScaleHyperprior',
+    'JointAutoregressiveHierarchicalPriors',
 ]
 
 
 class CompressionModel(nn.Module):
     """Base class for constructing an auto-encoder with at least one entropy
-    bottleneck modules.
+    bottleneck module.
 
     Args:
         entropy_bottleneck_channels (int): Number of channels of the entropy
@@ -73,8 +85,14 @@ class CompressionModel(nn.Module):
                 yield p
 
     def update(self, force=False):
-        """Updates the entropy bottleneck(s) CDF values. Needs to be called once
-        after training.
+        """Updates the entropy bottleneck(s) CDF values.
+
+        Needs to be called once after training to be able to later perform the
+        evaluation with an actual entropy coder.
+
+        Args:
+            force (bool): overwrite previous values (default: False)
+
         """
         for m in self.children():
             if not isinstance(m, EntropyBottleneck):
@@ -83,8 +101,10 @@ class CompressionModel(nn.Module):
 
 
 class FactorizedPrior(CompressionModel):
-    r"""Factorized Prior model from `"Variational image compression with a scale
-    hyperprior" <https://arxiv.org/abs/1802.01436>`_
+    r"""Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
+    N. Johnston: `"Variational Image Compression with a Scale Hyperprior"
+    <https://arxiv.org/abs/1802.01436>`_, Int Conf. on Learning Representations
+    (ICLR), 2018.
 
     Args:
         N (int): Number of channels
@@ -166,8 +186,10 @@ def get_scale_table(min=SCALES_MIN, max=SCALES_MAX, levels=SCALES_LEVELS):  # py
 
 
 class ScaleHyperprior(CompressionModel):
-    r"""Scale Hyperprior model from `"Variational image compression with a scale
-    hyperprior" <https://arxiv.org/abs/1802.01436>`_
+    r"""Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
+    N. Johnston: `"Variational Image Compression with a Scale Hyperprior"
+    <https://arxiv.org/abs/1802.01436>`_ Int. Conf. on Learning Representations
+    (ICLR), 2018.
 
     Args:
         N (int): Number of channels
@@ -251,8 +273,10 @@ class ScaleHyperprior(CompressionModel):
 
 
 class MeanScaleHyperprior(ScaleHyperprior):
-    r"""Mean Scale Hyperprior model from `"Joint Autoregressive and Hierarchical
-    Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_
+    r"""Scale Hyperprior with non zero-mean Gaussian conditionals from D.
+    Minnen, J. Balle, G.D. Toderici: `"Joint Autoregressive and Hierarchical
+    Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_,
+    Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).
 
     Args:
         N (int): Number of channels
@@ -299,9 +323,10 @@ class MeanScaleHyperprior(ScaleHyperprior):
 
 
 class JointAutoregressiveHierarchicalPriors(CompressionModel):
-    r"""Joint Autoregressive Hierarchical Priors model from `"Joint
-    Autoregressive and Hierarchical Priors for Learned Image Compression"
-    <https://arxiv.org/abs/1809.02736>`_
+    r"""Joint Autoregressive Hierarchical Priors model from D.
+    Minnen, J. Balle, G.D. Toderici: `"Joint Autoregressive and Hierarchical
+    Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_,
+    Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).
 
     Args:
         N (int): Number of channels
@@ -398,207 +423,3 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
         net = cls(N, M)
         net.load_state_dict(state_dict)
         return net
-
-
-models = {
-    'bmshj2018_factorized': FactorizedPrior,
-    'bmshj2018_hyperprior': ScaleHyperprior,
-    'mbt2018_mean': MeanScaleHyperprior,
-    'mbt2018': JointAutoregressiveHierarchicalPriors,
-}
-
-root_url = 'https://compressai.s3.amazonaws.com/models/v1'
-model_urls = {
-    'bmshj2018_factorized': {
-        'mse': {
-            1: f'{root_url}/bmshj2018-factorized-prior-1-446d5c7f.pth.tar',
-            2: f'{root_url}/bmshj2018-factorized-prior-2-87279a02.pth.tar',
-            3: f'{root_url}/bmshj2018-factorized-prior-3-5c6f152b.pth.tar',
-            4: f'{root_url}/bmshj2018-factorized-prior-4-1ed4405a.pth.tar',
-            5: f'{root_url}/bmshj2018-factorized-prior-5-866ba797.pth.tar',
-            6: f'{root_url}/bmshj2018-factorized-prior-6-9b02ea3a.pth.tar',
-            7: f'{root_url}/bmshj2018-factorized-prior-7-6dfd6734.pth.tar',
-            8: f'{root_url}/bmshj2018-factorized-prior-8-5232faa3.pth.tar',
-        },
-    },
-    'bmshj2018_hyperprior': {
-        'mse': {},
-    },
-    'mbt2018_mean': {
-        'mse': {},
-    },
-    'mbt2018': {
-        'mse': {},
-    },
-}
-
-cfgs = {
-    'bmshj2018_factorized': {
-        1: (128, 192),
-        2: (128, 192),
-        3: (128, 192),
-        4: (128, 192),
-        5: (128, 192),
-        6: (192, 320),
-        7: (192, 320),
-        8: (192, 320),
-    },
-    'bmshj2018_hyperprior': {
-        1: (128, 192),
-        2: (128, 192),
-        3: (128, 192),
-        4: (128, 192),
-        5: (128, 192),
-        6: (192, 320),
-        7: (192, 320),
-        8: (192, 320),
-    },
-    'mbt2018_mean': {
-        1: (128, 192),
-        2: (128, 192),
-        3: (128, 192),
-        4: (128, 192),
-        5: (128, 192),
-        6: (192, 320),
-        7: (192, 320),
-        8: (192, 320),
-    },
-    'mbt2018': {
-        1: (192, 192),
-        2: (192, 192),
-        3: (192, 192),
-        4: (192, 192),
-        5: (192, 192),
-        6: (192, 320),
-        7: (192, 320),
-        8: (192, 320),
-    },
-}
-
-
-def _load_model(architecture,
-                metric,
-                quality,
-                pretrained=False,
-                progress=True,
-                **kwargs):
-    if architecture not in models:
-        raise ValueError(f'Invalid architecture name "{architecture}"')
-
-    if quality not in cfgs[architecture]:
-        raise ValueError(f'Invalid quality value "{quality}"')
-
-    if pretrained:
-        if architecture not in model_urls or \
-                metric not in model_urls[architecture] or \
-                quality not in model_urls[architecture][metric]:
-            raise RuntimeError('Pre-trained model not yet available')
-
-        url = model_urls[architecture][metric][quality]
-        state_dict = load_state_dict_from_url(url, progress=progress)
-        model = models[architecture].from_state_dict(state_dict)
-        return model
-
-    model = models[architecture](*cfgs[architecture][quality], **kwargs)
-    return model
-
-
-def bmshj2018_factorized(quality,
-                         metric='mse',
-                         pretrained=False,
-                         progress=True,
-                         **kwargs):
-    r"""Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
-    N. Johnston: `"Variational Image Compression with a Scale Hyperprior"` Int.
-    Conf. on Learning Representations (ICLR), 2018
-
-    Args:
-        quality (int): Quality levels (1: lowest, highest: 8)
-        metric (str): Optimized metric, choose from ('mse')
-        pretrained (bool): If True, returns a pre-trained model
-        progress (bool): If True, displays a progress bar of the download to stderr
-    """
-    if metric not in ('mse', ):
-        raise ValueError(f'Invalid metric "{metric}"')
-
-    if quality < 1 or quality > 8:
-        raise ValueError(
-            f'Invalid quality "{quality}", should be between (1, 8)')
-
-    return _load_model('bmshj2018_factorized', metric, quality, pretrained,
-                       progress, **kwargs)
-
-
-def bmshj2018_hyperprior(quality,
-                         metric='mse',
-                         pretrained=False,
-                         progress=True,
-                         **kwargs):
-    r"""Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
-    N. Johnston: `"Variational Image Compression with a Scale Hyperprior"` Int.
-    Conf. on Learning Representations (ICLR), 2018
-
-    Args:
-        quality (int): Quality levels (1: lowest, highest: 8)
-        metric (str): Optimized metric, choose from ('mse')
-        pretrained (bool): If True, returns a pre-trained model
-        progress (bool): If True, displays a progress bar of the download to stderr
-    """
-    if metric not in ('mse', ):
-        raise ValueError(f'Invalid metric "{metric}"')
-
-    if quality < 1 or quality > 8:
-        raise ValueError(
-            f'Invalid quality "{quality}", should be between (1, 8)')
-
-    return _load_model('bmshj2018_hyperprior', metric, quality, pretrained,
-                       progress, **kwargs)
-
-
-def mbt2018_mean(quality,
-                 metric='mse',
-                 pretrained=False,
-                 progress=True,
-                 **kwargs):
-    r"""Scale Hyperprior with non zero-mean Gaussian conditionals from D.
-    Minnen, J. Balle G.D. Toderici: `"Joint Autoregressive and Hierarchical
-    Priors for Learned Image Compression"`, Adv. in Neural Information
-    Processing Systems 31 (NeurIPS 2018)
-
-    Args:
-        quality (int): Quality levels (1: lowest, highest: 8)
-        metric (str): Optimized metric, choose from ('mse')
-        pretrained (bool): If True, returns a pre-trained model
-        progress (bool): If True, displays a progress bar of the download to stderr
-    """
-    if metric not in ('mse', ):
-        raise ValueError(f'Invalid metric "{metric}"')
-
-    if quality < 1 or quality > 8:
-        raise ValueError(
-            f'Invalid quality "{quality}", should be between (1, 8)')
-
-    return _load_model('mbt2018_mean', metric, quality, pretrained, progress,
-                       **kwargs)
-
-
-def mbt2018(quality, metric='mse', pretrained=False, progress=True, **kwargs):
-    r"""Joint Autoregressive Hierarchical Priors model from `"Joint
-    Autoregressive and Hierarchical Priors for Learned Image Compression"
-    <https://arxiv.org/abs/1809.02736>`_
-
-    Args:
-        quality (int): Quality levels (1: lowest, highest: 8)
-        metric (str): Optimized metric, choose from ('mse')
-        pretrained (bool): If True, returns a pre-trained model
-        progress (bool): If True, displays a progress bar of the download to stderr
-    """
-    if metric not in ('mse', ):
-        raise ValueError(f'Invalid metric "{metric}"')
-
-    if quality < 1 or quality > 8:
-        raise ValueError(
-            f'Invalid quality "{quality}", should be between (1, 8)')
-
-    return _load_model('mbt2018', metric, quality, pretrained, progress,
-                       **kwargs)

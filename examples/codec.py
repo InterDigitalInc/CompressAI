@@ -1,3 +1,17 @@
+# Copyright 2020 InterDigital Communications, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import argparse
 import struct
 import sys
@@ -12,27 +26,13 @@ from torchvision.transforms import ToPILImage, ToTensor
 from PIL import Image
 
 import compressai
-from compressai.models import (bmshj2018_factorized, bmshj2018_hyperprior,
-                               mbt2018_mean, mbt2018)
+from compressai.zoo import models
 
-models = {
-    'bmshj2018-factorized': bmshj2018_factorized,
-    'bmshj2018-hyperprior': bmshj2018_hyperprior,
-    'mbt2018': mbt2018,
-    'mbt2018-mean': mbt2018_mean,
-}
-
-model_ids = {
-    'bmshj2018-factorized': 0,
-    'bmshj2018-hyperprior': 1,
-    'mbt2018': 2,
-    'mbt2018-mean': 3,
-}
+model_ids = {k: i for i, k in enumerate(models.keys())}
 
 metric_ids = {
     'mse': 0,
 }
-
 
 def inverse_dict(d):
     # We assume dict values are unique...
@@ -182,7 +182,7 @@ def show_image(img: Image.Image):
     plt.show()
 
 
-def encode():
+def encode(argv):
     parser = argparse.ArgumentParser(description='Encode image to bit-stream')
     parser.add_argument('image', type=str)
     parser.add_argument('--model',
@@ -206,14 +206,14 @@ def encode():
                         default=compressai.available_entropy_coders()[0],
                         help='Entropy coder (default: %(default)s)')
     parser.add_argument('-o', '--output', help='Output path')
-    args = parser.parse_args(sys.argv[2:])
+    args = parser.parse_args(argv)
     if not args.output:
         args.output = Path(Path(args.image).resolve().name).with_suffix('.bin')
     _encode(args.image, args.model, args.metric, args.quality, args.coder,
             args.output)
 
 
-def decode():
+def decode(argv):
     parser = argparse.ArgumentParser(description='Decode bit-stream to imager')
     parser.add_argument('input', type=str)
     parser.add_argument('-c',
@@ -223,25 +223,26 @@ def decode():
                         help='Entropy coder (default: %(default)s)')
     parser.add_argument('--show', action='store_true')
     parser.add_argument('-o', '--output', help='Output path')
-    args = parser.parse_args(sys.argv[2:])
+    args = parser.parse_args(argv)
     _decode(args.input, args.coder, args.show, args.output)
 
 
-def parse_args():
+def parse_args(argv):
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('command', choices=['encode', 'decode'])
-    args = parser.parse_args(sys.argv[1:2])
+    args = parser.parse_args(argv)
     return args
 
 
-def main():
-    args = parse_args()
+def main(argv):
+    args = parse_args(argv[1:2])
+    argv = argv[2:]
     torch.set_num_threads(1)  # just to be sure
     if args.command == 'encode':
-        encode()
+        encode(argv)
     elif args.command == 'decode':
-        decode()
+        decode(argv)
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
