@@ -168,6 +168,14 @@ py::bytes rANSEncoderInterface::encode_with_indexes(
   return std::string(reinterpret_cast<char *>(ptr), nbytes);
 }
 
+void rANSDecoderInterface::init_decode(const std::string& encoded) {
+    assert(ptr != nullptr);
+    _stream = encoded;
+    uint32_t *ptr = (uint32_t *)_stream.data();
+    _ptr = ptr;
+    Rans64DecInit(&_rans, &_ptr);
+}
+
 std::vector<int32_t> rANSDecoderInterface::decode_with_indexes(
     const std::string &encoded, const std::vector<int32_t> &indexes,
     const std::vector<std::vector<int32_t>> &cdfs,
@@ -238,6 +246,74 @@ std::vector<int32_t> rANSDecoderInterface::decode_with_indexes(
   return output;
 }
 
+std::vector<int32_t>
+rANSDecoderInterface::decode_stream(const std::vector<int32_t> &indexes,
+        const std::vector<std::vector<int32_t>> &cdfs,
+        const std::vector<int32_t> &cdfs_sizes,
+        const std::vector<int32_t> &offsets)
+{
+  assert(cdfs.size() == cdfs_sizes.size());
+  assert_cdfs(cdfs, cdfs_sizes);
+
+  std::vector<int32_t> output(indexes.size());
+
+  assert(_ptr != nullptr);
+
+  for (int i = 0; i < static_cast<int>(indexes.size()); ++i) {
+    const int32_t cdf_idx = indexes[i];
+    assert(cdf_idx >= 0);
+    assert(cdf_idx < cdfs.size());
+
+    const auto &cdf = cdfs[cdf_idx];
+
+    const int32_t max_value = cdfs_sizes[cdf_idx] - 2;
+    assert(max_value >= 0);
+    assert((max_value + 1) < cdf.size());
+
+    const int32_t offset = offsets[cdf_idx];
+
+    const uint32_t cum_freq = Rans64DecGet(&_rans, precision);
+
+    const auto cdf_end = cdf.begin() + cdfs_sizes[cdf_idx];
+    const auto it = std::find_if(cdf.begin(), cdf_end,
+                                 [cum_freq](int v) { return v > cum_freq; });
+    assert(it != cdf_end + 1);
+    const uint32_t s = std::distance(cdf.begin(), it) - 1;
+
+    Rans64DecAdvance(&_rans, &_ptr, cdf[s], cdf[s + 1] - cdf[s], precision);
+
+    int32_t value = static_cast<int32_t>(s);
+
+    if (value == max_value) {
+      /* Bypass decoding mode */
+      int32_t val = Rans64DecGetBits(&_rans, &_ptr, bypass_precision);
+      int32_t n_bypass = val;
+
+      while (val == max_bypass_val) {
+        val = Rans64DecGetBits(&_rans, &_ptr, bypass_precision);
+        n_bypass += val;
+      }
+
+      int32_t raw_val = 0;
+      for (int j = 0; j < n_bypass; ++j) {
+        val = Rans64DecGetBits(&_rans, &_ptr, bypass_precision);
+        assert(val <= max_bypass_val);
+        raw_val |= val << (j * bypass_precision);
+      }
+      value = raw_val >> 1;
+      if (raw_val & 1) {
+        value = -value - 1;
+      } else {
+        value += max_value;
+      }
+    }
+
+    output[i] = value + offset;
+  }
+
+  return output;
+}
+
 PYBIND11_MODULE(ans, m) {
   m.attr("__name__") = "compressai.ans";
 
@@ -249,5 +325,7 @@ PYBIND11_MODULE(ans, m) {
 
   py::class_<rANSDecoderInterface>(m, "RangeDecoder")
       .def(py::init<>())
+      .def("init_decode", &rANSDecoderInterface::init_decode)
+      .def("decode_stream", &rANSDecoderInterface::decode_stream)
       .def("decode_with_indexes", &rANSDecoderInterface::decode_with_indexes);
 }

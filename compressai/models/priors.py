@@ -288,6 +288,8 @@ class ScaleHyperprior(CompressionModel):
         indexes = self.gaussian_conditional.build_indexes(scales_hat)
         y_strings = self.gaussian_conditional.compress(y, indexes)
 
+        y_hat = self.gaussian_conditional.decompress(y_strings, indexes)
+
         return {'strings': [y_strings, z_strings], 'shape': z.size()[-2:]}
 
     def decompress(self, strings, shape):
@@ -478,3 +480,84 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
         net = cls(N, M)
         net.load_state_dict(state_dict)
         return net
+
+    def compress(self, x):
+        y = self.g_a(x)
+        z = self.h_a(y)
+
+        z_strings = self.entropy_bottleneck.compress(z)
+        z_hat = self.entropy_bottleneck.decompress(z_strings, z.size()[-2:])
+
+        params = self.h_s(z_hat)
+        ctx_params = self.context_prediction(torch.round(y))
+        gaussian_params = self.entropy_parameters(
+            torch.cat((params, ctx_params), dim=1))
+        scales_hat, means_hat = gaussian_params.chunk(2, 1)
+        indexes = self.gaussian_conditional.build_indexes(scales_hat)
+
+        y_strings = self.gaussian_conditional.compress(y,
+                                                       indexes,
+                                                       means=means_hat)
+        return {'strings': [y_strings, z_strings], 'shape': z.size()[-2:]}
+
+    def decompress(self, strings, shape):
+        assert isinstance(strings, list) and len(strings) == 2
+        z_hat = self.entropy_bottleneck.decompress(strings[1], shape)
+        params = self.h_s(z_hat)
+
+        y_hat = torch.zeros(
+            (z_hat.size(0), self.M, z_hat.size(2) * 4, z_hat.size(3) * 4),
+            device=z_hat.device)
+
+        # y_hat = torch.zeros(
+        #     (z_hat.size(0), self.M, 2 * padding + z_hat.size(2) * 4,
+        #      2 * padding + z_hat.size(3) * 4),
+        #     device=z_hat.device)
+
+        # params = F.pad(params, (padding, padding, padding, padding))
+
+        # for h in range(z_hat.size(2) * 4):
+        #     for w in range(z_hat.size(3) * 4):
+        #         for c in range(y_hat.size(1)):
+        #             print(h, w, c)
+        #             ctx_params = self.context_prediction(
+        #                 y_hat[:, :, h:h + kernel_size, w:w + kernel_size])
+        #             gaussian_params = self.entropy_parameters(
+        #                 torch.cat((params[:, :, h:h + kernel_size,
+        #                                   w:w + kernel_size], ctx_params),
+        #                           dim=1))
+        #             scales_hat, means_hat = gaussian_params.chunk(2, 1)
+        #             indexes = self.gaussian_conditional.build_indexes(
+        #                 scales_hat)
+
+        #             rv = self.gaussian_conditional.decompress(strings[0],
+        #                                                       indexes,
+        #                                                       means=means_hat)
+        #             y_hat[:, c, h + padding, w + padding] = rv[:, c, padding,
+        #                                                        padding]
+
+        # x_hat = self.g_s(y_hat[:, :, padding:-padding,
+        #                        padding:-padding]).clamp_(0, 1)
+
+        for c in range(y_hat.size(1)):
+            for h in range(y_hat.size(2)):
+                for w in range(y_hat.size(3)):
+                    ctx_params = self.context_prediction(y_hat)
+                    gaussian_params = self.entropy_parameters(
+                        torch.cat((params, ctx_params), dim=1))
+                    scales_hat, means_hat = gaussian_params.chunk(2, 1)
+                    indexes = self.gaussian_conditional.build_indexes(scales_hat)
+
+                    rv = self.gaussian_conditional.decompress(strings[0],
+                                                              indexes,
+                                                              means=means_hat)
+                    y_hat[:, c, h, w] = rv[:, c, h, w]
+
+        x_hat = self.g_s(y_hat).clamp_(0, 1)
+        return {'x_hat': x_hat}
+
+    def update(self, scale_table=None, force=False):
+        if scale_table is None:
+            scale_table = get_scale_table()
+        self.gaussian_conditional.update_scale_table(scale_table, force=force)
+        super().update(force=force)
