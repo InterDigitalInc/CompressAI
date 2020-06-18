@@ -19,6 +19,7 @@ import torch.nn as nn
 
 from compressai.entropy_models import (EntropyBottleneck, GaussianConditional)
 from compressai.layers import GDN, MaskedConv2d
+from compressai.ans import RangeDecoder
 
 from .utils import update_registered_buffers, conv, deconv
 
@@ -287,9 +288,6 @@ class ScaleHyperprior(CompressionModel):
         scales_hat = self.h_s(z_hat)
         indexes = self.gaussian_conditional.build_indexes(scales_hat)
         y_strings = self.gaussian_conditional.compress(y, indexes)
-
-        y_hat = self.gaussian_conditional.decompress(y_strings, indexes)
-
         return {'strings': [y_strings, z_strings], 'shape': z.size()[-2:]}
 
     def decompress(self, strings, shape):
@@ -489,69 +487,80 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
         z_hat = self.entropy_bottleneck.decompress(z_strings, z.size()[-2:])
 
         params = self.h_s(z_hat)
-        ctx_params = self.context_prediction(torch.round(y))
+        y_hat = torch.round(y)
+        ctx_params = self.context_prediction(y_hat)
         gaussian_params = self.entropy_parameters(
             torch.cat((params, ctx_params), dim=1))
         scales_hat, means_hat = gaussian_params.chunk(2, 1)
         indexes = self.gaussian_conditional.build_indexes(scales_hat)
 
-        y_strings = self.gaussian_conditional.compress(y,
-                                                       indexes,
-                                                       means=means_hat)
+        # permute (N, C, H, W) to (N, H, W, C) as we will later decode
+        # all the channel values simultaneously for a given (x, y) position with
+        # the auto-regressive decoder
+        y_strings = self.gaussian_conditional.compress(
+            y_hat.permute(0, 2, 3, 1),
+            indexes.permute(0, 2, 3, 1),
+            means=means_hat.permute(0, 2, 3, 1))
         return {'strings': [y_strings, z_strings], 'shape': z.size()[-2:]}
 
     def decompress(self, strings, shape):
         assert isinstance(strings, list) and len(strings) == 2
+        # FIXME: we don't respect the default entropy coder and directly call the
+        # range ANS decoder
+
         z_hat = self.entropy_bottleneck.decompress(strings[1], shape)
         params = self.h_s(z_hat)
 
-        y_hat = torch.zeros(
-            (z_hat.size(0), self.M, z_hat.size(2) * 4, z_hat.size(3) * 4),
-            device=z_hat.device)
+        s = 4  # scaling factor between z and y
+        kernel_size = 5  # context prediction kernel size
+        padding = (kernel_size - 1) // 2
 
-        # y_hat = torch.zeros(
-        #     (z_hat.size(0), self.M, 2 * padding + z_hat.size(2) * 4,
-        #      2 * padding + z_hat.size(3) * 4),
-        #     device=z_hat.device)
+        y_height = z_hat.size(2) * s
+        y_width = z_hat.size(3) * s
 
-        # params = F.pad(params, (padding, padding, padding, padding))
+        # initialize y_hat to zeros, and pad it so we can directly work with
+        # sub-tensors of size (N, C, kernel size, kernel_size)
+        # yapf: disable
+        y_hat = torch.zeros((z_hat.size(0), self.M, y_height + 2 * padding, y_width + 2 * padding),
+                            device=z_hat.device)
+        decoder = RangeDecoder()
 
-        # for h in range(z_hat.size(2) * 4):
-        #     for w in range(z_hat.size(3) * 4):
-        #         for c in range(y_hat.size(1)):
-        #             print(h, w, c)
-        #             ctx_params = self.context_prediction(
-        #                 y_hat[:, :, h:h + kernel_size, w:w + kernel_size])
-        #             gaussian_params = self.entropy_parameters(
-        #                 torch.cat((params[:, :, h:h + kernel_size,
-        #                                   w:w + kernel_size], ctx_params),
-        #                           dim=1))
-        #             scales_hat, means_hat = gaussian_params.chunk(2, 1)
-        #             indexes = self.gaussian_conditional.build_indexes(
-        #                 scales_hat)
+        # pylint: disable=protected-access
+        cdf = self.gaussian_conditional._quantized_cdf.tolist()
+        cdf_lengths = self.gaussian_conditional._cdf_length.reshape(-1).int().tolist()
+        offsets = self.gaussian_conditional._offset.reshape(-1).int().tolist()
 
-        #             rv = self.gaussian_conditional.decompress(strings[0],
-        #                                                       indexes,
-        #                                                       means=means_hat)
-        #             y_hat[:, c, h + padding, w + padding] = rv[:, c, padding,
-        #                                                        padding]
+        for i, y_string in enumerate(strings[0]):
+            decoder.set_stream(y_string)
 
-        # x_hat = self.g_s(y_hat[:, :, padding:-padding,
-        #                        padding:-padding]).clamp_(0, 1)
+            for h in range(y_height):
+                for w in range(y_width):
+                    # only perform the 5x5 convolution on a cropped tensor
+                    # centered in (h, w)
+                    y_crop = y_hat[i:i + 1, :, h:h + kernel_size, w:w + kernel_size]
+                    ctx_params = self.context_prediction(torch.round(y_crop))
 
-        for c in range(y_hat.size(1)):
-            for h in range(y_hat.size(2)):
-                for w in range(y_hat.size(3)):
-                    ctx_params = self.context_prediction(y_hat)
-                    gaussian_params = self.entropy_parameters(
-                        torch.cat((params, ctx_params), dim=1))
+                    # 1x1 conv for the entropy parameters prediction network, so
+                    # we only keep the elements in the "center"
+                    ctx_p = ctx_params[i:i + 1, :, padding:padding + 1, padding:padding + 1]
+                    p = params[i:i + 1, :, h:h + 1, w:w + 1]
+                    gaussian_params = self.entropy_parameters(torch.cat((p, ctx_p), dim=1))
                     scales_hat, means_hat = gaussian_params.chunk(2, 1)
+
                     indexes = self.gaussian_conditional.build_indexes(scales_hat)
 
-                    rv = self.gaussian_conditional.decompress(strings[0],
-                                                              indexes,
-                                                              means=means_hat)
-                    y_hat[:, c, h, w] = rv[:, c, h, w]
+                    rv = decoder.decode_stream(
+                        indexes[i, :].squeeze().int().tolist(),
+                        cdf,
+                        cdf_lengths,
+                        offsets)
+                    rv = torch.Tensor(rv).reshape(1, -1, 1, 1)
+
+                    rv = self.gaussian_conditional._dequantize(rv, means_hat)
+                    y_hat[i, :, h + padding:h + padding + 1, w + padding:w + padding + 1] = rv
+        y_hat = y_hat[:, :, padding:-padding, padding:-padding]
+        # pylint: enable=protected-access
+        # yapf: enable
 
         x_hat = self.g_s(y_hat).clamp_(0, 1)
         return {'x_hat': x_hat}

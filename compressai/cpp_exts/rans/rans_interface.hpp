@@ -54,7 +54,7 @@ public:
                       const std::vector<int32_t> &cdfs_sizes,
                       const std::vector<int32_t> &offsets);
 
-  void init_decode(const std::string &encoded);
+  void set_stream(const std::string &stream);
 
   std::vector<int32_t>
   decode_stream(const std::vector<int32_t> &indexes,

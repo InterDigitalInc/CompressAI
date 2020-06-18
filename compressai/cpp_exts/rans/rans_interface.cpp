@@ -3,9 +3,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -168,14 +168,6 @@ py::bytes rANSEncoderInterface::encode_with_indexes(
   return std::string(reinterpret_cast<char *>(ptr), nbytes);
 }
 
-void rANSDecoderInterface::init_decode(const std::string& encoded) {
-    assert(ptr != nullptr);
-    _stream = encoded;
-    uint32_t *ptr = (uint32_t *)_stream.data();
-    _ptr = ptr;
-    Rans64DecInit(&_rans, &_ptr);
-}
-
 std::vector<int32_t> rANSDecoderInterface::decode_with_indexes(
     const std::string &encoded, const std::vector<int32_t> &indexes,
     const std::vector<std::vector<int32_t>> &cdfs,
@@ -246,12 +238,19 @@ std::vector<int32_t> rANSDecoderInterface::decode_with_indexes(
   return output;
 }
 
-std::vector<int32_t>
-rANSDecoderInterface::decode_stream(const std::vector<int32_t> &indexes,
-        const std::vector<std::vector<int32_t>> &cdfs,
-        const std::vector<int32_t> &cdfs_sizes,
-        const std::vector<int32_t> &offsets)
-{
+void rANSDecoderInterface::set_stream(const std::string &encoded) {
+  _stream = encoded;
+  uint32_t *ptr = (uint32_t *)_stream.data();
+  assert(ptr != nullptr);
+  _ptr = ptr;
+  Rans64DecInit(&_rans, &_ptr);
+}
+
+std::vector<int32_t> rANSDecoderInterface::decode_stream(
+    const std::vector<int32_t> &indexes,
+    const std::vector<std::vector<int32_t>> &cdfs,
+    const std::vector<int32_t> &cdfs_sizes,
+    const std::vector<int32_t> &offsets) {
   assert(cdfs.size() == cdfs_sizes.size());
   assert_cdfs(cdfs, cdfs_sizes);
 
@@ -325,7 +324,7 @@ PYBIND11_MODULE(ans, m) {
 
   py::class_<rANSDecoderInterface>(m, "RangeDecoder")
       .def(py::init<>())
-      .def("init_decode", &rANSDecoderInterface::init_decode)
+      .def("set_stream", &rANSDecoderInterface::set_stream)
       .def("decode_stream", &rANSDecoderInterface::decode_stream)
       .def("decode_with_indexes", &rANSDecoderInterface::decode_with_indexes);
 }
