@@ -61,7 +61,7 @@ TFCI_SCRIPT="${HOME}/tensorflow-compression/compression/examples/tfci.py"
 _VTM_SRC_DIR="${HOME}/vvc/vtm-8.2"
 VTM_BIN_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
 VTM_CFG="${_HM_SRC_DIR}/cfg/encoder_intra_vtm.cfg | grep "$_VTM_SRC_DIR")"
-VTM_VERSION_FILE=$(dirname "${_VTM_SRC_DIR}/source/Lib/CommonLib/version.h")
+VTM_VERSION_FILE="${_VTM_SRC_DIR}/source/Lib/CommonLib/version.h"
 VTM_VERSION="$(sed -n -e 's/^#define VTM_VERSION //p' ${VTM_VERSION_FILE})"
 
 # HM
@@ -69,7 +69,7 @@ VTM_VERSION="$(sed -n -e 's/^#define VTM_VERSION //p' ${VTM_VERSION_FILE})"
 _HM_SRC_DIR="${HOME}/hevc/HM-16.19+SCM-8.8"
 HM_BIN_DIR="${_HM_SRC_DIR}/bin/"
 HM_CFG="${_HM_SRC_DIR}/cfg/encoder_intra_main_rext.cfg"
-HM_VERSION_FILE=$(dirname "${_HM_SRC_DIR}/source/Lib/TLibCommon/CommonDef.h")
+HM_VERSION_FILE="${_HM_SRC_DIR}/source/Lib/TLibCommon/CommonDef.h"
 HM_VERSION="$(sed -n -e 's/^#define NV_VERSION \(.*\)\/\/\/< Current software version/\1/p' ${HM_VERSION_FILE})"
 
 jpeg() {
