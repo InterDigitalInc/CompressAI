@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 Collect performance metrics of published traditional or end-to-end image
 codecs.
@@ -377,8 +376,8 @@ class BPG(BinaryCodec):
         return args
 
     def _get_encode_cmd(self, img, quality, out_filepath):
-        if not quality in (0,51):                                                                                                                               │
-            raise ValueError(f'Invalid quality value (0,51)')
+        if not quality in (0, 51):
+            raise ValueError(f'Invalid quality value: {quality} (0,51)')
         cmd = [
             self.encoder_path,
             '-o',
@@ -441,8 +440,8 @@ class TFCI(BinaryCodec):
         return args
 
     def _get_encode_cmd(self, img, quality, out_filepath):
-        if not quality in (1,8):                                                                                                                               │
-            raise ValueError(f'Invalid quality value (1,8).')
+        if not quality in (1, 8):
+            raise ValueError(f'Invalid quality value: {quality} (1, 8)')
         cmd = [
             sys.executable,
             self.tfci_path,
@@ -520,8 +519,8 @@ class VTM(Codec):
         return args
 
     def _run(self, img, quality):
-        if not quality in (0,51):                                                                                                                               │
-            raise ValueError(f'Invalid quality value (0,51)')
+        if not quality in (0, 51):
+            raise ValueError(f'Invalid quality value: {quality} (0,51)')
 
         # Convert input image to yuv 444 file
         arr = np.asarray(read_image(img))
@@ -652,8 +651,8 @@ class HM(Codec):
         return args
 
     def _run(self, img, quality):
-        if not quality in (0,51):                                                                                                                               │
-            raise ValueError(f'Invalid quality value (0,51)')
+        if not quality in (0, 51):
+            raise ValueError(f'Invalid quality value: {quality} (0,51)')
 
         # Convert input image to yuv 444 file
         arr = np.asarray(read_image(img))
@@ -771,8 +770,7 @@ def collect(codec: Codec,
 def setup_args():
     description = 'Collect codec metrics.'
     parser = argparse.ArgumentParser(description=description)
-    subparsers = parser.add_subparsers(dest='codec',
-                                       help='Select codec')
+    subparsers = parser.add_subparsers(dest='codec', help='Select codec')
     subparsers.required = True
     return parser, subparsers
 
