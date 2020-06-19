@@ -33,7 +33,7 @@ usage() {
     echo "supported codecs: [jpeg, jpeg2000, WebP, bpg, hm, vtm, bmshj2018-factorized-mse, bmshj2018-hyperprior-mse, mbt2018-mean-mse]"
 }
 
-if [ $1 == "-h" ] || [ $1 == "--help" ]; then
+if [[ $1 == "-h" || $1 == "--help" ]]; then
     usage
     exit 1
 fi
