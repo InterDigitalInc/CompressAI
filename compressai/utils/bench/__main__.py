@@ -376,7 +376,7 @@ class BPG(BinaryCodec):
         return args
 
     def _get_encode_cmd(self, img, quality, out_filepath):
-        if not quality in (0, 51):
+        if not 0 <= quality <= 51:
             raise ValueError(f'Invalid quality value: {quality} (0,51)')
         cmd = [
             self.encoder_path,
@@ -440,7 +440,7 @@ class TFCI(BinaryCodec):
         return args
 
     def _get_encode_cmd(self, img, quality, out_filepath):
-        if not quality in (1, 8):
+        if not 1 <= quality <= 8:
             raise ValueError(f'Invalid quality value: {quality} (1, 8)')
         cmd = [
             sys.executable,
@@ -519,7 +519,7 @@ class VTM(Codec):
         return args
 
     def _run(self, img, quality):
-        if not quality in (0, 51):
+        if not 0 <= quality <= 51:
             raise ValueError(f'Invalid quality value: {quality} (0,51)')
 
         # Convert input image to yuv 444 file
@@ -651,7 +651,7 @@ class HM(Codec):
         return args
 
     def _run(self, img, quality):
-        if not quality in (0, 51):
+        if not 0 <= quality <= 51:
             raise ValueError(f'Invalid quality value: {quality} (0,51)')
 
         # Convert input image to yuv 444 file
