@@ -30,7 +30,7 @@ NJOBS=${NJOBS:-4}
 
 usage() {
     echo "usage: $(basename $0) dataset CODECS"
-    echo "supported codecs: [JPEG, WebP, JPEG2000, BPG, TFCI, VTM, HM]"
+    echo "supported codecs: [jpeg, jpeg2000, WebP, bpg, hm, vtm, bmshj2018-factorized-mse, bmshj2018-hyperprior-mse, mbt2018-mean-mse]"
 }
 
 if [ $1 == "-h" ] || [ $1 == "--help" ]; then
