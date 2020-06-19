@@ -10,6 +10,27 @@ Currently, only models optimized w.r.t to the mean square error (*mse*) computed
 on the RGB channels are available. We expect to release models fine-tuned with
 other metrics in the future.
 
+Pass :code:`pretrained=True` to construct a model with pretrained weights.
+
+Instancing a pre-trained model will download its weights to a cache directory.
+See the official `PyTorch documentation
+<https://pytorch.org/docs/stable/model_zoo.html#torch.utils.model_zoo.load_url>`_
+for details on the mechanics of loading models from url in PyTorch.
+
+The current pre-trained models expect input batches of RGB image tensors of
+shape (N, 3, H, W). H and W are expected to be at least 64. The images data have
+to be in the [0, 1] range. The images *should not be normalized*. Based on the
+number of strided convolutions and deconvolutions of the model you are using,
+you might have to pad the input tensors H and W dimensions to be a power of 2.
+
+Models may have different behaviors for their training or evaluation modes. For
+example, the quantization operations may be performed differently. You can use
+``model.train()`` or ``model.eval()`` to switch between modes. See the PyTorch
+documentation for more information on
+`train <https://pytorch.org/docs/stable/nn.html?highlight=train#torch.nn.Module.train>`_
+and `eval <https://pytorch.org/docs/stable/nn.html?highlight=eval#torch.nn.Module.eval>`_.
+
+
 Training
 ~~~~~~~~
 
