@@ -30,7 +30,13 @@ NJOBS=${NJOBS:-4}
 
 usage() {
     echo "usage: $(basename $0) dataset CODECS"
+    echo "supported codecs: [JPEG, WebP, JPEG2000, BPG, TFCI, VTM, HM]"
 }
+
+if [ $1 == "-h" ] || [ $1 == "--help" ]; then
+    usage
+    exit 1
+fi
 
 if [[ $# -lt 2 ]]; then
     echo "Error: missing arguments"
