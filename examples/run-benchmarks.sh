@@ -87,6 +87,7 @@ webp() {
 }
 
 bpg() {
+    if [ -z ${BPGENC+x} ] || [ -z ${BPGDEC+x} ]; then echo "install libBPG"; exit 1; fi
     python -m compressai.utils.bench bpg "$dataset"             \
         -q $(seq 47 -5 2) -m "$1" -e "$2" -c "$3"               \
         --encoder-path "$BPGENC"                                \
@@ -95,6 +96,7 @@ bpg() {
 }
 
 hm() {
+    if [ -z ${HM_BIN_DIR+x} ]; then echo "set HM bin directory HM_BIN_DIR"; exit 1; fi
     echo "using HM version $HM_VERSION"
     python3 -m compressai.utils.bench hm "$dataset"             \
         -q $(seq 47 -5 2) -b "$HM_BIN_DIR" -c "$HM_CFG"         \
@@ -102,6 +104,7 @@ hm() {
 }
 
 vtm() {
+    if [ -z ${VTM_BIN_DIR+x} ]; then echo "set VTM bin directory VTM_BIN_DIR"; exit 1; fi
     echo "using VTM version $VTM_VERSION"
     python3 -m compressai.utils.bench vtm "$dataset"            \
         -q $(seq 47 -5 2) -b "$VTM_BIN_DIR" -c "$VTM_CFG"       \
@@ -109,6 +112,7 @@ vtm() {
 }
 
 tfci() {
+    if [ -z ${TFCI_SCRIPT+x} ]; then echo "set tfci.py path: TFCI_SCRIPT bin path"; exit 1; fi
     python3 -m compressai.utils.bench tfci "$dataset"           \
         --path "$TFCI_SCRIPT" --model "$1"                      \
         -q $(seq 1 8) -j "$NJOBS" > "benchmarks/$1.json"
