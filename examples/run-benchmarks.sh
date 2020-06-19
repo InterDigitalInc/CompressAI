@@ -60,7 +60,9 @@ TFCI_SCRIPT="${HOME}/tensorflow-compression/compression/examples/tfci.py"
 # edit below to provide the path to the chosen version of VTM
 _VTM_SRC_DIR="${HOME}/vvc/vtm-8.2"
 VTM_BIN_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
-VTM_CFG="${_HM_SRC_DIR}/cfg/encoder_intra_vtm.cfg | grep "$_VTM_SRC_DIR")"
+# uncomment below and provide bin directory if not found
+VTM_BIN_DIR="${_VTM_SRC_DIR}/bin/umake/clang-11.0/x86_64/release/"
+VTM_CFG="${_VTM_SRC_DIR}/cfg/encoder_intra_vtm.cfg"
 VTM_VERSION_FILE="${_VTM_SRC_DIR}/source/Lib/CommonLib/version.h"
 VTM_VERSION="$(sed -n -e 's/^#define VTM_VERSION //p' ${VTM_VERSION_FILE})"
 
