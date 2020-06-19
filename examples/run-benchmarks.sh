@@ -48,28 +48,29 @@ dataset="$1"
 shift
 
 # libpng
-# BPGENC="$(which bpgenc)"
-# BPGDEC="$(which bpgdec)"
+BPGENC="$(which bpgenc)"
+BPGDEC="$(which bpgdec)"
 
 # Tensorflow Compression script
 # https://github.com/tensorflow/compression
 # edit path below or uncomment locate function
-# TFCI_SCRIPT="~/tensorflow-compression/compression/examples/tfci.py"
+TFCI_SCRIPT="~/tensorflow-compression/compression/examples/tfci.py"
 
 # VTM
 # edit below to provide the path to the chosen version of VTM
-# _VTM_SRC_DIR="~/vvc/vtm-8.2"
-# VTM_BIN_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
-# VTM_CFG="$(locate encoder_intra_vtm.cfg | grep "$_VTM_SRC_DIR")"
-# VTM_VERSION_FILE="$(locate version.h | grep "$_VTM_SRC_DIR")"
-# VTM_VERSION="$(sed -n -e 's/^#define VTM_VERSION //p' ${VTM_VERSION_FILE})"
+_VTM_SRC_DIR="~/vvc/vtm-8.2"
+VTM_BIN_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
+VTM_CFG="${_HM_SRC_DIR}/cfg/encoder_intra_vtm.cfg | grep "$_VTM_SRC_DIR")"
+VTM_VERSION_FILE=$(dirname "${_VTM_SRC_DIR}/source/Lib/CommonLib/version.h")
+VTM_VERSION="$(sed -n -e 's/^#define VTM_VERSION //p' ${VTM_VERSION_FILE})"
 
 # HM
 # edit below to provide the path to the chosen version of HM
-# _HM_SRC_DIR="~/hevc/HM-16.19+SCM-8.8"
-# HM_BIN_DIR="${_HM_SRC_DIR}/bin/"
-# HM_CFG="${_HM_SRC_DIR}/cfg/encoder_intra_main_rext.cfg"
-# HM_VERSION="$(sed -n -e 's/^#define NV_VERSION        \(.*\)\/\/\/< Current software version/\1/p' "${_HM_SRC_DIR}/source/Lib/TLibCommon/CommonDef.h")"
+_HM_SRC_DIR="~/hevc/HM-16.19+SCM-8.8"
+HM_BIN_DIR="${_HM_SRC_DIR}/bin/"
+HM_CFG="${_HM_SRC_DIR}/cfg/encoder_intra_main_rext.cfg"
+HM_VERSION_FILE=$(dirname "${_HM_SRC_DIR}/source/Lib/TLibCommon/CommonDef.h")
+HM_VERSION="$(sed -n -e 's/^#define NV_VERSION \(.*\)\/\/\/< Current software version/\1/p' ${HM_VERSION_FILE})"
 
 jpeg() {
     python -m compressai.utils.bench jpeg "$dataset"            \
