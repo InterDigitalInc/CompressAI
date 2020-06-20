@@ -16,6 +16,7 @@ import math
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from compressai.entropy_models import (EntropyBottleneck, GaussianConditional)
 from compressai.layers import GDN, MaskedConv2d
@@ -487,20 +488,52 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
         z_hat = self.entropy_bottleneck.decompress(z_strings, z.size()[-2:])
 
         params = self.h_s(z_hat)
-        y_hat = torch.round(y)
-        ctx_params = self.context_prediction(y_hat)
-        gaussian_params = self.entropy_parameters(
-            torch.cat((params, ctx_params), dim=1))
-        scales_hat, means_hat = gaussian_params.chunk(2, 1)
-        indexes = self.gaussian_conditional.build_indexes(scales_hat)
 
-        # permute (N, C, H, W) to (N, H, W, C) as we will later decode
-        # all the channel values simultaneously for a given (x, y) position with
-        # the auto-regressive decoder
-        y_strings = self.gaussian_conditional.compress(
-            y_hat.permute(0, 2, 3, 1),
-            indexes.permute(0, 2, 3, 1),
-            means=means_hat.permute(0, 2, 3, 1))
+        s = 4  # scaling factor between z and y
+        kernel_size = 5  # context prediction kernel size
+        padding = (kernel_size - 1) // 2
+
+        y_height = z_hat.size(2) * s
+        y_width = z_hat.size(3) * s
+
+        y_hat = F.pad(y, (padding, padding, padding, padding))
+
+        # yapf: enable
+        # pylint: disable=protected-access
+        cdf = self.gaussian_conditional._quantized_cdf.tolist()
+        cdf_lengths = self.gaussian_conditional._cdf_length.reshape(-1).int().tolist()
+        offsets = self.gaussian_conditional._offset.reshape(-1).int().tolist()
+        # pylint: enable=protected-access
+
+        y_strings = []
+        for i in range(y.size(0)):
+            encoder = BufferedRansEncoder()
+            # Warning, this is slow...
+            for h in range(y_height):
+                for w in range(y_width):
+                    y_crop = y_hat[i:i + 1, :, h:h + kernel_size, w:w + kernel_size]
+                    ctx_params = self.context_prediction(y_crop)
+
+                    # 1x1 conv for the entropy parameters prediction network, so
+                    # we only keep the elements in the "center"
+                    ctx_p = ctx_params[i:i + 1, :, padding:padding + 1, padding:padding + 1]
+                    p = params[i:i + 1, :, h:h + 1, w:w + 1]
+                    gaussian_params = self.entropy_parameters(torch.cat((p, ctx_p), dim=1))
+                    scales_hat, means_hat = gaussian_params.chunk(2, 1)
+
+                    indexes = self.gaussian_conditional.build_indexes(scales_hat)
+                    y_q = torch.round(y_crop - means_hat)
+                    y_hat[i, :, h + padding, w + padding] = (y_q + means_hat)[i, :, padding, padding]
+                    encoder.encode_with_indexes(
+                        y_q[i, :, padding, padding].int().tolist(),
+                        indexes[i, :].squeeze().int().tolist(),
+                        cdf,
+                        cdf_lengths,
+                        offsets)
+            string = encoder.flush()
+            y_strings.append(string)
+        # yapf: disable
+
         return {'strings': [y_strings, z_strings], 'shape': z.size()[-2:]}
 
     def decompress(self, strings, shape):
@@ -523,13 +556,16 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
         # yapf: disable
         y_hat = torch.zeros((z_hat.size(0), self.M, y_height + 2 * padding, y_width + 2 * padding),
                             device=z_hat.device)
-        decoder = RangeDecoder()
+        decoder = RansDecoder()
 
         # pylint: disable=protected-access
         cdf = self.gaussian_conditional._quantized_cdf.tolist()
         cdf_lengths = self.gaussian_conditional._cdf_length.reshape(-1).int().tolist()
         offsets = self.gaussian_conditional._offset.reshape(-1).int().tolist()
 
+        # Warning: this is slow due to the auto-regressive nature of the
+        # decoding... See more recent publication where they use an
+        # auto-regressive module on chunks of channels for faster decoding...
         for i, y_string in enumerate(strings[0]):
             decoder.set_stream(y_string)
 
@@ -538,7 +574,8 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
                     # only perform the 5x5 convolution on a cropped tensor
                     # centered in (h, w)
                     y_crop = y_hat[i:i + 1, :, h:h + kernel_size, w:w + kernel_size]
-                    ctx_params = self.context_prediction(torch.round(y_crop))
+                    # ctx_params = self.context_prediction(torch.round(y_crop))
+                    ctx_params = self.context_prediction(y_crop)
 
                     # 1x1 conv for the entropy parameters prediction network, so
                     # we only keep the elements in the "center"
@@ -557,6 +594,7 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
                     rv = torch.Tensor(rv).reshape(1, -1, 1, 1)
 
                     rv = self.gaussian_conditional._dequantize(rv, means_hat)
+
                     y_hat[i, :, h + padding:h + padding + 1, w + padding:w + padding + 1] = rv
         y_hat = y_hat[:, :, padding:-padding, padding:-padding]
         # pylint: enable=protected-access
@@ -570,3 +608,15 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
             scale_table = get_scale_table()
         self.gaussian_conditional.update_scale_table(scale_table, force=force)
         super().update(force=force)
+
+    def load_state_dict(self, state_dict):
+        # Dynamically update the entropy bottleneck buffers related to the CDFs
+        update_registered_buffers(self.entropy_bottleneck,
+                                  'entropy_bottleneck',
+                                  ['_quantized_cdf', '_offset', '_cdf_length'],
+                                  state_dict)
+        update_registered_buffers(
+            self.gaussian_conditional, 'gaussian_conditional',
+            ['_quantized_cdf', '_offset', '_cdf_length', 'scale_table'],
+            state_dict)
+        super().load_state_dict(state_dict)

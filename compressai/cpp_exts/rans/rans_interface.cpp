@@ -136,8 +136,8 @@ void BufferedRansEncoder::encode_with_indexes(
 
     /* Bypass coding mode (value == max_value -> sentinel flag) */
     if (value == max_value) {
-      /* Determine number of pass (in bypass_precision size) needed to encode
-       * the raw value. */
+      /* Determine the number of bypasses (in bypass_precision size) needed to
+       * encode the raw value. */
       int32_t n_bypass = 0;
       while ((raw_val >> (n_bypass * bypass_precision)) != 0) {
         ++n_bypass;
