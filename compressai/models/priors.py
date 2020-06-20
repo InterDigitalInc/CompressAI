@@ -509,6 +509,7 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
         for i in range(y.size(0)):
             encoder = BufferedRansEncoder()
             # Warning, this is slow...
+            # TODO: profile the calls to the bindings...
             for h in range(y_height):
                 for w in range(y_width):
                     y_crop = y_hat[i:i + 1, :, h:h + kernel_size, w:w + kernel_size]
