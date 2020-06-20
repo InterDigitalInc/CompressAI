@@ -9,10 +9,10 @@ Based on the original C++ implementation from Fabian "ryg" Giesen
 .. currentmodule:: compressai.ans
 
 
-RangeEncoder
-------------
-.. autoclass:: RangeEncoder
+RansEncoder
+-----------
+.. autoclass:: RansEncoder
 
-RangeDecoder
-------------
-.. autoclass:: RangeDecoder
+RansDecoder
+-----------
+.. autoclass:: RansDecoder

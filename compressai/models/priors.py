@@ -19,7 +19,7 @@ import torch.nn as nn
 
 from compressai.entropy_models import (EntropyBottleneck, GaussianConditional)
 from compressai.layers import GDN, MaskedConv2d
-from compressai.ans import RangeDecoder  # pylint: disable=E0611,E0401
+from compressai.ans import BufferedRansEncoder, RansDecoder  # pylint: disable=E0611,E0401
 
 from .utils import update_registered_buffers, conv, deconv
 

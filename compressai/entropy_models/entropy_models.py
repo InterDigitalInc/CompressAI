@@ -25,8 +25,8 @@ class _EntropyCoder:
 
         if method == 'ans':
             from compressai import ans  # pylint: disable=E0611
-            encoder = ans.RangeEncoder()
-            decoder = ans.RangeDecoder()
+            encoder = ans.RansEncoder()
+            decoder = ans.RansDecoder()
         elif method == 'rangecoder':
             import range_coder  # pylint: disable=E0401
             encoder = range_coder.RangeEncoder()

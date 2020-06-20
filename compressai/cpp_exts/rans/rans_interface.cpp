@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+/* Rans64 extensions from:
+ * https://fgiesen.wordpress.com/2015/12/21/rans-in-practice/
+ * Unbounded range coding from:
+ * https://github.com/tensorflow/compression/blob/master/tensorflow_compression/cc/kernels/unbounded_index_range_coding_kernels.cc
+ **/
+
 #include "rans_interface.hpp"
 
 #include <pybind11/pybind11.h>
@@ -30,13 +36,15 @@
 
 namespace py = pybind11;
 
-constexpr int precision = 16; /* probability range */
+/* probability range, this could be a parameter... */
+constexpr int precision = 16;
 
-constexpr int bypass_precision = 4; /* number of bits in bypass mode */
-constexpr int max_bypass_val = (1 << bypass_precision) - 1;
+constexpr uint16_t bypass_precision = 4; /* number of bits in bypass mode */
+constexpr uint16_t max_bypass_val = (1 << bypass_precision) - 1;
 
 namespace {
 
+/* We only run this in debug mode as its costly... */
 void assert_cdfs(const std::vector<std::vector<int>> &cdfs,
                  const std::vector<int> &cdfs_sizes) {
   for (int i = 0; i < static_cast<int>(cdfs.size()); ++i) {
@@ -48,15 +56,13 @@ void assert_cdfs(const std::vector<std::vector<int>> &cdfs,
   }
 }
 
-/* Rans64 extensions from:
- * https://fgiesen.wordpress.com/2015/12/21/rans-in-practice/ */
 /* Support only 16 bits word max */
 inline void Rans64EncPutBits(Rans64State *r, uint32_t **pptr, uint32_t val,
                              uint32_t nbits) {
   assert(nbits <= 16);
   assert(val < (1u << nbits));
 
-  /* Renormalize */
+  /* Re-normalize */
   uint64_t x = *r;
   uint32_t freq = 1 << (16 - nbits);
   uint64_t x_max = ((RANS64_L >> 16) << 32) * freq;
@@ -76,7 +82,7 @@ inline uint32_t Rans64DecGetBits(Rans64State *r, uint32_t **pptr,
   uint64_t x = *r;
   uint32_t val = x & ((1u << n_bits) - 1);
 
-  /* Renormalize */
+  /* Re-normalize */
   x = x >> n_bits;
   if (x < RANS64_L) {
     x = (x << 32) | **pptr;
@@ -90,7 +96,7 @@ inline uint32_t Rans64DecGetBits(Rans64State *r, uint32_t **pptr,
 }
 } // namespace
 
-py::bytes rANSEncoderInterface::encode_with_indexes(
+void BufferedRansEncoder::encode_with_indexes(
     const std::vector<int32_t> &symbols, const std::vector<int32_t> &indexes,
     const std::vector<std::vector<int32_t>> &cdfs,
     const std::vector<int32_t> &cdfs_sizes,
@@ -98,18 +104,9 @@ py::bytes rANSEncoderInterface::encode_with_indexes(
   assert(cdfs.size() == cdfs_sizes.size());
   assert_cdfs(cdfs, cdfs_sizes);
 
-  std::vector<uint32_t> output(symbols.size(), 0xCC); // too much space ?
-
-  Rans64State rans;
-  Rans64EncInit(&rans);
-
-  // end of output buffer
-  uint32_t *ptr = output.data() + output.size();
-  assert(ptr != nullptr);
-
   // backward loop on symbols from the end;
-  for (int i = static_cast<int>(symbols.size()); i > 0; --i) {
-    const int32_t cdf_idx = indexes[i - 1];
+  for (size_t i = 0; i < symbols.size(); ++i) {
+    const int32_t cdf_idx = indexes[i];
     assert(cdf_idx >= 0);
     assert(cdf_idx < cdfs.size());
 
@@ -119,46 +116,71 @@ py::bytes rANSEncoderInterface::encode_with_indexes(
     assert(max_value >= 0);
     assert((max_value + 1) < cdf.size());
 
-    int32_t value = symbols[i - 1] - offsets[cdf_idx];
+    int32_t value = symbols[i] - offsets[cdf_idx];
 
-    if (value < 0 || value >= max_value) {
-      /* Bypass coding mode */
-
-      int32_t raw_val = 0;
-      if (value < 0) {
-        raw_val = -2 * value - 1;
-      } else {
-        raw_val = 2 * (value - max_value);
-      }
-
-      int32_t n_bypass = 0;
-      while ((raw_val >> (n_bypass * bypass_precision)) != 0) {
-        ++n_bypass;
-      }
-
-      /* Encode raw value */
-      for (int j = n_bypass - 1; j >= 0; --j) {
-        const int32_t val =
-            (raw_val >> (j * bypass_precision)) & max_bypass_val;
-        Rans64EncPutBits(&rans, &ptr, val, bypass_precision);
-      }
-
-      /* Encode number of bypasses */
-      while (n_bypass >= max_bypass_val) {
-        n_bypass -= max_bypass_val;
-        Rans64EncPutBits(&rans, &ptr, max_bypass_val, bypass_precision);
-      }
-      Rans64EncPutBits(&rans, &ptr, n_bypass, bypass_precision);
-
-      /* Signal flag for bypass mode */
+    uint32_t raw_val = 0;
+    if (value < 0) {
+      raw_val = -2 * value - 1;
+      value = max_value;
+    } else if (value >= max_value) {
+      raw_val = 2 * (value - max_value);
       value = max_value;
     }
 
     assert(value >= 0);
     assert(value < cdfs_sizes[cdf_idx] - 1);
 
-    Rans64EncPut(&rans, &ptr, cdf[value], cdf[value + 1] - cdf[value],
-                 precision);
+    _syms.push_back({static_cast<uint16_t>(cdf[value]),
+                     static_cast<uint16_t>(cdf[value + 1] - cdf[value]),
+                     false});
+
+    /* Bypass coding mode (value == max_value -> sentinel flag) */
+    if (value == max_value) {
+      /* Determine number of pass (in bypass_precision size) needed to encode
+       * the raw value. */
+      int32_t n_bypass = 0;
+      while ((raw_val >> (n_bypass * bypass_precision)) != 0) {
+        ++n_bypass;
+      }
+
+      /* Encode number of bypasses */
+      int32_t val = n_bypass;
+      while (val >= max_bypass_val) {
+        _syms.push_back({max_bypass_val, max_bypass_val + 1, true});
+        val -= max_bypass_val;
+      }
+      _syms.push_back(
+          {static_cast<uint16_t>(val), static_cast<uint16_t>(val + 1), true});
+
+      /* Encode raw value */
+      for (int32_t j = 0; j < n_bypass; ++j) {
+        const int32_t val =
+            (raw_val >> (j * bypass_precision)) & max_bypass_val;
+        _syms.push_back(
+            {static_cast<uint16_t>(val), static_cast<uint16_t>(val + 1), true});
+      }
+    }
+  }
+}
+
+py::bytes BufferedRansEncoder::flush() {
+  Rans64State rans;
+  Rans64EncInit(&rans);
+
+  std::vector<uint32_t> output(_syms.size(), 0xCC); // too much space ?
+  uint32_t *ptr = output.data() + output.size();
+  assert(ptr != nullptr);
+
+  while (!_syms.empty()) {
+    const RansSymbol sym = _syms.back();
+
+    if (!sym.bypass) {
+      Rans64EncPut(&rans, &ptr, sym.start, sym.range, precision);
+    } else {
+      // unlikely...
+      Rans64EncPutBits(&rans, &ptr, sym.start, bypass_precision);
+    }
+    _syms.pop_back();
   }
 
   Rans64EncFlush(&rans, &ptr);
@@ -168,11 +190,25 @@ py::bytes rANSEncoderInterface::encode_with_indexes(
   return std::string(reinterpret_cast<char *>(ptr), nbytes);
 }
 
-std::vector<int32_t> rANSDecoderInterface::decode_with_indexes(
-    const std::string &encoded, const std::vector<int32_t> &indexes,
-    const std::vector<std::vector<int32_t>> &cdfs,
-    const std::vector<int32_t> &cdfs_sizes,
-    const std::vector<int32_t> &offsets) {
+py::bytes
+RansEncoder::encode_with_indexes(const std::vector<int32_t> &symbols,
+                                 const std::vector<int32_t> &indexes,
+                                 const std::vector<std::vector<int32_t>> &cdfs,
+                                 const std::vector<int32_t> &cdfs_sizes,
+                                 const std::vector<int32_t> &offsets) {
+
+  BufferedRansEncoder buffered_rans_enc;
+  buffered_rans_enc.encode_with_indexes(symbols, indexes, cdfs, cdfs_sizes,
+                                        offsets);
+  return buffered_rans_enc.flush();
+}
+
+std::vector<int32_t>
+RansDecoder::decode_with_indexes(const std::string &encoded,
+                                 const std::vector<int32_t> &indexes,
+                                 const std::vector<std::vector<int32_t>> &cdfs,
+                                 const std::vector<int32_t> &cdfs_sizes,
+                                 const std::vector<int32_t> &offsets) {
   assert(cdfs.size() == cdfs_sizes.size());
   assert_cdfs(cdfs, cdfs_sizes);
 
@@ -238,7 +274,7 @@ std::vector<int32_t> rANSDecoderInterface::decode_with_indexes(
   return output;
 }
 
-void rANSDecoderInterface::set_stream(const std::string &encoded) {
+void RansDecoder::set_stream(const std::string &encoded) {
   _stream = encoded;
   uint32_t *ptr = (uint32_t *)_stream.data();
   assert(ptr != nullptr);
@@ -246,11 +282,11 @@ void rANSDecoderInterface::set_stream(const std::string &encoded) {
   Rans64DecInit(&_rans, &_ptr);
 }
 
-std::vector<int32_t> rANSDecoderInterface::decode_stream(
-    const std::vector<int32_t> &indexes,
-    const std::vector<std::vector<int32_t>> &cdfs,
-    const std::vector<int32_t> &cdfs_sizes,
-    const std::vector<int32_t> &offsets) {
+std::vector<int32_t>
+RansDecoder::decode_stream(const std::vector<int32_t> &indexes,
+                           const std::vector<std::vector<int32_t>> &cdfs,
+                           const std::vector<int32_t> &cdfs_sizes,
+                           const std::vector<int32_t> &offsets) {
   assert(cdfs.size() == cdfs_sizes.size());
   assert_cdfs(cdfs, cdfs_sizes);
 
@@ -318,13 +354,18 @@ PYBIND11_MODULE(ans, m) {
 
   m.doc() = "range Asymmetric Numeral System python bindings";
 
-  py::class_<rANSEncoderInterface>(m, "RangeEncoder")
+  py::class_<BufferedRansEncoder>(m, "BufferedRansEncoder")
       .def(py::init<>())
-      .def("encode_with_indexes", &rANSEncoderInterface::encode_with_indexes);
+      .def("encode_with_indexes", &BufferedRansEncoder::encode_with_indexes)
+      .def("flush", &BufferedRansEncoder::flush);
 
-  py::class_<rANSDecoderInterface>(m, "RangeDecoder")
+  py::class_<RansEncoder>(m, "RansEncoder")
       .def(py::init<>())
-      .def("set_stream", &rANSDecoderInterface::set_stream)
-      .def("decode_stream", &rANSDecoderInterface::decode_stream)
-      .def("decode_with_indexes", &rANSDecoderInterface::decode_with_indexes);
+      .def("encode_with_indexes", &RansEncoder::encode_with_indexes);
+
+  py::class_<RansDecoder>(m, "RansDecoder")
+      .def(py::init<>())
+      .def("set_stream", &RansDecoder::set_stream)
+      .def("decode_stream", &RansDecoder::decode_stream)
+      .def("decode_with_indexes", &RansDecoder::decode_with_indexes);
 }
