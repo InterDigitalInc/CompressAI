@@ -72,14 +72,14 @@ model_urls = {
     },
     'mbt2018': {
         'mse': {
-            1: '{root_url}/mbt2018-1-3f36cd77.pth.tar',
-            2: '{root_url}/mbt2018-2-43b70cdd.pth.tar',
-            3: '{root_url}/mbt2018-3-22901978.pth.tar',
-            4: '{root_url}/mbt2018-4-456e2af9.pth.tar',
-            5: '{root_url}/mbt2018-5-b4a046dd.pth.tar',
-            6: '{root_url}/mbt2018-6-7052e5ea.pth.tar',
-            7: '{root_url}/mbt2018-7-8ba2bf82.pth.tar',
-            8: '{root_url}/mbt2018-8-dd0097aa.pth.tar',
+            1: f'{root_url}/mbt2018-1-3f36cd77.pth.tar',
+            2: f'{root_url}/mbt2018-2-43b70cdd.pth.tar',
+            3: f'{root_url}/mbt2018-3-22901978.pth.tar',
+            4: f'{root_url}/mbt2018-4-456e2af9.pth.tar',
+            5: f'{root_url}/mbt2018-5-b4a046dd.pth.tar',
+            6: f'{root_url}/mbt2018-6-7052e5ea.pth.tar',
+            7: f'{root_url}/mbt2018-7-8ba2bf82.pth.tar',
+            8: f'{root_url}/mbt2018-8-dd0097aa.pth.tar',
         },
     },
 }
