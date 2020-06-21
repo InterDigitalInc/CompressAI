@@ -361,12 +361,12 @@ PYBIND11_MODULE(ans, m) {
 
   py::class_<RansEncoder>(m, "RansEncoder")
       .def(py::init<>())
-      .def("encode_with_indexes", &rANSEncoderInterface::encode_with_indexes,
+      .def("encode_with_indexes", &RansEncoder::encode_with_indexes,
 
   py::class_<RansDecoder>(m, "RansDecoder")
       .def(py::init<>())
       .def("set_stream", &RansDecoder::set_stream)
       .def("decode_stream", &RansDecoder::decode_stream)
-      .def("decode_with_indexes", &rANSDecoderInterface::decode_with_indexes,
+      .def("decode_with_indexes", &RansDecoder::decode_with_indexes,
               "Decode a string to a list of symbols");
 }
