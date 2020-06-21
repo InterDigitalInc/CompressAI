@@ -31,6 +31,9 @@ documentation for more information on
 and `eval <https://pytorch.org/docs/stable/nn.html?highlight=eval#torch.nn.Module.eval>`_.
 
 
+.. contents:: Table of content
+   :local:
+
 Training
 ~~~~~~~~
 

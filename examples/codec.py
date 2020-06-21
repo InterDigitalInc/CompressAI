@@ -161,7 +161,7 @@ def _decode(inputpath, coder, show, output=None):
     load_time = time.time() - start
 
     with torch.no_grad():
-        out = net.decompress(shape, strings)
+        out = net.decompress(strings, shape)
     img = torch2img(out['x_hat'])
     dec_time = time.time() - dec_start
     print(f'Decoded in {dec_time:.2f}s (model loading: {load_time:.2f}s)')

@@ -14,8 +14,7 @@
 
 from torch.hub import load_state_dict_from_url
 
-from compressai.models import (FactorizedPrior,
-                               ScaleHyperprior,
+from compressai.models import (FactorizedPrior, ScaleHyperprior,
                                MeanScaleHyperprior,
                                JointAutoregressiveHierarchicalPriors)
 
@@ -48,13 +47,40 @@ model_urls = {
         },
     },
     'bmshj2018-hyperprior': {
-        'mse': {},
+        'mse': {
+            1: f'{root_url}/bmshj2018-hyperprior-1-7eb97409.pth.tar',
+            2: f'{root_url}/bmshj2018-hyperprior-2-93677231.pth.tar',
+            3: f'{root_url}/bmshj2018-hyperprior-3-6d87be32.pth.tar',
+            4: f'{root_url}/bmshj2018-hyperprior-4-de1b779c.pth.tar',
+            5: f'{root_url}/bmshj2018-hyperprior-5-f8b614e1.pth.tar',
+            6: f'{root_url}/bmshj2018-hyperprior-6-1ab9c41e.pth.tar',
+            7: f'{root_url}/bmshj2018-hyperprior-7-3804dcbd.pth.tar',
+            8: f'{root_url}/bmshj2018-hyperprior-8-a583f0cf.pth.tar',
+        },
     },
     'mbt2018-mean': {
-        'mse': {},
+        'mse': {
+            1: f'{root_url}/mbt2018-mean-1-e522738d.pth.tar',
+            2: f'{root_url}/mbt2018-mean-2-e54a039d.pth.tar',
+            3: f'{root_url}/mbt2018-mean-3-723404a8.pth.tar',
+            4: f'{root_url}/mbt2018-mean-4-6dba02a3.pth.tar',
+            5: f'{root_url}/mbt2018-mean-5-d504e8eb.pth.tar',
+            6: f'{root_url}/mbt2018-mean-6-a19628ab.pth.tar',
+            7: f'{root_url}/mbt2018-mean-7-d5d441d1.pth.tar',
+            8: f'{root_url}/mbt2018-mean-8-8089ae3e.pth.tar',
+        },
     },
     'mbt2018': {
-        'mse': {},
+        'mse': {
+            1: f'{root_url}/mbt2018-1-3f36cd77.pth.tar',
+            2: f'{root_url}/mbt2018-2-43b70cdd.pth.tar',
+            3: f'{root_url}/mbt2018-3-22901978.pth.tar',
+            4: f'{root_url}/mbt2018-4-456e2af9.pth.tar',
+            5: f'{root_url}/mbt2018-5-b4a046dd.pth.tar',
+            6: f'{root_url}/mbt2018-6-7052e5ea.pth.tar',
+            7: f'{root_url}/mbt2018-7-8ba2bf82.pth.tar',
+            8: f'{root_url}/mbt2018-8-dd0097aa.pth.tar',
+        },
     },
 }
 
@@ -84,7 +110,7 @@ cfgs = {
         2: (128, 192),
         3: (128, 192),
         4: (128, 192),
-        5: (128, 192),
+        5: (192, 320),
         6: (192, 320),
         7: (192, 320),
         8: (192, 320),
@@ -94,7 +120,7 @@ cfgs = {
         2: (192, 192),
         3: (192, 192),
         4: (192, 192),
-        5: (192, 192),
+        5: (192, 320),
         6: (192, 320),
         7: (192, 320),
         8: (192, 320),
@@ -125,7 +151,8 @@ def _load_model(architecture,
         model = model_architectures[architecture].from_state_dict(state_dict)
         return model
 
-    model = model_architectures[architecture](*cfgs[architecture][quality], **kwargs)
+    model = model_architectures[architecture](*cfgs[architecture][quality],
+                                              **kwargs)
     return model
 
 
