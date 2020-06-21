@@ -157,3 +157,7 @@ bmshj2018 hyperprior
 mbt2018 mean
 ------------
 .. image:: media/images/mbt2018-mean-mse.png
+
+mbt2018
+------------
+.. image:: media/images/mbt2018-mse.png
