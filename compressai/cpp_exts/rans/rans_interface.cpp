@@ -361,7 +361,7 @@ PYBIND11_MODULE(ans, m) {
 
   py::class_<RansEncoder>(m, "RansEncoder")
       .def(py::init<>())
-      .def("encode_with_indexes", &RansEncoder::encode_with_indexes,
+      .def("encode_with_indexes", &RansEncoder::encode_with_indexes);
 
   py::class_<RansDecoder>(m, "RansDecoder")
       .def(py::init<>())
