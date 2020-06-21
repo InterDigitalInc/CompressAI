@@ -347,6 +347,18 @@ class TestMbt2018:
         with pytest.raises(ValueError):
             mbt2018(1, metric='ssim')
 
+    def test_pretrained(self):
+        # test we can load the correct models from the urls
+        for i in range(1, 5):
+            net = mbt2018(i, metric='mse', pretrained=True)
+            assert net.state_dict()['g_a.0.weight'].size(0) == 192
+            assert net.state_dict()['g_a.6.weight'].size(0) == 192
+
+        for i in range(5, 9):
+            net = mbt2018(i, metric='mse', pretrained=True)
+            assert net.state_dict()['g_a.0.weight'].size(0) == 192
+            assert net.state_dict()['g_a.6.weight'].size(0) == 320
+
 
 class Foo(nn.Module):
     def __init__(self):
