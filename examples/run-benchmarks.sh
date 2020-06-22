@@ -54,21 +54,21 @@ BPGDEC="$(which bpgdec)"
 # Tensorflow Compression script
 # https://github.com/tensorflow/compression
 # edit path below or uncomment locate function
-TFCI_SCRIPT="${HOME}/tensorflow-compression/compression/examples/tfci.py"
+TFCI_SCRIPT="${HOME}/tensorflow-compression/compression/models/tfci.py"
 
 # VTM
 # edit below to provide the path to the chosen version of VTM
-_VTM_SRC_DIR="${HOME}/vvc/vtm-8.2"
+_VTM_SRC_DIR="${HOME}/vvc/vtm-9.1"
 VTM_BIN_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
 # uncomment below and provide bin directory if not found
-VTM_BIN_DIR="${_VTM_SRC_DIR}/bin/umake/clang-11.0/x86_64/release/"
+# VTM_BIN_DIR="${_VTM_SRC_DIR}/bin/umake/clang-11.0/x86_64/release/"
 VTM_CFG="${_VTM_SRC_DIR}/cfg/encoder_intra_vtm.cfg"
 VTM_VERSION_FILE="${_VTM_SRC_DIR}/source/Lib/CommonLib/version.h"
 VTM_VERSION="$(sed -n -e 's/^#define VTM_VERSION //p' ${VTM_VERSION_FILE})"
 
 # HM
 # edit below to provide the path to the chosen version of HM
-_HM_SRC_DIR="${HOME}/hevc/HM-16.19+SCM-8.8"
+_HM_SRC_DIR="${HOME}/hevc/HM-16.20+SCM-8.8"
 HM_BIN_DIR="${_HM_SRC_DIR}/bin/"
 HM_CFG="${_HM_SRC_DIR}/cfg/encoder_intra_main_rext.cfg"
 HM_VERSION_FILE="${_HM_SRC_DIR}/source/Lib/TLibCommon/CommonDef.h"
@@ -115,7 +115,7 @@ vtm() {
 }
 
 tfci() {
-    if [ -z ${TFCI_SCRIPT+x} ]; then echo "set tfci.py path: TFCI_SCRIPT bin path"; exit 1; fi
+    if [ -z ${TFCI_SCRIPT+x} ]; then echo "set TFCI_SCRIPT bin path"; exit 1; fi
     python3 -m compressai.utils.bench tfci "$dataset"           \
         --path "$TFCI_SCRIPT" --model "$1"                      \
         -q $(seq 1 8) -j "$NJOBS" > "benchmarks/$1.json"
