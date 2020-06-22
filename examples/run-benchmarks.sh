@@ -30,7 +30,7 @@ NJOBS=${NJOBS:-4}
 
 usage() {
     echo "usage: $(basename $0) dataset CODECS"
-    echo "supported codecs: [jpeg, jpeg2000, WebP, bpg, hm, vtm, bmshj2018-factorized-mse, bmshj2018-hyperprior-mse, mbt2018-mean-mse]"
+    echo "supported codecs: [jpeg, jpeg2000, WebP, av1, bpg, hm, vtm, bmshj2018-factorized-mse, bmshj2018-hyperprior-mse, mbt2018-mean-mse]"
 }
 
 if [[ $1 == "-h" || $1 == "--help" ]]; then
@@ -89,6 +89,11 @@ webp() {
         -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/webp.json
 }
 
+av1() {
+    python -m compressai.utils.bench av1 "$dataset"        \
+        -q $(seq 62 -5 2) -j "$NJOBS" > benchmarks/av1.json
+}
+
 bpg() {
     if [ -z ${BPGENC+x} ] || [ -z ${BPGDEC+x} ]; then echo "install libBPG"; exit 1; fi
     python -m compressai.utils.bench bpg "$dataset"             \
@@ -133,6 +138,9 @@ for i in "$@"; do
             ;;
         "webp")
             webp
+            ;;
+        "av1")
+            av1
             ;;
         "bpg")
             # bpg "420" "x265" "rgb" bpg_420_x265_rgb.json
