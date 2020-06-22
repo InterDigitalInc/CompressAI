@@ -62,6 +62,7 @@ def read_image(filepath: str, mode: str = 'RGB') -> np.array:
 def compute_metrics(a: Union[np.array, Image.Image],
                     b: Union[np.array, Image.Image],
                     max_val: float = 255.) -> Tuple[float, float]:
+    """Returns PSNR and MS-SSIM between images `a` and `b`. """
     if isinstance(a, Image.Image):
         a = np.asarray(a)
     if isinstance(b, Image.Image):
@@ -326,6 +327,45 @@ class JPEG2000(BinaryCodec):
         ]
         return cmd
 
+
+class AV1(BinaryCodec):
+    """Use ffmpeg libaom-av1 version.
+    """
+    fmt = '.ivf'
+
+    @property
+    def name(self):
+        return 'AV1'
+
+    @property
+    def description(self):
+        return f'AV1: libaom-av1. ffmpeg version {_get_ffmpeg_version()}'
+
+    def _get_encode_cmd(self, img, quality, out_filepath):
+        cmd = [
+            'ffmpeg',
+            '-i',
+            img,
+            '-strict',
+            'experimental',
+            '-pix_fmt',
+            'yuv420p',
+            '-c:v',
+            'libaom-av1',
+            '-b:v',
+            0,
+            '-crf',
+            quality,
+            out_filepath,
+        ]
+        return cmd
+
+    def _get_decode_cmd(self, out_filepath, rec_filepath):
+        cmd = [
+            'ffmpeg', '-loglevel', 'panic', '-y', '-i', out_filepath,
+            rec_filepath
+        ]
+        return cmd
 
 class BPG(BinaryCodec):
     """BPG from Fabrice Bellard."""
@@ -727,7 +767,7 @@ class HM(Codec):
         }
 
 
-codecs = [JPEG, WebP, JPEG2000, BPG, TFCI, VTM, HM]
+codecs = [JPEG, WebP, JPEG2000, BPG, TFCI, VTM, HM, AV1]
 
 
 def collect(codec: Codec,
