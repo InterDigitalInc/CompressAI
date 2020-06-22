@@ -148,10 +148,13 @@ Original paper: [mbt2018]_
 Performances
 ~~~~~~~~~~~~
 
+all models
+----------
+.. image:: media/images/all.png
+
 bmshj2018 factorized
 --------------------
 .. image:: media/images/bmshj2018-factorized-mse.png
-
 
 bmshj2018 hyperprior
 --------------------
@@ -162,5 +165,5 @@ mbt2018 mean
 .. image:: media/images/mbt2018-mean-mse.png
 
 mbt2018
-------------
+-------
 .. image:: media/images/mbt2018-mse.png
