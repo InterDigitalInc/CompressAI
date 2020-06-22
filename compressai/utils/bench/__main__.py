@@ -344,6 +344,9 @@ class AV1(BinaryCodec):
     def _get_encode_cmd(self, img, quality, out_filepath):
         cmd = [
             'ffmpeg',
+             '-loglevel',
+            'panic',
+            '-y',
             '-i',
             img,
             '-strict',
@@ -352,8 +355,6 @@ class AV1(BinaryCodec):
             'yuv420p',
             '-c:v',
             'libaom-av1',
-            '-b:v',
-            0,
             '-crf',
             quality,
             out_filepath,
@@ -599,6 +600,7 @@ class VTM(Codec):
             '1',
             '--InputChromaFormat=444',
             '--InputBitDepth=8',
+            '--ConformanceMode=1'
         ]
 
         if self.rgb:
