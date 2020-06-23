@@ -82,7 +82,7 @@ def get_extra_requirements():
 setup(
     name=package_name,
     version=version,
-    description='A ML library for end-to-end data compression research',
+    description='A PyTorch library and evaluation platform for end-to-end compression research',
     packages=find_packages(exclude=('tests', )),
     zip_safe=False,
     python_requires='>=3.6',
