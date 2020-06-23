@@ -448,7 +448,7 @@ class AV1(Codec):
         os.unlink(yuv_path)
 
         # Decode
-        cmd = [self.decoder_path, '-b', out_filepath, '-o', yuv_path, '-d', 8]
+        cmd = [self.decoder_path, out_filepath, '-o', yuv_path, '--rawvideo', '--output-bit-depth=8']
 
         start = time.time()
         run_command(cmd)
