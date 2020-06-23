@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 Find the closest codec quality parameter to reach a given metric (bpp, ms-ssim,
 or psnr).
@@ -32,19 +31,23 @@ from compressai.utils.bench.codecs import (Codec, JPEG, WebP, JPEG2000, BPG,
                                            VTM, HM, AV1)
 
 
-def find_closest(codec: Codec,
-                 img: str,
-                 target: float,
-                 metric='str') -> Tuple[int, Dict[str, float], Image.Image]:
+def find_closest(
+        codec: Codec,
+        img: str,
+        target: float,
+        metric: str = 'psnr') -> Tuple[int, Dict[str, float], Image.Image]:
+    rev = False  # higher Q -> better quality or reverse
     if isinstance(codec, (JPEG, JPEG2000, WebP)):
         lower = 0
         upper = 100
     elif isinstance(codec, (BPG, HM, VTM)):
-        lower = 50
-        upper = 0
+        lower = 0
+        upper = 50
+        rev = True
     elif isinstance(codec, (AV1, )):
-        lower = 62
-        upper = 0
+        lower = 0
+        upper = 62
+        rev = True
     else:
         assert False, codec
 
@@ -52,11 +55,23 @@ def find_closest(codec: Codec,
         mid = (upper + lower) // 2
         rv, rec = codec.run(img, mid, return_rec=True)
         if rv[metric] > target:
-            upper = mid - 1
+            if not rev:
+                upper = mid - 1
+            else:
+                lower = mid + 1
         elif rv[metric] < target:
-            lower = mid + 1
+            if not rev:
+                lower = mid + 1
+            else:
+                upper = mid - 1
         else:
             break
+        sys.stderr.write(
+            f'\rtarget {metric}: {target:.4f} | value: {rv[metric]:.4f} | q: {mid}'
+        )
+        sys.stderr.flush()
+    sys.stderr.write('\n')
+    sys.stderr.flush()
     return mid, rv, rec
 
 
@@ -92,9 +107,7 @@ def main(argv: List[str]):
     codec_cls = next(c for c in codecs if c.__name__.lower() == args.codec)
     codec = codec_cls(args)
 
-    quality, metrics, rec = find_closest(codec, args.image, args.target,
-                                         args.metric)
-    print(f'Closest found for q={quality}')
+    _, metrics, rec = find_closest(codec, args.image, args.target, args.metric)
     for k, v in metrics.items():
         print(f'{k}: {v:.4f}')
 
