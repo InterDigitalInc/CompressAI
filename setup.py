@@ -97,12 +97,13 @@ setup(
     extras_require=get_extra_requirements(),
     license='Apache-2',
     classifiers=[
-        'Intended Audience :: Developers',
         'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
-        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ],
     ext_modules=get_extensions(),
     cmdclass={
