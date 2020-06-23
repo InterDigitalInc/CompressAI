@@ -731,47 +731,6 @@ class HM(Codec):
         }
 
 
-class AV1ffmpeg(BinaryCodec):
-    """Use ffmpeg libaom-av1 version.
-    """
-    fmt = '.ivf'
-
-    @property
-    def name(self):
-        return 'AV1ffmpeg'
-
-    @property
-    def description(self):
-        return f'AV1ffmpeg: libaom-av1. ffmpeg version {_get_ffmpeg_version()}'
-
-    def _get_encode_cmd(self, img, quality, out_filepath):
-        cmd = [
-            'ffmpeg',
-            '-loglevel',
-            'panic',
-            '-y',
-            '-i',
-            img,
-            '-strict',
-            'experimental',
-            '-pix_fmt',
-            'yuv420p',
-            '-c:v',
-            'libaom-av1',
-            '-crf',
-            quality,
-            out_filepath,
-        ]
-        return cmd
-
-    def _get_decode_cmd(self, out_filepath, rec_filepath):
-        cmd = [
-            'ffmpeg', '-loglevel', 'panic', '-y', '-i', out_filepath,
-            rec_filepath
-        ]
-        return cmd
-
-
 class AV1(Codec):
     """AV1: AOM reference software"""
 
@@ -886,7 +845,7 @@ class AV1(Codec):
         }
 
 
-codecs = [JPEG, WebP, JPEG2000, BPG, TFCI, VTM, HM, AV1ffmpeg, AV1]
+codecs = [JPEG, WebP, JPEG2000, BPG, TFCI, VTM, HM, AV1]
 
 
 def collect(codec: Codec,
