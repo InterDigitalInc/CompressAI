@@ -18,7 +18,8 @@ import torch.nn as nn
 import pytest
 
 from compressai.zoo import (bmshj2018_factorized, bmshj2018_hyperprior,
-                            mbt2018_mean, mbt2018)
+                            mbt2018_mean, mbt2018, cheng2020_anchor,
+                            cheng2020_attn)
 from compressai.zoo.image import _load_model
 
 from compressai.models.priors import (SCALES_LEVELS, SCALES_MAX, SCALES_MIN,
@@ -26,6 +27,7 @@ from compressai.models.priors import (SCALES_LEVELS, SCALES_MAX, SCALES_MIN,
                                       MeanScaleHyperprior, ScaleHyperprior,
                                       JointAutoregressiveHierarchicalPriors,
                                       get_scale_table)
+from compressai.models import Cheng2020Anchor, Cheng2020Attention
 
 from compressai.models.utils import (find_named_module,
                                      update_registered_buffers,
@@ -358,6 +360,23 @@ class TestMbt2018:
             net = mbt2018(i, metric='mse', pretrained=True)
             assert net.state_dict()['g_a.0.weight'].size(0) == 192
             assert net.state_dict()['g_a.6.weight'].size(0) == 320
+
+
+class TestCheng2020:
+    @pytest.mark.parametrize('func,cls', (
+        (cheng2020_anchor, Cheng2020Anchor),
+        (cheng2020_attn, Cheng2020Attention),
+    ))
+    def test_anchor_ok(self, func, cls):
+        for i in range(1, 4):
+            net = func(i, metric='mse')
+            assert isinstance(net, cls)
+            assert net.state_dict()['g_a.0.conv1.weight'].size(0) == 128
+
+        for i in range(4, 7):
+            net = func(i, metric='mse')
+            assert isinstance(net, cls)
+            assert net.state_dict()['g_a.0.conv1.weight'].size(0) == 192
 
 
 class Foo(nn.Module):

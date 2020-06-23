@@ -95,7 +95,7 @@ class Cheng2020Attention(Cheng2020Anchor):
         N (int): Number of channels
     """
     def __init__(self, N=192, **kwargs):
-        super().__init__(N=N, M=N, **kwargs)
+        super().__init__(N=N, **kwargs)
 
         self.g_a = nn.Sequential(
             ResidualBlockWithStride(3, N, stride=2),
