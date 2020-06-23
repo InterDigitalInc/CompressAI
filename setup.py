@@ -101,6 +101,7 @@ setup(
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
     ext_modules=get_extensions(),
