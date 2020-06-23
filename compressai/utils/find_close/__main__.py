@@ -88,7 +88,7 @@ def setup_args():
     parser.add_argument('-m',
                         '--metric',
                         type=str,
-                        choices=['bpp', 'psnr', 'msssim'],
+                        choices=['bpp', 'psnr', 'ms-ssim'],
                         default='bpp')
     parser.add_argument('--save',
                         action='store_true',

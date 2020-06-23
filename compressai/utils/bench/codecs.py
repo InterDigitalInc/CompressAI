@@ -204,7 +204,7 @@ class PillowCodec(Codec):
 
         out = {
             'psnr': psnr_val,
-            'msssim': msssim_val,
+            'ms-ssim': msssim_val,
             'bpp': bpp_val,
             'encoding_time': enc_time,
             'decoding_time': dec_time,
@@ -266,7 +266,7 @@ class BinaryCodec(Codec):
 
         out = {
             'psnr': psnr_val,
-            'msssim': msssim_val,
+            'ms-ssim': msssim_val,
             'bpp': bpp_val,
             'encoding_time': enc_time,
             'decoding_time': dec_time,
@@ -583,7 +583,7 @@ class VTM(Codec):
 
         out = {
             'psnr': psnr_val,
-            'msssim': msssim_val,
+            'ms-ssim': msssim_val,
             'bpp': bpp,
             'encoding_time': enc_time,
             'decoding_time': dec_time
@@ -725,7 +725,7 @@ class HM(Codec):
 
         out = {
             'psnr': psnr_val,
-            'msssim': msssim_val,
+            'ms-ssim': msssim_val,
             'bpp': bpp,
             'encoding_time': enc_time,
             'decoding_time': dec_time
@@ -844,7 +844,7 @@ class AV1(Codec):
 
         out = {
             'psnr': psnr_val,
-            'msssim': msssim_val,
+            'ms-ssim': msssim_val,
             'bpp': bpp,
             'encoding_time': enc_time,
             'decoding_time': dec_time
