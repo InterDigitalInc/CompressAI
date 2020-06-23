@@ -238,7 +238,7 @@ class BinaryCodec(Codec):
     """Call a external binary."""
     fmt = None
 
-    def _run(self, img, quality):
+    def _run(self, img, quality, return_rec=False):
         fd0, png_filepath = mkstemp(suffix='.png')
         fd1, out_filepath = mkstemp(suffix=self.fmt)
 
