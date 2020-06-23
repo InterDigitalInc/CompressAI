@@ -344,7 +344,7 @@ class AV1(BinaryCodec):
     def _get_encode_cmd(self, img, quality, out_filepath):
         cmd = [
             'ffmpeg',
-             '-loglevel',
+            '-loglevel',
             'panic',
             '-y',
             '-i',
@@ -367,6 +367,7 @@ class AV1(BinaryCodec):
             rec_filepath
         ]
         return cmd
+
 
 class BPG(BinaryCodec):
     """BPG from Fabrice Bellard."""
@@ -579,28 +580,10 @@ class VTM(Codec):
         # Encode
         height, width = arr.shape[1:]
         cmd = [
-            self.encoder_path,
-            '-i',
-            yuv_path,
-            '-c',
-            self.config_path,
-            '-q',
-            quality,
-            '-o',
-            '/dev/null',
-            '-b',
-            out_filepath,
-            '-wdt',
-            width,
-            '-hgt',
-            height,
-            '-fr',
-            '1',
-            '-f',
-            '1',
-            '--InputChromaFormat=444',
-            '--InputBitDepth=8',
-            '--ConformanceMode=1'
+            self.encoder_path, '-i', yuv_path, '-c', self.config_path, '-q',
+            quality, '-o', '/dev/null', '-b', out_filepath, '-wdt', width,
+            '-hgt', height, '-fr', '1', '-f', '1', '--InputChromaFormat=444',
+            '--InputBitDepth=8', '--ConformanceMode=1'
         ]
 
         if self.rgb:
