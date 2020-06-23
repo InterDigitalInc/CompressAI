@@ -3,7 +3,7 @@
 CompressAI (_compress-ay_) is a PyTorch library and evaluation platform for
 end-to-end compression research.
 
-CompressAI is built on top of PyTorch and provides:
+CompressAI currently provides:
 
 * custom operations, layers and models for deep learning based data compression
 * a partial port of the official [TensorFlow compression
@@ -14,12 +14,12 @@ CompressAI is built on top of PyTorch and provides:
 
 ## Installation
 
-CompressAI only supports python 3.6+ and pytorch 1.4+. A C++17 compiler, a
-recent version of pip (19.0+), and some python dependencies (see `setup.py`)
-are also required.
+CompressAI only supports python 3.6+ and PyTorch 1.4+. A C++17 compiler, a
+recent version of pip (19.0+), and common python packages (see `setup.py` for
+the full list) are also required.
 
-To get started and install CompressAI, run the following commands in a virtual
-environment:
+To get started and install CompressAI, run the following commands in a [virtual
+environment](https://docs.python.org/3.6/library/venv.html):
 
 ```bash
 git clone https://github.com/InterDigitalInc/CompressAI
@@ -32,7 +32,7 @@ For a custom installation, you can also run one of the following commands:
 * `pip install -e '.[tutorials]'`: install the packages required for the tutorials (notebooks)
 * `pip install -e '.[all]'`: install all the optional packages
 
-This is the currently recommended installation method. Docker images and pypi
+This is the currently recommended installation method. Docker images and PyPI
 packages will be released in the future. Conda environments are not officially
 supported.
 
