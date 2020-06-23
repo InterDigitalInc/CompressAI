@@ -391,22 +391,13 @@ class AV1(Codec):
                             type=str,
                             required=True,
                             help='AOM build dir')
-        parser.add_argument('-c',
-                            '--config',
-                            metavar='',
-                            type=str,
-                            required=True,
-                            help='AOM config file')
-        parser.add_argument('--rgb',
-                            action='store_true',
-                            help='Use RGB color space (over YCbCr)')
 
     def _set_args(self, args):
         args = super()._set_args(args)
         self.encoder_path = os.path.join(args.build_dir, 'aomenc')
         self.decoder_path = os.path.join(args.build_dir, 'aomdec')
-        self.config_path = args.config
-        self.rgb = args.rgb
+        #self.config_path = args.config
+        #self.rgb = args.rgb
         return args
 
     def _run(self, img, quality):
@@ -416,12 +407,12 @@ class AV1(Codec):
         # Convert input image to yuv 444 file
         arr = np.asarray(read_image(img))
         fd, yuv_path = mkstemp(suffix='.yuv')
-        out_filepath = os.path.splitext(yuv_path)[0] + '.bin'
+        out_filepath = os.path.splitext(yuv_path)[0] + '.webm'
 
         arr = arr.transpose((2, 0, 1))  # color channel first
 
-        if not self.rgb:
-            arr = rgb2ycbcr(arr)
+        #if not self.rgb:
+        arr = rgb2ycbcr(arr)
 
         with open(yuv_path, 'wb') as f:
             f.write(arr.tobytes())
@@ -430,46 +421,29 @@ class AV1(Codec):
         height, width = arr.shape[1:]
         cmd = [
             self.encoder_path,
-            yuv_path,
-            '--limit=500',
-            '--cq-level',
-            quality,
-            '-o',
-            out_filepath,
-            '--width',
+            '-w',
             width,
-            '-height',
+            '-h',
             height,
-            '-fps',
-            '1',
-            '-f',
-            '1',
-            '--InputChromaFormat=444',
+            '--fps=1/1',
+            '--limit=1',
             '--input-bit-depth=8',
             '--cpu-used=0',
             '--threads=1',
-            '--codec=av1',
             '--passes=2',
-            '--end-usage=q',
-            '--i420',
+            '--end-usage=cq',
+            '--cq-level='+str(quality),
+            '--i444',
             '--skip=0',
-            '--minsection-pct=0',
-            '--maxsection-pct=2000',
-            '--static-thresh=0',
-            '--drop-frame=0',
             '--tune=psnr',
-            '--q-hist=0',
-            '--rate-hist=0',
             '--psnr',
             '--bit-depth=8',
+            '-o',
+            out_filepath,
+            yuv_path,
         ]
 
-        if self.rgb:
-            cmd += [
-                '--InputColourSpaceConvert=RGBtoGBR',
-                '--SNRInternalColourSpace=1',
-                '--OutputInternalColourSpace=0',
-            ]
+        print(cmd)
         start = time.time()
         run_command(cmd)
         enc_time = time.time() - start
@@ -480,8 +454,8 @@ class AV1(Codec):
 
         # Decode
         cmd = [self.decoder_path, '-b', out_filepath, '-o', yuv_path, '-d', 8]
-        if self.rgb:
-            cmd.append('--OutputInternalColourSpace=GBRtoRGB')
+        # if self.rgb:
+        #     cmd.append('--OutputInternalColourSpace=GBRtoRGB')
 
         start = time.time()
         run_command(cmd)
@@ -493,9 +467,9 @@ class AV1(Codec):
         bitdepth = 8
         arr = arr.astype(np.float32) / (2**bitdepth - 1)
         rec_arr = rec_arr.astype(np.float32) / (2**bitdepth - 1)
-        if not self.rgb:
-            arr = ycbcr2rgb(arr)
-            rec_arr = ycbcr2rgb(rec_arr)
+
+        arr = ycbcr2rgb(arr)
+        rec_arr = ycbcr2rgb(rec_arr)
         psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.)
 
         bpp = filesize(out_filepath) * 8. / (height * width)
