@@ -11,12 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 Collect performance metrics of published traditional or end-to-end image
 codecs.
 """
-from typing import Union, Tuple
+from typing import Union, Tuple, List
 
 import argparse
 import io
@@ -27,8 +26,11 @@ import subprocess
 import sys
 import time
 
-from tempfile import mkstemp
+import multiprocessing as mp
+
 from collections import defaultdict
+from itertools import starmap
+from tempfile import mkstemp
 
 import PIL
 import PIL.Image as Image
@@ -60,6 +62,7 @@ def read_image(filepath: str, mode: str = 'RGB') -> np.array:
 def compute_metrics(a: Union[np.array, Image.Image],
                     b: Union[np.array, Image.Image],
                     max_val: float = 255.) -> Tuple[float, float]:
+    """Returns PSNR and MS-SSIM between images `a` and `b`. """
     if isinstance(a, Image.Image):
         a = np.asarray(a)
     if isinstance(b, Image.Image):
@@ -153,21 +156,15 @@ class Codec:
     """Abstract base class"""
     _description = None
 
-    def __init__(self):
-        self.qualities = []
-        self._parse_args()
+    def __init__(self, args):
+        self._set_args(args)
 
-    def _get_parser(self):
-        description = f'{self.__class__.__name__} codec'
-        parser = argparse.ArgumentParser(description=description)
-        parser.add_argument('-q',
-                            '--quality',
-                            metavar='',
-                            default=75,
-                            nargs='*',
-                            type=int,
-                            help='quality parameter (default: %(default)s)')
-        return parser
+    def _set_args(self, args):
+        return args
+
+    @classmethod
+    def setup_args(cls, parser):
+        setup_common_args(parser)
 
     @property
     def description(self):
@@ -177,52 +174,15 @@ class Codec:
     def name(self):
         raise NotImplementedError()
 
-    def _parse_args(self):
-        parser = self._get_parser()
-        args = parser.parse_args(sys.argv[3:])
-        if isinstance(args.quality, list):
-            self.qualities = args.quality
-        else:
-            self.qualities = [args.quality]
-        return args
-
     def _load_img(self, img):
         return os.path.abspath(img)
 
     def _run(self, img, quality, *args, **kwargs):
         raise NotImplementedError()
 
-    def run(self, img, quality, *args, **kwargs):
+    def run(self, img, quality, index, *args, **kwargs):
         img = self._load_img(img)
-        return self._run(img, quality, *args, **kwargs)
-
-    def collect(self, dataset):
-        filepaths = [
-            os.path.join(dataset, f) for f in os.listdir(dataset)
-            if os.path.splitext(f)[-1].lower() in IMG_EXTENSIONS
-        ]
-
-        if len(filepaths) == 0:
-            print('No images found in the dataset directory')
-            sys.exit(1)
-
-        results = defaultdict(list)
-        for i, q in enumerate(self.qualities):
-            metrics = defaultdict(float)
-            for j, f in enumerate(filepaths):
-                rv = self.run(f, q)
-                for k, v in rv.items():
-                    metrics[k] += v
-                sys.stderr.write(f'\r{self.name}'
-                                 f' | quality: {i+1:d}/{len(self.qualities):d}'
-                                 f' | file: {j+1:d}/{len(filepaths):d}')
-                sys.stderr.flush()
-            for k, v in metrics.items():
-                metrics[k] = v / len(filepaths)
-                results[k].append(metrics[k])
-        sys.stderr.write('\n')
-        sys.stderr.flush()
-        return results
+        return (index, self._run(img, quality, *args, **kwargs))
 
 
 class PillowCodec(Codec):
@@ -380,8 +340,9 @@ class BPG(BinaryCodec):
     def description(self):
         return f'BPG. BPG version {_get_bpg_version(self.encoder_path)}'
 
-    def _get_parser(self):
-        parser = super()._get_parser()
+    @classmethod
+    def setup_args(cls, parser):
+        super().setup_args(parser)
         parser.add_argument('-m',
                             choices=['420', '444'],
                             default='444',
@@ -404,10 +365,9 @@ class BPG(BinaryCodec):
         parser.add_argument('--decoder-path',
                             default='bpgdec',
                             help='BPG decoder path')
-        return parser
 
-    def _parse_args(self):
-        args = super()._parse_args()
+    def _set_args(self, args):
+        args = super()._set_args(args)
         self.color_mode = args.c
         self.encoder = args.e
         self.subsampling_mode = args.m
@@ -417,6 +377,8 @@ class BPG(BinaryCodec):
         return args
 
     def _get_encode_cmd(self, img, quality, out_filepath):
+        if not 0 <= quality <= 51:
+            raise ValueError(f'Invalid quality value: {quality} (0,51)')
         cmd = [
             self.encoder_path,
             '-o',
@@ -458,27 +420,29 @@ class TFCI(BinaryCodec):
     def name(self):
         return f'{self.model}'
 
-    def _get_parser(self):
-        parser = super()._get_parser()
+    @classmethod
+    def setup_args(cls, parser):
+        super().setup_args(parser)
         parser.add_argument('-m',
                             '--model',
-                            choices=self._models,
-                            default=self._models[0],
+                            choices=cls._models,
+                            default=cls._models[0],
                             help='model architecture (default: %(default)s)')
         parser.add_argument(
             '-p',
             '--path',
             required=True,
             help='tfci python script path (default: %(default)s)')
-        return parser
 
-    def _parse_args(self):
-        args = super()._parse_args()
+    def _set_args(self, args):
+        args = super()._set_args(args)
         self.model = args.model
         self.tfci_path = args.path
         return args
 
     def _get_encode_cmd(self, img, quality, out_filepath):
+        if not 1 <= quality <= 8:
+            raise ValueError(f'Invalid quality value: {quality} (1, 8)')
         cmd = [
             sys.executable,
             self.tfci_path,
@@ -528,8 +492,9 @@ class VTM(Codec):
     def name(self):
         return 'VTM'
 
-    def _get_parser(self):
-        parser = super()._get_parser()
+    @classmethod
+    def setup_args(cls, parser):
+        super().setup_args(parser)
         parser.add_argument('-b',
                             '--build-dir',
                             metavar='',
@@ -545,10 +510,9 @@ class VTM(Codec):
         parser.add_argument('--rgb',
                             action='store_true',
                             help='Use RGB color space (over YCbCr)')
-        return parser
 
-    def _parse_args(self):
-        args = super()._parse_args()
+    def _set_args(self, args):
+        args = super()._set_args(args)
         self.encoder_path = get_vtm_encoder_path(args.build_dir)
         self.decoder_path = get_vtm_decoder_path(args.build_dir)
         self.config_path = args.config
@@ -556,6 +520,9 @@ class VTM(Codec):
         return args
 
     def _run(self, img, quality):
+        if not 0 <= quality <= 51:
+            raise ValueError(f'Invalid quality value: {quality} (0,51)')
+
         # Convert input image to yuv 444 file
         arr = np.asarray(read_image(img))
         fd, yuv_path = mkstemp(suffix='.yuv')
@@ -572,27 +539,10 @@ class VTM(Codec):
         # Encode
         height, width = arr.shape[1:]
         cmd = [
-            self.encoder_path,
-            '-i',
-            yuv_path,
-            '-c',
-            self.config_path,
-            '-q',
-            quality,
-            '-o',
-            '/dev/null',
-            '-b',
-            out_filepath,
-            '-wdt',
-            width,
-            '-hgt',
-            height,
-            '-fr',
-            '1',
-            '-f',
-            '1',
-            '--InputChromaFormat=444',
-            '--InputBitDepth=8',
+            self.encoder_path, '-i', yuv_path, '-c', self.config_path, '-q',
+            quality, '-o', '/dev/null', '-b', out_filepath, '-wdt', width,
+            '-hgt', height, '-fr', '1', '-f', '1', '--InputChromaFormat=444',
+            '--InputBitDepth=8', '--ConformanceMode=1'
         ]
 
         if self.rgb:
@@ -657,8 +607,9 @@ class HM(Codec):
     def name(self):
         return 'HM'
 
-    def _get_parser(self):
-        parser = super()._get_parser()
+    @classmethod
+    def setup_args(cls, parser):
+        super().setup_args(parser)
         parser.add_argument('-b',
                             '--build-dir',
                             metavar='',
@@ -674,10 +625,9 @@ class HM(Codec):
         parser.add_argument('--rgb',
                             action='store_true',
                             help='Use RGB color space (over YCbCr)')
-        return parser
 
-    def _parse_args(self):
-        args = super()._parse_args()
+    def _set_args(self, args):
+        args = super()._set_args(args)
         self.encoder_path = os.path.join(args.build_dir, "TAppEncoderStatic")
         self.decoder_path = os.path.join(args.build_dir, "TAppDecoderStatic")
         self.config_path = args.config
@@ -685,6 +635,9 @@ class HM(Codec):
         return args
 
     def _run(self, img, quality):
+        if not 0 <= quality <= 51:
+            raise ValueError(f'Invalid quality value: {quality} (0,51)')
+
         # Convert input image to yuv 444 file
         arr = np.asarray(read_image(img))
         fd, yuv_path = mkstemp(suffix='.yuv')
@@ -701,11 +654,31 @@ class HM(Codec):
         # Encode
         height, width = arr.shape[1:]
         cmd = [
-            self.encoder_path, '-i', yuv_path, '-c', self.config_path, '-q',
-            quality, '-o', '/dev/null', '-b', out_filepath, '-wdt', width,
-            '-hgt', height, '-fr', '1', '-f', '1', '--InputChromaFormat=444',
-            '--InputBitDepth=8', '--SEIDecodedPictureHash', '--Level=5.1',
-            '--CUNoSplitIntraACT=0'
+            self.encoder_path,
+            '-i',
+            yuv_path,
+            '-c',
+            self.config_path,
+            '-q',
+            quality,
+            '-o',
+            '/dev/null',
+            '-b',
+            out_filepath,
+            '-wdt',
+            width,
+            '-hgt',
+            height,
+            '-fr',
+            '1',
+            '-f',
+            '1',
+            '--InputChromaFormat=444',
+            '--InputBitDepth=8',
+            '--SEIDecodedPictureHash',
+            '--Level=5.1',
+            '--CUNoSplitIntraACT=0',
+            '--ConformanceMode=1',
         ]
 
         if self.rgb:
@@ -758,25 +731,197 @@ class HM(Codec):
         }
 
 
-codecs = [JPEG, WebP, JPEG2000, BPG, TFCI, VTM, HM]
+class AV1(Codec):
+    """AV1: AOM reference software"""
+
+    fmt = '.webm'
+
+    @property
+    def description(self):
+        return 'AV1'
+
+    @property
+    def name(self):
+        return 'AV1'
+
+    @classmethod
+    def setup_args(cls, parser):
+        super().setup_args(parser)
+        parser.add_argument('-b',
+                            '--bin-dir',
+                            metavar='',
+                            type=str,
+                            required=True,
+                            help='AOM binaries dir')
+
+    def _set_args(self, args):
+        args = super()._set_args(args)
+        self.encoder_path = os.path.join(args.build_dir, 'aomenc')
+        self.decoder_path = os.path.join(args.build_dir, 'aomdec')
+        return args
+
+    def _run(self, img, quality):
+        if not 0 <= quality <= 63:
+            raise ValueError(f'Invalid quality value: {quality} (0,63)')
+
+        # Convert input image to yuv 444 file
+        arr = np.asarray(read_image(img))
+        fd, yuv_path = mkstemp(suffix='.yuv')
+        out_filepath = os.path.splitext(yuv_path)[0] + '.webm'
+
+        arr = arr.transpose((2, 0, 1))  # color channel first
+        arr = rgb2ycbcr(arr)
+
+        with open(yuv_path, 'wb') as f:
+            f.write(arr.tobytes())
+
+        # Encode
+        height, width = arr.shape[1:]
+        cmd = [
+            self.encoder_path,
+            '-w',
+            width,
+            '-h',
+            height,
+            '--fps=1/1',
+            '--limit=1',
+            '--input-bit-depth=8',
+            '--cpu-used=0',
+            '--threads=1',
+            '--passes=2',
+            '--end-usage=cq',
+            '--cq-level=' + str(quality),
+            '--i444',
+            '--skip=0',
+            '--tune=psnr',
+            '--psnr',
+            '--bit-depth=8',
+            '-o',
+            out_filepath,
+            yuv_path,
+        ]
+
+        start = time.time()
+        run_command(cmd)
+        enc_time = time.time() - start
+
+        # cleanup encoder input
+        os.close(fd)
+        os.unlink(yuv_path)
+
+        # Decode
+        cmd = [
+            self.decoder_path, out_filepath, '-o', yuv_path, '--rawvideo',
+            '--output-bit-depth=8'
+        ]
+
+        start = time.time()
+        run_command(cmd)
+        dec_time = time.time() - start
+
+        # Compute PSNR
+        rec_arr = np.fromfile(yuv_path, dtype=np.uint8)
+        rec_arr = rec_arr.reshape(arr.shape)
+        bitdepth = 8
+        arr = arr.astype(np.float32) / (2**bitdepth - 1)
+        rec_arr = rec_arr.astype(np.float32) / (2**bitdepth - 1)
+
+        arr = ycbcr2rgb(arr)
+        rec_arr = ycbcr2rgb(rec_arr)
+        psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.)
+
+        bpp = filesize(out_filepath) * 8. / (height * width)
+
+        # Cleanup
+        os.unlink(yuv_path)
+        os.unlink(out_filepath)
+
+        return {
+            'psnr': psnr_val,
+            'msssim': msssim_val,
+            'bpp': bpp,
+            'encoding_time': enc_time,
+            'decoding_time': dec_time
+        }
+
+
+codecs = [JPEG, WebP, JPEG2000, BPG, TFCI, VTM, HM, AV1]
+
+
+def collect(codec: Codec,
+            dataset: str,
+            qualities: List[int],
+            num_jobs: int = 1):
+    filepaths = [
+        os.path.join(dataset, f) for f in os.listdir(dataset)
+        if os.path.splitext(f)[-1].lower() in IMG_EXTENSIONS
+    ]
+
+    pool = mp.Pool(num_jobs) if num_jobs > 1 else None
+
+    if len(filepaths) == 0:
+        print('No images found in the dataset directory')
+        sys.exit(1)
+
+    args = [(f, q, i) for i, q in enumerate(qualities) for f in filepaths]
+    if pool:
+        rv = pool.starmap(codec.run, args)
+    else:
+        rv = list(starmap(codec.run, args))
+
+    results = [defaultdict(float) for _ in range(len(qualities))]
+    for i, metrics in rv:
+        for k, v in metrics.items():
+            results[i][k] += v
+    for i, _ in enumerate(results):
+        for k, v in results[i].items():
+            results[i][k] = v / len(filepaths)
+
+    # list of dict -> dict of list
+    out = defaultdict(list)
+    for r in results:
+        for k, v in r.items():
+            out[k].append(v)
+    return out
 
 
 def setup_args():
-    description = 'Collect codec metrics and performances.'
+    description = 'Collect codec metrics.'
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('codec',
-                        type=str,
-                        choices=[c.__name__.lower() for c in codecs])
+    subparsers = parser.add_subparsers(dest='codec', help='Select codec')
+    subparsers.required = True
+    return parser, subparsers
+
+
+def setup_common_args(parser):
     parser.add_argument('dataset', type=str)
-    return parser
+    parser.add_argument('-j',
+                        '--num-jobs',
+                        type=int,
+                        metavar='N',
+                        default=1,
+                        help='Number of parallel jobs (default: %(default)s)')
+    parser.add_argument('-q',
+                        '--quality',
+                        dest='qualities',
+                        metavar='',
+                        default=[75],
+                        nargs='*',
+                        type=int,
+                        help='quality parameter (default: %(default)s)')
 
 
 def main(argv):
-    args = setup_args().parse_args(argv[1:3])
+    parser, subparsers = setup_args()
+    for c in codecs:
+        cparser = subparsers.add_parser(c.__name__.lower(),
+                                        help=f'{c.__name__}')
+        c.setup_args(cparser)
+    args = parser.parse_args(argv)
 
     codec_cls = next(c for c in codecs if c.__name__.lower() == args.codec)
-    codec = codec_cls()
-    results = codec.collect(args.dataset)
+    codec = codec_cls(args)
+    results = collect(codec, args.dataset, args.qualities, args.num_jobs)
 
     output = {
         'name': codec.name,
@@ -788,4 +933,4 @@ def main(argv):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main(sys.argv[1:])

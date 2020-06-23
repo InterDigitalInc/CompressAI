@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Copyright 2020 InterDigital Communications, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#!/usr/bin/env bash
-
 # Do not forget to 
 # - set paths to codec bins and sources below
-# - activate the virtual environment containing compressAI
+# - activate the virtual environment containing CompressAI
 
 set -e
 
@@ -28,79 +28,15 @@ trap 'err_report $LINENO' ERR
 
 NJOBS=${NJOBS:-4}
 
-# libpng
-BPGENC="$(which bpgenc)"
-BPGDEC="$(which bpgdec)"
-
-# Tensorflow Compression script
-# https://github.com/tensorflow/compression
-# edit path below or uncoment locate function
-TFCI_SCRIPT="~/tensorflow-compression/compression/examples/tfci.py"
-# TFCI_SCRIPT="$(locate tfci.py)"
-
-# VTM
-# edit below to provide the path to the chosen version of VTM
-_VTM_SRC_DIR="~/vvc/vtm-8.2"
-# uncomment below to locate source dir
-# _VTM_SRC_DIR="$(locate '*VVCSoftware_VTM')"
-VTM_BIN_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
-VTM_CFG="$(locate encoder_intra_vtm.cfg | grep "$_VTM_SRC_DIR")"
-VTM_VERSION_FILE="$(locate version.h | grep "$_VTM_SRC_DIR")"
-VTM_VERSION="$(sed -n -e 's/^#define VTM_VERSION //p' ${VTM_VERSION_FILE})"
-
-# HM
-# edit below to provide the path to the chosen version of HM
-_HM_SRC_DIR="~/hevc/HM-16.19+SCM-8.8"
-HM_BIN_DIR="${_HM_SRC_DIR}/bin/"
-HM_CFG="${_HM_SRC_DIR}/cfg/encoder_intra_main_rext.cfg"
-HM_VERSION="$(sed -n -e 's/^#define NV_VERSION        \(.*\)\/\/\/< Current software version/\1/p' "${_HM_SRC_DIR}/source/Lib/TLibCommon/CommonDef.h")"
-
 usage() {
     echo "usage: $(basename $0) dataset CODECS"
+    echo "supported codecs: [jpeg, jpeg2000, WebP, bpg, hm, vtm, av1, bmshj2018-factorized-mse, bmshj2018-hyperprior-mse, mbt2018-mean-mse]"
 }
 
-jpeg() {
-    python3 -m compressai.utils.bench jpeg "$dataset"     \
-        -q $(seq 5 5 95) > results/jpeg.json
-}
-
-jpeg2000() {
-    python3 -m compressai.utils.bench jpeg2000 "$dataset" \
-        -q $(seq 5 5 95) > results/jpeg2000.json
-}
-
-webp() {
-    python3 -m compressai.utils.bench webp "$dataset"     \
-        -q $(seq 5 5 95) > results/webp.json
-}
-
-bpg() {
-    python3 -m compressai.utils.bench bpg "$dataset"      \
-        -q $(seq 47 -5 2) -m "$1" -e "$2" -c "$3"                 \
-        --encoder-path "$BPGENC"                                  \
-        --decoder-path "$BPGDEC"                                  \
-        > "results/$4"
-}
-
-hm() {
-    echo "using HM version $HM_VERSION"
-    python3 -m compressai.utils.bench hm "$dataset"     \
-        -q $(seq 47 -5 2) -b "$HM_BIN_DIR" -c "$HM_CFG" \
-        > "results/hm.json"
-}
-
-vtm() {
-    echo "using VTM version $VTM_VERSION"
-    python3 -m compressai.utils.bench vtm "$dataset"      \
-        -q $(seq 47 -5 2) -b "$VTM_BIN_DIR" -c "$VTM_CFG" \
-        > "results/vtm.json"
-}
-
-tfci() {
-    python3 -m compressai.utils.bench tfci "$dataset"     \
-        --path "$TFCI_SCRIPT" --model "$1"                        \
-        -q $(seq 1 8) > "results/$1.json"
-}
+if [[ $1 == "-h" || $1 == "--help" ]]; then
+    usage
+    exit 1
+fi
 
 if [[ $# -lt 2 ]]; then
     echo "Error: missing arguments"
@@ -111,7 +47,92 @@ fi
 dataset="$1"
 shift
 
-mkdir -p "results"
+# libpng
+BPGENC="$(which bpgenc)"
+BPGDEC="$(which bpgdec)"
+
+# Tensorflow Compression script
+# https://github.com/tensorflow/compression
+# edit path below or uncomment locate function
+TFCI_SCRIPT="${HOME}/tensorflow-compression/compression/models/tfci.py"
+
+# VTM
+# edit below to provide the path to the chosen version of VTM
+_VTM_SRC_DIR="${HOME}/vvc/vtm-9.1"
+VTM_BIN_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
+# uncomment below and provide bin directory if not found
+# VTM_BIN_DIR="${_VTM_SRC_DIR}/bin/umake/clang-11.0/x86_64/release/"
+VTM_CFG="${_VTM_SRC_DIR}/cfg/encoder_intra_vtm.cfg"
+VTM_VERSION_FILE="${_VTM_SRC_DIR}/source/Lib/CommonLib/version.h"
+VTM_VERSION="$(sed -n -e 's/^#define VTM_VERSION //p' ${VTM_VERSION_FILE})"
+
+# HM
+# edit below to provide the path to the chosen version of HM
+_HM_SRC_DIR="${HOME}/hevc/HM-16.20+SCM-8.8"
+HM_BIN_DIR="${_HM_SRC_DIR}/bin/"
+HM_CFG="${_HM_SRC_DIR}/cfg/encoder_intra_main_rext.cfg"
+HM_VERSION_FILE="${_HM_SRC_DIR}/source/Lib/TLibCommon/CommonDef.h"
+HM_VERSION="$(sed -n -e 's/^#define NV_VERSION \(.*\)\/\/\/< Current software version/\1/p' ${HM_VERSION_FILE})"
+
+# AV1
+# edit below to provide the path to the chosen version of VTM
+AV1_BIN_DIR="${HOME}/aom/build_darwin"
+
+jpeg() {
+    python -m compressai.utils.bench jpeg "$dataset"            \
+        -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/jpeg.json
+}
+
+jpeg2000() {
+    python -m compressai.utils.bench jpeg2000 "$dataset"        \
+        -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/jpeg2000.json
+}
+
+webp() {
+    python -m compressai.utils.bench webp "$dataset"            \
+        -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/webp.json
+}
+
+bpg() {
+    if [ -z ${BPGENC+x} ] || [ -z ${BPGDEC+x} ]; then echo "install libBPG"; exit 1; fi
+    python -m compressai.utils.bench bpg "$dataset"             \
+        -q $(seq 47 -5 2) -m "$1" -e "$2" -c "$3"               \
+        --encoder-path "$BPGENC"                                \
+        --decoder-path "$BPGDEC"                                \
+        -j "$NJOBS" > "benchmarks/$4"
+}
+
+hm() {
+    if [ -z ${HM_BIN_DIR+x} ]; then echo "set HM bin directory HM_BIN_DIR"; exit 1; fi
+    echo "using HM version $HM_VERSION"
+    python3 -m compressai.utils.bench hm "$dataset"             \
+        -q $(seq 47 -5 2) -b "$HM_BIN_DIR" -c "$HM_CFG"         \
+        -j "$NJOBS" > "benchmarks/hm.json"
+}
+
+vtm() {
+    if [ -z ${VTM_BIN_DIR+x} ]; then echo "set VTM bin directory VTM_BIN_DIR"; exit 1; fi
+    echo "using VTM version $VTM_VERSION"
+    python3 -m compressai.utils.bench vtm "$dataset"            \
+        -q $(seq 47 -5 2) -b "$VTM_BIN_DIR" -c "$VTM_CFG"       \
+        -j "$NJOBS" > "benchmarks/vtm.json"
+}
+
+av1() {
+    if [ -z ${AV1_BIN_DIR+x} ]; then echo "set AV1 bin directory AV1_BIN_DIR"; exit 1; fi
+    python3 -m compressai.utils.bench av1 "$dataset"            \
+        -q $(seq 62 -5 2) -b "${AV1_BIN_DIR}"       \
+        -j "$NJOBS" > "benchmarks/av1.json"
+}
+
+tfci() {
+    if [ -z ${TFCI_SCRIPT+x} ]; then echo "set TFCI_SCRIPT bin path"; exit 1; fi
+    python3 -m compressai.utils.bench tfci "$dataset"           \
+        --path "$TFCI_SCRIPT" --model "$1"                      \
+        -q $(seq 1 8) -j "$NJOBS" > "benchmarks/$1.json"
+}
+
+mkdir -p "benchmarks"
 
 for i in "$@"; do
     case $i in
@@ -140,6 +161,9 @@ for i in "$@"; do
             ;;
         "vtm")
             vtm
+            ;;
+        "av1")
+            av1
             ;;
         'bmshj2018-factorized-mse')
             tfci 'bmshj2018-factorized-mse'
