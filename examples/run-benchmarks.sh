@@ -30,7 +30,7 @@ NJOBS=${NJOBS:-4}
 
 usage() {
     echo "usage: $(basename $0) dataset CODECS"
-    echo "supported codecs: [jpeg, jpeg2000, WebP, av1, bpg, hm, vtm, bmshj2018-factorized-mse, bmshj2018-hyperprior-mse, mbt2018-mean-mse]"
+    echo "supported codecs: [jpeg, jpeg2000, WebP, bpg, hm, vtm, av1, av1-ffmpeg, bmshj2018-factorized-mse, bmshj2018-hyperprior-mse, mbt2018-mean-mse]"
 }
 
 if [[ $1 == "-h" || $1 == "--help" ]]; then
@@ -74,6 +74,10 @@ HM_CFG="${_HM_SRC_DIR}/cfg/encoder_intra_main_rext.cfg"
 HM_VERSION_FILE="${_HM_SRC_DIR}/source/Lib/TLibCommon/CommonDef.h"
 HM_VERSION="$(sed -n -e 's/^#define NV_VERSION \(.*\)\/\/\/< Current software version/\1/p' ${HM_VERSION_FILE})"
 
+# AV1
+# edit below to provide the path to the chosen version of VTM
+AV1_BIN_DIR="${HOME}/aom/build_darwin"
+
 jpeg() {
     python -m compressai.utils.bench jpeg "$dataset"            \
         -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/jpeg.json
@@ -87,11 +91,6 @@ jpeg2000() {
 webp() {
     python -m compressai.utils.bench webp "$dataset"            \
         -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/webp.json
-}
-
-av1() {
-    python -m compressai.utils.bench av1 "$dataset"        \
-        -q $(seq 62 -5 2) -j "$NJOBS" > benchmarks/av1.json
 }
 
 bpg() {
@@ -119,6 +118,18 @@ vtm() {
         -j "$NJOBS" > "benchmarks/vtm.json"
 }
 
+av1-ffmpeg() {
+    python -m compressai.utils.bench av1ffmpeg "$dataset"        \
+        -q $(seq 62 -5 2) -j "$NJOBS" > benchmarks/av1-ffmpeg.json
+}
+
+av1() {
+    if [ -z ${AV1_BIN_DIR+x} ]; then echo "set AV1 bin directory AV1_BIN_DIR"; exit 1; fi
+    python3 -m compressai.utils.bench av1 "$dataset"            \
+        -q $(seq 62 -5 2) -b "${AV1_BIN_DIR}"       \
+        -j "$NJOBS" > "benchmarks/av1.json"
+}
+
 tfci() {
     if [ -z ${TFCI_SCRIPT+x} ]; then echo "set TFCI_SCRIPT bin path"; exit 1; fi
     python3 -m compressai.utils.bench tfci "$dataset"           \
@@ -139,9 +150,6 @@ for i in "$@"; do
         "webp")
             webp
             ;;
-        "av1")
-            av1
-            ;;
         "bpg")
             # bpg "420" "x265" "rgb" bpg_420_x265_rgb.json
             # bpg "420" "x265" "ycbcr" bpg_420_x265_ycbcr.json
@@ -158,6 +166,12 @@ for i in "$@"; do
             ;;
         "vtm")
             vtm
+            ;;
+        "av1-ffmpeg")
+            av1-ffmpeg
+            ;;
+        "av1")
+            av1
             ;;
         'bmshj2018-factorized-mse')
             tfci 'bmshj2018-factorized-mse'
