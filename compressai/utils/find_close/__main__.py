@@ -107,7 +107,8 @@ def main(argv: List[str]):
     codec_cls = next(c for c in codecs if c.__name__.lower() == args.codec)
     codec = codec_cls(args)
 
-    _, metrics, rec = find_closest(codec, args.image, args.target, args.metric)
+    quality, metrics, rec = find_closest(codec, args.image, args.target,
+                                         args.metric)
     for k, v in metrics.items():
         print(f'{k}: {v:.4f}')
 
