@@ -82,6 +82,23 @@ Original paper: [mbt2018]_
 .. autofunction:: mbt2018
 
 
+cheng2020_anchor
+----------------
+Original paper: [cheng2020]_
+
+.. autofunction:: cheng2020_anchor
+
+.. warning:: Pre-trained weights are not yet available
+
+
+cheng2020_attn
+--------------
+Original paper: [cheng2020]_
+
+.. autofunction:: cheng2020_attn
+
+.. warning:: Pre-trained weights are not yet available
+
 ....
 
 
@@ -142,6 +159,20 @@ Original paper: [mbt2018]_
             year={2019},
             publisher={Springer}
         }
+
+
+.. [cheng2020]
+   .. code-block:: bibtex
+
+        @inproceedings{cheng2020image,
+            title={Learned Image Compression with Discretized Gaussian Mixture 
+            Likelihoods and Attention Modules},
+            author={Cheng, Zhengxue and Sun, Heming and Takeuchi, Masaru and Katto, 
+            Jiro},
+            booktitle= "Proceedings of the IEEE Conference on Computer Vision and 
+            Pattern Recognition (CVPR)",
+            year={2020}
+        }]
 
 ....
 

@@ -12,11 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .gdn import GDN, GDN1
-from .layers import MaskedConv2d
+from .gdn import *
+from .layers import *
 
 __all__ = [
     'GDN',
     'GDN1',
+    'AttentionBlock',
     'MaskedConv2d',
+    'ResidualBlock',
+    'ResidualBlockUpsample',
+    'ResidualBlockWithStride',
+    'conv3x3',
+    'subpel_conv3x3',
 ]

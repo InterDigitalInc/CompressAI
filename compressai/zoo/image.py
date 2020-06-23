@@ -16,13 +16,16 @@ from torch.hub import load_state_dict_from_url
 
 from compressai.models import (FactorizedPrior, ScaleHyperprior,
                                MeanScaleHyperprior,
-                               JointAutoregressiveHierarchicalPriors)
+                               JointAutoregressiveHierarchicalPriors,
+                               Cheng2020Anchor, Cheng2020Attention)
 
 __all__ = [
     'bmshj2018_factorized',
     'bmshj2018_hyperprior',
     'mbt2018',
     'mbt2018_mean',
+    'cheng2020_anchor',
+    'cheng2020_attn',
 ]
 
 model_architectures = {
@@ -30,6 +33,8 @@ model_architectures = {
     'bmshj2018-hyperprior': ScaleHyperprior,
     'mbt2018-mean': MeanScaleHyperprior,
     'mbt2018': JointAutoregressiveHierarchicalPriors,
+    'cheng2020-anchor': Cheng2020Anchor,
+    'cheng2020-attn': Cheng2020Attention,
 }
 
 root_url = 'https://compressai.s3.amazonaws.com/models/v1'
@@ -82,6 +87,12 @@ model_urls = {
             8: f'{root_url}/mbt2018-8-dd0097aa.pth.tar',
         },
     },
+    'cheng2020-anchor': {
+        'mse': {},
+    },
+    'cheng2020-attn': {
+        'mse': {},
+    },
 }
 
 cfgs = {
@@ -124,6 +135,22 @@ cfgs = {
         6: (192, 320),
         7: (192, 320),
         8: (192, 320),
+    },
+    'cheng2020-anchor': {
+        1: (128, ),
+        2: (128, ),
+        3: (128, ),
+        4: (192, ),
+        5: (192, ),
+        6: (192, ),
+    },
+    'cheng2020-attn': {
+        1: (128, ),
+        2: (128, ),
+        3: (128, ),
+        4: (192, ),
+        5: (192, ),
+        6: (192, ),
     },
 }
 
@@ -257,4 +284,58 @@ def mbt2018(quality, metric='mse', pretrained=False, progress=True, **kwargs):
             f'Invalid quality "{quality}", should be between (1, 8)')
 
     return _load_model('mbt2018', metric, quality, pretrained, progress,
+                       **kwargs)
+
+
+def cheng2020_anchor(quality,
+                     metric='mse',
+                     pretrained=False,
+                     progress=True,
+                     **kwargs):
+    r"""Anchor model variant from `"Learned Image Compression with
+    Discretized Gaussian Mixture Likelihoods and Attention Modules"
+    <https://arxiv.org/abs/2001.01568>`_, by Zhengxue Cheng, Heming Sun, Masaru
+    Takeuchi, Jiro Katto.
+
+    Args:
+        quality (int): Quality levels (1: lowest, highest: 6)
+        metric (str): Optimized metric, choose from ('mse')
+        pretrained (bool): If True, returns a pre-trained model
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    if metric not in ('mse', ):
+        raise ValueError(f'Invalid metric "{metric}"')
+
+    if quality < 1 or quality > 6:
+        raise ValueError(
+            f'Invalid quality "{quality}", should be between (1, 6)')
+
+    return _load_model('cheng2020-anchor', metric, quality, pretrained,
+                       progress, **kwargs)
+
+
+def cheng2020_attn(quality,
+                   metric='mse',
+                   pretrained=False,
+                   progress=True,
+                   **kwargs):
+    r"""Self-attention model variant from `"Learned Image Compression with
+    Discretized Gaussian Mixture Likelihoods and Attention Modules"
+    <https://arxiv.org/abs/2001.01568>`_, by Zhengxue Cheng, Heming Sun, Masaru
+    Takeuchi, Jiro Katto.
+
+    Args:
+        quality (int): Quality levels (1: lowest, highest: 6)
+        metric (str): Optimized metric, choose from ('mse')
+        pretrained (bool): If True, returns a pre-trained model
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    if metric not in ('mse', ):
+        raise ValueError(f'Invalid metric "{metric}"')
+
+    if quality < 1 or quality > 6:
+        raise ValueError(
+            f'Invalid quality "{quality}", should be between (1, 6)')
+
+    return _load_model('cheng2020-attn', metric, quality, pretrained, progress,
                        **kwargs)
