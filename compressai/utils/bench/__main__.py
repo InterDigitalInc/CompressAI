@@ -328,158 +328,6 @@ class JPEG2000(BinaryCodec):
         return cmd
 
 
-class AV1ffmpeg(BinaryCodec):
-    """Use ffmpeg libaom-av1 version.
-    """
-    fmt = '.ivf'
-
-    @property
-    def name(self):
-        return 'AV1ffmpeg'
-
-    @property
-    def description(self):
-        return f'AV1ffmpeg: libaom-av1. ffmpeg version {_get_ffmpeg_version()}'
-
-    def _get_encode_cmd(self, img, quality, out_filepath):
-        cmd = [
-            'ffmpeg',
-            '-loglevel',
-            'panic',
-            '-y',
-            '-i',
-            img,
-            '-strict',
-            'experimental',
-            '-pix_fmt',
-            'yuv420p',
-            '-c:v',
-            'libaom-av1',
-            '-crf',
-            quality,
-            out_filepath,
-        ]
-        return cmd
-
-    def _get_decode_cmd(self, out_filepath, rec_filepath):
-        cmd = [
-            'ffmpeg', '-loglevel', 'panic', '-y', '-i', out_filepath,
-            rec_filepath
-        ]
-        return cmd
-
-
-class AV1(Codec):
-    """AV1: AOM reference software"""
-
-    fmt = '.webm'
-
-    @property
-    def description(self):
-        return 'AV1'
-
-    @property
-    def name(self):
-        return 'AV1'
-
-    @classmethod
-    def setup_args(cls, parser):
-        super().setup_args(parser)
-        parser.add_argument('-b',
-                            '--build-dir',
-                            metavar='',
-                            type=str,
-                            required=True,
-                            help='AOM build dir')
-
-    def _set_args(self, args):
-        args = super()._set_args(args)
-        self.encoder_path = os.path.join(args.build_dir, 'aomenc')
-        self.decoder_path = os.path.join(args.build_dir, 'aomdec')
-        return args
-
-    def _run(self, img, quality):
-        if not 0 <= quality <= 63:
-            raise ValueError(f'Invalid quality value: {quality} (0,63)')
-
-        # Convert input image to yuv 444 file
-        arr = np.asarray(read_image(img))
-        fd, yuv_path = mkstemp(suffix='.yuv')
-        out_filepath = os.path.splitext(yuv_path)[0] + '.webm'
-
-        arr = arr.transpose((2, 0, 1))  # color channel first
-        arr = rgb2ycbcr(arr)
-
-        with open(yuv_path, 'wb') as f:
-            f.write(arr.tobytes())
-
-        # Encode
-        height, width = arr.shape[1:]
-        cmd = [
-            self.encoder_path,
-            '-w',
-            width,
-            '-h',
-            height,
-            '--fps=1/1',
-            '--limit=1',
-            '--input-bit-depth=8',
-            '--cpu-used=0',
-            '--threads=1',
-            '--passes=2',
-            '--end-usage=cq',
-            '--cq-level=' + str(quality),
-            '--i444',
-            '--skip=0',
-            '--tune=psnr',
-            '--psnr',
-            '--bit-depth=8',
-            '-o',
-            out_filepath,
-            yuv_path,
-        ]
-
-        start = time.time()
-        run_command(cmd)
-        enc_time = time.time() - start
-
-        # cleanup encoder input
-        os.close(fd)
-        os.unlink(yuv_path)
-
-        # Decode
-        cmd = [self.decoder_path, out_filepath, '-o', yuv_path, '--rawvideo', '--output-bit-depth=8']
-
-        start = time.time()
-        run_command(cmd)
-        dec_time = time.time() - start
-
-        # Compute PSNR
-        rec_arr = np.fromfile(yuv_path, dtype=np.uint8)
-        rec_arr = rec_arr.reshape(arr.shape)
-        bitdepth = 8
-        arr = arr.astype(np.float32) / (2**bitdepth - 1)
-        rec_arr = rec_arr.astype(np.float32) / (2**bitdepth - 1)
-
-        arr = ycbcr2rgb(arr)
-        rec_arr = ycbcr2rgb(rec_arr)
-        psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.)
-
-        bpp = filesize(out_filepath) * 8. / (height * width)
-
-        # Cleanup
-        os.unlink(yuv_path)
-        os.unlink(out_filepath)
-
-        return {
-            'psnr': psnr_val,
-            'msssim': msssim_val,
-            'bpp': bpp,
-            'encoding_time': enc_time,
-            'decoding_time': dec_time
-        }
-
-
 class BPG(BinaryCodec):
     """BPG from Fabrice Bellard."""
     fmt = '.bpg'
@@ -866,6 +714,161 @@ class HM(Codec):
         if not self.rgb:
             arr = ycbcr2rgb(arr)
             rec_arr = ycbcr2rgb(rec_arr)
+        psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.)
+
+        bpp = filesize(out_filepath) * 8. / (height * width)
+
+        # Cleanup
+        os.unlink(yuv_path)
+        os.unlink(out_filepath)
+
+        return {
+            'psnr': psnr_val,
+            'msssim': msssim_val,
+            'bpp': bpp,
+            'encoding_time': enc_time,
+            'decoding_time': dec_time
+        }
+
+
+class AV1ffmpeg(BinaryCodec):
+    """Use ffmpeg libaom-av1 version.
+    """
+    fmt = '.ivf'
+
+    @property
+    def name(self):
+        return 'AV1ffmpeg'
+
+    @property
+    def description(self):
+        return f'AV1ffmpeg: libaom-av1. ffmpeg version {_get_ffmpeg_version()}'
+
+    def _get_encode_cmd(self, img, quality, out_filepath):
+        cmd = [
+            'ffmpeg',
+            '-loglevel',
+            'panic',
+            '-y',
+            '-i',
+            img,
+            '-strict',
+            'experimental',
+            '-pix_fmt',
+            'yuv420p',
+            '-c:v',
+            'libaom-av1',
+            '-crf',
+            quality,
+            out_filepath,
+        ]
+        return cmd
+
+    def _get_decode_cmd(self, out_filepath, rec_filepath):
+        cmd = [
+            'ffmpeg', '-loglevel', 'panic', '-y', '-i', out_filepath,
+            rec_filepath
+        ]
+        return cmd
+
+
+class AV1(Codec):
+    """AV1: AOM reference software"""
+
+    fmt = '.webm'
+
+    @property
+    def description(self):
+        return 'AV1'
+
+    @property
+    def name(self):
+        return 'AV1'
+
+    @classmethod
+    def setup_args(cls, parser):
+        super().setup_args(parser)
+        parser.add_argument('-b',
+                            '--bin-dir',
+                            metavar='',
+                            type=str,
+                            required=True,
+                            help='AOM binaries dir')
+
+    def _set_args(self, args):
+        args = super()._set_args(args)
+        self.encoder_path = os.path.join(args.build_dir, 'aomenc')
+        self.decoder_path = os.path.join(args.build_dir, 'aomdec')
+        return args
+
+    def _run(self, img, quality):
+        if not 0 <= quality <= 63:
+            raise ValueError(f'Invalid quality value: {quality} (0,63)')
+
+        # Convert input image to yuv 444 file
+        arr = np.asarray(read_image(img))
+        fd, yuv_path = mkstemp(suffix='.yuv')
+        out_filepath = os.path.splitext(yuv_path)[0] + '.webm'
+
+        arr = arr.transpose((2, 0, 1))  # color channel first
+        arr = rgb2ycbcr(arr)
+
+        with open(yuv_path, 'wb') as f:
+            f.write(arr.tobytes())
+
+        # Encode
+        height, width = arr.shape[1:]
+        cmd = [
+            self.encoder_path,
+            '-w',
+            width,
+            '-h',
+            height,
+            '--fps=1/1',
+            '--limit=1',
+            '--input-bit-depth=8',
+            '--cpu-used=0',
+            '--threads=1',
+            '--passes=2',
+            '--end-usage=cq',
+            '--cq-level=' + str(quality),
+            '--i444',
+            '--skip=0',
+            '--tune=psnr',
+            '--psnr',
+            '--bit-depth=8',
+            '-o',
+            out_filepath,
+            yuv_path,
+        ]
+
+        start = time.time()
+        run_command(cmd)
+        enc_time = time.time() - start
+
+        # cleanup encoder input
+        os.close(fd)
+        os.unlink(yuv_path)
+
+        # Decode
+        cmd = [
+            self.decoder_path, out_filepath, '-o', yuv_path, '--rawvideo',
+            '--output-bit-depth=8'
+        ]
+
+        start = time.time()
+        run_command(cmd)
+        dec_time = time.time() - start
+
+        # Compute PSNR
+        rec_arr = np.fromfile(yuv_path, dtype=np.uint8)
+        rec_arr = rec_arr.reshape(arr.shape)
+        bitdepth = 8
+        arr = arr.astype(np.float32) / (2**bitdepth - 1)
+        rec_arr = rec_arr.astype(np.float32) / (2**bitdepth - 1)
+
+        arr = ycbcr2rgb(arr)
+        rec_arr = ycbcr2rgb(rec_arr)
         psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.)
 
         bpp = filesize(out_filepath) * 8. / (height * width)
