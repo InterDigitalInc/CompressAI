@@ -372,7 +372,7 @@ class AV1ffmpeg(BinaryCodec):
 class AV1(Codec):
     """AV1: AOM reference software"""
 
-    fmt = '.bin'
+    fmt = '.webm'
 
     @property
     def description(self):
@@ -403,15 +403,15 @@ class AV1(Codec):
 
     def _set_args(self, args):
         args = super()._set_args(args)
-        self.encoder_path = get_vtm_encoder_path(args.build_dir)
-        self.decoder_path = get_vtm_decoder_path(args.build_dir)
+        self.encoder_path = os.path.join(args.build_dir, 'aomenc')
+        self.decoder_path = os.path.join(args.build_dir, 'aomdec')
         self.config_path = args.config
         self.rgb = args.rgb
         return args
 
     def _run(self, img, quality):
-        if not 0 <= quality <= 51:
-            raise ValueError(f'Invalid quality value: {quality} (0,51)')
+        if not 0 <= quality <= 63:
+            raise ValueError(f'Invalid quality value: {quality} (0,63)')
 
         # Convert input image to yuv 444 file
         arr = np.asarray(read_image(img))
@@ -429,10 +429,39 @@ class AV1(Codec):
         # Encode
         height, width = arr.shape[1:]
         cmd = [
-            self.encoder_path, '-i', yuv_path, '-c', self.config_path, '-q',
-            quality, '-o', '/dev/null', '-b', out_filepath, '-wdt', width,
-            '-hgt', height, '-fr', '1', '-f', '1', '--InputChromaFormat=444',
-            '--InputBitDepth=8', '--ConformanceMode=1'
+            self.encoder_path,
+            yuv_path,
+            '--limit=500',
+            '--cq-level',
+            quality,
+            '-o',
+            out_filepath,
+            '--width',
+            width,
+            '-height',
+            height,
+            '-fps',
+            '1',
+            '-f',
+            '1',
+            '--InputChromaFormat=444',
+            '--input-bit-depth=8',
+            '--cpu-used=0',
+            '--threads=1',
+            '--codec=av1',
+            '--passes=2',
+            '--end-usage=q',
+            '--i420',
+            '--skip=0',
+            '--minsection-pct=0',
+            '--maxsection-pct=2000',
+            '--static-thresh=0',
+            '--drop-frame=0',
+            '--tune=psnr',
+            '--q-hist=0',
+            '--rate-hist=0',
+            '--psnr',
+            '--bit-depth=8',
         ]
 
         if self.rgb:
