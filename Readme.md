@@ -1,6 +1,9 @@
 # CompressAI
 
-CompressAI (_compress-ay_) is built on top of PyTorch and provides:
+CompressAI (_compress-ay_) is a PyTorch library and evaluation platform for
+end-to-end compression research.
+
+CompressAI is built on top of PyTorch and provides:
 
 * custom operations, layers and models for deep learning based data compression
 * a partial port of the official [TensorFlow compression
