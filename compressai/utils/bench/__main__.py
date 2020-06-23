@@ -396,8 +396,6 @@ class AV1(Codec):
         args = super()._set_args(args)
         self.encoder_path = os.path.join(args.build_dir, 'aomenc')
         self.decoder_path = os.path.join(args.build_dir, 'aomdec')
-        #self.config_path = args.config
-        #self.rgb = args.rgb
         return args
 
     def _run(self, img, quality):
@@ -410,8 +408,6 @@ class AV1(Codec):
         out_filepath = os.path.splitext(yuv_path)[0] + '.webm'
 
         arr = arr.transpose((2, 0, 1))  # color channel first
-
-        #if not self.rgb:
         arr = rgb2ycbcr(arr)
 
         with open(yuv_path, 'wb') as f:
@@ -432,7 +428,7 @@ class AV1(Codec):
             '--threads=1',
             '--passes=2',
             '--end-usage=cq',
-            '--cq-level='+str(quality),
+            '--cq-level=' + str(quality),
             '--i444',
             '--skip=0',
             '--tune=psnr',
@@ -443,7 +439,6 @@ class AV1(Codec):
             yuv_path,
         ]
 
-        print(cmd)
         start = time.time()
         run_command(cmd)
         enc_time = time.time() - start
@@ -454,8 +449,6 @@ class AV1(Codec):
 
         # Decode
         cmd = [self.decoder_path, '-b', out_filepath, '-o', yuv_path, '-d', 8]
-        # if self.rgb:
-        #     cmd.append('--OutputInternalColourSpace=GBRtoRGB')
 
         start = time.time()
         run_command(cmd)
