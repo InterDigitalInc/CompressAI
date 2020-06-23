@@ -30,7 +30,7 @@ NJOBS=${NJOBS:-4}
 
 usage() {
     echo "usage: $(basename $0) dataset CODECS"
-    echo "supported codecs: [jpeg, jpeg2000, WebP, bpg, hm, vtm, av1, av1-ffmpeg, bmshj2018-factorized-mse, bmshj2018-hyperprior-mse, mbt2018-mean-mse]"
+    echo "supported codecs: [jpeg, jpeg2000, WebP, bpg, hm, vtm, av1, bmshj2018-factorized-mse, bmshj2018-hyperprior-mse, mbt2018-mean-mse]"
 }
 
 if [[ $1 == "-h" || $1 == "--help" ]]; then
@@ -118,11 +118,6 @@ vtm() {
         -j "$NJOBS" > "benchmarks/vtm.json"
 }
 
-av1-ffmpeg() {
-    python -m compressai.utils.bench av1ffmpeg "$dataset"        \
-        -q $(seq 62 -5 2) -j "$NJOBS" > benchmarks/av1-ffmpeg.json
-}
-
 av1() {
     if [ -z ${AV1_BIN_DIR+x} ]; then echo "set AV1 bin directory AV1_BIN_DIR"; exit 1; fi
     python3 -m compressai.utils.bench av1 "$dataset"            \
@@ -166,9 +161,6 @@ for i in "$@"; do
             ;;
         "vtm")
             vtm
-            ;;
-        "av1-ffmpeg")
-            av1-ffmpeg
             ;;
         "av1")
             av1
