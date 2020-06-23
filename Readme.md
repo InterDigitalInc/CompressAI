@@ -18,8 +18,8 @@ CompressAI only supports python 3.6+ and PyTorch 1.4+. A C++17 compiler, a
 recent version of pip (19.0+), and common python packages (see `setup.py` for
 the full list) are also required.
 
-To get started and install CompressAI, run the following commands in a virtual
-environment:
+To get started and install CompressAI, run the following commands in a [virtual
+environment](https://docs.python.org/3.6/library/venv.html):
 
 ```bash
 git clone https://github.com/InterDigitalInc/CompressAI
