@@ -24,7 +24,7 @@ environment](https://docs.python.org/3.6/library/venv.html):
 ```bash
 git clone https://github.com/InterDigitalInc/CompressAI
 cd compressai
-pip install -e .
+pip install -U pip && pip install -e .
 ```
 
 For a custom installation, you can also run one of the following commands:
