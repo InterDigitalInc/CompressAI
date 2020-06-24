@@ -55,7 +55,7 @@ To encode/decode images with the provided pre-trained models, run the
 `codec.py` example:
 
 ```bash
-python examples/codec.py --help
+python3 examples/codec.py --help
 ```
 
 An examplary training script with a rate-distortion loss is provided in
@@ -64,7 +64,7 @@ with your own model implemented within CompressAI, and then run the script for a
 simple training pipeline:
 
 ```bash
-python example/train.py -d /path/to/my/image/dataset/ --epochs 300 -lr 1e-4 --batch-size 16 --cuda --save
+python3 example/train.py -d /path/to/my/image/dataset/ --epochs 300 -lr 1e-4 --batch-size 16 --cuda --save
 ```
 
 A jupyter notebook illustrating the usage of a pre-trained model for learned image
@@ -81,7 +81,7 @@ To evaluate a pre-trained model on your own dataset, CompressAI provides an
 evaluation script:
 
 ```bash
-python -m compressai.utils.eval_model MODEL_NAME /path/to/images/folder/
+python3 -m compressai.utils.eval_model MODEL_NAME /path/to/images/folder/
 ```
 
 To evaluate published classical or machine-learning based image/video
