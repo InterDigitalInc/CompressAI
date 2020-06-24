@@ -39,10 +39,10 @@ supported.
 
 ## Documentation
 
-* [Installation]()
-* [CompressAI API]()
-* [Training your own model]()
-* [List of available models (model zoo)]()
+* [Installation](https://interdigitalinc.github.io/CompressAI/tutorial_installation.html)
+* [CompressAI API](https://interdigitalinc.github.io/CompressAI/)
+* [Training your own model](https://interdigitalinc.github.io/CompressAI/tutorial_train.html)
+* [List of available models (model zoo)](https://interdigitalinc.github.io/CompressAI/zoo.html)
 
 
 ## Usage
