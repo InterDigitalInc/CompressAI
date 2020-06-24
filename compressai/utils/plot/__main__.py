@@ -70,6 +70,7 @@ def matplotlib_plt(scatters,
                    ylabel,
                    output_file,
                    limits=None,
+                   show=False,
                    figsize=None):
     if figsize is None:
         figsize = (9, 6)
@@ -86,10 +87,12 @@ def matplotlib_plt(scatters,
 
     if title:
         ax.title.set_text(title)
+
+    if show:
+        plt.show()
+
     if output_file:
         fig.savefig(output_file, dpi=300)
-
-    plt.show()
 
 
 def plotly_plt(scatters,
@@ -97,6 +100,7 @@ def plotly_plt(scatters,
                ylabel,
                output_file,
                limits=None,
+               show=False,
                figsize=None):
     del figsize
     scatters = [
@@ -124,7 +128,7 @@ def plotly_plt(scatters,
                 },
             )
         },
-        auto_open=False,
+        auto_open=show,
         filename=output_file or 'plot.html')
 
 
@@ -173,6 +177,9 @@ def setup_args():
                         default=_backends[0],
                         choices=_backends,
                         help='Change plot backend (default: %(default)s)')
+    parser.add_argument('--show',
+                        action='store_true',
+                        help='Open plot figure')
     return parser
 
 
@@ -196,7 +203,8 @@ def main(argv):
                            ylabel,
                            args.output,
                            limits=args.axes,
-                           figsize=args.figsize)
+                           figsize=args.figsize,
+                           show=args.show)
 
 
 if __name__ == '__main__':
