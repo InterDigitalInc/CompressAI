@@ -17,3 +17,23 @@ GDN
 GDN1
 ----
 .. autoclass:: GDN1
+
+
+ResidualBlock
+-------------
+.. autoclass:: ResidualBlock
+
+
+ResidualBlockWithStride
+-----------------------
+.. autoclass:: ResidualBlockWithStride
+
+
+ResidualBlockUpsample
+---------------------
+.. autoclass:: ResidualBlockUpsample
+
+
+AttentionBlock
+--------------
+.. autoclass:: AttentionBlock 
