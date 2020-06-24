@@ -754,7 +754,7 @@ class AV1(Codec):
     def setup_args(cls, parser):
         super().setup_args(parser)
         parser.add_argument('-b',
-                            '--bin-dir',
+                            '--build-dir',
                             metavar='',
                             type=str,
                             required=True,
@@ -795,7 +795,7 @@ class AV1(Codec):
             '--cpu-used=0',
             '--threads=1',
             '--passes=2',
-            '--end-usage=cq',
+            '--end-usage=q',
             '--cq-level=' + str(quality),
             '--i444',
             '--skip=0',
