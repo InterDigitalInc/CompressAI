@@ -49,7 +49,7 @@ supported.
 
 ### Examples
 
-Scripts and notebooks examples can be found in the `examples/` directory.
+Script and notebook examples can be found in the `examples/` directory.
 
 To encode/decode images with the provided pre-trained models, run the
 `codec.py` example:
@@ -58,16 +58,16 @@ To encode/decode images with the provided pre-trained models, run the
 python examples/codec.py --help
 ```
 
-An example training script with a rate-distortion loss is provided in
-`examples/train.py`. You can replace the example model in the training script
-with your own model implemented with CompressAI, and then run the script for a
+An examplary training script with a rate-distortion loss is provided in
+`examples/train.py`. You can replace the model used in the training script
+with your own model implemented within CompressAI, and then run the script for a
 simple training pipeline:
 
 ```bash
 python example/train.py -d /path/to/my/image/dataset/ --epochs 300 -lr 1e-4 --batch-size 16 --cuda --save
 ```
 
-A jupyter notebook illustrating a pre-trained model for learned image
+A jupyter notebook illustrating the usage of a pre-trained model for learned image
 compression is also provided in the `examples` directory:
 
 ```bash
@@ -95,12 +95,12 @@ python3 -m compressai.utils.bench vtm --help
 
 ## License
 
-CompressAI is licensed under under the Apache License, Version 2.0
+CompressAI is licensed under the Apache License, Version 2.0
 
 ## Contributing
 
 We welcome feedback and contributions. Please open a GitHub issue to report
-bugs, request enhancements or if you have questions. 
+bugs, request enhancements or if you have any questions.
 
 Before contributing, please read the CONTRIBUTING.md file.
 
@@ -121,7 +121,7 @@ original models and datasets, and cite this project as:
 	howpublished = {\url{https://github.com/InterDigitalInc/CompressAI}},
 	url = "https://github.com/InterDigitalInc/CompressAI",
 	year = 2020,
-	note = "[Online; accessed 20-June-2020]"
+	note = "[Online; accessed 24-June-2020]"
 }
 
 ```
@@ -132,4 +132,6 @@ original models and datasets, and cite this project as:
  * BPG image format by _Fabrice Bellard_: https://bellard.org/bpg
  * HEVC HM reference software: https://hevc.hhi.fraunhofer.de
  * VVC VTM reference software: https://vcgit.hhi.fraunhofer.de/jvet/VVCSoftware_VTM
+ * AOM AV1 reference software: https://aomedia.googlesource.com/aom
+ * Z. Cheng et al. 2020: https://github.com/ZhengxueCheng/Learned-Image-Compression-with-GMM-and-Attention
  * Kodak image dataset: http://r0k.us/graphics/kodak/
