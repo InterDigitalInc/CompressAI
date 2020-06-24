@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 Simple plotting utility to display Rate-Distortion curves (RD) comparison
 between codecs.
@@ -66,8 +65,15 @@ def parse_json_file(filepath, metric):
     }
 
 
-def matplotlib_plt(scatters, title, ylabel, output_file, limits=None):
-    fig, ax = plt.subplots(figsize=(9, 6))
+def matplotlib_plt(scatters,
+                   title,
+                   ylabel,
+                   output_file,
+                   limits=None,
+                   figsize=None):
+    if figsize is None:
+        figsize = (9, 6)
+    fig, ax = plt.subplots(figsize=figsize)
     for sc in scatters:
         ax.plot(sc['xs'], sc['ys'], '.-', label=sc['name'])
 
@@ -86,7 +92,12 @@ def matplotlib_plt(scatters, title, ylabel, output_file, limits=None):
     plt.show()
 
 
-def plotly_plt(scatters, title, ylabel, output_file, limits=None):
+def plotly_plt(scatters,
+               title,
+               ylabel,
+               output_file,
+               limits=None,
+               figsize=None):
     scatters = [
         go.Scatter(x=sc['xs'], y=sc['ys'], name=sc['name']) for sc in scatters
     ]
@@ -142,6 +153,13 @@ def setup_args():
                         type=str,
                         help='Output file name')
     parser.add_argument(
+        '--figsize',
+        metavar='',
+        type=float,
+        nargs=2,
+        default=(9, 6),
+        help='Figure relative size (width, height), default: %(default)s')
+    parser.add_argument(
         '--axes',
         metavar='',
         type=float,
@@ -166,6 +184,8 @@ def main(argv):
         scatters.append(rv)
 
     ylabel = args.metric
+    if ylabel == 'psnr':
+        ylabel = 'PSNR [dB]'
     func_map = {
         'matplotlib': matplotlib_plt,
         'plotly': plotly_plt,
@@ -174,7 +194,8 @@ def main(argv):
                            args.title,
                            ylabel,
                            args.output,
-                           limits=args.axes)
+                           limits=args.axes,
+                           figsize=args.figsize)
 
 
 if __name__ == '__main__':
