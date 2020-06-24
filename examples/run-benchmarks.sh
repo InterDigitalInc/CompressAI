@@ -30,7 +30,7 @@ NJOBS=${NJOBS:-4}
 
 usage() {
     echo "usage: $(basename $0) dataset CODECS"
-    echo "supported codecs: [jpeg, jpeg2000, WebP, bpg, hm, vtm, av1, bmshj2018-factorized-mse, bmshj2018-hyperprior-mse, mbt2018-mean-mse]"
+    echo "supported codecs: [jpeg, jpeg2000, webp, bpg, hm, vtm, av1, bmshj2018-factorized-mse, bmshj2018-hyperprior-mse, mbt2018-mean-mse]"
 }
 
 if [[ $1 == "-h" || $1 == "--help" ]]; then
@@ -76,26 +76,26 @@ BPGDEC="$(which bpgdec)"
 
 # AV1
 # edit below to provide the path to the chosen version of VTM
-# AV1_BIN_DIR="${HOME}/aom/build_darwin"
+# AV1_BIN_DIR="${HOME}/av1/aom/build_gcc"
 
 jpeg() {
-    python -m compressai.utils.bench jpeg "$dataset"            \
+    python3 -m compressai.utils.bench jpeg "$dataset"            \
         -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/jpeg.json
 }
 
 jpeg2000() {
-    python -m compressai.utils.bench jpeg2000 "$dataset"        \
+    python3 -m compressai.utils.bench jpeg2000 "$dataset"        \
         -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/jpeg2000.json
 }
 
 webp() {
-    python -m compressai.utils.bench webp "$dataset"            \
+    python3 -m compressai.utils.bench webp "$dataset"            \
         -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/webp.json
 }
 
 bpg() {
     if [ -z ${BPGENC+x} ] || [ -z ${BPGDEC+x} ]; then echo "install libBPG"; exit 1; fi
-    python -m compressai.utils.bench bpg "$dataset"             \
+    python3 -m compressai.utils.bench bpg "$dataset"             \
         -q $(seq 47 -5 2) -m "$1" -e "$2" -c "$3"               \
         --encoder-path "$BPGENC"                                \
         --decoder-path "$BPGDEC"                                \
