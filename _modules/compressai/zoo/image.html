@@ -188,13 +188,16 @@
 
 <span class="kn">from</span> <span class="nn">compressai.models</span> <span class="kn">import</span> <span class="p">(</span><span class="n">FactorizedPrior</span><span class="p">,</span> <span class="n">ScaleHyperprior</span><span class="p">,</span>
                                <span class="n">MeanScaleHyperprior</span><span class="p">,</span>
-                               <span class="n">JointAutoregressiveHierarchicalPriors</span><span class="p">)</span>
+                               <span class="n">JointAutoregressiveHierarchicalPriors</span><span class="p">,</span>
+                               <span class="n">Cheng2020Anchor</span><span class="p">,</span> <span class="n">Cheng2020Attention</span><span class="p">)</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;bmshj2018_factorized&#39;</span><span class="p">,</span>
     <span class="s1">&#39;bmshj2018_hyperprior&#39;</span><span class="p">,</span>
     <span class="s1">&#39;mbt2018&#39;</span><span class="p">,</span>
     <span class="s1">&#39;mbt2018_mean&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cheng2020_anchor&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cheng2020_attn&#39;</span><span class="p">,</span>
 <span class="p">]</span>
 
 <span class="n">model_architectures</span> <span class="o">=</span> <span class="p">{</span>
@@ -202,6 +205,8 @@
     <span class="s1">&#39;bmshj2018-hyperprior&#39;</span><span class="p">:</span> <span class="n">ScaleHyperprior</span><span class="p">,</span>
     <span class="s1">&#39;mbt2018-mean&#39;</span><span class="p">:</span> <span class="n">MeanScaleHyperprior</span><span class="p">,</span>
     <span class="s1">&#39;mbt2018&#39;</span><span class="p">:</span> <span class="n">JointAutoregressiveHierarchicalPriors</span><span class="p">,</span>
+    <span class="s1">&#39;cheng2020-anchor&#39;</span><span class="p">:</span> <span class="n">Cheng2020Anchor</span><span class="p">,</span>
+    <span class="s1">&#39;cheng2020-attn&#39;</span><span class="p">:</span> <span class="n">Cheng2020Attention</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">root_url</span> <span class="o">=</span> <span class="s1">&#39;https://compressai.s3.amazonaws.com/models/v1&#39;</span>
@@ -254,6 +259,12 @@
             <span class="mi">8</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s1">/mbt2018-8-dd0097aa.pth.tar&#39;</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">},</span>
+    <span class="s1">&#39;cheng2020-anchor&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;mse&#39;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;cheng2020-attn&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;mse&#39;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="p">},</span>
 <span class="p">}</span>
 
 <span class="n">cfgs</span> <span class="o">=</span> <span class="p">{</span>
@@ -296,6 +307,22 @@
         <span class="mi">6</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">320</span><span class="p">),</span>
         <span class="mi">7</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">320</span><span class="p">),</span>
         <span class="mi">8</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">320</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;cheng2020-anchor&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="p">),</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="p">),</span>
+        <span class="mi">3</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="p">),</span>
+        <span class="mi">4</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="p">),</span>
+        <span class="mi">5</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="p">),</span>
+        <span class="mi">6</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="p">),</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;cheng2020-attn&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="p">),</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="p">),</span>
+        <span class="mi">3</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="p">),</span>
+        <span class="mi">4</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="p">),</span>
+        <span class="mi">5</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="p">),</span>
+        <span class="mi">6</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="p">),</span>
     <span class="p">},</span>
 <span class="p">}</span>
 
@@ -429,6 +456,60 @@
             <span class="sa">f</span><span class="s1">&#39;Invalid quality &quot;</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">&quot;, should be between (1, 8)&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="s1">&#39;mbt2018&#39;</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span>
+                       <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cheng2020_anchor"><a class="viewcode-back" href="../../../zoo.html#compressai.zoo.cheng2020_anchor">[docs]</a><span class="k">def</span> <span class="nf">cheng2020_anchor</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span>
+                     <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;mse&#39;</span><span class="p">,</span>
+                     <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Anchor model variant from `&quot;Learned Image Compression with</span>
+<span class="sd">    Discretized Gaussian Mixture Likelihoods and Attention Modules&quot;</span>
+<span class="sd">    &lt;https://arxiv.org/abs/2001.01568&gt;`_, by Zhengxue Cheng, Heming Sun, Masaru</span>
+<span class="sd">    Takeuchi, Jiro Katto.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        quality (int): Quality levels (1: lowest, highest: 6)</span>
+<span class="sd">        metric (str): Optimized metric, choose from (&#39;mse&#39;)</span>
+<span class="sd">        pretrained (bool): If True, returns a pre-trained model</span>
+<span class="sd">        progress (bool): If True, displays a progress bar of the download to stderr</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;mse&#39;</span><span class="p">,</span> <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid metric &quot;</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">quality</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">quality</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Invalid quality &quot;</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">&quot;, should be between (1, 6)&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="s1">&#39;cheng2020-anchor&#39;</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span>
+                       <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cheng2020_attn"><a class="viewcode-back" href="../../../zoo.html#compressai.zoo.cheng2020_attn">[docs]</a><span class="k">def</span> <span class="nf">cheng2020_attn</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span>
+                   <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;mse&#39;</span><span class="p">,</span>
+                   <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                   <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Self-attention model variant from `&quot;Learned Image Compression with</span>
+<span class="sd">    Discretized Gaussian Mixture Likelihoods and Attention Modules&quot;</span>
+<span class="sd">    &lt;https://arxiv.org/abs/2001.01568&gt;`_, by Zhengxue Cheng, Heming Sun, Masaru</span>
+<span class="sd">    Takeuchi, Jiro Katto.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        quality (int): Quality levels (1: lowest, highest: 6)</span>
+<span class="sd">        metric (str): Optimized metric, choose from (&#39;mse&#39;)</span>
+<span class="sd">        pretrained (bool): If True, returns a pre-trained model</span>
+<span class="sd">        progress (bool): If True, displays a progress bar of the download to stderr</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;mse&#39;</span><span class="p">,</span> <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid metric &quot;</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">quality</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">quality</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Invalid quality &quot;</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">&quot;, should be between (1, 6)&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="s1">&#39;cheng2020-attn&#39;</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span>
                        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 </pre></div>
 

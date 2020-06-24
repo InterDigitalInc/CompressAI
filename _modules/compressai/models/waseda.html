@@ -186,12 +186,9 @@
 
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 
-<span class="kn">from</span> <span class="nn">compressai.layers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">conv3x3</span><span class="p">,</span>
-                               <span class="n">subpel_conv3x3</span><span class="p">,</span>
-                               <span class="n">ResidualBlockWithStride</span><span class="p">,</span>
-                               <span class="n">ResidualBlockUpsample</span><span class="p">,</span>
-                               <span class="n">ResidualBlock</span><span class="p">,</span>
-                               <span class="n">AttentionBlock</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compressai.layers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">conv3x3</span><span class="p">,</span> <span class="n">subpel_conv3x3</span><span class="p">,</span>
+                               <span class="n">ResidualBlockWithStride</span><span class="p">,</span> <span class="n">ResidualBlockUpsample</span><span class="p">,</span>
+                               <span class="n">ResidualBlock</span><span class="p">,</span> <span class="n">AttentionBlock</span><span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">.priors</span> <span class="kn">import</span> <span class="n">JointAutoregressiveHierarchicalPriors</span>
 
@@ -270,7 +267,7 @@
 <span class="sd">        N (int): Number of channels</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">192</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
             <span class="n">ResidualBlockWithStride</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>

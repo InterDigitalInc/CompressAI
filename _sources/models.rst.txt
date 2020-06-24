@@ -32,3 +32,13 @@ JointAutoregressiveHierarchicalPriors
 -------------------------------------
 .. autoclass:: JointAutoregressiveHierarchicalPriors
     :members:
+
+Cheng2020Anchor
+---------------
+.. autoclass:: Cheng2020Anchor
+    :members:
+
+Cheng2020Attention
+------------------
+.. autoclass:: Cheng2020Attention
+    :members:

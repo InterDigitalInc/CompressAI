@@ -109,14 +109,16 @@
 <li class="toctree-l3"><a class="reference internal" href="#bmshj2018-hyperprior">bmshj2018_hyperprior</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mbt2018-mean">mbt2018_mean</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mbt2018">mbt2018</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cheng2020-anchor">cheng2020_anchor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cheng2020-attn">cheng2020_attn</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#performances">Performances</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#all-models">all models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id9">bmshj2018 factorized</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id10">bmshj2018 hyperprior</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id11">mbt2018 mean</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id12">mbt2018</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id12">bmshj2018 factorized</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id13">bmshj2018 hyperprior</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id14">mbt2018 mean</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id15">mbt2018</a></li>
 </ul>
 </li>
 </ul>
@@ -214,28 +216,30 @@ and <a class="reference external" href="https://pytorch.org/docs/stable/nn.html?
 <div class="contents local topic" id="table-of-content">
 <p class="topic-title">Table of content</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#training" id="id13">Training</a></p></li>
-<li><p><a class="reference internal" href="#models" id="id14">Models</a></p>
+<li><p><a class="reference internal" href="#training" id="id16">Training</a></p></li>
+<li><p><a class="reference internal" href="#models" id="id17">Models</a></p>
 <ul>
-<li><p><a class="reference internal" href="#bmshj2018-factorized" id="id15">bmshj2018_factorized</a></p></li>
-<li><p><a class="reference internal" href="#bmshj2018-hyperprior" id="id16">bmshj2018_hyperprior</a></p></li>
-<li><p><a class="reference internal" href="#mbt2018-mean" id="id17">mbt2018_mean</a></p></li>
-<li><p><a class="reference internal" href="#mbt2018" id="id18">mbt2018</a></p></li>
+<li><p><a class="reference internal" href="#bmshj2018-factorized" id="id18">bmshj2018_factorized</a></p></li>
+<li><p><a class="reference internal" href="#bmshj2018-hyperprior" id="id19">bmshj2018_hyperprior</a></p></li>
+<li><p><a class="reference internal" href="#mbt2018-mean" id="id20">mbt2018_mean</a></p></li>
+<li><p><a class="reference internal" href="#mbt2018" id="id21">mbt2018</a></p></li>
+<li><p><a class="reference internal" href="#cheng2020-anchor" id="id22">cheng2020_anchor</a></p></li>
+<li><p><a class="reference internal" href="#cheng2020-attn" id="id23">cheng2020_attn</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#performances" id="id19">Performances</a></p>
+<li><p><a class="reference internal" href="#performances" id="id24">Performances</a></p>
 <ul>
-<li><p><a class="reference internal" href="#all-models" id="id20">all models</a></p></li>
-<li><p><a class="reference internal" href="#id9" id="id21">bmshj2018 factorized</a></p></li>
-<li><p><a class="reference internal" href="#id10" id="id22">bmshj2018 hyperprior</a></p></li>
-<li><p><a class="reference internal" href="#id11" id="id23">mbt2018 mean</a></p></li>
-<li><p><a class="reference internal" href="#id12" id="id24">mbt2018</a></p></li>
+<li><p><a class="reference internal" href="#all-models" id="id25">all models</a></p></li>
+<li><p><a class="reference internal" href="#id12" id="id26">bmshj2018 factorized</a></p></li>
+<li><p><a class="reference internal" href="#id13" id="id27">bmshj2018 hyperprior</a></p></li>
+<li><p><a class="reference internal" href="#id14" id="id28">mbt2018 mean</a></p></li>
+<li><p><a class="reference internal" href="#id15" id="id29">mbt2018</a></p></li>
 </ul>
 </li>
 </ul>
 </div>
 <div class="section" id="training">
-<h2><a class="toc-backref" href="#id13">Training</a><a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id16">Training</a><a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h2>
 <p>Unless specified otherwise, networks were trained for 4-5M steps on <em>256x256</em>
 image patches randomly cropped and extracted from the <a class="reference external" href="http://toflow.csail.mit.edu/">Vime90K</a> dataset <a class="reference internal" href="#xue2019video" id="id1"><span>[xue2019video]</span></a>.</p>
 <p>Models are trained with a batch size of 16 or 32, and an initial learning rate
@@ -247,9 +251,9 @@ architecture used.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="models">
-<h2><a class="toc-backref" href="#id14">Models</a><a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id17">Models</a><a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="bmshj2018-factorized">
-<h3><a class="toc-backref" href="#id15">bmshj2018_factorized</a><a class="headerlink" href="#bmshj2018-factorized" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id18">bmshj2018_factorized</a><a class="headerlink" href="#bmshj2018-factorized" title="Permalink to this headline">¶</a></h3>
 <p>Original paper: <a class="reference internal" href="#bmshj2018" id="id2"><span>[bmshj2018]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.bmshj2018_factorized">
@@ -271,7 +275,7 @@ N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.0143
 
 </div>
 <div class="section" id="bmshj2018-hyperprior">
-<h3><a class="toc-backref" href="#id16">bmshj2018_hyperprior</a><a class="headerlink" href="#bmshj2018-hyperprior" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id19">bmshj2018_hyperprior</a><a class="headerlink" href="#bmshj2018-hyperprior" title="Permalink to this headline">¶</a></h3>
 <p>Original paper: <a class="reference internal" href="#bmshj2018" id="id3"><span>[bmshj2018]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.bmshj2018_hyperprior">
@@ -293,8 +297,8 @@ N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.0143
 
 </div>
 <div class="section" id="mbt2018-mean">
-<h3><a class="toc-backref" href="#id17">mbt2018_mean</a><a class="headerlink" href="#mbt2018-mean" title="Permalink to this headline">¶</a></h3>
-<p>Original paper: <a class="reference internal" href="#id8" id="id5"><span>[mbt2018]</span></a></p>
+<h3><a class="toc-backref" href="#id20">mbt2018_mean</a><a class="headerlink" href="#mbt2018-mean" title="Permalink to this headline">¶</a></h3>
+<p>Original paper: <a class="reference internal" href="#id11" id="id5"><span>[mbt2018]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.mbt2018_mean">
 <code class="sig-prename descclassname">compressai.zoo.</code><code class="sig-name descname">mbt2018_mean</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'mse'</span></em>, <em class="sig-param"><span class="n">pretrained</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#mbt2018_mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.zoo.mbt2018_mean" title="Permalink to this definition">¶</a></dt>
@@ -316,8 +320,8 @@ Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</p>
 
 </div>
 <div class="section" id="mbt2018">
-<h3><a class="toc-backref" href="#id18">mbt2018</a><a class="headerlink" href="#mbt2018" title="Permalink to this headline">¶</a></h3>
-<p>Original paper: <a class="reference internal" href="#id8" id="id6"><span>[mbt2018]</span></a></p>
+<h3><a class="toc-backref" href="#id21">mbt2018</a><a class="headerlink" href="#mbt2018" title="Permalink to this headline">¶</a></h3>
+<p>Original paper: <a class="reference internal" href="#id11" id="id6"><span>[mbt2018]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.mbt2018">
 <code class="sig-prename descclassname">compressai.zoo.</code><code class="sig-name descname">mbt2018</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'mse'</span></em>, <em class="sig-param"><span class="n">pretrained</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#mbt2018"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.zoo.mbt2018" title="Permalink to this definition">¶</a></dt>
@@ -337,6 +341,58 @@ Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</p>
 </dl>
 </dd></dl>
 
+</div>
+<div class="section" id="cheng2020-anchor">
+<h3><a class="toc-backref" href="#id22">cheng2020_anchor</a><a class="headerlink" href="#cheng2020-anchor" title="Permalink to this headline">¶</a></h3>
+<p>Original paper: <a class="reference internal" href="#cheng2020" id="id8"><span>[cheng2020]</span></a></p>
+<dl class="py function">
+<dt id="compressai.zoo.cheng2020_anchor">
+<code class="sig-prename descclassname">compressai.zoo.</code><code class="sig-name descname">cheng2020_anchor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'mse'</span></em>, <em class="sig-param"><span class="n">pretrained</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#cheng2020_anchor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.zoo.cheng2020_anchor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Anchor model variant from <a class="reference external" href="https://arxiv.org/abs/2001.01568">“Learned Image Compression with
+Discretized Gaussian Mixture Likelihoods and Attention Modules”</a>, by Zhengxue Cheng, Heming Sun, Masaru
+Takeuchi, Jiro Katto.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quality</strong> (<em>int</em>) – Quality levels (1: lowest, highest: 6)</p></li>
+<li><p><strong>metric</strong> (<em>str</em>) – Optimized metric, choose from (‘mse’)</p></li>
+<li><p><strong>pretrained</strong> (<em>bool</em>) – If True, returns a pre-trained model</p></li>
+<li><p><strong>progress</strong> (<em>bool</em>) – If True, displays a progress bar of the download to stderr</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Pre-trained weights are not yet available</p>
+</div>
+</div>
+<div class="section" id="cheng2020-attn">
+<h3><a class="toc-backref" href="#id23">cheng2020_attn</a><a class="headerlink" href="#cheng2020-attn" title="Permalink to this headline">¶</a></h3>
+<p>Original paper: <a class="reference internal" href="#cheng2020" id="id9"><span>[cheng2020]</span></a></p>
+<dl class="py function">
+<dt id="compressai.zoo.cheng2020_attn">
+<code class="sig-prename descclassname">compressai.zoo.</code><code class="sig-name descname">cheng2020_attn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'mse'</span></em>, <em class="sig-param"><span class="n">pretrained</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#cheng2020_attn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.zoo.cheng2020_attn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Self-attention model variant from <a class="reference external" href="https://arxiv.org/abs/2001.01568">“Learned Image Compression with
+Discretized Gaussian Mixture Likelihoods and Attention Modules”</a>, by Zhengxue Cheng, Heming Sun, Masaru
+Takeuchi, Jiro Katto.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quality</strong> (<em>int</em>) – Quality levels (1: lowest, highest: 6)</p></li>
+<li><p><strong>metric</strong> (<em>str</em>) – Optimized metric, choose from (‘mse’)</p></li>
+<li><p><strong>pretrained</strong> (<em>bool</em>) – If True, returns a pre-trained model</p></li>
+<li><p><strong>progress</strong> (<em>bool</em>) – If True, displays a progress bar of the download to stderr</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Pre-trained weights are not yet available</p>
+</div>
 <hr class="docutils" />
 <p class="rubric">Citations</p>
 <dl class="citation">
@@ -356,7 +412,7 @@ Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</p>
 </pre></div>
 </div>
 </dd>
-<dt class="label" id="id8"><span class="brackets">mbt2018</span><span class="fn-backref">(<a href="#id5">1</a>,<a href="#id6">2</a>)</span></dt>
+<dt class="label" id="id11"><span class="brackets">mbt2018</span><span class="fn-backref">(<a href="#id5">1</a>,<a href="#id6">2</a>)</span></dt>
 <dd><div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@inproceedings</span><span class="p">{</span><span class="nl">minnenbt18</span><span class="p">,</span>
   <span class="na">author</span>    <span class="p">=</span> <span class="s">{David Minnen and</span>
 <span class="s">               Johannes Ball{\&#39;{e}} and</span>
@@ -392,30 +448,43 @@ Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</p>
 </pre></div>
 </div>
 </dd>
+<dt class="label" id="cheng2020"><span class="brackets">cheng2020</span><span class="fn-backref">(<a href="#id8">1</a>,<a href="#id9">2</a>)</span></dt>
+<dd><div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@inproceedings</span><span class="p">{</span><span class="nl">cheng2020image</span><span class="p">,</span>
+    <span class="na">title</span><span class="p">=</span><span class="s">{Learned Image Compression with Discretized Gaussian Mixture</span>
+<span class="s">    Likelihoods and Attention Modules}</span><span class="p">,</span>
+    <span class="na">author</span><span class="p">=</span><span class="s">{Cheng, Zhengxue and Sun, Heming and Takeuchi, Masaru and Katto,</span>
+<span class="s">    Jiro}</span><span class="p">,</span>
+    <span class="na">booktitle</span><span class="p">=</span> <span class="s">&quot;Proceedings of the IEEE Conference on Computer Vision and</span>
+<span class="s">    Pattern Recognition (CVPR)&quot;</span><span class="p">,</span>
+    <span class="na">year</span><span class="p">=</span><span class="s">{2020}</span>
+<span class="p">}</span><span class="c">]</span>
+</pre></div>
+</div>
+</dd>
 </dl>
 </div>
 </div>
 <hr class="docutils" />
 <div class="section" id="performances">
-<h2><a class="toc-backref" href="#id19">Performances</a><a class="headerlink" href="#performances" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id24">Performances</a><a class="headerlink" href="#performances" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="all-models">
-<h3><a class="toc-backref" href="#id20">all models</a><a class="headerlink" href="#all-models" title="Permalink to this headline">¶</a></h3>
-<img alt="_images/all.png" src="_images/all.png" />
-</div>
-<div class="section" id="id9">
-<h3><a class="toc-backref" href="#id21">bmshj2018 factorized</a><a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
-<img alt="_images/bmshj2018-factorized-mse.png" src="_images/bmshj2018-factorized-mse.png" />
-</div>
-<div class="section" id="id10">
-<h3><a class="toc-backref" href="#id22">bmshj2018 hyperprior</a><a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
-<img alt="_images/bmshj2018-hyperprior-mse.png" src="_images/bmshj2018-hyperprior-mse.png" />
-</div>
-<div class="section" id="id11">
-<h3><a class="toc-backref" href="#id23">mbt2018 mean</a><a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
-<img alt="_images/mbt2018-mean-mse.png" src="_images/mbt2018-mean-mse.png" />
+<h3><a class="toc-backref" href="#id25">all models</a><a class="headerlink" href="#all-models" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/compressai.png" src="_images/compressai.png" />
 </div>
 <div class="section" id="id12">
-<h3><a class="toc-backref" href="#id24">mbt2018</a><a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id26">bmshj2018 factorized</a><a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/bmshj2018-factorized-mse.png" src="_images/bmshj2018-factorized-mse.png" />
+</div>
+<div class="section" id="id13">
+<h3><a class="toc-backref" href="#id27">bmshj2018 hyperprior</a><a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/bmshj2018-hyperprior-mse.png" src="_images/bmshj2018-hyperprior-mse.png" />
+</div>
+<div class="section" id="id14">
+<h3><a class="toc-backref" href="#id28">mbt2018 mean</a><a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/mbt2018-mean-mse.png" src="_images/mbt2018-mean-mse.png" />
+</div>
+<div class="section" id="id15">
+<h3><a class="toc-backref" href="#id29">mbt2018</a><a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
 <img alt="_images/mbt2018-mse.png" src="_images/mbt2018-mse.png" />
 </div>
 </div>

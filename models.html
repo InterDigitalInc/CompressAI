@@ -103,6 +103,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#scalehyperprior">ScaleHyperprior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#meanscalehyperprior">MeanScaleHyperprior</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jointautoregressivehierarchicalpriors">JointAutoregressiveHierarchicalPriors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cheng2020anchor">Cheng2020Anchor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cheng2020attention">Cheng2020Attention</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
@@ -512,6 +514,42 @@ evaluation with an actual entropy coder.</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="cheng2020anchor">
+<h2>Cheng2020Anchor<a class="headerlink" href="#cheng2020anchor" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="compressai.models.Cheng2020Anchor">
+<em class="property">class </em><code class="sig-prename descclassname">compressai.models.</code><code class="sig-name descname">Cheng2020Anchor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">N</span><span class="o">=</span><span class="default_value">192</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/waseda.html#Cheng2020Anchor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.models.Cheng2020Anchor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Anchor model variant from <a class="reference external" href="https://arxiv.org/abs/2001.01568">“Learned Image Compression with
+Discretized Gaussian Mixture Likelihoods and Attention Modules”</a>, by Zhengxue Cheng, Heming Sun, Masaru
+Takeuchi, Jiro Katto.</p>
+<p>Uses residual blocks with small convolutions (3x3 and 1x1), and sub-pixel
+convolutions for up-sampling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>N</strong> (<em>int</em>) – Number of channels</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="cheng2020attention">
+<h2>Cheng2020Attention<a class="headerlink" href="#cheng2020attention" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="compressai.models.Cheng2020Attention">
+<em class="property">class </em><code class="sig-prename descclassname">compressai.models.</code><code class="sig-name descname">Cheng2020Attention</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">N</span><span class="o">=</span><span class="default_value">192</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/waseda.html#Cheng2020Attention"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.models.Cheng2020Attention" title="Permalink to this definition">¶</a></dt>
+<dd><p>Self-attention model variant from <a class="reference external" href="https://arxiv.org/abs/2001.01568">“Learned Image Compression with
+Discretized Gaussian Mixture Likelihoods and Attention Modules”</a>, by Zhengxue Cheng, Heming Sun, Masaru
+Takeuchi, Jiro Katto.</p>
+<p>Uses self-attention, residual blocks with small convolutions (3x3 and 1x1),
+and sub-pixel convolutions for up-sampling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>N</strong> (<em>int</em>) – Number of channels</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

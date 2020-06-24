@@ -201,6 +201,7 @@ optional arguments:
 between codecs.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compression.utils.plot [-h] -f [[...]] [-m] [-t] [-o]
                                         [--figsize ] [--axes   ] [--backend]
+                                        [--show]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -212,6 +213,7 @@ optional arguments:
   --axes                Axes limit (xmin, xmax, ymin, ymax), default: (0, 2,
                         28, 43)
   --backend             Change plot backend (default: matplotlib)
+  --show                Open plot figure
 </pre></div>
 </div>
 </div>
@@ -221,13 +223,13 @@ optional arguments:
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compression.utils.eval_model [-h] [-m {mse}] [-c {ans}]
                                               [-q QUALITIES [QUALITIES ...]]
                                               [--entropy-estimation]
-                                              {bmshj2018-factorized,bmshj2018-hyperprior,mbt2018-mean,mbt2018}
+                                              {bmshj2018-factorized,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}
                                               dataset
 
 Run model on image dataset
 
 positional arguments:
-  {bmshj2018-factorized,bmshj2018-hyperprior,mbt2018-mean,mbt2018}
+  {bmshj2018-factorized,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}
                         model architecture
   dataset               dataset path
 
