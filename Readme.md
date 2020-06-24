@@ -7,7 +7,7 @@ CompressAI currently provides:
 
 * custom operations, layers and models for deep learning based data compression
 * a partial port of the official [TensorFlow compression
-  ](https://github.com/tensorflow/compression>) library
+  ](https://github.com/tensorflow/compression) library
 * pre-trained end-to-end compression models for learned image compression
 * evaluation scripts to compare learned models against classical image/video
   compression codecs
