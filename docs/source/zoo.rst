@@ -150,7 +150,7 @@ Performances
 
 all models
 ----------
-.. image:: media/images/all.png
+.. image:: media/images/compressai.png
 
 bmshj2018 factorized
 --------------------
