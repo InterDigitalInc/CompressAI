@@ -1,4 +1,4 @@
-# Copyright 2020 InterDigital Communications, Inc.
+#- Copyright 2020 InterDigital Communications, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ def parse_json_file(filepath, metric):
             f'Error: metric "{metric}" not available.'
             f' Available metrics: {", ".join(data["results"].keys())}')
 
-    if metric == 'msssim':
+    if metric == 'ms-ssim':
         # Convert to db
         values = np.array(data['results'][metric])
         data['results'][metric] = -10 * np.log10(1 - values)

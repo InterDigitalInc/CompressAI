@@ -54,29 +54,29 @@ BPGDEC="$(which bpgdec)"
 # Tensorflow Compression script
 # https://github.com/tensorflow/compression
 # edit path below or uncomment locate function
-TFCI_SCRIPT="${HOME}/tensorflow-compression/compression/models/tfci.py"
+# TFCI_SCRIPT="${HOME}/tensorflow-compression/compression/models/tfci.py"
 
 # VTM
 # edit below to provide the path to the chosen version of VTM
-_VTM_SRC_DIR="${HOME}/vvc/vtm-9.1"
-VTM_BIN_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
+# _VTM_SRC_DIR="${HOME}/vvc/vtm-9.1"
+# VTM_BIN_DIR="$(dirname "$(locate '*release/EncoderApp' | grep "$_VTM_SRC_DIR")")"
 # uncomment below and provide bin directory if not found
 # VTM_BIN_DIR="${_VTM_SRC_DIR}/bin/umake/clang-11.0/x86_64/release/"
-VTM_CFG="${_VTM_SRC_DIR}/cfg/encoder_intra_vtm.cfg"
-VTM_VERSION_FILE="${_VTM_SRC_DIR}/source/Lib/CommonLib/version.h"
-VTM_VERSION="$(sed -n -e 's/^#define VTM_VERSION //p' ${VTM_VERSION_FILE})"
+# VTM_CFG="${_VTM_SRC_DIR}/cfg/encoder_intra_vtm.cfg"
+# VTM_VERSION_FILE="${_VTM_SRC_DIR}/source/Lib/CommonLib/version.h"
+# VTM_VERSION="$(sed -n -e 's/^#define VTM_VERSION //p' ${VTM_VERSION_FILE})"
 
 # HM
 # edit below to provide the path to the chosen version of HM
-_HM_SRC_DIR="${HOME}/hevc/HM-16.20+SCM-8.8"
-HM_BIN_DIR="${_HM_SRC_DIR}/bin/"
-HM_CFG="${_HM_SRC_DIR}/cfg/encoder_intra_main_rext.cfg"
-HM_VERSION_FILE="${_HM_SRC_DIR}/source/Lib/TLibCommon/CommonDef.h"
-HM_VERSION="$(sed -n -e 's/^#define NV_VERSION \(.*\)\/\/\/< Current software version/\1/p' ${HM_VERSION_FILE})"
+# _HM_SRC_DIR="${HOME}/hevc/HM-16.20+SCM-8.8"
+# HM_BIN_DIR="${_HM_SRC_DIR}/bin/"
+# HM_CFG="${_HM_SRC_DIR}/cfg/encoder_intra_main_rext.cfg"
+# HM_VERSION_FILE="${_HM_SRC_DIR}/source/Lib/TLibCommon/CommonDef.h"
+# HM_VERSION="$(sed -n -e 's/^#define NV_VERSION \(.*\)\/\/\/< Current software version/\1/p' ${HM_VERSION_FILE})"
 
 # AV1
 # edit below to provide the path to the chosen version of VTM
-AV1_BIN_DIR="${HOME}/aom/build_darwin"
+# AV1_BIN_DIR="${HOME}/aom/build_darwin"
 
 jpeg() {
     python -m compressai.utils.bench jpeg "$dataset"            \
