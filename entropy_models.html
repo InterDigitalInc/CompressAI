@@ -1,0 +1,259 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compressai.entropy_models &mdash; compressai  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="compressai.ans" href="ans.html" />
+    <link rel="prev" title="compressai.datasets" href="datasets.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> compressai
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">CompressAI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_train.html">Training</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Library API</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="compressai.html">compressai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">compressai.datasets</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">compressai.entropy_models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#entropybottleneck">EntropyBottleneck</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gaussianconditional">GaussianConditional</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ans.html">compressai.ans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">compressai.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Model Zoo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="zoo.html">Image compression</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Utils</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cli_usage.html">Command line usage</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">compressai</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>compressai.entropy_models</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/entropy_models.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="compressai-entropy-models">
+<h1>compressai.entropy_models<a class="headerlink" href="#compressai-entropy-models" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="entropybottleneck">
+<h2>EntropyBottleneck<a class="headerlink" href="#entropybottleneck" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="compressai.entropy_models.EntropyBottleneck">
+<em class="property">class </em><code class="sig-prename descclassname">compressai.entropy_models.</code><code class="sig-name descname">EntropyBottleneck</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">channels</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">tail_mass</span><span class="o">=</span><span class="default_value">1e-09</span></em>, <em class="sig-param"><span class="n">init_scale</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">filters</span><span class="o">=</span><span class="default_value">3, 3, 3, 3</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/entropy_models/entropy_models.html#EntropyBottleneck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.entropy_models.EntropyBottleneck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Entropy bottleneck layer, introduced by J. Ballé, D. Minnen, S. Singh,
+S. J. Hwang, N. Johnston, in <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational image compression with a scale
+hyperprior”</a>.</p>
+<p>This is a re-implementation of the entropy bottleneck layer in
+<em>tensorflow/compression</em>. See the original paper and the <a class="reference external" href="https://tensorflow.github.io/compression/docs/entropy_bottleneck.html">tensorflow
+documentation</a>
+for an introduction.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="gaussianconditional">
+<h2>GaussianConditional<a class="headerlink" href="#gaussianconditional" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="compressai.entropy_models.GaussianConditional">
+<em class="property">class </em><code class="sig-prename descclassname">compressai.entropy_models.</code><code class="sig-name descname">GaussianConditional</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scale_table</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">scale_bound</span><span class="o">=</span><span class="default_value">0.11</span></em>, <em class="sig-param"><span class="n">tail_mass</span><span class="o">=</span><span class="default_value">1e-09</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/entropy_models/entropy_models.html#GaussianConditional"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.entropy_models.GaussianConditional" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gaussian conditional layer, introduced by J. Ballé, D. Minnen, S. Singh,
+S. J. Hwang, N. Johnston, in <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational image compression with a scale
+hyperprior”</a>.</p>
+<p>This is a re-implementation of the Gaussian conditional layer in
+<em>tensorflow/compression</em>. See the <a class="reference external" href="https://tensorflow.github.io/compression/docs/api_docs/python/tfc/GaussianConditional.html">tensorflow documentation</a>.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ans.html" class="btn btn-neutral float-right" title="compressai.ans" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="datasets.html" class="btn btn-neutral float-left" title="compressai.datasets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, InterDigital Communications, Inc.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

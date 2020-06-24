@@ -1,0 +1,303 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation &mdash; compressai  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Training" href="tutorial_train.html" />
+    <link rel="prev" title="Introduction" href="tutorial_intro.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> compressai
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">CompressAI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorial_intro.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#python-package">Python package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#virtual-environment">Virtual environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-pip">Using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build-your-own-package">Build your own package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#docker">Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_train.html">Training</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Library API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="compressai.html">compressai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">compressai.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ans.html">compressai.ans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">compressai.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Model Zoo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="zoo.html">Image compression</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Utils</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cli_usage.html">Command line usage</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">compressai</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Installation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tutorial_installation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>CompressAI only supports python3. We also recommend to use a virtual
+environment to isolate project packages from the base system installation.</p>
+<div class="section" id="python-package">
+<h2>Python package<a class="headerlink" href="#python-package" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>python 3.6 or later (<cite>python3-dev</cite>, <cite>python3-pip</cite>, <cite>python3-venv</cite>)</p></li>
+<li><p>pip 19.0 or later</p></li>
+<li><p>a C++17 compiler (tested with <cite>gcc</cite> and <cite>clang</cite>)</p></li>
+<li><p>python packages: <cite>numpy</cite>, <cite>scipy</cite>, <cite>torch</cite>, <cite>torchvision</cite></p></li>
+</ul>
+</div>
+<div class="section" id="virtual-environment">
+<h3>Virtual environment<a class="headerlink" href="#virtual-environment" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 -m venv venv
+<span class="nb">source</span> ./venv/bin/activate
+pip install -U pip
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-pip">
+<h3>Using pip<a class="headerlink" href="#using-pip" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li><p>Clone the CompressAI repository:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/InterDigitalInc/CompressAI compressai
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Install CompressAI:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> compressai
+pip install -e .
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Custom installation</p></li>
+</ol>
+<p>You can also run one of the following commands:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">'.[dev]'</span></code>: install the packages required for development (testing, linting, docs)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">'.[tutorials]'</span></code>: install the packages required for the tutorials (notebooks)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">'.[all]'</span></code>: install all the optional packages</p></li>
+</ul>
+</div>
+<div class="section" id="build-your-own-package">
+<h3>Build your own package<a class="headerlink" href="#build-your-own-package" title="Permalink to this headline">¶</a></h3>
+<p>You can also build your own pip package:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/InterDigitalInc/CompressAI compressai
+<span class="nb">cd</span> compressai
+python3 setup.py bdist_wheel --dist-dir dist/
+pip install dist/compressai-*.whl
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>on MacOS you might want to use <code class="code docutils literal notranslate"><span class="pre">CC=clang</span> <span class="pre">CXX=clang++</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">...</span></code> to
+compile with clang instead of gcc.</p>
+</div>
+</div>
+</div>
+<div class="section" id="docker">
+<h2>Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
+<p>We are planning to provide docker images in the future.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tutorial_train.html" class="btn btn-neutral float-right" title="Training" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tutorial_intro.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, InterDigital Communications, Inc.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

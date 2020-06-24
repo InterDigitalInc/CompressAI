@@ -1,0 +1,340 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compressai.models.waseda &mdash; compressai  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> compressai
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CompressAI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial_intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial_installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial_train.html">Training</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Library API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../compressai.html">compressai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">compressai.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ans.html">compressai.ans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">compressai.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ops.html">compressai.ops</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Model Zoo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../zoo.html">Image compression</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Utils</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli_usage.html">Command line usage</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">compressai</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../compressai.html">compressai</a> &raquo;</li>
+        
+      <li>compressai.models.waseda</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compressai.models.waseda</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2020 InterDigital Communications, Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+<span class="kn">from</span> <span class="nn">compressai.layers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">conv3x3</span><span class="p">,</span>
+                               <span class="n">subpel_conv3x3</span><span class="p">,</span>
+                               <span class="n">ResidualBlockWithStride</span><span class="p">,</span>
+                               <span class="n">ResidualBlockUpsample</span><span class="p">,</span>
+                               <span class="n">ResidualBlock</span><span class="p">,</span>
+                               <span class="n">AttentionBlock</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">.priors</span> <span class="kn">import</span> <span class="n">JointAutoregressiveHierarchicalPriors</span>
+
+
+<div class="viewcode-block" id="Cheng2020Anchor"><a class="viewcode-back" href="../../../models.html#compressai.models.Cheng2020Anchor">[docs]</a><span class="k">class</span> <span class="nc">Cheng2020Anchor</span><span class="p">(</span><span class="n">JointAutoregressiveHierarchicalPriors</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Anchor model variant from `&quot;Learned Image Compression with</span>
+<span class="sd">    Discretized Gaussian Mixture Likelihoods and Attention Modules&quot;</span>
+<span class="sd">    &lt;https://arxiv.org/abs/2001.01568&gt;`_, by Zhengxue Cheng, Heming Sun, Masaru</span>
+<span class="sd">    Takeuchi, Jiro Katto.</span>
+
+<span class="sd">    Uses residual blocks with small convolutions (3x3 and 1x1), and sub-pixel</span>
+<span class="sd">    convolutions for up-sampling.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        N (int): Number of channels</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">192</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">ResidualBlockWithStride</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">ResidualBlockWithStride</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">ResidualBlockWithStride</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">conv3x3</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">conv3x3</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv3x3</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv3x3</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv3x3</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv3x3</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">conv3x3</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">subpel_conv3x3</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv3x3</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">subpel_conv3x3</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">N</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv3x3</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">N</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">ResidualBlockUpsample</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">ResidualBlockUpsample</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">ResidualBlockUpsample</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">subpel_conv3x3</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Cheng2020Attention"><a class="viewcode-back" href="../../../models.html#compressai.models.Cheng2020Attention">[docs]</a><span class="k">class</span> <span class="nc">Cheng2020Attention</span><span class="p">(</span><span class="n">Cheng2020Anchor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Self-attention model variant from `&quot;Learned Image Compression with</span>
+<span class="sd">    Discretized Gaussian Mixture Likelihoods and Attention Modules&quot;</span>
+<span class="sd">    &lt;https://arxiv.org/abs/2001.01568&gt;`_, by Zhengxue Cheng, Heming Sun, Masaru</span>
+<span class="sd">    Takeuchi, Jiro Katto.</span>
+
+<span class="sd">    Uses self-attention, residual blocks with small convolutions (3x3 and 1x1),</span>
+<span class="sd">    and sub-pixel convolutions for up-sampling.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        N (int): Number of channels</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">192</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">ResidualBlockWithStride</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">ResidualBlockWithStride</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">AttentionBlock</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+            <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">ResidualBlockWithStride</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">conv3x3</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">AttentionBlock</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">AttentionBlock</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+            <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">ResidualBlockUpsample</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">ResidualBlockUpsample</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">AttentionBlock</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+            <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">ResidualBlockUpsample</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">subpel_conv3x3</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, InterDigital Communications, Inc.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

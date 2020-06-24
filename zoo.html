@@ -1,0 +1,473 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Image compression &mdash; compressai  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Command line usage" href="cli_usage.html" />
+    <link rel="prev" title="compressai.ops" href="ops.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> compressai
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">CompressAI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_train.html">Training</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Library API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="compressai.html">compressai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">compressai.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ans.html">compressai.ans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">compressai.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Model Zoo</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Image compression</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#training">Training</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#models">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bmshj2018-factorized">bmshj2018_factorized</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bmshj2018-hyperprior">bmshj2018_hyperprior</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mbt2018-mean">mbt2018_mean</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mbt2018">mbt2018</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#performances">Performances</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#all-models">all models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">bmshj2018 factorized</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id10">bmshj2018 hyperprior</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id11">mbt2018 mean</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id12">mbt2018</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Utils</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cli_usage.html">Command line usage</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">compressai</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Image compression</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/zoo.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="image-compression">
+<h1>Image compression<a class="headerlink" href="#image-compression" title="Permalink to this headline">¶</a></h1>
+<p>This is the list of the pre-trained models for end-to-end image compression
+available in CompressAI.</p>
+<p>Currently, only models optimized w.r.t to the mean square error (<em>mse</em>) computed
+on the RGB channels are available. We expect to release models fine-tuned with
+other metrics in the future.</p>
+<p>Pass <code class="code docutils literal notranslate"><span class="pre">pretrained=True</span></code> to construct a model with pretrained weights.</p>
+<p>Instancing a pre-trained model will download its weights to a cache directory.
+See the official <a class="reference external" href="https://pytorch.org/docs/stable/model_zoo.html#torch.utils.model_zoo.load_url">PyTorch documentation</a>
+for details on the mechanics of loading models from url in PyTorch.</p>
+<p>The current pre-trained models expect input batches of RGB image tensors of
+shape (N, 3, H, W). H and W are expected to be at least 64. The images data have
+to be in the [0, 1] range. The images <em>should not be normalized</em>. Based on the
+number of strided convolutions and deconvolutions of the model you are using,
+you might have to pad the input tensors H and W dimensions to be a power of 2.</p>
+<p>Models may have different behaviors for their training or evaluation modes. For
+example, the quantization operations may be performed differently. You can use
+<code class="docutils literal notranslate"><span class="pre">model.train()</span></code> or <code class="docutils literal notranslate"><span class="pre">model.eval()</span></code> to switch between modes. See the PyTorch
+documentation for more information on
+<a class="reference external" href="https://pytorch.org/docs/stable/nn.html?highlight=train#torch.nn.Module.train">train</a>
+and <a class="reference external" href="https://pytorch.org/docs/stable/nn.html?highlight=eval#torch.nn.Module.eval">eval</a>.</p>
+<div class="contents local topic" id="table-of-content">
+<p class="topic-title">Table of content</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#training" id="id13">Training</a></p></li>
+<li><p><a class="reference internal" href="#models" id="id14">Models</a></p>
+<ul>
+<li><p><a class="reference internal" href="#bmshj2018-factorized" id="id15">bmshj2018_factorized</a></p></li>
+<li><p><a class="reference internal" href="#bmshj2018-hyperprior" id="id16">bmshj2018_hyperprior</a></p></li>
+<li><p><a class="reference internal" href="#mbt2018-mean" id="id17">mbt2018_mean</a></p></li>
+<li><p><a class="reference internal" href="#mbt2018" id="id18">mbt2018</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#performances" id="id19">Performances</a></p>
+<ul>
+<li><p><a class="reference internal" href="#all-models" id="id20">all models</a></p></li>
+<li><p><a class="reference internal" href="#id9" id="id21">bmshj2018 factorized</a></p></li>
+<li><p><a class="reference internal" href="#id10" id="id22">bmshj2018 hyperprior</a></p></li>
+<li><p><a class="reference internal" href="#id11" id="id23">mbt2018 mean</a></p></li>
+<li><p><a class="reference internal" href="#id12" id="id24">mbt2018</a></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="training">
+<h2><a class="toc-backref" href="#id13">Training</a><a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h2>
+<p>Unless specified otherwise, networks were trained for 4-5M steps on <em>256x256</em>
+image patches randomly cropped and extracted from the <a class="reference external" href="http://toflow.csail.mit.edu/">Vime90K</a> dataset <a class="reference internal" href="#xue2019video" id="id1"><span>[xue2019video]</span></a>.</p>
+<p>Models are trained with a batch size of 16 or 32, and an initial learning rate
+of 1e-4 for approximately 1-2M steps. The learning rate is then divided by 2
+when the evaluation loss reaches a plateau (we use a patience of 20 epochs).</p>
+<p>Training usually take between one or two weeks to reach state-of-the-art
+performances, depending on the model, the number of channels and the GPU
+architecture used.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="models">
+<h2><a class="toc-backref" href="#id14">Models</a><a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="bmshj2018-factorized">
+<h3><a class="toc-backref" href="#id15">bmshj2018_factorized</a><a class="headerlink" href="#bmshj2018-factorized" title="Permalink to this headline">¶</a></h3>
+<p>Original paper: <a class="reference internal" href="#bmshj2018" id="id2"><span>[bmshj2018]</span></a></p>
+<dl class="py function">
+<dt id="compressai.zoo.bmshj2018_factorized">
+<code class="sig-prename descclassname">compressai.zoo.</code><code class="sig-name descname">bmshj2018_factorized</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'mse'</span></em>, <em class="sig-param"><span class="n">pretrained</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#bmshj2018_factorized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.zoo.bmshj2018_factorized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
+N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational Image Compression with a Scale Hyperprior”</a>, Int Conf. on Learning Representations
+(ICLR), 2018.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quality</strong> (<em>int</em>) – Quality levels (1: lowest, highest: 8)</p></li>
+<li><p><strong>metric</strong> (<em>str</em>) – Optimized metric, choose from (‘mse’)</p></li>
+<li><p><strong>pretrained</strong> (<em>bool</em>) – If True, returns a pre-trained model</p></li>
+<li><p><strong>progress</strong> (<em>bool</em>) – If True, displays a progress bar of the download to stderr</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="bmshj2018-hyperprior">
+<h3><a class="toc-backref" href="#id16">bmshj2018_hyperprior</a><a class="headerlink" href="#bmshj2018-hyperprior" title="Permalink to this headline">¶</a></h3>
+<p>Original paper: <a class="reference internal" href="#bmshj2018" id="id3"><span>[bmshj2018]</span></a></p>
+<dl class="py function">
+<dt id="compressai.zoo.bmshj2018_hyperprior">
+<code class="sig-prename descclassname">compressai.zoo.</code><code class="sig-name descname">bmshj2018_hyperprior</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'mse'</span></em>, <em class="sig-param"><span class="n">pretrained</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#bmshj2018_hyperprior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.zoo.bmshj2018_hyperprior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
+N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational Image Compression with a Scale Hyperprior”</a> Int. Conf. on Learning Representations
+(ICLR), 2018.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quality</strong> (<em>int</em>) – Quality levels (1: lowest, highest: 8)</p></li>
+<li><p><strong>metric</strong> (<em>str</em>) – Optimized metric, choose from (‘mse’)</p></li>
+<li><p><strong>pretrained</strong> (<em>bool</em>) – If True, returns a pre-trained model</p></li>
+<li><p><strong>progress</strong> (<em>bool</em>) – If True, displays a progress bar of the download to stderr</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="mbt2018-mean">
+<h3><a class="toc-backref" href="#id17">mbt2018_mean</a><a class="headerlink" href="#mbt2018-mean" title="Permalink to this headline">¶</a></h3>
+<p>Original paper: <a class="reference internal" href="#id8" id="id5"><span>[mbt2018]</span></a></p>
+<dl class="py function">
+<dt id="compressai.zoo.mbt2018_mean">
+<code class="sig-prename descclassname">compressai.zoo.</code><code class="sig-name descname">mbt2018_mean</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'mse'</span></em>, <em class="sig-param"><span class="n">pretrained</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#mbt2018_mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.zoo.mbt2018_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale Hyperprior with non zero-mean Gaussian conditionals from D.
+Minnen, J. Balle, G.D. Toderici: <a class="reference external" href="https://arxiv.org/abs/1809.02736">“Joint Autoregressive and Hierarchical
+Priors for Learned Image Compression”</a>,
+Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quality</strong> (<em>int</em>) – Quality levels (1: lowest, highest: 8)</p></li>
+<li><p><strong>metric</strong> (<em>str</em>) – Optimized metric, choose from (‘mse’)</p></li>
+<li><p><strong>pretrained</strong> (<em>bool</em>) – If True, returns a pre-trained model</p></li>
+<li><p><strong>progress</strong> (<em>bool</em>) – If True, displays a progress bar of the download to stderr</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="mbt2018">
+<h3><a class="toc-backref" href="#id18">mbt2018</a><a class="headerlink" href="#mbt2018" title="Permalink to this headline">¶</a></h3>
+<p>Original paper: <a class="reference internal" href="#id8" id="id6"><span>[mbt2018]</span></a></p>
+<dl class="py function">
+<dt id="compressai.zoo.mbt2018">
+<code class="sig-prename descclassname">compressai.zoo.</code><code class="sig-name descname">mbt2018</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'mse'</span></em>, <em class="sig-param"><span class="n">pretrained</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#mbt2018"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.zoo.mbt2018" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joint Autoregressive Hierarchical Priors model from D.
+Minnen, J. Balle, G.D. Toderici: <a class="reference external" href="https://arxiv.org/abs/1809.02736">“Joint Autoregressive and Hierarchical
+Priors for Learned Image Compression”</a>,
+Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quality</strong> (<em>int</em>) – Quality levels (1: lowest, highest: 8)</p></li>
+<li><p><strong>metric</strong> (<em>str</em>) – Optimized metric, choose from (‘mse’)</p></li>
+<li><p><strong>pretrained</strong> (<em>bool</em>) – If True, returns a pre-trained model</p></li>
+<li><p><strong>progress</strong> (<em>bool</em>) – If True, displays a progress bar of the download to stderr</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<p class="rubric">Citations</p>
+<dl class="citation">
+<dt class="label" id="bmshj2018"><span class="brackets">bmshj2018</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id3">2</a>)</span></dt>
+<dd><div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@inproceedings</span><span class="p">{</span><span class="nl">ballemshj18</span><span class="p">,</span>
+  <span class="na">author</span>    <span class="p">=</span> <span class="s">{Johannes Ball{\&#39;{e}} and</span>
+<span class="s">               David Minnen and</span>
+<span class="s">               Saurabh Singh and</span>
+<span class="s">               Sung Jin Hwang and</span>
+<span class="s">               Nick Johnston}</span><span class="p">,</span>
+  <span class="na">title</span>     <span class="p">=</span> <span class="s">{Variational image compression with a scale hyperprior}</span><span class="p">,</span>
+  <span class="na">booktitle</span> <span class="p">=</span> <span class="s">{6th International Conference on Learning Representations, {ICLR} 2018,</span>
+<span class="s">               Vancouver, BC, Canada, April 30 - May 3, 2018, Conference Track Proceedings}</span><span class="p">,</span>
+  <span class="na">publisher</span> <span class="p">=</span> <span class="s">{OpenReview.net}</span><span class="p">,</span>
+  <span class="na">year</span>      <span class="p">=</span> <span class="s">{2018}</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+<dt class="label" id="id8"><span class="brackets">mbt2018</span><span class="fn-backref">(<a href="#id5">1</a>,<a href="#id6">2</a>)</span></dt>
+<dd><div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@inproceedings</span><span class="p">{</span><span class="nl">minnenbt18</span><span class="p">,</span>
+  <span class="na">author</span>    <span class="p">=</span> <span class="s">{David Minnen and</span>
+<span class="s">               Johannes Ball{\&#39;{e}} and</span>
+<span class="s">               George Toderici}</span><span class="p">,</span>
+  <span class="na">editor</span>    <span class="p">=</span> <span class="s">{Samy Bengio and</span>
+<span class="s">               Hanna M. Wallach and</span>
+<span class="s">               Hugo Larochelle and</span>
+<span class="s">               Kristen Grauman and</span>
+<span class="s">               Nicol{\`{o}} Cesa{-}Bianchi and</span>
+<span class="s">               Roman Garnett}</span><span class="p">,</span>
+  <span class="na">title</span>     <span class="p">=</span> <span class="s">{Joint Autoregressive and Hierarchical Priors for Learned Image Compression}</span><span class="p">,</span>
+  <span class="na">booktitle</span> <span class="p">=</span> <span class="s">{Advances in Neural Information Processing Systems 31: Annual Conference</span>
+<span class="s">               on Neural Information Processing Systems 2018, NeurIPS 2018, 3-8 December</span>
+<span class="s">               2018, Montr{\&#39;{e}}al, Canada}</span><span class="p">,</span>
+  <span class="na">pages</span>     <span class="p">=</span> <span class="s">{10794--10803}</span><span class="p">,</span>
+  <span class="na">year</span>      <span class="p">=</span> <span class="s">{2018}</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+<dt class="label" id="xue2019video"><span class="brackets"><a class="fn-backref" href="#id1">xue2019video</a></span></dt>
+<dd><div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@article</span><span class="p">{</span><span class="nl">xue2019video</span><span class="p">,</span>
+    <span class="na">title</span><span class="p">=</span><span class="s">{Video Enhancement with Task-Oriented Flow}</span><span class="p">,</span>
+    <span class="na">author</span><span class="p">=</span><span class="s">{Xue, Tianfan and Chen, Baian and Wu, Jiajun and Wei, Donglai and</span>
+<span class="s">    Freeman, William T}</span><span class="p">,</span>
+    <span class="na">journal</span><span class="p">=</span><span class="s">{International Journal of Computer Vision (IJCV)}</span><span class="p">,</span>
+    <span class="na">volume</span><span class="p">=</span><span class="s">{127}</span><span class="p">,</span>
+    <span class="na">number</span><span class="p">=</span><span class="s">{8}</span><span class="p">,</span>
+    <span class="na">pages</span><span class="p">=</span><span class="s">{1106--1125}</span><span class="p">,</span>
+    <span class="na">year</span><span class="p">=</span><span class="s">{2019}</span><span class="p">,</span>
+    <span class="na">publisher</span><span class="p">=</span><span class="s">{Springer}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="performances">
+<h2><a class="toc-backref" href="#id19">Performances</a><a class="headerlink" href="#performances" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="all-models">
+<h3><a class="toc-backref" href="#id20">all models</a><a class="headerlink" href="#all-models" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/all.png" src="_images/all.png" />
+</div>
+<div class="section" id="id9">
+<h3><a class="toc-backref" href="#id21">bmshj2018 factorized</a><a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/bmshj2018-factorized-mse.png" src="_images/bmshj2018-factorized-mse.png" />
+</div>
+<div class="section" id="id10">
+<h3><a class="toc-backref" href="#id22">bmshj2018 hyperprior</a><a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/bmshj2018-hyperprior-mse.png" src="_images/bmshj2018-hyperprior-mse.png" />
+</div>
+<div class="section" id="id11">
+<h3><a class="toc-backref" href="#id23">mbt2018 mean</a><a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/mbt2018-mean-mse.png" src="_images/mbt2018-mean-mse.png" />
+</div>
+<div class="section" id="id12">
+<h3><a class="toc-backref" href="#id24">mbt2018</a><a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/mbt2018-mse.png" src="_images/mbt2018-mse.png" />
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cli_usage.html" class="btn btn-neutral float-right" title="Command line usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ops.html" class="btn btn-neutral float-left" title="compressai.ops" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, InterDigital Communications, Inc.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

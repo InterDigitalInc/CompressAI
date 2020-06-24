@@ -1,0 +1,452 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Training &mdash; compressai  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="compressai" href="compressai.html" />
+    <link rel="prev" title="Installation" href="tutorial_installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> compressai
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">CompressAI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorial_intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Training</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#defining-a-custom-model">Defining a custom model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#loss-functions">Loss functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#updating-the-model">Updating the model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#entropy-coding">Entropy coding</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Library API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="compressai.html">compressai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">compressai.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ans.html">compressai.ans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">compressai.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Model Zoo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="zoo.html">Image compression</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Utils</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cli_usage.html">Command line usage</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">compressai</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Training</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tutorial_train.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="training">
+<h1>Training<a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial we are going to implement a custom auto encoder architecture
+by using some modules and layers pre-defined in CompressAI.</p>
+<p>For a complete runnable example, check out the <code class="code docutils literal notranslate"><span class="pre">train.py</span></code> script in the
+<code class="code docutils literal notranslate"><span class="pre">examples/</span></code> folder of the CompressAI source tree.</p>
+<div class="section" id="defining-a-custom-model">
+<h2>Defining a custom model<a class="headerlink" href="#defining-a-custom-model" title="Permalink to this headline">¶</a></h2>
+<p>Let’s build a simple auto encoder with an
+<a class="reference internal" href="entropy_models.html#compressai.entropy_models.EntropyBottleneck" title="compressai.entropy_models.EntropyBottleneck"><code class="xref py py-mod docutils literal notranslate"><span class="pre">EntropyBottleneck</span></code></a> module, 3 convolutions at
+the encoder, 3 transposed deconvolutions for the decoder, and
+<a class="reference internal" href="layers.html#compressai.layers.GDN" title="compressai.layers.GDN"><code class="xref py py-mod docutils literal notranslate"><span class="pre">GDN</span></code></a> activation functions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+<span class="kn">from</span> <span class="nn">compressai.entropy_models</span> <span class="kn">import</span> <span class="n">EntropyBottleneck</span>
+<span class="kn">from</span> <span class="nn">compressai.layers</span> <span class="kn">import</span> <span class="n">GDN</span>
+
+<span class="k">class</span> <span class="nc">Network</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">128</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encode</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">decode</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">output_padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">output_padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">output_padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
+
+   <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+       <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+       <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+       <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+       <span class="k">return</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">y_likelihoods</span>
+</pre></div>
+</div>
+<p>The convolutions are strided to reduce the spatial dimensions of the tensor,
+while increasing the number of channels (which helps to learn better latent
+representation). The bottleneck module is used to obtain a differentiable
+entropy estimation of the latent tensors while training.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See the original paper: <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational image compression with a scale
+hyperprior”</a>, and the <strong>tensorflow/compression</strong>
+<a class="reference external" href="https://tensorflow.github.io/compression/docs/entropy_bottleneck.html">documentation</a>
+for a detailed explanation of the EntropyBottleneck module.</p>
+</div>
+</div>
+<div class="section" id="loss-functions">
+<h2>Loss functions<a class="headerlink" href="#loss-functions" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p>Rate distortion loss</p>
+<p>We are going to define a simple rate-distortion loss, which maximizes the
+PSNR reconstruction (RGB) and minimizes the length (in bits) of the quantized
+latent tensor (<code class="code docutils literal notranslate"><span class="pre">y_hat</span></code>).</p>
+<p>A scalar is used to balance between the reconstruction quality and the
+bit-rate (like the JPEG quality parameter, or the QP with HEVC):</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{L} = \mathcal{D} + \lambda * \mathcal{R}\]</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+<span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">()</span>
+<span class="n">x_hat</span><span class="p">,</span> <span class="n">y_likelihoods</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="c1"># bitrate of the quantized latent</span>
+<span class="n">N</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+<span class="n">num_pixels</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">H</span> <span class="o">*</span> <span class="n">W</span>
+<span class="n">bpp_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">y_likelihoods</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">num_pixels</span><span class="p">)</span>
+
+<span class="c1"># mean square error</span>
+<span class="n">mse_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">)</span>
+
+<span class="c1"># final loss term</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">mse_loss</span> <span class="o">+</span> <span class="n">lmbda</span> <span class="o">*</span> <span class="n">bpp_loss</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<blockquote>
+<div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It’s possible to train architectures that can handle multiple bit-rate
+distortion points but that’s outside the scope of this tutorial. See this
+paper: <a class="reference external" href="http://openaccess.thecvf.com/content_ICCV_2019/papers/Choi_Variable_Rate_Deep_Image_Compression_With_a_Conditional_Autoencoder_ICCV_2019_paper.pdf">“Variable Rate Deep Image Compression With a Conditional Autoencoder”</a>
+for a good example.</p>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Auxiliary loss</p></li>
+</ol>
+<blockquote>
+<div><p>The entropy bottleneck parameters need to be trained to minimize the density
+model evaluation of the latent elements. The auxiliary loss is accessible
+through the <code class="code docutils literal notranslate"><span class="pre">entropy_bottleneck</span></code> layer:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">aux_loss</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">loss</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The auxiliary loss must be minimized during or after the training of the
+network.</p>
+</div></blockquote>
+<ol class="arabic" start="3">
+<li><p>Optimizers</p>
+<p>To train both the compression network and the entropy bottleneck densities
+estimation, we will thus need two optimizers. To simplify the implementation,
+CompressAI provides a <a class="reference internal" href="models.html#compressai.models.CompressionModel" title="compressai.models.CompressionModel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">CompressionModel</span></code></a> base class,
+that includes an <a class="reference internal" href="entropy_models.html#compressai.entropy_models.EntropyBottleneck" title="compressai.entropy_models.EntropyBottleneck"><code class="xref py py-mod docutils literal notranslate"><span class="pre">EntropyBottleneck</span></code></a> module
+and some helper methods, let’s rewrite our network:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">compressai.models</span> <span class="kn">import</span> <span class="n">CompressionModel</span>
+<span class="kn">from</span> <span class="nn">compressai.models.utils</span> <span class="kn">import</span> <span class="n">conv</span><span class="p">,</span> <span class="n">deconv</span>
+
+<span class="k">class</span> <span class="nc">Network</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">128</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encode</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">conv</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">decode</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="p">)</span>
+
+   <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+       <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+       <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+       <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+       <span class="k">return</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">y_likelihoods</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<blockquote>
+<div><p>Now, we can simply access the two sets of trainable parameters:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
+<span class="n">aux_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">aux_parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And write a training loop:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+  <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+  <span class="n">aux_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+  <span class="n">x_hat</span><span class="p">,</span> <span class="n">y_likelihoods</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+  <span class="c1"># ...</span>
+  <span class="c1"># compute loss as before</span>
+  <span class="c1"># ...</span>
+
+  <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+  <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+  <span class="n">aux_loss</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">aux_loss</span><span class="p">()</span>
+  <span class="n">aux_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+  <span class="n">aux_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="updating-the-model">
+<h2>Updating the model<a class="headerlink" href="#updating-the-model" title="Permalink to this headline">¶</a></h2>
+<p>Once a model has been trained, you need to run the <code class="code docutils literal notranslate"><span class="pre">update_model</span></code> script
+to update the internal parameters of the entropy bottlenecks:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m compressai.utils.update_model -n final-model --arch ARCH model_checkpoint.pth.tar
+</pre></div>
+</div>
+<p>This will modify the buffers related to the learned cumulative distribution
+functions (CDFs) required to perform the actual entropy coding.</p>
+<p>You can run <code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">compressai.utils.update_model</span> <span class="pre">--help</span></code> to get the
+complete list of options.</p>
+<p>Alternatively, you can call the <a class="reference internal" href="models.html#compressai.models.CompressionModel.update" title="compressai.models.CompressionModel.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code></a>
+method of a <a class="reference internal" href="models.html#compressai.models.CompressionModel" title="compressai.models.CompressionModel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">CompressionModel</span></code></a> or
+<a class="reference internal" href="entropy_models.html#compressai.entropy_models.EntropyBottleneck" title="compressai.entropy_models.EntropyBottleneck"><code class="xref py py-mod docutils literal notranslate"><span class="pre">EntropyBottleneck</span></code></a> instance at the end of your
+training script, before saving the model checkpoint.</p>
+</div>
+<div class="section" id="entropy-coding">
+<h2>Entropy coding<a class="headerlink" href="#entropy-coding" title="Permalink to this headline">¶</a></h2>
+<p>By default CompressAI uses a range Asymmetric Numeral Systems (ANS) entropy
+coder. You can use <a class="reference internal" href="compressai.html#compressai.available_entropy_coders" title="compressai.available_entropy_coders"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compressai.available_entropy_coders()</span></code></a> to get a list
+of the implemented entropy coders and change the default entropy coder via
+<a class="reference internal" href="compressai.html#compressai.set_entropy_coder" title="compressai.set_entropy_coder"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compressai.set_entropy_coder()</span></code></a>.</p>
+<ol class="arabic simple">
+<li><p>Compress an image tensor to a bit-stream:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">strings</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Decompress a bit-stream to an image tensor:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">shape</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">2</span><span class="p">:]</span>
+<span class="n">y_hat</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span>
+<span class="n">x_hat</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="compressai.html" class="btn btn-neutral float-right" title="compressai" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tutorial_installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, InterDigital Communications, Inc.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

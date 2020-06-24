@@ -1,0 +1,349 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Command line usage &mdash; compressai  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Image compression" href="zoo.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> compressai
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">CompressAI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_train.html">Training</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Library API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="compressai.html">compressai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">compressai.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ans.html">compressai.ans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">compressai.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Model Zoo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="zoo.html">Image compression</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Utils</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Command line usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#bench">bench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot">plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#eval-model">eval_model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#find-close">find_close</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#update-model">update_model</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">compressai</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Command line usage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cli_usage.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="command-line-usage">
+<h1>Command line usage<a class="headerlink" href="#command-line-usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="bench">
+<h2>bench<a class="headerlink" href="#bench" title="Permalink to this headline">¶</a></h2>
+<p>Collect performance metrics of published traditional or end-to-end image
+codecs.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compression.utils.bench [-h] {} ...
+
+Collect codec metrics.
+
+positional arguments:
+  {}          Select codec
+
+optional arguments:
+  -h, --help  show this help message and exit
+</pre></div>
+</div>
+</div>
+<div class="section" id="plot">
+<h2>plot<a class="headerlink" href="#plot" title="Permalink to this headline">¶</a></h2>
+<p>Simple plotting utility to display Rate-Distortion curves (RD) comparison
+between codecs.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compression.utils.plot [-h] -f [[...]] [-m] [-t] [-o]
+                                        [--figsize ] [--axes   ] [--backend]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f [ [ ...]], --results-file [ [ ...]]
+  -m , --metric         Metric (default: psnr)
+  -t , --title          Plot title
+  -o , --output         Output file name
+  --figsize             Figure relative size (width, height), default: (9, 6)
+  --axes                Axes limit (xmin, xmax, ymin, ymax), default: (0, 2,
+                        28, 43)
+  --backend             Change plot backend (default: matplotlib)
+</pre></div>
+</div>
+</div>
+<div class="section" id="eval-model">
+<h2>eval_model<a class="headerlink" href="#eval-model" title="Permalink to this headline">¶</a></h2>
+<p>Evaluate an end-to-end compression model on an image dataset.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compression.utils.eval_model [-h] [-m {mse}] [-c {ans}]
+                                              [-q QUALITIES [QUALITIES ...]]
+                                              [--entropy-estimation]
+                                              {bmshj2018-factorized,bmshj2018-hyperprior,mbt2018-mean,mbt2018}
+                                              dataset
+
+Run model on image dataset
+
+positional arguments:
+  {bmshj2018-factorized,bmshj2018-hyperprior,mbt2018-mean,mbt2018}
+                        model architecture
+  dataset               dataset path
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -m {mse}, --metric {mse}
+                        metric trained against (default: mse)
+  -c {ans}, --entropy-coder {ans}
+                        Entropy coder (default: ans)
+  -q QUALITIES [QUALITIES ...], --quality QUALITIES [QUALITIES ...]
+  --entropy-estimation  Use evaluated entropy estimation (no entropy coding)
+</pre></div>
+</div>
+</div>
+<div class="section" id="find-close">
+<h2>find_close<a class="headerlink" href="#find-close" title="Permalink to this headline">¶</a></h2>
+<p>Find the closest codec quality parameter to reach a given metric (bpp, ms-ssim,
+or psnr).</p>
+<dl class="simple">
+<dt>Example usages:</dt><dd><ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">compressai.utils.find_close</span> <span class="pre">webp</span> <span class="pre">~/picture.png</span> <span class="pre">0.5</span> <span class="pre">--metric</span> <span class="pre">bpp</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">compressai.utils.find_close</span> <span class="pre">jpeg</span> <span class="pre">~/picture.png</span> <span class="pre">35</span> <span class="pre">--metric</span> <span class="pre">psnr</span> <span class="pre">--save</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compression.utils.find_close [-h] [-m {bpp,psnr,ms-ssim}]
+                                              [--save]
+                                              {} ... image target
+
+Collect codec metrics and performances.
+
+positional arguments:
+  {}                    Select codec
+  image                 image filepath
+  target                target value to match
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -m {bpp,psnr,ms-ssim}, --metric {bpp,psnr,ms-ssim}
+  --save                Save reconstructed image to disk
+</pre></div>
+</div>
+</div>
+<div class="section" id="update-model">
+<h2>update_model<a class="headerlink" href="#update-model" title="Permalink to this headline">¶</a></h2>
+<p>Update the CDFs parameters of a trained model.</p>
+<p>To be called on a model checkpoint after training. This will update the internal
+CDFs related buffers required for entropy coding.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compression.utils.update_model [-h] [-n NAME] [-d DIR]
+                                                [--no-update]
+                                                [--architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior}]
+                                                filepath
+
+Export a trained model to a new checkpoint with an updated CDFs parameters and
+a hash prefix, so that it can be loaded later via `load_state_dict_from_url`.
+
+positional arguments:
+  filepath              Path to the checkpoint model to be exported.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -n NAME, --name NAME  Exported model name.
+  -d DIR, --dir DIR     Exported model directory.
+  --no-update           Do not update the model CDFs parameters.
+  --architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior}
+                        Set model architecture (default: scale-hyperprior).
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="zoo.html" class="btn btn-neutral float-left" title="Image compression" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, InterDigital Communications, Inc.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

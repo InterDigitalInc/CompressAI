@@ -1,0 +1,843 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compressai.models.priors &mdash; compressai  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> compressai
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CompressAI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial_intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial_installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial_train.html">Training</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Library API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../compressai.html">compressai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">compressai.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ans.html">compressai.ans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">compressai.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ops.html">compressai.ops</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Model Zoo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../zoo.html">Image compression</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Utils</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli_usage.html">Command line usage</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">compressai</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../compressai.html">compressai</a> &raquo;</li>
+        
+      <li>compressai.models.priors</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compressai.models.priors</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2020 InterDigital Communications, Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+
+<span class="kn">from</span> <span class="nn">compressai.entropy_models</span> <span class="kn">import</span> <span class="p">(</span><span class="n">EntropyBottleneck</span><span class="p">,</span> <span class="n">GaussianConditional</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compressai.layers</span> <span class="kn">import</span> <span class="n">GDN</span><span class="p">,</span> <span class="n">MaskedConv2d</span>
+<span class="kn">from</span> <span class="nn">compressai.ans</span> <span class="kn">import</span> <span class="n">BufferedRansEncoder</span><span class="p">,</span> <span class="n">RansDecoder</span>  <span class="c1"># pylint: disable=E0611,E0401</span>
+
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">update_registered_buffers</span><span class="p">,</span> <span class="n">conv</span><span class="p">,</span> <span class="n">deconv</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;CompressionModel&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;FactorizedPrior&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ScaleHyperprior&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MeanScaleHyperprior&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;JointAutoregressiveHierarchicalPriors&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="CompressionModel"><a class="viewcode-back" href="../../../models.html#compressai.models.CompressionModel">[docs]</a><span class="k">class</span> <span class="nc">CompressionModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for constructing an auto-encoder with at least one entropy</span>
+<span class="sd">    bottleneck module.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        entropy_bottleneck_channels (int): Number of channels of the entropy</span>
+<span class="sd">            bottleneck</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entropy_bottleneck_channels</span><span class="p">,</span> <span class="n">init_weights</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span> <span class="o">=</span> <span class="n">EntropyBottleneck</span><span class="p">(</span>
+            <span class="n">entropy_bottleneck_channels</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">init_weights</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_weights</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CompressionModel.aux_loss"><a class="viewcode-back" href="../../../models.html#compressai.models.CompressionModel.aux_loss">[docs]</a>    <span class="k">def</span> <span class="nf">aux_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the aggregated loss over the auxiliary entropy bottleneck</span>
+<span class="sd">        module(s).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">aux_loss</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">loss</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">()</span>
+                       <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">EntropyBottleneck</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">aux_loss</span></div>
+
+    <span class="k">def</span> <span class="nf">_initialize_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">)):</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">kaiming_normal_</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">bias</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">zeros_</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CompressionModel.forward"><a class="viewcode-back" href="../../../models.html#compressai.models.CompressionModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CompressionModel.parameters"><a class="viewcode-back" href="../../../models.html#compressai.models.CompressionModel.parameters">[docs]</a>    <span class="k">def</span> <span class="nf">parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns an iterator over the model parameters.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">EntropyBottleneck</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+                <span class="k">yield</span> <span class="n">p</span></div>
+
+<div class="viewcode-block" id="CompressionModel.aux_parameters"><a class="viewcode-back" href="../../../models.html#compressai.models.CompressionModel.aux_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">aux_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an iterator over the entropy bottleneck(s) parameters for</span>
+<span class="sd">        the auxiliary loss.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">EntropyBottleneck</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+                <span class="k">yield</span> <span class="n">p</span></div>
+
+<div class="viewcode-block" id="CompressionModel.update"><a class="viewcode-back" href="../../../models.html#compressai.models.CompressionModel.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Updates the entropy bottleneck(s) CDF values.</span>
+
+<span class="sd">        Needs to be called once after training to be able to later perform the</span>
+<span class="sd">        evaluation with an actual entropy coder.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            force (bool): overwrite previous values (default: False)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">EntropyBottleneck</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="FactorizedPrior"><a class="viewcode-back" href="../../../models.html#compressai.models.FactorizedPrior">[docs]</a><span class="k">class</span> <span class="nc">FactorizedPrior</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,</span>
+<span class="sd">    N. Johnston: `&quot;Variational Image Compression with a Scale Hyperprior&quot;</span>
+<span class="sd">    &lt;https://arxiv.org/abs/1802.01436&gt;`_, Int Conf. on Learning Representations</span>
+<span class="sd">    (ICLR), 2018.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        N (int): Number of channels</span>
+<span class="sd">        M (int): Number of channels in the expansion layers (last layer of the</span>
+<span class="sd">            encoder and last layer of the hyperprior decoder)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">entropy_bottleneck_channels</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">conv</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="FactorizedPrior.forward"><a class="viewcode-back" href="../../../models.html#compressai.models.FactorizedPrior.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;x_hat&#39;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">,</span>
+            <span class="s1">&#39;likelihoods&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">y_likelihoods</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="FactorizedPrior.load_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.FactorizedPrior.load_state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
+        <span class="c1"># Dynamically update the entropy bottleneck buffers related to the CDFs</span>
+        <span class="n">update_registered_buffers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">,</span>
+                                  <span class="s1">&#39;entropy_bottleneck&#39;</span><span class="p">,</span>
+                                  <span class="p">[</span><span class="s1">&#39;_quantized_cdf&#39;</span><span class="p">,</span> <span class="s1">&#39;_offset&#39;</span><span class="p">,</span> <span class="s1">&#39;_cdf_length&#39;</span><span class="p">],</span>
+                                  <span class="n">state_dict</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FactorizedPrior.from_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.FactorizedPrior.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s1">&#39;g_a.0.weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s1">&#39;g_a.6.weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">net</span></div>
+
+    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">y_strings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;strings&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">y_strings</span><span class="p">],</span> <span class="s1">&#39;shape&#39;</span><span class="p">:</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]}</span>
+
+    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">strings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">)</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;x_hat&#39;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">}</span></div>
+
+
+<span class="c1"># From Balle&#39;s tensorflow compression examples</span>
+<span class="n">SCALES_MIN</span> <span class="o">=</span> <span class="mf">0.11</span>
+<span class="n">SCALES_MAX</span> <span class="o">=</span> <span class="mi">256</span>
+<span class="n">SCALES_LEVELS</span> <span class="o">=</span> <span class="mi">64</span>
+
+
+<span class="k">def</span> <span class="nf">get_scale_table</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="n">SCALES_MIN</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">SCALES_MAX</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="n">SCALES_LEVELS</span><span class="p">):</span>  <span class="c1"># pylint: disable=W0622</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">min</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">max</span><span class="p">),</span> <span class="n">levels</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="ScaleHyperprior"><a class="viewcode-back" href="../../../models.html#compressai.models.ScaleHyperprior">[docs]</a><span class="k">class</span> <span class="nc">ScaleHyperprior</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,</span>
+<span class="sd">    N. Johnston: `&quot;Variational Image Compression with a Scale Hyperprior&quot;</span>
+<span class="sd">    &lt;https://arxiv.org/abs/1802.01436&gt;`_ Int. Conf. on Learning Representations</span>
+<span class="sd">    (ICLR), 2018.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        N (int): Number of channels</span>
+<span class="sd">        M (int): Number of channels in the expansion layers (last layer of the</span>
+<span class="sd">            encoder and last layer of the hyperprior decoder)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">entropy_bottleneck_channels</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">conv</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span> <span class="o">=</span> <span class="n">GaussianConditional</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ScaleHyperprior.forward"><a class="viewcode-back" href="../../../models.html#compressai.models.ScaleHyperprior.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+        <span class="n">z_hat</span><span class="p">,</span> <span class="n">z_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">scales_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+        <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">scales_hat</span><span class="p">)</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;x_hat&#39;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">,</span>
+            <span class="s1">&#39;likelihoods&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">y_likelihoods</span><span class="p">,</span>
+                <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="n">z_likelihoods</span>
+            <span class="p">},</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="ScaleHyperprior.load_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.ScaleHyperprior.load_state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
+        <span class="c1"># Dynamically update the entropy bottleneck buffers related to the CDFs</span>
+        <span class="n">update_registered_buffers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">,</span>
+                                  <span class="s1">&#39;entropy_bottleneck&#39;</span><span class="p">,</span>
+                                  <span class="p">[</span><span class="s1">&#39;_quantized_cdf&#39;</span><span class="p">,</span> <span class="s1">&#39;_offset&#39;</span><span class="p">,</span> <span class="s1">&#39;_cdf_length&#39;</span><span class="p">],</span>
+                                  <span class="n">state_dict</span><span class="p">)</span>
+        <span class="n">update_registered_buffers</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="p">,</span> <span class="s1">&#39;gaussian_conditional&#39;</span><span class="p">,</span>
+            <span class="p">[</span><span class="s1">&#39;_quantized_cdf&#39;</span><span class="p">,</span> <span class="s1">&#39;_offset&#39;</span><span class="p">,</span> <span class="s1">&#39;_cdf_length&#39;</span><span class="p">,</span> <span class="s1">&#39;scale_table&#39;</span><span class="p">],</span>
+            <span class="n">state_dict</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScaleHyperprior.from_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.ScaleHyperprior.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s1">&#39;g_a.0.weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s1">&#39;g_a.6.weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">net</span></div>
+
+<div class="viewcode-block" id="ScaleHyperprior.update"><a class="viewcode-back" href="../../../models.html#compressai.models.ScaleHyperprior.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_table</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">scale_table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">scale_table</span> <span class="o">=</span> <span class="n">get_scale_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">update_scale_table</span><span class="p">(</span><span class="n">scale_table</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+
+        <span class="n">z_strings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">z_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">z_strings</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+
+        <span class="n">scales_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+        <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">build_indexes</span><span class="p">(</span><span class="n">scales_hat</span><span class="p">)</span>
+        <span class="n">y_strings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;strings&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">y_strings</span><span class="p">,</span> <span class="n">z_strings</span><span class="p">],</span> <span class="s1">&#39;shape&#39;</span><span class="p">:</span> <span class="n">z</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]}</span>
+
+    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="n">z_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">strings</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="p">)</span>
+        <span class="n">scales_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+        <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">build_indexes</span><span class="p">(</span><span class="n">scales_hat</span><span class="p">)</span>
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">strings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indexes</span><span class="p">)</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;x_hat&#39;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="MeanScaleHyperprior"><a class="viewcode-back" href="../../../models.html#compressai.models.MeanScaleHyperprior">[docs]</a><span class="k">class</span> <span class="nc">MeanScaleHyperprior</span><span class="p">(</span><span class="n">ScaleHyperprior</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scale Hyperprior with non zero-mean Gaussian conditionals from D.</span>
+<span class="sd">    Minnen, J. Balle, G.D. Toderici: `&quot;Joint Autoregressive and Hierarchical</span>
+<span class="sd">    Priors for Learned Image Compression&quot; &lt;https://arxiv.org/abs/1809.02736&gt;`_,</span>
+<span class="sd">    Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        N (int): Number of channels</span>
+<span class="sd">        M (int): Number of channels in the expansion layers (last layer of the</span>
+<span class="sd">            encoder and last layer of the hyperprior decoder)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">M</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">M</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">M</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="MeanScaleHyperprior.forward"><a class="viewcode-back" href="../../../models.html#compressai.models.MeanScaleHyperprior.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">z_hat</span><span class="p">,</span> <span class="n">z_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">gaussian_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+        <span class="n">scales_hat</span><span class="p">,</span> <span class="n">means_hat</span> <span class="o">=</span> <span class="n">gaussian_params</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="p">(</span><span class="n">y</span><span class="p">,</span>
+                                                         <span class="n">scales_hat</span><span class="p">,</span>
+                                                         <span class="n">means</span><span class="o">=</span><span class="n">means_hat</span><span class="p">)</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;x_hat&#39;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">,</span>
+            <span class="s1">&#39;likelihoods&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">y_likelihoods</span><span class="p">,</span>
+                <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="n">z_likelihoods</span>
+            <span class="p">},</span>
+        <span class="p">}</span></div>
+
+    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="n">z_strings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">z_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">z_strings</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+
+        <span class="n">gaussian_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+        <span class="n">scales_hat</span><span class="p">,</span> <span class="n">means_hat</span> <span class="o">=</span> <span class="n">gaussian_params</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">build_indexes</span><span class="p">(</span><span class="n">scales_hat</span><span class="p">)</span>
+        <span class="n">y_strings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">y</span><span class="p">,</span>
+                                                       <span class="n">indexes</span><span class="p">,</span>
+                                                       <span class="n">means</span><span class="o">=</span><span class="n">means_hat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;strings&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">y_strings</span><span class="p">,</span> <span class="n">z_strings</span><span class="p">],</span> <span class="s1">&#39;shape&#39;</span><span class="p">:</span> <span class="n">z</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]}</span>
+
+    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="n">z_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">strings</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="p">)</span>
+        <span class="n">gaussian_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+        <span class="n">scales_hat</span><span class="p">,</span> <span class="n">means_hat</span> <span class="o">=</span> <span class="n">gaussian_params</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">build_indexes</span><span class="p">(</span><span class="n">scales_hat</span><span class="p">)</span>
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">strings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                     <span class="n">indexes</span><span class="p">,</span>
+                                                     <span class="n">means</span><span class="o">=</span><span class="n">means_hat</span><span class="p">)</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;x_hat&#39;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="JointAutoregressiveHierarchicalPriors"><a class="viewcode-back" href="../../../models.html#compressai.models.JointAutoregressiveHierarchicalPriors">[docs]</a><span class="k">class</span> <span class="nc">JointAutoregressiveHierarchicalPriors</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Joint Autoregressive Hierarchical Priors model from D.</span>
+<span class="sd">    Minnen, J. Balle, G.D. Toderici: `&quot;Joint Autoregressive and Hierarchical</span>
+<span class="sd">    Priors for Learned Image Compression&quot; &lt;https://arxiv.org/abs/1809.02736&gt;`_,</span>
+<span class="sd">    Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        N (int): Number of channels</span>
+<span class="sd">        M (int): Number of channels in the expansion layers (last layer of the</span>
+<span class="sd">            encoder and last layer of the hyperprior decoder)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">192</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">192</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">entropy_bottleneck_channels</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">conv</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">GDN</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">deconv</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">M</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">conv</span><span class="p">(</span><span class="n">M</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">M</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">M</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">//</span> <span class="mi">3</span><span class="p">,</span> <span class="n">M</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">//</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">M</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">//</span> <span class="mi">3</span><span class="p">,</span> <span class="n">M</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">//</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">M</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">//</span> <span class="mi">3</span><span class="p">,</span> <span class="n">M</span> <span class="o">*</span> <span class="mi">6</span> <span class="o">//</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span> <span class="o">=</span> <span class="n">MaskedConv2d</span><span class="p">(</span><span class="n">M</span><span class="p">,</span>
+                                               <span class="mi">2</span> <span class="o">*</span> <span class="n">M</span><span class="p">,</span>
+                                               <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                               <span class="n">padding</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                               <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span> <span class="o">=</span> <span class="n">GaussianConditional</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+
+<div class="viewcode-block" id="JointAutoregressiveHierarchicalPriors.forward"><a class="viewcode-back" href="../../../models.html#compressai.models.JointAutoregressiveHierarchicalPriors.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">z_hat</span><span class="p">,</span> <span class="n">z_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">_quantize</span><span class="p">(</span>  <span class="c1"># pylint: disable=protected-access</span>
+            <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;noise&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span> <span class="k">else</span> <span class="s1">&#39;dequantize&#39;</span><span class="p">)</span>
+        <span class="n">ctx_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+        <span class="n">gaussian_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">params</span><span class="p">,</span> <span class="n">ctx_params</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">scales_hat</span><span class="p">,</span> <span class="n">means_hat</span> <span class="o">=</span> <span class="n">gaussian_params</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">y_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="p">(</span><span class="n">y</span><span class="p">,</span>
+                                                     <span class="n">scales_hat</span><span class="p">,</span>
+                                                     <span class="n">means</span><span class="o">=</span><span class="n">means_hat</span><span class="p">)</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;x_hat&#39;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">,</span>
+            <span class="s1">&#39;likelihoods&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">y_likelihoods</span><span class="p">,</span>
+                <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="n">z_likelihoods</span>
+            <span class="p">},</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="JointAutoregressiveHierarchicalPriors.from_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.JointAutoregressiveHierarchicalPriors.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s1">&#39;g_a.0.weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s1">&#39;g_a.6.weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">net</span></div>
+
+    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="n">z_strings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">z_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">z_strings</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># scaling factor between z and y</span>
+        <span class="n">kernel_size</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># context prediction kernel size</span>
+        <span class="n">padding</span> <span class="o">=</span> <span class="p">(</span><span class="n">kernel_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+
+        <span class="n">y_height</span> <span class="o">=</span> <span class="n">z_hat</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span>
+        <span class="n">y_width</span> <span class="o">=</span> <span class="n">z_hat</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span>
+
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">(</span><span class="n">padding</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">padding</span><span class="p">))</span>
+
+        <span class="c1"># yapf: enable</span>
+        <span class="c1"># pylint: disable=protected-access</span>
+        <span class="n">cdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">_quantized_cdf</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">cdf_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">_cdf_length</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">_offset</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="c1"># pylint: enable=protected-access</span>
+
+        <span class="n">y_strings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+            <span class="n">encoder</span> <span class="o">=</span> <span class="n">BufferedRansEncoder</span><span class="p">()</span>
+            <span class="c1"># Warning, this is slow...</span>
+            <span class="c1"># TODO: profile the calls to the bindings...</span>
+            <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y_height</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y_width</span><span class="p">):</span>
+                    <span class="n">y_crop</span> <span class="o">=</span> <span class="n">y_hat</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">h</span><span class="p">:</span><span class="n">h</span> <span class="o">+</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span><span class="n">w</span> <span class="o">+</span> <span class="n">kernel_size</span><span class="p">]</span>
+                    <span class="n">ctx_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span><span class="p">(</span><span class="n">y_crop</span><span class="p">)</span>
+
+                    <span class="c1"># 1x1 conv for the entropy parameters prediction network, so</span>
+                    <span class="c1"># we only keep the elements in the &quot;center&quot;</span>
+                    <span class="n">ctx_p</span> <span class="o">=</span> <span class="n">ctx_params</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">padding</span><span class="p">:</span><span class="n">padding</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="p">:</span><span class="n">padding</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">h</span><span class="p">:</span><span class="n">h</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span><span class="n">w</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="n">gaussian_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="n">ctx_p</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="n">scales_hat</span><span class="p">,</span> <span class="n">means_hat</span> <span class="o">=</span> <span class="n">gaussian_params</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+                    <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">build_indexes</span><span class="p">(</span><span class="n">scales_hat</span><span class="p">)</span>
+                    <span class="n">y_q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">y_crop</span> <span class="o">-</span> <span class="n">means_hat</span><span class="p">)</span>
+                    <span class="n">y_hat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="n">h</span> <span class="o">+</span> <span class="n">padding</span><span class="p">,</span> <span class="n">w</span> <span class="o">+</span> <span class="n">padding</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_q</span> <span class="o">+</span> <span class="n">means_hat</span><span class="p">)[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">padding</span><span class="p">]</span>
+                    <span class="n">encoder</span><span class="o">.</span><span class="n">encode_with_indexes</span><span class="p">(</span>
+                        <span class="n">y_q</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">padding</span><span class="p">]</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                        <span class="n">indexes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                        <span class="n">cdf</span><span class="p">,</span>
+                        <span class="n">cdf_lengths</span><span class="p">,</span>
+                        <span class="n">offsets</span><span class="p">)</span>
+            <span class="n">string</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="n">y_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+        <span class="c1"># yapf: disable</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;strings&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">y_strings</span><span class="p">,</span> <span class="n">z_strings</span><span class="p">],</span> <span class="s1">&#39;shape&#39;</span><span class="p">:</span> <span class="n">z</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]}</span>
+
+    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="c1"># FIXME: we don&#39;t respect the default entropy coder and directly call the</span>
+        <span class="c1"># range ANS decoder</span>
+
+        <span class="n">z_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">strings</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># scaling factor between z and y</span>
+        <span class="n">kernel_size</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># context prediction kernel size</span>
+        <span class="n">padding</span> <span class="o">=</span> <span class="p">(</span><span class="n">kernel_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+
+        <span class="n">y_height</span> <span class="o">=</span> <span class="n">z_hat</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span>
+        <span class="n">y_width</span> <span class="o">=</span> <span class="n">z_hat</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span>
+
+        <span class="c1"># initialize y_hat to zeros, and pad it so we can directly work with</span>
+        <span class="c1"># sub-tensors of size (N, C, kernel size, kernel_size)</span>
+        <span class="c1"># yapf: disable</span>
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">z_hat</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="n">y_height</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">padding</span><span class="p">,</span> <span class="n">y_width</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">padding</span><span class="p">),</span>
+                            <span class="n">device</span><span class="o">=</span><span class="n">z_hat</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">decoder</span> <span class="o">=</span> <span class="n">RansDecoder</span><span class="p">()</span>
+
+        <span class="c1"># pylint: disable=protected-access</span>
+        <span class="n">cdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">_quantized_cdf</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">cdf_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">_cdf_length</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">_offset</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="c1"># Warning: this is slow due to the auto-regressive nature of the</span>
+        <span class="c1"># decoding... See more recent publication where they use an</span>
+        <span class="c1"># auto-regressive module on chunks of channels for faster decoding...</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">y_string</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">strings</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">decoder</span><span class="o">.</span><span class="n">set_stream</span><span class="p">(</span><span class="n">y_string</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y_height</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y_width</span><span class="p">):</span>
+                    <span class="c1"># only perform the 5x5 convolution on a cropped tensor</span>
+                    <span class="c1"># centered in (h, w)</span>
+                    <span class="n">y_crop</span> <span class="o">=</span> <span class="n">y_hat</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">h</span><span class="p">:</span><span class="n">h</span> <span class="o">+</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span><span class="n">w</span> <span class="o">+</span> <span class="n">kernel_size</span><span class="p">]</span>
+                    <span class="c1"># ctx_params = self.context_prediction(torch.round(y_crop))</span>
+                    <span class="n">ctx_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span><span class="p">(</span><span class="n">y_crop</span><span class="p">)</span>
+
+                    <span class="c1"># 1x1 conv for the entropy parameters prediction network, so</span>
+                    <span class="c1"># we only keep the elements in the &quot;center&quot;</span>
+                    <span class="n">ctx_p</span> <span class="o">=</span> <span class="n">ctx_params</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">padding</span><span class="p">:</span><span class="n">padding</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="p">:</span><span class="n">padding</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">h</span><span class="p">:</span><span class="n">h</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span><span class="n">w</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="n">gaussian_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="n">ctx_p</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="n">scales_hat</span><span class="p">,</span> <span class="n">means_hat</span> <span class="o">=</span> <span class="n">gaussian_params</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+                    <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">build_indexes</span><span class="p">(</span><span class="n">scales_hat</span><span class="p">)</span>
+
+                    <span class="n">rv</span> <span class="o">=</span> <span class="n">decoder</span><span class="o">.</span><span class="n">decode_stream</span><span class="p">(</span>
+                        <span class="n">indexes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                        <span class="n">cdf</span><span class="p">,</span>
+                        <span class="n">cdf_lengths</span><span class="p">,</span>
+                        <span class="n">offsets</span><span class="p">)</span>
+                    <span class="n">rv</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">rv</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+                    <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">_dequantize</span><span class="p">(</span><span class="n">rv</span><span class="p">,</span> <span class="n">means_hat</span><span class="p">)</span>
+
+                    <span class="n">y_hat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="n">h</span> <span class="o">+</span> <span class="n">padding</span><span class="p">:</span><span class="n">h</span> <span class="o">+</span> <span class="n">padding</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">w</span> <span class="o">+</span> <span class="n">padding</span><span class="p">:</span><span class="n">w</span> <span class="o">+</span> <span class="n">padding</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rv</span>
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="n">y_hat</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">padding</span><span class="p">:</span><span class="o">-</span><span class="n">padding</span><span class="p">,</span> <span class="n">padding</span><span class="p">:</span><span class="o">-</span><span class="n">padding</span><span class="p">]</span>
+        <span class="c1"># pylint: enable=protected-access</span>
+        <span class="c1"># yapf: enable</span>
+
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;x_hat&#39;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">}</span>
+
+<div class="viewcode-block" id="JointAutoregressiveHierarchicalPriors.update"><a class="viewcode-back" href="../../../models.html#compressai.models.JointAutoregressiveHierarchicalPriors.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_table</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">scale_table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">scale_table</span> <span class="o">=</span> <span class="n">get_scale_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">update_scale_table</span><span class="p">(</span><span class="n">scale_table</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="JointAutoregressiveHierarchicalPriors.load_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.JointAutoregressiveHierarchicalPriors.load_state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
+        <span class="c1"># Dynamically update the entropy bottleneck buffers related to the CDFs</span>
+        <span class="n">update_registered_buffers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">,</span>
+                                  <span class="s1">&#39;entropy_bottleneck&#39;</span><span class="p">,</span>
+                                  <span class="p">[</span><span class="s1">&#39;_quantized_cdf&#39;</span><span class="p">,</span> <span class="s1">&#39;_offset&#39;</span><span class="p">,</span> <span class="s1">&#39;_cdf_length&#39;</span><span class="p">],</span>
+                                  <span class="n">state_dict</span><span class="p">)</span>
+        <span class="n">update_registered_buffers</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="p">,</span> <span class="s1">&#39;gaussian_conditional&#39;</span><span class="p">,</span>
+            <span class="p">[</span><span class="s1">&#39;_quantized_cdf&#39;</span><span class="p">,</span> <span class="s1">&#39;_offset&#39;</span><span class="p">,</span> <span class="s1">&#39;_cdf_length&#39;</span><span class="p">,</span> <span class="s1">&#39;scale_table&#39;</span><span class="p">],</span>
+            <span class="n">state_dict</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, InterDigital Communications, Inc.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
