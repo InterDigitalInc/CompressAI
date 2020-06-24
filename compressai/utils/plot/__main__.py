@@ -98,6 +98,7 @@ def plotly_plt(scatters,
                output_file,
                limits=None,
                figsize=None):
+    del figsize
     scatters = [
         go.Scatter(x=sc['xs'], y=sc['ys'], name=sc['name']) for sc in scatters
     ]
