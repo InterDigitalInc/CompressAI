@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 Evaluate an end-to-end compression model on an image dataset.
 """
@@ -55,14 +54,31 @@ def read_image(filepath: str) -> torch.Tensor:
 def inference(model, x):
     x = x.unsqueeze(0)
 
+    h, w = x.size(2), x.size(3)
+    p = 64  # maximum 6 strides of 2
+    new_h = (h + p - 1) // p * p
+    new_w = (w + p - 1) // p * p
+    padding_left = (new_w - w) // 2
+    padding_right = new_w - w - padding_left
+    padding_top = (new_h - h) // 2
+    padding_bottom = new_h - h - padding_top
+    x_padded = F.pad(
+        x, (padding_left, padding_right, padding_top, padding_bottom),
+        mode='constant',
+        value=0)
+
     with torch.no_grad():
         start = time.time()
-        out_enc = model.compress(x)
+        out_enc = model.compress(x_padded)
         enc_time = time.time() - start
 
         start = time.time()
         out_dec = model.decompress(out_enc['strings'], out_enc['shape'])
         dec_time = time.time() - start
+
+    out_dec['x_hat'] = F.pad(
+        out_dec['x_hat'],
+        (-padding_left, -padding_right, -padding_top, -padding_bottom))
 
     num_pixels = x.size(0) * x.size(2) * x.size(3)
     bpp = sum(len(s[0]) for s in out_enc['strings']) * 8. / num_pixels
