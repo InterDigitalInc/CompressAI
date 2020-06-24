@@ -27,7 +27,6 @@ import multiprocessing as mp
 from collections import defaultdict
 from itertools import starmap
 
-
 from .codecs import Codec, JPEG, WebP, JPEG2000, BPG, TFCI, VTM, HM, AV1
 
 # from torchvision.datasets.folder
@@ -35,6 +34,12 @@ IMG_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif',
                   '.tiff', '.webp')
 
 codecs = [JPEG, WebP, JPEG2000, BPG, TFCI, VTM, HM, AV1]
+
+
+# we need the quality index (not value) to compute the stats later
+def func(codec, i, *args):
+    rv = codec.run(*args)
+    return i, rv
 
 
 def collect(codec: Codec,
@@ -52,12 +57,8 @@ def collect(codec: Codec,
         print('No images found in the dataset directory')
         sys.exit(1)
 
-    args = [(i, f, q) for i, q in enumerate(qualities) for f in filepaths]
-
-    # we need the quality index (not value) to compute the stats later
-    def func(i, *args):
-        rv = codec.run(*args)
-        return i, rv
+    args = [(codec, i, f, q) for i, q in enumerate(qualities)
+            for f in filepaths]
 
     if pool:
         rv = pool.starmap(func, args)
