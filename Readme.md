@@ -64,7 +64,7 @@ with your own model implemented within CompressAI, and then run the script for a
 simple training pipeline:
 
 ```bash
-python3 example/train.py -d /path/to/my/image/dataset/ --epochs 300 -lr 1e-4 --batch-size 16 --cuda --save
+python3 examples/train.py -d /path/to/my/image/dataset/ --epochs 300 -lr 1e-4 --batch-size 16 --cuda --save
 ```
 
 A jupyter notebook illustrating the usage of a pre-trained model for learned image
