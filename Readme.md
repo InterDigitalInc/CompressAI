@@ -22,7 +22,7 @@ To get started and install CompressAI, run the following commands in a [virtual
 environment](https://docs.python.org/3.6/library/venv.html):
 
 ```bash
-git clone https://github.com/InterDigitalInc/CompressAI
+git clone https://github.com/InterDigitalInc/CompressAI compressai
 cd compressai
 pip install -U pip && pip install -e .
 ```
