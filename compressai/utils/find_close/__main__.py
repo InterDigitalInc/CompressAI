@@ -38,32 +38,39 @@ def find_closest(
         metric: str = 'psnr') -> Tuple[int, Dict[str, float], Image.Image]:
     rev = False  # higher Q -> better quality or reverse
     if isinstance(codec, (JPEG, JPEG2000, WebP)):
-        lower = 0
-        upper = 100
+        lower = -1
+        upper = 101
     elif isinstance(codec, (BPG, HM, VTM)):
-        lower = 0
-        upper = 50
+        lower = -1
+        upper = 51
         rev = True
     elif isinstance(codec, (AV1, )):
-        lower = 0
-        upper = 62
+        lower = -1
+        upper = 63
         rev = True
     else:
         assert False, codec
 
-    while upper >= lower:
+    best_rv = None
+    best_rec = None
+    while upper > lower + 1:
         mid = (upper + lower) // 2
         rv, rec = codec.run(img, mid, return_rec=True)
+        is_best = (best_rv is None or \
+                   abs(rv[metric] - target) < abs(best_rv[metric] - target))
+        if is_best:
+            best_rv = rv
+            best_rec = rec
         if rv[metric] > target:
             if not rev:
-                upper = mid - 1
+                upper = mid
             else:
-                lower = mid + 1
+                lower = mid
         elif rv[metric] < target:
             if not rev:
-                lower = mid + 1
+                lower = mid
             else:
-                upper = mid - 1
+                upper = mid
         else:
             break
         sys.stderr.write(
@@ -72,7 +79,7 @@ def find_closest(
         sys.stderr.flush()
     sys.stderr.write('\n')
     sys.stderr.flush()
-    return mid, rv, rec
+    return mid, best_rv, best_rec
 
 
 codecs = [JPEG, WebP, JPEG2000, BPG, VTM, HM, AV1]
