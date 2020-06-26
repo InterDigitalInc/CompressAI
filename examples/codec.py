@@ -20,6 +20,7 @@ import time
 from pathlib import Path
 
 import torch
+import torch.nn.functional as F
 
 from torchvision.transforms import ToPILImage, ToTensor
 
@@ -33,6 +34,7 @@ model_ids = {k: i for i, k in enumerate(models.keys())}
 metric_ids = {
     'mse': 0,
 }
+
 
 def inverse_dict(d):
     # We assume dict values are unique...
@@ -111,6 +113,32 @@ def parse_header(header):
             inverse_dict(metric_ids)[metric], quality)
 
 
+def pad(x, p=2**6):
+    h, w = x.size(2), x.size(3)
+    H = (h + p - 1) // p * p
+    W = (w + p - 1) // p * p
+    padding_left = (W - w) // 2
+    padding_right = W - w - padding_left
+    padding_top = (H - h) // 2
+    padding_bottom = H - h - padding_top
+    return F.pad(x, (padding_left, padding_right, padding_top, padding_bottom),
+                 mode='constant',
+                 value=0)
+
+
+def crop(x, size):
+    H, W = x.size(2), x.size(3)
+    h, w = size
+    padding_left = (W - w) // 2
+    padding_right = W - w - padding_left
+    padding_top = (H - h) // 2
+    padding_bottom = H - h - padding_top
+    return F.pad(
+        x, (-padding_left, -padding_right, -padding_top, -padding_bottom),
+        mode='constant',
+        value=0)
+
+
 def _encode(image, model, metric, quality, coder, output):
     compressai.set_entropy_coder(coder)
     enc_start = time.time()
@@ -120,8 +148,12 @@ def _encode(image, model, metric, quality, coder, output):
     net = models[model](quality=quality, metric=metric, pretrained=True).eval()
     load_time = time.time() - start
 
+    x = img2torch(img)
+    h, w = x.size(2), x.size(3)
+    p = 64  # maximum 6 strides of 2
+    x = pad(x, p)
+
     with torch.no_grad():
-        x = img2torch(img)
         out = net.compress(x)
 
     shape = out['shape']
@@ -129,7 +161,9 @@ def _encode(image, model, metric, quality, coder, output):
 
     with Path(output).open('wb') as f:
         write_uchars(f, header)
-        # write shape and number of encode latents
+        # write original image size
+        write_uints(f, (h, w))
+        # write shape and number of encoded latents
         write_uints(f, (shape[0], shape[1], len(out['strings'])))
         for s in out['strings']:
             write_uints(f, (len(s[0]), ))
@@ -148,6 +182,7 @@ def _decode(inputpath, coder, show, output=None):
     dec_start = time.time()
     with Path(inputpath).open('rb') as f:
         model, metric, quality = parse_header(read_uchars(f, 2))
+        original_size = read_uints(f, 2)
         shape = read_uints(f, 2)
         strings = []
         n_strings = read_uints(f, 1)[0]
@@ -162,7 +197,9 @@ def _decode(inputpath, coder, show, output=None):
 
     with torch.no_grad():
         out = net.decompress(strings, shape)
-    img = torch2img(out['x_hat'])
+
+    x_hat = crop(out['x_hat'], original_size)
+    img = torch2img(x_hat)
     dec_time = time.time() - dec_start
     print(f'Decoded in {dec_time:.2f}s (model loading: {load_time:.2f}s)')
 
@@ -209,6 +246,7 @@ def encode(argv):
     args = parser.parse_args(argv)
     if not args.output:
         args.output = Path(Path(args.image).resolve().name).with_suffix('.bin')
+
     _encode(args.image, args.model, args.metric, args.quality, args.coder,
             args.output)
 
