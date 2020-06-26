@@ -31,11 +31,7 @@ from compressai.utils.bench.codecs import (Codec, JPEG, WebP, JPEG2000, BPG,
                                            VTM, HM, AV1)
 
 
-def find_closest(
-        codec: Codec,
-        img: str,
-        target: float,
-        metric: str = 'psnr') -> Tuple[int, Dict[str, float], Image.Image]:
+def get_codec_q_bounds(codec: Codec) -> Tuple[bool, int, int]:
     rev = False  # higher Q -> better quality or reverse
     if isinstance(codec, (JPEG, JPEG2000, WebP)):
         lower = -1
@@ -50,13 +46,22 @@ def find_closest(
         rev = True
     else:
         assert False, codec
+    return rev, lower, upper
 
-    best_rv = None
+
+def find_closest(
+        codec: Codec,
+        img: str,
+        target: float,
+        metric: str = 'psnr') -> Tuple[int, Dict[str, float], Image.Image]:
+    rev, lower, upper = get_codec_q_bounds(codec)
+
+    best_rv = {}
     best_rec = None
     while upper > lower + 1:
         mid = (upper + lower) // 2
         rv, rec = codec.run(img, mid, return_rec=True)
-        is_best = (best_rv is None or \
+        is_best = (best_rv == {} or \
                    abs(rv[metric] - target) < abs(best_rv[metric] - target))
         if is_best:
             best_rv = rv
