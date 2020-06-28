@@ -307,7 +307,7 @@ class JPEG2000(BinaryCodec):
             '-vcodec',
             'jpeg2000',
             '-pix_fmt',
-            'yuv420p',
+            'yuv444p',
             '-c:v',
             'libopenjpeg',
             '-compression_level',
@@ -516,8 +516,8 @@ class VTM(Codec):
         return args
 
     def _run(self, img, quality, return_rec=False):
-        if not 0 <= quality <= 51:
-            raise ValueError(f'Invalid quality value: {quality} (0,51)')
+        if not 0 <= quality <= 63:
+            raise ValueError(f'Invalid quality value: {quality} (0,63)')
 
         # Convert input image to yuv 444 file
         arr = np.asarray(read_image(img))

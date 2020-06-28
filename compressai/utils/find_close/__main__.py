@@ -36,13 +36,13 @@ def get_codec_q_bounds(codec: Codec) -> Tuple[bool, int, int]:
     if isinstance(codec, (JPEG, JPEG2000, WebP)):
         lower = -1
         upper = 101
-    elif isinstance(codec, (BPG, HM, VTM)):
+    elif isinstance(codec, (BPG, HM)):
         lower = -1
         upper = 51
         rev = True
-    elif isinstance(codec, (AV1, )):
+    elif isinstance(codec, (AV1, VTM)):
         lower = -1
-        upper = 63
+        upper = 64
         rev = True
     else:
         assert False, codec
