@@ -26,7 +26,7 @@ err_report() {
 }
 trap 'err_report $LINENO' ERR
 
-NJOBS=${NJOBS:-4}
+NJOBS=30
 
 usage() {
     echo "usage: $(basename $0) dataset CODECS"
@@ -76,7 +76,7 @@ BPGDEC="$(which bpgdec)"
 
 # AV1
 # edit below to provide the path to the chosen version of VTM
-# AV1_BIN_DIR="${HOME}/av1/aom/build_gcc"
+AV1_BIN_DIR="${HOME}/av1/aom/build_gcc"
 
 jpeg() {
     python3 -m compressai.utils.bench jpeg "$dataset"            \
