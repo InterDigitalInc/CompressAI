@@ -378,6 +378,15 @@ class TestCheng2020:
             assert isinstance(net, cls)
             assert net.state_dict()['g_a.0.conv1.weight'].size(0) == 192
 
+    def test_pretrained(self):
+        for i in range(1, 4):
+            net = cheng2020_anchor(i, metric='mse', pretrained=True)
+            assert net.state_dict()['g_a.0.conv1.weight'].size(0) == 128
+
+        for i in range(4, 7):
+            net = cheng2020_anchor(i, metric='mse', pretrained=True)
+            assert net.state_dict()['g_a.0.conv1.weight'].size(0) == 192
+
 
 class Foo(nn.Module):
     def __init__(self):
