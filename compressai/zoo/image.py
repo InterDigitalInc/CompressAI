@@ -88,7 +88,14 @@ model_urls = {
         },
     },
     'cheng2020-anchor': {
-        'mse': {},
+        'mse': {
+            1: f'{root_url}/cheng2020-anchor-1-dad2ebff.pth.tar',
+            2: f'{root_url}/cheng2020-anchor-2-a29008eb.pth.tar',
+            3: f'{root_url}/cheng2020-anchor-3-e49be189.pth.tar',
+            4: f'{root_url}/cheng2020-anchor-4-98b0b468.pth.tar',
+            5: f'{root_url}/cheng2020-anchor-5-23852949.pth.tar',
+            6: f'{root_url}/cheng2020-anchor-6-4c052b1a.pth.tar',
+        },
     },
     'cheng2020-attn': {
         'mse': {},

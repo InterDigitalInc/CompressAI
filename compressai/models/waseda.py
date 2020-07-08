@@ -81,6 +81,14 @@ class Cheng2020Anchor(JointAutoregressiveHierarchicalPriors):
             subpel_conv3x3(N, 3, 2),
         )
 
+    @classmethod
+    def from_state_dict(cls, state_dict):
+        """Return a new model instance from `state_dict`."""
+        N = state_dict['g_a.0.conv1.weight'].size(0)
+        net = cls(N)
+        net.load_state_dict(state_dict)
+        return net
+
 
 class Cheng2020Attention(Cheng2020Anchor):
     """Self-attention model variant from `"Learned Image Compression with
