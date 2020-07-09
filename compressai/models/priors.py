@@ -516,27 +516,33 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
             encoder = BufferedRansEncoder()
             # Warning, this is slow...
             # TODO: profile the calls to the bindings...
+            symbols_list = []
+            indexes_list = []
             for h in range(y_height):
                 for w in range(y_width):
-                    y_crop = y_hat[i:i + 1, :, h:h + kernel_size, w:w + kernel_size]
-                    ctx_params = self.context_prediction(y_crop)
+                    y_crop = y_hat[i:i + 1, :, h:h + kernel_size,
+                                   w:w + kernel_size]
+                    ctx_p = F.conv2d(y_crop,
+                                     self.context_prediction.weight,
+                                     bias=self.context_prediction.bias)
 
                     # 1x1 conv for the entropy parameters prediction network, so
                     # we only keep the elements in the "center"
-                    ctx_p = ctx_params[i:i + 1, :, padding:padding + 1, padding:padding + 1]
                     p = params[i:i + 1, :, h:h + 1, w:w + 1]
-                    gaussian_params = self.entropy_parameters(torch.cat((p, ctx_p), dim=1))
+                    gaussian_params = self.entropy_parameters(
+                        torch.cat((p, ctx_p), dim=1))
                     scales_hat, means_hat = gaussian_params.chunk(2, 1)
 
                     indexes = self.gaussian_conditional.build_indexes(scales_hat)
                     y_q = torch.round(y_crop - means_hat)
                     y_hat[i, :, h + padding, w + padding] = (y_q + means_hat)[i, :, padding, padding]
-                    encoder.encode_with_indexes(
-                        y_q[i, :, padding, padding].int().tolist(),
-                        indexes[i, :].squeeze().int().tolist(),
-                        cdf,
-                        cdf_lengths,
-                        offsets)
+
+                    symbols_list.extend(y_q[i, :, padding, padding].int().tolist())
+                    indexes_list.extend(indexes[i, :].squeeze().int().tolist())
+
+            encoder.encode_with_indexes(symbols_list, indexes_list, cdf,
+                                        cdf_lengths, offsets)
+
             string = encoder.flush()
             y_strings.append(string)
         # yapf: disable
@@ -581,12 +587,11 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
                     # only perform the 5x5 convolution on a cropped tensor
                     # centered in (h, w)
                     y_crop = y_hat[i:i + 1, :, h:h + kernel_size, w:w + kernel_size]
-                    # ctx_params = self.context_prediction(torch.round(y_crop))
-                    ctx_params = self.context_prediction(y_crop)
-
+                    ctx_p = F.conv2d(y_crop,
+                                     self.context_prediction.weight,
+                                     bias=self.context_prediction.bias)
                     # 1x1 conv for the entropy parameters prediction network, so
                     # we only keep the elements in the "center"
-                    ctx_p = ctx_params[i:i + 1, :, padding:padding + 1, padding:padding + 1]
                     p = params[i:i + 1, :, h:h + 1, w:w + 1]
                     gaussian_params = self.entropy_parameters(torch.cat((p, ctx_p), dim=1))
                     scales_hat, means_hat = gaussian_params.chunk(2, 1)
