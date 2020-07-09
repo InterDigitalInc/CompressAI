@@ -88,8 +88,6 @@ Original paper: [cheng2020]_
 
 .. autofunction:: cheng2020_anchor
 
-.. warning:: Pre-trained weights are not yet available
-
 
 cheng2020_attn
 --------------
