@@ -61,9 +61,8 @@ def ycbcr2rgb(ycbcr: Tensor) -> Tensor:
     return rgb
 
 
-def yuv_444_to_420(
-    yuv: Union[Tensor, Tuple[Tensor, Tensor, Tensor]]
-) -> Tuple[Tensor, Tensor, Tensor]:
+def yuv_444_to_420(yuv: Union[Tensor, Tuple[Tensor, Tensor, Tensor]]
+                  ) -> Tuple[Tensor, Tensor, Tensor]:
     """Convert a 444 tensor to a 420 representation.
     """
     def _downsample(tensor):
