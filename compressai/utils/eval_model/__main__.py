@@ -85,7 +85,7 @@ def inference(model, x):
 
     return {
         'psnr': psnr(x, out_dec['x_hat']),
-        'msssim': ms_ssim(x, out_dec['x_hat'], data_range=1.).item(),
+        'ms-ssim': ms_ssim(x, out_dec['x_hat'], data_range=1.).item(),
         'bpp': bpp,
         'encoding_time': enc_time,
         'decoding_time': dec_time,
