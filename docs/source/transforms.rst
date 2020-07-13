@@ -11,9 +11,9 @@ Transforms on Tensors
 
 .. autoclass:: YCbCr2RGB
 
-.. autoclass:: YUV444To420
-
 .. autoclass:: YUV420To444
+
+.. autoclass:: YUV444To420
 
 
 Functional Transforms

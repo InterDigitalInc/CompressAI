@@ -61,7 +61,8 @@ def ycbcr2rgb(ycbcr: Tensor) -> Tensor:
     return rgb
 
 
-def yuv_444_to_420(yuv: Union[Tensor, Tuple[Tensor, Tensor, Tensor]]
+def yuv_444_to_420(yuv: Union[Tensor, Tuple[Tensor, Tensor, Tensor]],
+                   mode: str = 'avg_pool',
                   ) -> Tuple[Tensor, Tensor, Tensor]:
     """Convert a 444 tensor to a 420 representation.
 
@@ -69,12 +70,17 @@ def yuv_444_to_420(yuv: Union[Tensor, Tuple[Tensor, Tensor, Tensor]]
         yuv (torch.Tensor or (torch.Tensor, torch.Tensor, torch.Tensor)): 444
             input to be downsampled. Takes either a (Nx3xHxW) tensor or a tuple
             of 3 (Nx1xHxW) tensors.
+        mode (str): algorithm used for downsampling: ``'avg_pool'`` |. Default ``'avg_pool'``
 
     Returns:
         (torch.Tensor, torch.Tensor, torch.Tensor): Converted 420
     """
-    def _downsample(tensor):
-        return F.avg_pool2d(tensor, kernel_size=2, stride=2)
+    if mode not in ('avg_pool', ):
+        raise ValueError(f'Invalid downsampling mode "{mode}".')
+
+    if mode == 'avg_pool':
+        def _downsample(tensor):
+            return F.avg_pool2d(tensor, kernel_size=2, stride=2)
 
     if isinstance(yuv, torch.Tensor):
         y, u, v = yuv.chunk(3, 1)
@@ -85,6 +91,7 @@ def yuv_444_to_420(yuv: Union[Tensor, Tuple[Tensor, Tensor, Tensor]]
 
 
 def yuv_420_to_444(yuv: Tuple[Tensor, Tensor, Tensor],
+                   mode: str = 'bilinear',
                    return_tuple: bool = False
                    ) -> Union[Tensor, Tuple[Tensor, Tensor, Tensor]]:
     """Convert a 420 input to a 444 representation.
@@ -92,6 +99,7 @@ def yuv_420_to_444(yuv: Tuple[Tensor, Tensor, Tensor],
     Args:
         yuv (torch.Tensor, torch.Tensor, torch.Tensor): 420 input frames in
             (Nx1xHxW) format
+        mode (str): algorithm used for upsampling: ``'bilinear'`` | ``'nearest'`` Default ``'bilinear'``
         return_tuple (bool): return input as tuple of tensors instead of a
             concatenated tensor, 3 (Nx1xHxW) tensors instead of one (Nx3xHxW)
             tensor (default: False)
@@ -104,11 +112,15 @@ def yuv_420_to_444(yuv: Tuple[Tensor, Tensor, Tensor],
             any(not isinstance(c, torch.Tensor) for c in yuv):
         raise ValueError('Expected a tuple of 3 torch tensors')
 
-    def _upsample(tensor):
-        return F.interpolate(tensor,
-                             scale_factor=2,
-                             mode='bilinear',
-                             align_corners=False)
+    if mode not in ('bilinear', 'nearest'):
+        raise ValueError(f'Invalid upsampling mode "{mode}".')
+
+    if mode in ('bilinear', 'nearest'):
+        def _upsample(tensor):
+            return F.interpolate(tensor,
+                                 scale_factor=2,
+                                 mode=mode,
+                                 align_corners=False)
 
     y, u, v = yuv
     u, v = _upsample(u), _upsample(v)
