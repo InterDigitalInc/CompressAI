@@ -21,13 +21,13 @@ def _check_input_tensor(tensor: Tensor) -> None:
 
 def rgb2ycbcr(rgb: Tensor) -> Tensor:
     """RGB to YCbCr conversion for torch Tensor.
-    Use the ITU-R BT.709 coefficients.
+    Using ITU-R BT.709 coefficients.
 
     Args:
-        rgb (torch.Tensor): 3D or 4D floating point rgb tensor
+        rgb (torch.Tensor): 3D or 4D floating point RGB tensor
 
-    Return:
-        ycbcr(torch.Tensor): converted tensor
+    Returns:
+        ycbcr (torch.Tensor): converted tensor
     """
     _check_input_tensor(rgb)
 
@@ -42,13 +42,13 @@ def rgb2ycbcr(rgb: Tensor) -> Tensor:
 
 def ycbcr2rgb(ycbcr: Tensor) -> Tensor:
     """YCbCr to RGB conversion for torch Tensor.
-    Use the ITU-R BT.709 coefficients.
+    Using ITU-R BT.709 coefficients.
 
     Args:
-        ycbcr(torch.Tensor): 3D or 4D floating point rgb tensor
+        ycbcr (torch.Tensor): 3D or 4D floating point RGB tensor
 
-    Return:
-        rgb(torch.Tensor): converted tensor
+    Returns:
+        rgb (torch.Tensor): converted tensor
     """
     _check_input_tensor(ycbcr)
 
@@ -64,6 +64,14 @@ def ycbcr2rgb(ycbcr: Tensor) -> Tensor:
 def yuv_444_to_420(yuv: Union[Tensor, Tuple[Tensor, Tensor, Tensor]]
                   ) -> Tuple[Tensor, Tensor, Tensor]:
     """Convert a 444 tensor to a 420 representation.
+
+    Args:
+        yuv (torch.Tensor or (torch.Tensor, torch.Tensor, torch.Tensor)): 444
+            input to be downsampled. Takes either a (Nx3xHxW) tensor or a tuple
+            of 3 (Nx1xHxW) tensors.
+
+    Returns:
+        (torch.Tensor, torch.Tensor, torch.Tensor): Converted 420
     """
     def _downsample(tensor):
         return F.avg_pool2d(tensor, kernel_size=2, stride=2)
@@ -79,12 +87,18 @@ def yuv_444_to_420(yuv: Union[Tensor, Tuple[Tensor, Tensor, Tensor]]
 def yuv_420_to_444(yuv: Tuple[Tensor, Tensor, Tensor],
                    return_tuple: bool = False
                    ) -> Union[Tensor, Tuple[Tensor, Tensor, Tensor]]:
-    """Convert a 420 tensor to a 444 representation.
+    """Convert a 420 input to a 444 representation.
 
     Args:
-        yuv (tuple(Tensor, Tensor, Tensor)): 420 input frames
+        yuv (torch.Tensor, torch.Tensor, torch.Tensor): 420 input frames in
+            (Nx1xHxW) format
         return_tuple (bool): return input as tuple of tensors instead of a
-        concatenated tensor (default: False)
+            concatenated tensor, 3 (Nx1xHxW) tensors instead of one (Nx3xHxW)
+            tensor (default: False)
+
+    Returns:
+        (torch.Tensor or (torch.Tensor, torch.Tensor, torch.Tensor)): Converted
+            444
     """
     if len(yuv) != 3 or \
             any(not isinstance(c, torch.Tensor) for c in yuv):
