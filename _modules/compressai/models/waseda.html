@@ -251,7 +251,15 @@
             <span class="n">ResidualBlockUpsample</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
             <span class="n">ResidualBlock</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span>
             <span class="n">subpel_conv3x3</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Cheng2020Anchor.from_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.Cheng2020Anchor.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s1">&#39;g_a.0.conv1.weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">net</span></div></div>
 
 
 <div class="viewcode-block" id="Cheng2020Attention"><a class="viewcode-back" href="../../../models.html#compressai.models.Cheng2020Attention">[docs]</a><span class="k">class</span> <span class="nc">Cheng2020Attention</span><span class="p">(</span><span class="n">Cheng2020Anchor</span><span class="p">):</span>

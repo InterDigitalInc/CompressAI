@@ -88,8 +88,6 @@ Original paper: [cheng2020]_
 
 .. autofunction:: cheng2020_anchor
 
-.. warning:: Pre-trained weights are not yet available
-
 
 cheng2020_attn
 --------------
@@ -182,6 +180,10 @@ Performances
 all models
 ----------
 .. image:: media/images/compressai.png
+
+.. image:: media/images/compressai-clic2020-mobile.png
+
+.. image:: media/images/compressai-clic2020-pro.png
 
 bmshj2018 factorized
 --------------------

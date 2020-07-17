@@ -1,6 +1,7 @@
 SOURCEDIR = ../compressai/docs
 
 build:
+	@rm -rf "$(SOURCEDIR)/_build/"
 	@make -C "$(SOURCEDIR)" html
 	$(eval BUILDDIR = $(shell sed -n -e 's/^BUILDDIR *= \(.*\)/\1/p' "$(SOURCEDIR)/Makefile"))
 	@cp -r $(wildcard $(SOURCEDIR)/$(BUILDDIR)/html/*) .
