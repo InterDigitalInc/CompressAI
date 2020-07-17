@@ -183,6 +183,8 @@ all models
 
 .. image:: media/images/compressai-clic2020-mobile.png
 
+.. image:: media/images/compressai-clic2020-pro.png
+
 bmshj2018 factorized
 --------------------
 .. image:: media/images/bmshj2018-factorized-mse.png
