@@ -50,6 +50,16 @@ model_urls = {
             7: f'{root_url}/bmshj2018-factorized-prior-7-6dfd6734.pth.tar',
             8: f'{root_url}/bmshj2018-factorized-prior-8-5232faa3.pth.tar',
         },
+        'ms-ssim': {
+            1: f'{root_url}/bmshj2018-factorized-ms-ssim-1-9781d705.pth.tar',
+            2: f'{root_url}/bmshj2018-factorized-ms-ssim-2-4a584386.pth.tar',
+            3: f'{root_url}/bmshj2018-factorized-ms-ssim-3-5352f123.pth.tar',
+            4: f'{root_url}/bmshj2018-factorized-ms-ssim-4-4f91b847.pth.tar',
+            5: f'{root_url}/bmshj2018-factorized-ms-ssim-5-b3a88897.pth.tar',
+            6: f'{root_url}/bmshj2018-factorized-ms-ssim-6-ee028763.pth.tar',
+            7: f'{root_url}/bmshj2018-factorized-ms-ssim-7-8c265a29.pth.tar',
+            8: f'{root_url}/bmshj2018-factorized-ms-ssim-8-8811bd14.pth.tar',
+        }
     },
     'bmshj2018-hyperprior': {
         'mse': {
@@ -62,6 +72,16 @@ model_urls = {
             7: f'{root_url}/bmshj2018-hyperprior-7-3804dcbd.pth.tar',
             8: f'{root_url}/bmshj2018-hyperprior-8-a583f0cf.pth.tar',
         },
+        'ms-ssim': {
+            1: f'{root_url}/bmshj2018-hyperprior-ms-ssim-1-5cf249be.pth.tar',
+            2: f'{root_url}/bmshj2018-hyperprior-ms-ssim-2-1ff60d1f.pth.tar',
+            3: f'{root_url}/bmshj2018-hyperprior-ms-ssim-3-92dd7878.pth.tar',
+            4: f'{root_url}/bmshj2018-hyperprior-ms-ssim-4-4377354e.pth.tar',
+            5: f'{root_url}/bmshj2018-hyperprior-ms-ssim-5-c34afc8d.pth.tar',
+            6: f'{root_url}/bmshj2018-hyperprior-ms-ssim-6-3a6d8229.pth.tar',
+            7: f'{root_url}/bmshj2018-hyperprior-ms-ssim-7-8747d3bc.pth.tar',
+            8: f'{root_url}/bmshj2018-hyperprior-ms-ssim-8-cc15b5f3.pth.tar',
+        }
     },
     'mbt2018-mean': {
         'mse': {
@@ -206,7 +226,7 @@ def bmshj2018_factorized(quality,
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    if metric not in ('mse', ):
+    if metric not in ('mse', 'ms-ssim'):
         raise ValueError(f'Invalid metric "{metric}"')
 
     if quality < 1 or quality > 8:
@@ -233,7 +253,7 @@ def bmshj2018_hyperprior(quality,
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    if metric not in ('mse', ):
+    if metric not in ('mse', 'ms-ssim'):
         raise ValueError(f'Invalid metric "{metric}"')
 
     if quality < 1 or quality > 8:

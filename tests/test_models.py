@@ -229,15 +229,16 @@ class TestBmshj2018Factorized:
         with pytest.raises(ValueError):
             bmshj2018_factorized(1, metric='ssim')
 
-    def test_pretrained(self):
-        # test we can load the correct models from the urls
+    @pytest.mark.parametrize('metric', [('mse',), ('ms-ssim',)])  # bypass weird pytest bug
+    def test_pretrained(self, metric):
+        metric = metric[0]
         for i in range(1, 6):
-            net = bmshj2018_factorized(i, metric='mse', pretrained=True)
+            net = bmshj2018_factorized(i, metric=metric, pretrained=True)
             assert net.state_dict()['g_a.0.weight'].size(0) == 128
             assert net.state_dict()['g_a.6.weight'].size(0) == 192
 
         for i in range(6, 9):
-            net = bmshj2018_factorized(i, metric='mse', pretrained=True)
+            net = bmshj2018_factorized(i, metric=metric, pretrained=True)
             assert net.state_dict()['g_a.0.weight'].size(0) == 192
             assert net.state_dict()['g_a.6.weight'].size(0) == 320
 
