@@ -146,7 +146,7 @@ def setup_args():
     parser.add_argument('-m',
                         '--metric',
                         type=str,
-                        choices=['mse'],
+                        choices=['mse', 'ms-ssim'],
                         default='mse',
                         help='metric trained against (default: %(default)s)')
     parser.add_argument('dataset', type=str, help='dataset path')
