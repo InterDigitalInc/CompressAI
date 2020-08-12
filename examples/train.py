@@ -153,12 +153,12 @@ def test_epoch(epoch, test_dataloader, model, criterion):
             mse_loss.update(out_criterion['mse_loss'])
 
     print(f'Test epoch {epoch}: Average losses:'
-          f'\tLoss: {loss.val:.3f} |'
-          f'\tMSE loss: {mse_loss.val:.3f} |'
-          f'\tBpp loss: {bpp_loss.val:.2f} |'
-          f'\tAux loss: {aux_loss.val:.2f}\n')
+          f'\tLoss: {loss.avg:.3f} |'
+          f'\tMSE loss: {mse_loss.avg:.3f} |'
+          f'\tBpp loss: {bpp_loss.avg:.2f} |'
+          f'\tAux loss: {aux_loss.avg:.2f}\n')
 
-    return loss.val
+    return loss.avg
 
 
 def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
