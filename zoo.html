@@ -242,12 +242,95 @@ and <a class="reference external" href="https://pytorch.org/docs/stable/nn.html?
 <h2><a class="toc-backref" href="#id16">Training</a><a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h2>
 <p>Unless specified otherwise, networks were trained for 4-5M steps on <em>256x256</em>
 image patches randomly cropped and extracted from the <a class="reference external" href="http://toflow.csail.mit.edu/">Vime90K</a> dataset <a class="reference internal" href="#xue2019video" id="id1"><span>[xue2019video]</span></a>.</p>
-<p>Models are trained with a batch size of 16 or 32, and an initial learning rate
+<p>Models were trained with a batch size of 16 or 32, and an initial learning rate
 of 1e-4 for approximately 1-2M steps. The learning rate is then divided by 2
 when the evaluation loss reaches a plateau (we use a patience of 20 epochs).</p>
 <p>Training usually take between one or two weeks to reach state-of-the-art
 performances, depending on the model, the number of channels and the GPU
 architecture used.</p>
+<p>The following loss functions and lambda values were used for training:</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 83%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Metric</p></th>
+<th class="head"><p>Loss function</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>MSE</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{L} = \lambda * 255^{2} * \mathcal{D} + \mathcal{R}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>MS-SSIM</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathcal{L} = \lambda * (1 - \mathcal{D}) + \mathcal{R}\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<p>with <span class="math notranslate nohighlight">\(\mathcal{D}\)</span> and <span class="math notranslate nohighlight">\(\mathcal{R}\)</span> respectively the mean
+distortion and the mean estimated bit-rate.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Quality</p></th>
+<th class="head"><p>1</p></th>
+<th class="head"><p>2</p></th>
+<th class="head"><p>3</p></th>
+<th class="head"><p>4</p></th>
+<th class="head"><p>5</p></th>
+<th class="head"><p>6</p></th>
+<th class="head"><p>7</p></th>
+<th class="head"><p>8</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>MSE</p></td>
+<td><p>0.0018</p></td>
+<td><p>0.0035</p></td>
+<td><p>0.0067</p></td>
+<td><p>0.0130</p></td>
+<td><p>0.0250</p></td>
+<td><p>0.0483</p></td>
+<td><p>0.0932</p></td>
+<td><p>0.1800</p></td>
+</tr>
+<tr class="row-odd"><td><p>MS-SSIM</p></td>
+<td><p>2.40</p></td>
+<td><p>4.58</p></td>
+<td><p>8.73</p></td>
+<td><p>16.64</p></td>
+<td><p>31.73</p></td>
+<td><p>60.50</p></td>
+<td><p>115.37</p></td>
+<td><p>220.00</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The number of channels for the convolutionnal layers and the entropy
+bottleneck depends on the architecture and the quality parameter (~targeted
+bit-rate). For low bit-rates (&lt; 1bpp), the litterature usually recommends 192
+channels for the entropy bottleneck, and 320 channels for higher bitrates.
+The detailed list of configurations can be found in
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">compressai.zoo.image.cfgs</span></code>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the <em>cheng2020_*</em> architectures, we trained with the first 6
+quality parameters.</p>
+</div>
 </div>
 <hr class="docutils" />
 <div class="section" id="models">
