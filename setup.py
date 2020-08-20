@@ -22,7 +22,7 @@ from setuptools import find_packages, setup
 
 cwd = Path(__file__).resolve().parent
 package_name = 'compressai'
-version = '1.0.0'
+version = '1.0.2'
 
 
 def write_version_file():
