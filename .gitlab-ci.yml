@@ -42,9 +42,13 @@ test:compressai:pytorch-1.4:
     tags:
         - docker
 
-test:compressai:pytorch-1.5:
+test:compressai:pytorch-1.5.1:
     extends: test:compressai:pytorch-1.4
-    image: pytorch/pytorch:1.5-cuda10.1-cudnn7-runtime
+    image: pytorch/pytorch:1.5.1-cuda10.1-cudnn7-runtime
+
+test:compressai:pytorch-1.6.0:
+    extends: test:compressai:pytorch-1.4
+    image: pytorch/pytorch:1.6.0-cuda10.1-cudnn7-runtime
 
 doc:compressai:
     stage: doc
