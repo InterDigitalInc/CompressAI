@@ -197,8 +197,8 @@ def test_scale_table_default():
 
 def test_scale_table_custom():
     table = get_scale_table(0.02, 1337, 32)
-    assert table[0] == 0.02
-    assert table[-1] == 1337
+    assert pytest.approx(table[0].item(), 0.02)
+    assert pytest.approx(table[-1].item(), 1337)
     assert len(table.size()) == 1
     assert table.size(0) == 32
 
