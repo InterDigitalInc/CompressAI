@@ -101,8 +101,8 @@ class AverageMeter:
         self.avg = self.sum / self.count
 
 
-def train_epoch(epoch, train_dataloader, model, criterion, optimizer,
-                aux_optimizer):
+def train_one_epoch(model, criterion, train_dataloader, optimizer,
+                    aux_optimizer, epoch, clip_max_norm):
     model.train()
     device = next(model.parameters()).device
 
@@ -116,6 +116,8 @@ def train_epoch(epoch, train_dataloader, model, criterion, optimizer,
 
         out_criterion = criterion(out_net, d)
         out_criterion['loss'].backward()
+        if clip_max_norm > 0:
+            torch.nn.utils.clip_grad_norm_(model.parameters(), clip_max_norm)
         optimizer.step()
 
         aux_loss = model.aux_loss()
@@ -231,6 +233,10 @@ def parse_args(argv):
         '--seed',
         type=float,
         help='Set random seed for reproducibility')
+    parser.add_argument('--clip_max_norm',
+                        default=0.1,
+                        type=float,
+                        help='gradient clipping max norm')
     # yapf: enable
     args = parser.parse_args(argv)
     return args
@@ -279,8 +285,8 @@ def main(argv):
 
     best_loss = 1e10
     for epoch in range(args.epochs):
-        train_epoch(epoch, train_dataloader, net, criterion, optimizer,
-                    aux_optimizer)
+        train_one_epoch(net, criterion, train_dataloader, optimizer,
+                        aux_optimizer, epoch, args.clip_max_norm)
 
         loss = test_epoch(epoch, test_dataloader, net, criterion)
 
