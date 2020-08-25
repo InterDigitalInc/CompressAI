@@ -176,6 +176,7 @@ def parse_args(argv):
         '-d',
         '--dataset',
         type=str,
+        required=True,
         help='Training dataset')
     parser.add_argument(
         '-e',
