@@ -14,9 +14,12 @@
 
 import importlib.util
 import io
+import re
 
 from contextlib import redirect_stdout
 from pathlib import Path
+
+import pytest
 
 
 def test_train_example():
@@ -51,4 +54,16 @@ def test_train_example():
     with logpath.open('r') as f:
         expected = f.read()
 
-    assert log == expected
+    test_values = [
+        m[0] for m in re.findall(r'(?P<number>([0-9]*[.])?[0-9]+)', log)
+    ]
+    expected_values = [
+        m[0] for m in re.findall(r'(?P<number>([0-9]*[.])?[0-9]+)', expected)
+    ]
+
+    assert len(test_values) == len(expected_values)
+    for a, b in zip(test_values, expected_values):
+        try:
+            assert int(a) == int(b)
+        except ValueError:
+            assert pytest.approx(float(a), float(b))
