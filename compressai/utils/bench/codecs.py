@@ -462,8 +462,8 @@ def get_vtm_encoder_path(build_dir):
     try:
         elfnames = {'Darwin': 'EncoderApp', 'Linux': 'EncoderAppStatic'}
         return os.path.join(build_dir, elfnames[system])
-    except KeyError:
-        raise RuntimeError(f'Unsupported platform "{system}"')
+    except KeyError as err:
+        raise RuntimeError(f'Unsupported platform "{system}"') from err
 
 
 def get_vtm_decoder_path(build_dir):
@@ -471,8 +471,8 @@ def get_vtm_decoder_path(build_dir):
     try:
         elfnames = {'Darwin': 'DecoderApp', 'Linux': 'DecoderAppStatic'}
         return os.path.join(build_dir, elfnames[system])
-    except KeyError:
-        raise RuntimeError(f'Unsupported platform "{system}"')
+    except KeyError as err:
+        raise RuntimeError(f'Unsupported platform "{system}"') from err
 
 
 class VTM(Codec):
