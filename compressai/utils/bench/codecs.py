@@ -485,9 +485,8 @@ class VTM(Codec):
 
         if not self.rgb:
             # convert rgb content to YCbCr
-            rgb = torch.from_numpy(
-                arr.copy()).float().unsqueeze(0) / (2**bitdepth - 1)
-            arr = np.clip(rgb2ycbcr(rgb).squeeze().numpy(), 0, 1)
+            rgb = torch.from_numpy(arr.copy()).float() / (2**bitdepth - 1)
+            arr = np.clip(rgb2ycbcr(rgb).numpy(), 0, 1)
             arr = (arr * (2**bitdepth - 1)).astype(np.uint8)
 
         with open(yuv_path, 'wb') as f:
@@ -532,10 +531,8 @@ class VTM(Codec):
         arr = arr.astype(np.float32) / (2**bitdepth - 1)
         rec_arr = rec_arr.astype(np.float32) / (2**bitdepth - 1)
         if not self.rgb:
-            arr = ycbcr2rgb(torch.from_numpy(
-                arr.copy()).unsqueeze(0)).squeeze(0).numpy()
-            rec_arr = ycbcr2rgb(torch.from_numpy(
-                rec_arr.copy()).unsqueeze(0)).squeeze(0).numpy()
+            arr = ycbcr2rgb(torch.from_numpy(arr.copy())).numpy()
+            rec_arr = ycbcr2rgb(torch.from_numpy(rec_arr.copy())).numpy()
 
         psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.)
 
