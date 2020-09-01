@@ -16,7 +16,9 @@ def _check_input_tensor(tensor: Tensor) -> None:
             not tensor.is_floating_point() or \
             not len(tensor.size()) in (3, 4) or \
             not tensor.size(-3) == 3:
-        raise ValueError('Expected a 4D tensor with shape (Nx3xHxW) as input')
+        raise ValueError(
+            'Expected a 3D or 4D tensor with shape (Nx3xHxW) or (3xHxW) as input'
+        )
 
 
 def rgb2ycbcr(rgb: Tensor) -> Tensor:
@@ -61,9 +63,10 @@ def ycbcr2rgb(ycbcr: Tensor) -> Tensor:
     return rgb
 
 
-def yuv_444_to_420(yuv: Union[Tensor, Tuple[Tensor, Tensor, Tensor]],
-                   mode: str = 'avg_pool',
-                  ) -> Tuple[Tensor, Tensor, Tensor]:
+def yuv_444_to_420(
+        yuv: Union[Tensor, Tuple[Tensor, Tensor, Tensor]],
+        mode: str = 'avg_pool',
+) -> Tuple[Tensor, Tensor, Tensor]:
     """Convert a 444 tensor to a 420 representation.
 
     Args:
@@ -79,6 +82,7 @@ def yuv_444_to_420(yuv: Union[Tensor, Tuple[Tensor, Tensor, Tensor]],
         raise ValueError(f'Invalid downsampling mode "{mode}".')
 
     if mode == 'avg_pool':
+
         def _downsample(tensor):
             return F.avg_pool2d(tensor, kernel_size=2, stride=2)
 
@@ -90,10 +94,11 @@ def yuv_444_to_420(yuv: Union[Tensor, Tuple[Tensor, Tensor, Tensor]],
     return (y, _downsample(u), _downsample(v))
 
 
-def yuv_420_to_444(yuv: Tuple[Tensor, Tensor, Tensor],
-                   mode: str = 'bilinear',
-                   return_tuple: bool = False
-                   ) -> Union[Tensor, Tuple[Tensor, Tensor, Tensor]]:
+def yuv_420_to_444(
+    yuv: Tuple[Tensor, Tensor, Tensor],
+    mode: str = 'bilinear',
+    return_tuple: bool = False
+) -> Union[Tensor, Tuple[Tensor, Tensor, Tensor]]:
     """Convert a 420 input to a 444 representation.
 
     Args:
@@ -116,6 +121,7 @@ def yuv_420_to_444(yuv: Tuple[Tensor, Tensor, Tensor],
         raise ValueError(f'Invalid upsampling mode "{mode}".')
 
     if mode in ('bilinear', 'nearest'):
+
         def _upsample(tensor):
             return F.interpolate(tensor,
                                  scale_factor=2,
