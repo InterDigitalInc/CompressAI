@@ -487,7 +487,7 @@ class VTM(Codec):
             # convert rgb content to YCbCr
             rgb = torch.from_numpy(
                 arr.copy()).float().unsqueeze(0) / (2**bitdepth - 1)
-            arr = (np.clip(rgb2ycbcr(rgb).squeeze().numpy(), 0, 1))
+            arr = np.clip(rgb2ycbcr(rgb).squeeze().numpy(), 0, 1)
             arr = (arr * (2**bitdepth - 1)).astype(np.uint8)
 
         with open(yuv_path, 'wb') as f:
