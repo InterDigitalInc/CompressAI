@@ -30,6 +30,8 @@ import numpy as np
 import torch
 from pytorch_msssim import ms_ssim
 
+from compressai.transforms.functional import (rgb2ycbcr, ycbcr2rgb)
+
 # from torchvision.datasets.folder
 IMG_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif',
                   '.tiff', '.webp')
@@ -69,54 +71,6 @@ def compute_metrics(a: Union[np.array, Image.Image],
     p = 20 * np.log10(max_val) - 10 * np.log10(mse)
     m = ms_ssim(a, b, data_range=max_val).item()
     return p, m
-
-
-def rgb2ycbcr(rgb: np.array, bitdepth: int = 8) -> np.array:
-    """RGB -> YCbCr, BT.709 conversion."""
-    assert bitdepth in (8, 10)
-    assert len(rgb.shape) == 3
-    assert rgb.shape[0] == 3
-
-    dtype = rgb.dtype
-    assert dtype in (np.float32, np.uint8)
-
-    if dtype == np.uint8:
-        rgb = rgb.astype(np.float32) / (2**bitdepth - 1)
-
-    ycbcr = np.empty_like(rgb)
-
-    ycbcr[0] = 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]
-    ycbcr[1] = (rgb[2] - ycbcr[0]) / 1.8556 + 0.5
-    ycbcr[2] = (rgb[0] - ycbcr[0]) / 1.5748 + 0.5
-
-    ycbcr = np.clip(ycbcr, 0, 1)
-
-    if dtype == np.uint8:
-        ycbcr = (ycbcr * (2**bitdepth - 1)).astype(np.uint8)
-
-    return ycbcr
-
-
-def ycbcr2rgb(ycbcr: np.array, bitdepth: int = 8) -> np.array:
-    """YCbCr -> RGB, BT.709 conversion."""
-    assert bitdepth in (8, 10)
-    assert len(ycbcr.shape) == 3
-    assert ycbcr.shape[0] == 3
-
-    dtype = ycbcr.dtype
-    assert dtype in (np.float32, np.uint8)
-
-    if dtype == np.uint8:
-        ycbcr = ycbcr.astype(np.float32) / (2**bitdepth - 1)
-
-    rgb = np.empty_like(ycbcr)
-    rgb[0] = 1.5748 * (ycbcr[2] - 0.5) + ycbcr[0]
-    rgb[2] = 1.8556 * (ycbcr[1] - 0.5) + ycbcr[0]
-    rgb[1] = (ycbcr[0] - 0.2126 * rgb[0] - 0.0722 * rgb[2]) / 0.7152
-
-    rgb = np.clip(rgb, 0, 1)
-
-    return rgb
 
 
 def run_command(cmd, ignore_returncodes=None):
@@ -519,6 +473,9 @@ class VTM(Codec):
         if not 0 <= quality <= 63:
             raise ValueError(f'Invalid quality value: {quality} (0,63)')
 
+        # Taking 8bit input for now
+        bitdepth = 8
+
         # Convert input image to yuv 444 file
         arr = np.asarray(read_image(img))
         fd, yuv_path = mkstemp(suffix='.yuv')
@@ -527,7 +484,11 @@ class VTM(Codec):
         arr = arr.transpose((2, 0, 1))  # color channel first
 
         if not self.rgb:
-            arr = rgb2ycbcr(arr)
+            # convert rgb content to YCbCr
+            rgb = torch.from_numpy(
+                arr.copy()).float().unsqueeze(0) / (2**bitdepth - 1)
+            arr = (np.clip(rgb2ycbcr(rgb).squeeze().numpy(), 0, 1))
+            arr = (arr * (2**bitdepth - 1)).astype(np.uint8)
 
         with open(yuv_path, 'wb') as f:
             f.write(arr.tobytes())
@@ -567,12 +528,15 @@ class VTM(Codec):
         # Compute PSNR
         rec_arr = np.fromfile(yuv_path, dtype=np.uint8)
         rec_arr = rec_arr.reshape(arr.shape)
-        bitdepth = 8
+
         arr = arr.astype(np.float32) / (2**bitdepth - 1)
         rec_arr = rec_arr.astype(np.float32) / (2**bitdepth - 1)
         if not self.rgb:
-            arr = ycbcr2rgb(arr)
-            rec_arr = ycbcr2rgb(rec_arr)
+            arr = ycbcr2rgb(torch.from_numpy(
+                arr.copy()).unsqueeze(0)).squeeze(0).numpy()
+            rec_arr = ycbcr2rgb(torch.from_numpy(
+                rec_arr.copy()).unsqueeze(0)).squeeze(0).numpy()
+
         psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.)
 
         bpp = filesize(out_filepath) * 8. / (height * width)
