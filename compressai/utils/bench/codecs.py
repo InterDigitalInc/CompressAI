@@ -604,11 +604,15 @@ class HM(Codec):
         arr = np.asarray(read_image(img))
         fd, yuv_path = mkstemp(suffix='.yuv')
         out_filepath = os.path.splitext(yuv_path)[0] + '.bin'
+        bitdepth = 8
 
         arr = arr.transpose((2, 0, 1))  # color channel first
 
         if not self.rgb:
-            arr = rgb2ycbcr(arr)
+            # convert rgb content to YCbCr
+            rgb = torch.from_numpy(arr.copy()).float() / (2**bitdepth - 1)
+            arr = np.clip(rgb2ycbcr(rgb).numpy(), 0, 1)
+            arr = (arr * (2**bitdepth - 1)).astype(np.uint8)
 
         with open(yuv_path, 'wb') as f:
             f.write(arr.tobytes())
@@ -670,12 +674,11 @@ class HM(Codec):
         # Compute PSNR
         rec_arr = np.fromfile(yuv_path, dtype=np.uint8)
         rec_arr = rec_arr.reshape(arr.shape)
-        bitdepth = 8
         arr = arr.astype(np.float32) / (2**bitdepth - 1)
         rec_arr = rec_arr.astype(np.float32) / (2**bitdepth - 1)
         if not self.rgb:
-            arr = ycbcr2rgb(arr)
-            rec_arr = ycbcr2rgb(rec_arr)
+            arr = ycbcr2rgb(torch.from_numpy(arr.copy())).numpy()
+            rec_arr = ycbcr2rgb(torch.from_numpy(rec_arr.copy())).numpy()
         psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.)
 
         bpp = filesize(out_filepath) * 8. / (height * width)
@@ -735,9 +738,14 @@ class AV1(Codec):
         arr = np.asarray(read_image(img))
         fd, yuv_path = mkstemp(suffix='.yuv')
         out_filepath = os.path.splitext(yuv_path)[0] + '.webm'
+        bitdepth = 8
 
         arr = arr.transpose((2, 0, 1))  # color channel first
-        arr = rgb2ycbcr(arr)
+
+        # convert rgb content to YCbCr
+        rgb = torch.from_numpy(arr.copy()).float() / (2**bitdepth - 1)
+        arr = np.clip(rgb2ycbcr(rgb).numpy(), 0, 1)
+        arr = (arr * (2**bitdepth - 1)).astype(np.uint8)
 
         with open(yuv_path, 'wb') as f:
             f.write(arr.tobytes())
@@ -789,12 +797,13 @@ class AV1(Codec):
         # Compute PSNR
         rec_arr = np.fromfile(yuv_path, dtype=np.uint8)
         rec_arr = rec_arr.reshape(arr.shape)
-        bitdepth = 8
+
         arr = arr.astype(np.float32) / (2**bitdepth - 1)
         rec_arr = rec_arr.astype(np.float32) / (2**bitdepth - 1)
 
-        arr = ycbcr2rgb(arr)
-        rec_arr = ycbcr2rgb(rec_arr)
+        arr = ycbcr2rgb(torch.from_numpy(arr.copy())).numpy()
+        rec_arr = ycbcr2rgb(torch.from_numpy(rec_arr.copy())).numpy()
+
         psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.)
 
         bpp = filesize(out_filepath) * 8. / (height * width)
