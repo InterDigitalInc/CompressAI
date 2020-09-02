@@ -18,14 +18,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# pylint: enable=E0611,E0401
+# pylint: disable=E0611,E0401
 from compressai.ans import BufferedRansEncoder, RansDecoder
 from compressai.entropy_models import EntropyBottleneck, GaussianConditional
 from compressai.layers import GDN, MaskedConv2d
 
 from .utils import conv, deconv, update_registered_buffers
 
-# pylint: disable=E0611,E0401
+# pylint: enable=E0611,E0401
 
 
 __all__ = [
