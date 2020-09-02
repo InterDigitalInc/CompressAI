@@ -32,6 +32,7 @@ from torchvision import transforms
 
 class AutoEncoder(CompressionModel):
     """Simple autoencoder with a factorized prior """
+
     def __init__(self, N=128):
         super().__init__(entropy_bottleneck_channels=N)
 
@@ -56,15 +57,16 @@ class AutoEncoder(CompressionModel):
         y_hat, y_likelihoods = self.entropy_bottleneck(y)
         x_hat = self.decode(y_hat)
         return {
-            'x_hat': x_hat,
-            'likelihoods': {
-                'y': y_likelihoods,
-            }
+            "x_hat": x_hat,
+            "likelihoods": {
+                "y": y_likelihoods,
+            },
         }
 
 
 class RateDistortionLoss(nn.Module):
     """Custom rate distortion loss with a Lagrangian parameter."""
+
     def __init__(self, lmbda=1e-2):
         super().__init__()
         self.mse = nn.MSELoss()
@@ -75,17 +77,19 @@ class RateDistortionLoss(nn.Module):
         out = {}
         num_pixels = N * H * W
 
-        out['bpp_loss'] = sum(
+        out["bpp_loss"] = sum(
             (torch.log(likelihoods).sum() / (-math.log(2) * num_pixels))
-            for likelihoods in output['likelihoods'].values())
-        out['mse_loss'] = self.mse(output['x_hat'], target)
-        out['loss'] = self.lmbda * 255**2 * out['mse_loss'] + out['bpp_loss']
+            for likelihoods in output["likelihoods"].values()
+        )
+        out["mse_loss"] = self.mse(output["x_hat"], target)
+        out["loss"] = self.lmbda * 255 ** 2 * out["mse_loss"] + out["bpp_loss"]
 
         return out
 
 
 class AverageMeter:
     """Compute running average."""
+
     def __init__(self):
         self.val = 0
         self.avg = 0
@@ -99,8 +103,7 @@ class AverageMeter:
         self.avg = self.sum / self.count
 
 
-def train_epoch(epoch, train_dataloader, model, criterion, optimizer,
-                aux_optimizer):
+def train_epoch(epoch, train_dataloader, model, criterion, optimizer, aux_optimizer):
     model.train()
     device = next(model.parameters()).device
 
@@ -113,7 +116,7 @@ def train_epoch(epoch, train_dataloader, model, criterion, optimizer,
         out_net = model(d)
 
         out_criterion = criterion(out_net, d)
-        out_criterion['loss'].backward()
+        out_criterion["loss"].backward()
         optimizer.step()
 
         aux_loss = model.aux_loss()
@@ -121,13 +124,15 @@ def train_epoch(epoch, train_dataloader, model, criterion, optimizer,
         aux_optimizer.step()
 
         if i % 10 == 0:
-            print(f'Train epoch {epoch}: ['
-                  f'{i*len(d)}/{len(train_dataloader.dataset)}'
-                  f' ({100. * i / len(train_dataloader):.0f}%)]'
-                  f'\tLoss: {out_criterion["loss"].item():.3f} |'
-                  f'\tMSE loss: {out_criterion["mse_loss"].item():.3f} |'
-                  f'\tBpp loss: {out_criterion["bpp_loss"].item():.2f} |'
-                  f'\tAux loss: {aux_loss.item():.2f}')
+            print(
+                f"Train epoch {epoch}: ["
+                f"{i*len(d)}/{len(train_dataloader.dataset)}"
+                f" ({100. * i / len(train_dataloader):.0f}%)]"
+                f'\tLoss: {out_criterion["loss"].item():.3f} |'
+                f'\tMSE loss: {out_criterion["mse_loss"].item():.3f} |'
+                f'\tBpp loss: {out_criterion["bpp_loss"].item():.2f} |'
+                f"\tAux loss: {aux_loss.item():.2f}"
+            )
 
 
 def test_epoch(epoch, test_dataloader, model, criterion):
@@ -146,90 +151,84 @@ def test_epoch(epoch, test_dataloader, model, criterion):
             out_criterion = criterion(out_net, d)
 
             aux_loss.update(model.aux_loss())
-            bpp_loss.update(out_criterion['bpp_loss'])
-            loss.update(out_criterion['loss'])
-            mse_loss.update(out_criterion['mse_loss'])
+            bpp_loss.update(out_criterion["bpp_loss"])
+            loss.update(out_criterion["loss"])
+            mse_loss.update(out_criterion["mse_loss"])
 
-    print(f'Test epoch {epoch}: Average losses:'
-          f'\tLoss: {loss.val:.3f} |'
-          f'\tMSE loss: {mse_loss.val:.3f} |'
-          f'\tBpp loss: {bpp_loss.val:.2f} |'
-          f'\tAux loss: {aux_loss.val:.2f}\n')
+    print(
+        f"Test epoch {epoch}: Average losses:"
+        f"\tLoss: {loss.val:.3f} |"
+        f"\tMSE loss: {mse_loss.val:.3f} |"
+        f"\tBpp loss: {bpp_loss.val:.2f} |"
+        f"\tAux loss: {aux_loss.val:.2f}\n"
+    )
 
     return loss.val
 
 
-def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
+def save_checkpoint(state, is_best, filename="checkpoint.pth.tar"):
     torch.save(state, filename)
     if is_best:
-        shutil.copyfile(filename, 'checkpoint_best_loss.pth.tar')
+        shutil.copyfile(filename, "checkpoint_best_loss.pth.tar")
 
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(description='Example training script')
-    # yapf: disable
+    parser = argparse.ArgumentParser(description="Example training script")
+    parser.add_argument("-d", "--dataset", type=str, help="Training dataset")
     parser.add_argument(
-        '-d',
-        '--dataset',
-        type=str,
-        help='Training dataset')
-    parser.add_argument(
-        '-e',
-        '--epochs',
+        "-e",
+        "--epochs",
         default=100,
         type=int,
-        help='Number of epochs (default: %(default)s)')
+        help="Number of epochs (default: %(default)s)",
+    )
     parser.add_argument(
-        '-lr',
-        '--learning-rate',
+        "-lr",
+        "--learning-rate",
         default=1e-4,
         type=float,
-        help='Learning rate (default: %(default)s)')
+        help="Learning rate (default: %(default)s)",
+    )
     parser.add_argument(
-        '-n',
-        '--num-workers',
+        "-n",
+        "--num-workers",
         type=int,
         default=3,
-        help='Dataloaders threads (default: %(default)s)')
+        help="Dataloaders threads (default: %(default)s)",
+    )
     parser.add_argument(
-        '--lambda',
-        dest='lmbda',
+        "--lambda",
+        dest="lmbda",
         type=float,
         default=1e-2,
-        help='Bit-rate distortion parameter (default: %(default)s)')
+        help="Bit-rate distortion parameter (default: %(default)s)",
+    )
     parser.add_argument(
-        '--batch-size',
-        type=int,
-        default=16,
-        help='Batch size (default: %(default)s)')
+        "--batch-size", type=int, default=16, help="Batch size (default: %(default)s)"
+    )
     parser.add_argument(
-        '--test-batch-size',
+        "--test-batch-size",
         type=int,
         default=64,
-        help='Test batch size (default: %(default)s)')
+        help="Test batch size (default: %(default)s)",
+    )
     parser.add_argument(
-        '--aux-learning-rate',
+        "--aux-learning-rate",
         default=1e-3,
-        help='Auxiliary loss learning rate (default: %(default)s)')
+        help="Auxiliary loss learning rate (default: %(default)s)",
+    )
     parser.add_argument(
-        '--patch-size',
+        "--patch-size",
         type=int,
         nargs=2,
         default=(256, 256),
-        help='Size of the patches to be cropped (default: %(default)s)')
+        help="Size of the patches to be cropped (default: %(default)s)",
+    )
+    parser.add_argument("--cuda", action="store_true", help="Use cuda")
+    parser.add_argument("--save", action="store_true", help="Save model to disk")
     parser.add_argument(
-        '--cuda',
-        action='store_true',
-        help='Use cuda')
-    parser.add_argument(
-        '--save',
-        action='store_true',
-        help='Save model to disk')
-    parser.add_argument(
-        '--seed',
-        type=float,
-        help='Set random seed for reproducibility')
-    # yapf: enable
+        "--seed", type=float, help="Set random seed for reproducibility"
+    )
     args = parser.parse_args(argv)
     return args
 
@@ -242,33 +241,33 @@ def main(argv):
         random.seed(args.seed)
 
     train_transforms = transforms.Compose(
-        [transforms.RandomCrop(args.patch_size),
-         transforms.ToTensor()])
+        [transforms.RandomCrop(args.patch_size), transforms.ToTensor()]
+    )
 
     test_transforms = transforms.Compose(
-        [transforms.CenterCrop(args.patch_size),
-         transforms.ToTensor()])
+        [transforms.CenterCrop(args.patch_size), transforms.ToTensor()]
+    )
 
-    train_dataset = ImageFolder(args.dataset,
-                                split='train',
-                                transform=train_transforms)
-    test_dataset = ImageFolder(args.dataset,
-                               split='test',
-                               transform=test_transforms)
+    train_dataset = ImageFolder(args.dataset, split="train", transform=train_transforms)
+    test_dataset = ImageFolder(args.dataset, split="test", transform=test_transforms)
 
-    train_dataloader = DataLoader(train_dataset,
-                                  batch_size=args.batch_size,
-                                  num_workers=args.num_workers,
-                                  shuffle=True,
-                                  pin_memory=True)
+    train_dataloader = DataLoader(
+        train_dataset,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+        shuffle=True,
+        pin_memory=True,
+    )
 
-    test_dataloader = DataLoader(test_dataset,
-                                 batch_size=args.test_batch_size,
-                                 num_workers=args.num_workers,
-                                 shuffle=False,
-                                 pin_memory=True)
+    test_dataloader = DataLoader(
+        test_dataset,
+        batch_size=args.test_batch_size,
+        num_workers=args.num_workers,
+        shuffle=False,
+        pin_memory=True,
+    )
 
-    device = 'cuda' if args.cuda and torch.cuda.is_available() else 'cpu'
+    device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
     net = AutoEncoder()
     net = net.to(device)
     optimizer = optim.Adam(net.parameters(), lr=args.learning_rate)
@@ -277,8 +276,7 @@ def main(argv):
 
     best_loss = 1e10
     for epoch in range(args.epochs):
-        train_epoch(epoch, train_dataloader, net, criterion, optimizer,
-                    aux_optimizer)
+        train_epoch(epoch, train_dataloader, net, criterion, optimizer, aux_optimizer)
 
         loss = test_epoch(epoch, test_dataloader, net, criterion)
 
@@ -287,13 +285,15 @@ def main(argv):
         if args.save:
             save_checkpoint(
                 {
-                    'epoch': epoch + 1,
-                    'state_dict': net.state_dict(),
-                    'loss': loss,
-                    'optimizer': optimizer.state_dict(),
-                    'aux_optimizer': aux_optimizer.state_dict(),
-                }, is_best)
+                    "epoch": epoch + 1,
+                    "state_dict": net.state_dict(),
+                    "loss": loss,
+                    "optimizer": optimizer.state_dict(),
+                    "aux_optimizer": aux_optimizer.state_dict(),
+                },
+                is_best,
+            )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main(sys.argv[1:])

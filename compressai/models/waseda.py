@@ -38,6 +38,7 @@ class Cheng2020Anchor(JointAutoregressiveHierarchicalPriors):
     Args:
         N (int): Number of channels
     """
+
     def __init__(self, N=192, **kwargs):
         super().__init__(N=N, M=N, **kwargs)
 
@@ -89,7 +90,7 @@ class Cheng2020Anchor(JointAutoregressiveHierarchicalPriors):
     @classmethod
     def from_state_dict(cls, state_dict):
         """Return a new model instance from `state_dict`."""
-        N = state_dict['g_a.0.conv1.weight'].size(0)
+        N = state_dict["g_a.0.conv1.weight"].size(0)
         net = cls(N)
         net.load_state_dict(state_dict)
         return net
@@ -107,6 +108,7 @@ class Cheng2020Attention(Cheng2020Anchor):
     Args:
         N (int): Number of channels
     """
+
     def __init__(self, N=192, **kwargs):
         super().__init__(N=N, **kwargs)
 

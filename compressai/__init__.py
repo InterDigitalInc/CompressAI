@@ -19,12 +19,13 @@ try:
 except ImportError:
     pass
 
-_entropy_coder = 'ans'
+_entropy_coder = "ans"
 _available_entropy_coders = [_entropy_coder]
 
 try:
     import range_coder
-    _available_entropy_coders.append('rangecoder')
+
+    _available_entropy_coders.append("rangecoder")
 except ImportError:
     pass
 
@@ -42,7 +43,8 @@ def set_entropy_coder(entropy_coder):
     if entropy_coder not in _available_entropy_coders:
         raise ValueError(
             f'Invalid entropy coder "{entropy_coder}", choose from'
-            f'({", ".join(_available_entropy_coders)}).')
+            f'({", ".join(_available_entropy_coders)}).'
+        )
     _entropy_coder = entropy_coder
 
 

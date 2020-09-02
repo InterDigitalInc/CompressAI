@@ -26,11 +26,11 @@ from compressai.layers import GDN, MaskedConv2d
 from .utils import conv, deconv, update_registered_buffers
 
 __all__ = [
-    'CompressionModel',
-    'FactorizedPrior',
-    'ScaleHyperprior',
-    'MeanScaleHyperprior',
-    'JointAutoregressiveHierarchicalPriors',
+    "CompressionModel",
+    "FactorizedPrior",
+    "ScaleHyperprior",
+    "MeanScaleHyperprior",
+    "JointAutoregressiveHierarchicalPriors",
 ]
 
 
@@ -42,10 +42,10 @@ class CompressionModel(nn.Module):
         entropy_bottleneck_channels (int): Number of channels of the entropy
             bottleneck
     """
+
     def __init__(self, entropy_bottleneck_channels, init_weights=True):
         super().__init__()
-        self.entropy_bottleneck = EntropyBottleneck(
-            entropy_bottleneck_channels)
+        self.entropy_bottleneck = EntropyBottleneck(entropy_bottleneck_channels)
 
         if init_weights:
             self._initialize_weights()
@@ -54,8 +54,9 @@ class CompressionModel(nn.Module):
         """Return the aggregated loss over the auxiliary entropy bottleneck
         module(s).
         """
-        aux_loss = sum(m.loss() for m in self.modules()
-                       if isinstance(m, EntropyBottleneck))
+        aux_loss = sum(
+            m.loss() for m in self.modules() if isinstance(m, EntropyBottleneck)
+        )
         return aux_loss
 
     def _initialize_weights(self):
@@ -114,6 +115,7 @@ class FactorizedPrior(CompressionModel):
         M (int): Number of channels in the expansion layers (last layer of the
             encoder and last layer of the hyperprior decoder)
     """
+
     def __init__(self, N, M, **kwargs):
         super().__init__(entropy_bottleneck_channels=M, **kwargs)
 
@@ -143,25 +145,27 @@ class FactorizedPrior(CompressionModel):
         x_hat = self.g_s(y_hat)
 
         return {
-            'x_hat': x_hat,
-            'likelihoods': {
-                'y': y_likelihoods,
+            "x_hat": x_hat,
+            "likelihoods": {
+                "y": y_likelihoods,
             },
         }
 
     def load_state_dict(self, state_dict):
         # Dynamically update the entropy bottleneck buffers related to the CDFs
-        update_registered_buffers(self.entropy_bottleneck,
-                                  'entropy_bottleneck',
-                                  ['_quantized_cdf', '_offset', '_cdf_length'],
-                                  state_dict)
+        update_registered_buffers(
+            self.entropy_bottleneck,
+            "entropy_bottleneck",
+            ["_quantized_cdf", "_offset", "_cdf_length"],
+            state_dict,
+        )
         super().load_state_dict(state_dict)
 
     @classmethod
     def from_state_dict(cls, state_dict):
         """Return a new model instance from `state_dict`."""
-        N = state_dict['g_a.0.weight'].size(0)
-        M = state_dict['g_a.6.weight'].size(0)
+        N = state_dict["g_a.0.weight"].size(0)
+        M = state_dict["g_a.6.weight"].size(0)
         net = cls(N, M)
         net.load_state_dict(state_dict)
         return net
@@ -169,13 +173,13 @@ class FactorizedPrior(CompressionModel):
     def compress(self, x):
         y = self.g_a(x)
         y_strings = self.entropy_bottleneck.compress(y)
-        return {'strings': [y_strings], 'shape': y.size()[-2:]}
+        return {"strings": [y_strings], "shape": y.size()[-2:]}
 
     def decompress(self, strings, shape):
         assert isinstance(strings, list) and len(strings) == 1
         y_hat = self.entropy_bottleneck.decompress(strings[0], shape)
         x_hat = self.g_s(y_hat)
-        return {'x_hat': x_hat}
+        return {"x_hat": x_hat}
 
 
 # From Balle's tensorflow compression examples
@@ -184,7 +188,9 @@ SCALES_MAX = 256
 SCALES_LEVELS = 64
 
 
-def get_scale_table(min=SCALES_MIN, max=SCALES_MAX, levels=SCALES_LEVELS):  # pylint: disable=W0622
+def get_scale_table(
+    min=SCALES_MIN, max=SCALES_MAX, levels=SCALES_LEVELS
+):  # pylint: disable=W0622
     return torch.exp(torch.linspace(math.log(min), math.log(max), levels))
 
 
@@ -199,6 +205,7 @@ class ScaleHyperprior(CompressionModel):
         M (int): Number of channels in the expansion layers (last layer of the
             encoder and last layer of the hyperprior decoder)
     """
+
     def __init__(self, N, M, **kwargs):
         super().__init__(entropy_bottleneck_channels=N, **kwargs)
 
@@ -252,30 +259,31 @@ class ScaleHyperprior(CompressionModel):
         x_hat = self.g_s(y_hat)
 
         return {
-            'x_hat': x_hat,
-            'likelihoods': {
-                'y': y_likelihoods,
-                'z': z_likelihoods
-            },
+            "x_hat": x_hat,
+            "likelihoods": {"y": y_likelihoods, "z": z_likelihoods},
         }
 
     def load_state_dict(self, state_dict):
         # Dynamically update the entropy bottleneck buffers related to the CDFs
-        update_registered_buffers(self.entropy_bottleneck,
-                                  'entropy_bottleneck',
-                                  ['_quantized_cdf', '_offset', '_cdf_length'],
-                                  state_dict)
         update_registered_buffers(
-            self.gaussian_conditional, 'gaussian_conditional',
-            ['_quantized_cdf', '_offset', '_cdf_length', 'scale_table'],
-            state_dict)
+            self.entropy_bottleneck,
+            "entropy_bottleneck",
+            ["_quantized_cdf", "_offset", "_cdf_length"],
+            state_dict,
+        )
+        update_registered_buffers(
+            self.gaussian_conditional,
+            "gaussian_conditional",
+            ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
+            state_dict,
+        )
         super().load_state_dict(state_dict)
 
     @classmethod
     def from_state_dict(cls, state_dict):
         """Return a new model instance from `state_dict`."""
-        N = state_dict['g_a.0.weight'].size(0)
-        M = state_dict['g_a.6.weight'].size(0)
+        N = state_dict["g_a.0.weight"].size(0)
+        M = state_dict["g_a.6.weight"].size(0)
         net = cls(N, M)
         net.load_state_dict(state_dict)
         return net
@@ -296,7 +304,7 @@ class ScaleHyperprior(CompressionModel):
         scales_hat = self.h_s(z_hat)
         indexes = self.gaussian_conditional.build_indexes(scales_hat)
         y_strings = self.gaussian_conditional.compress(y, indexes)
-        return {'strings': [y_strings, z_strings], 'shape': z.size()[-2:]}
+        return {"strings": [y_strings, z_strings], "shape": z.size()[-2:]}
 
     def decompress(self, strings, shape):
         assert isinstance(strings, list) and len(strings) == 2
@@ -305,7 +313,7 @@ class ScaleHyperprior(CompressionModel):
         indexes = self.gaussian_conditional.build_indexes(scales_hat)
         y_hat = self.gaussian_conditional.decompress(strings[0], indexes)
         x_hat = self.g_s(y_hat).clamp_(0, 1)
-        return {'x_hat': x_hat}
+        return {"x_hat": x_hat}
 
 
 class MeanScaleHyperprior(ScaleHyperprior):
@@ -319,6 +327,7 @@ class MeanScaleHyperprior(ScaleHyperprior):
         M (int): Number of channels in the expansion layers (last layer of the
             encoder and last layer of the hyperprior decoder)
     """
+
     def __init__(self, N, M, **kwargs):
         super().__init__(N, M, **kwargs)
 
@@ -344,17 +353,12 @@ class MeanScaleHyperprior(ScaleHyperprior):
         z_hat, z_likelihoods = self.entropy_bottleneck(z)
         gaussian_params = self.h_s(z_hat)
         scales_hat, means_hat = gaussian_params.chunk(2, 1)
-        y_hat, y_likelihoods = self.gaussian_conditional(y,
-                                                         scales_hat,
-                                                         means=means_hat)
+        y_hat, y_likelihoods = self.gaussian_conditional(y, scales_hat, means=means_hat)
         x_hat = self.g_s(y_hat)
 
         return {
-            'x_hat': x_hat,
-            'likelihoods': {
-                'y': y_likelihoods,
-                'z': z_likelihoods
-            },
+            "x_hat": x_hat,
+            "likelihoods": {"y": y_likelihoods, "z": z_likelihoods},
         }
 
     def compress(self, x):
@@ -367,10 +371,8 @@ class MeanScaleHyperprior(ScaleHyperprior):
         gaussian_params = self.h_s(z_hat)
         scales_hat, means_hat = gaussian_params.chunk(2, 1)
         indexes = self.gaussian_conditional.build_indexes(scales_hat)
-        y_strings = self.gaussian_conditional.compress(y,
-                                                       indexes,
-                                                       means=means_hat)
-        return {'strings': [y_strings, z_strings], 'shape': z.size()[-2:]}
+        y_strings = self.gaussian_conditional.compress(y, indexes, means=means_hat)
+        return {"strings": [y_strings, z_strings], "shape": z.size()[-2:]}
 
     def decompress(self, strings, shape):
         assert isinstance(strings, list) and len(strings) == 2
@@ -378,11 +380,11 @@ class MeanScaleHyperprior(ScaleHyperprior):
         gaussian_params = self.h_s(z_hat)
         scales_hat, means_hat = gaussian_params.chunk(2, 1)
         indexes = self.gaussian_conditional.build_indexes(scales_hat)
-        y_hat = self.gaussian_conditional.decompress(strings[0],
-                                                     indexes,
-                                                     means=means_hat)
+        y_hat = self.gaussian_conditional.decompress(
+            strings[0], indexes, means=means_hat
+        )
         x_hat = self.g_s(y_hat).clamp_(0, 1)
-        return {'x_hat': x_hat}
+        return {"x_hat": x_hat}
 
 
 class JointAutoregressiveHierarchicalPriors(CompressionModel):
@@ -396,6 +398,7 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
         M (int): Number of channels in the expansion layers (last layer of the
             encoder and last layer of the hyperprior decoder)
     """
+
     def __init__(self, N=192, M=192, **kwargs):
         super().__init__(entropy_bottleneck_channels=N, **kwargs)
 
@@ -443,11 +446,9 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
             nn.Conv2d(M * 8 // 3, M * 6 // 3, 1),
         )
 
-        self.context_prediction = MaskedConv2d(M,
-                                               2 * M,
-                                               kernel_size=5,
-                                               padding=2,
-                                               stride=1)
+        self.context_prediction = MaskedConv2d(
+            M, 2 * M, kernel_size=5, padding=2, stride=1
+        )
 
         self.gaussian_conditional = GaussianConditional(None)
         self.N = int(N)
@@ -460,29 +461,26 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
         params = self.h_s(z_hat)
 
         y_hat = self.gaussian_conditional._quantize(  # pylint: disable=protected-access
-            y, 'noise' if self.training else 'dequantize')
+            y, "noise" if self.training else "dequantize"
+        )
         ctx_params = self.context_prediction(y_hat)
         gaussian_params = self.entropy_parameters(
-            torch.cat((params, ctx_params), dim=1))
+            torch.cat((params, ctx_params), dim=1)
+        )
         scales_hat, means_hat = gaussian_params.chunk(2, 1)
-        _, y_likelihoods = self.gaussian_conditional(y,
-                                                     scales_hat,
-                                                     means=means_hat)
+        _, y_likelihoods = self.gaussian_conditional(y, scales_hat, means=means_hat)
         x_hat = self.g_s(y_hat)
 
         return {
-            'x_hat': x_hat,
-            'likelihoods': {
-                'y': y_likelihoods,
-                'z': z_likelihoods
-            },
+            "x_hat": x_hat,
+            "likelihoods": {"y": y_likelihoods, "z": z_likelihoods},
         }
 
     @classmethod
     def from_state_dict(cls, state_dict):
         """Return a new model instance from `state_dict`."""
-        N = state_dict['g_a.0.weight'].size(0)
-        M = state_dict['g_a.6.weight'].size(0)
+        N = state_dict["g_a.0.weight"].size(0)
+        M = state_dict["g_a.6.weight"].size(0)
         net = cls(N, M)
         net.load_state_dict(state_dict)
         return net
@@ -505,7 +503,6 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
 
         y_hat = F.pad(y, (padding, padding, padding, padding))
 
-        # yapf: enable
         # pylint: disable=protected-access
         cdf = self.gaussian_conditional._quantized_cdf.tolist()
         cdf_lengths = self.gaussian_conditional._cdf_length.reshape(-1).int().tolist()
@@ -521,34 +518,40 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
             indexes_list = []
             for h in range(y_height):
                 for w in range(y_width):
-                    y_crop = y_hat[i:i + 1, :, h:h + kernel_size,
-                                   w:w + kernel_size]
-                    ctx_p = F.conv2d(y_crop,
-                                     self.context_prediction.weight,
-                                     bias=self.context_prediction.bias)
+                    y_crop = y_hat[
+                        i : i + 1, :, h : h + kernel_size, w : w + kernel_size
+                    ]
+                    ctx_p = F.conv2d(
+                        y_crop,
+                        self.context_prediction.weight,
+                        bias=self.context_prediction.bias,
+                    )
 
                     # 1x1 conv for the entropy parameters prediction network, so
                     # we only keep the elements in the "center"
-                    p = params[i:i + 1, :, h:h + 1, w:w + 1]
+                    p = params[i : i + 1, :, h : h + 1, w : w + 1]
                     gaussian_params = self.entropy_parameters(
-                        torch.cat((p, ctx_p), dim=1))
+                        torch.cat((p, ctx_p), dim=1)
+                    )
                     scales_hat, means_hat = gaussian_params.chunk(2, 1)
 
                     indexes = self.gaussian_conditional.build_indexes(scales_hat)
                     y_q = torch.round(y_crop - means_hat)
-                    y_hat[i, :, h + padding, w + padding] = (y_q + means_hat)[i, :, padding, padding]
+                    y_hat[i, :, h + padding, w + padding] = (y_q + means_hat)[
+                        i, :, padding, padding
+                    ]
 
                     symbols_list.extend(y_q[i, :, padding, padding].int().tolist())
                     indexes_list.extend(indexes[i, :].squeeze().int().tolist())
 
-            encoder.encode_with_indexes(symbols_list, indexes_list, cdf,
-                                        cdf_lengths, offsets)
+            encoder.encode_with_indexes(
+                symbols_list, indexes_list, cdf, cdf_lengths, offsets
+            )
 
             string = encoder.flush()
             y_strings.append(string)
-        # yapf: disable
 
-        return {'strings': [y_strings, z_strings], 'shape': z.size()[-2:]}
+        return {"strings": [y_strings, z_strings], "shape": z.size()[-2:]}
 
     def decompress(self, strings, shape):
         assert isinstance(strings, list) and len(strings) == 2
@@ -567,9 +570,10 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
 
         # initialize y_hat to zeros, and pad it so we can directly work with
         # sub-tensors of size (N, C, kernel size, kernel_size)
-        # yapf: disable
-        y_hat = torch.zeros((z_hat.size(0), self.M, y_height + 2 * padding, y_width + 2 * padding),
-                            device=z_hat.device)
+        y_hat = torch.zeros(
+            (z_hat.size(0), self.M, y_height + 2 * padding, y_width + 2 * padding),
+            device=z_hat.device,
+        )
         decoder = RansDecoder()
 
         # pylint: disable=protected-access
@@ -587,14 +591,20 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
                 for w in range(y_width):
                     # only perform the 5x5 convolution on a cropped tensor
                     # centered in (h, w)
-                    y_crop = y_hat[i:i + 1, :, h:h + kernel_size, w:w + kernel_size]
-                    ctx_p = F.conv2d(y_crop,
-                                     self.context_prediction.weight,
-                                     bias=self.context_prediction.bias)
+                    y_crop = y_hat[
+                        i : i + 1, :, h : h + kernel_size, w : w + kernel_size
+                    ]
+                    ctx_p = F.conv2d(
+                        y_crop,
+                        self.context_prediction.weight,
+                        bias=self.context_prediction.bias,
+                    )
                     # 1x1 conv for the entropy parameters prediction network, so
                     # we only keep the elements in the "center"
-                    p = params[i:i + 1, :, h:h + 1, w:w + 1]
-                    gaussian_params = self.entropy_parameters(torch.cat((p, ctx_p), dim=1))
+                    p = params[i : i + 1, :, h : h + 1, w : w + 1]
+                    gaussian_params = self.entropy_parameters(
+                        torch.cat((p, ctx_p), dim=1)
+                    )
                     scales_hat, means_hat = gaussian_params.chunk(2, 1)
 
                     indexes = self.gaussian_conditional.build_indexes(scales_hat)
@@ -603,18 +613,23 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
                         indexes[i, :].squeeze().int().tolist(),
                         cdf,
                         cdf_lengths,
-                        offsets)
+                        offsets,
+                    )
                     rv = torch.Tensor(rv).reshape(1, -1, 1, 1)
 
                     rv = self.gaussian_conditional._dequantize(rv, means_hat)
 
-                    y_hat[i, :, h + padding:h + padding + 1, w + padding:w + padding + 1] = rv
+                    y_hat[
+                        i,
+                        :,
+                        h + padding : h + padding + 1,
+                        w + padding : w + padding + 1,
+                    ] = rv
         y_hat = y_hat[:, :, padding:-padding, padding:-padding]
         # pylint: enable=protected-access
-        # yapf: enable
 
         x_hat = self.g_s(y_hat).clamp_(0, 1)
-        return {'x_hat': x_hat}
+        return {"x_hat": x_hat}
 
     def update(self, scale_table=None, force=False):
         if scale_table is None:
@@ -624,12 +639,16 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
 
     def load_state_dict(self, state_dict):
         # Dynamically update the entropy bottleneck buffers related to the CDFs
-        update_registered_buffers(self.entropy_bottleneck,
-                                  'entropy_bottleneck',
-                                  ['_quantized_cdf', '_offset', '_cdf_length'],
-                                  state_dict)
         update_registered_buffers(
-            self.gaussian_conditional, 'gaussian_conditional',
-            ['_quantized_cdf', '_offset', '_cdf_length', 'scale_table'],
-            state_dict)
+            self.entropy_bottleneck,
+            "entropy_bottleneck",
+            ["_quantized_cdf", "_offset", "_cdf_length"],
+            state_dict,
+        )
+        update_registered_buffers(
+            self.gaussian_conditional,
+            "gaussian_conditional",
+            ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
+            state_dict,
+        )
         super().load_state_dict(state_dict)

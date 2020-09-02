@@ -24,7 +24,7 @@ from compressai.transforms.functional import (
 )
 
 
-@pytest.mark.parametrize('func', (rgb2ycbcr, ycbcr2rgb))
+@pytest.mark.parametrize("func", (rgb2ycbcr, ycbcr2rgb))
 def test_invalid_input(func):
     with pytest.raises(ValueError):
         func(torch.rand(1, 3).numpy())
@@ -39,7 +39,7 @@ def test_invalid_input(func):
         func(torch.rand(1, 3, 4, 4).int())
 
 
-@pytest.mark.parametrize('func', (rgb2ycbcr, ycbcr2rgb))
+@pytest.mark.parametrize("func", (rgb2ycbcr, ycbcr2rgb))
 def test_ok(func):
     x = torch.rand(1, 3, 32, 32)
     rv = func(x)

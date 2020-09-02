@@ -22,9 +22,9 @@ realimport = builtins.__import__
 
 def monkeypatched_import(name, *args):
     # raise ImportError
-    if name == 'compressai.version':
+    if name == "compressai.version":
         raise ImportError
-    if name == 'range_coder':
+    if name == "range_coder":
         raise ImportError
     return realimport(name, *args)
 
@@ -40,4 +40,5 @@ def test_import_errors():
 def test_version():
     builtins.__import__ = realimport
     from compressai.version import __version__
+
     assert len(__version__) == 5

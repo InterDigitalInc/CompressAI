@@ -11,24 +11,28 @@ from compressai.ops import LowerBound
 
 
 class _EntropyCoder:
-    """Proxy class to an actual entropy coder class.
-    """
+    """Proxy class to an actual entropy coder class."""
+
     def __init__(self, method):
         if not isinstance(method, str):
             raise ValueError(f'Invalid method type "{type(method)}"')
 
         from compressai import available_entropy_coders
-        if method not in available_entropy_coders():
-            methods = ', '.join(available_entropy_coders())
-            raise ValueError(f'Unknown entropy coder "{method}"'
-                             f' (available: {methods})')
 
-        if method == 'ans':
+        if method not in available_entropy_coders():
+            methods = ", ".join(available_entropy_coders())
+            raise ValueError(
+                f'Unknown entropy coder "{method}"' f" (available: {methods})"
+            )
+
+        if method == "ans":
             from compressai import ans  # pylint: disable=E0611
+
             encoder = ans.RansEncoder()
             decoder = ans.RansDecoder()
-        elif method == 'rangecoder':
+        elif method == "rangecoder":
             import range_coder  # pylint: disable=E0401
+
             encoder = range_coder.RangeEncoder()
             decoder = range_coder.RangeDecoder()
 
@@ -44,6 +48,7 @@ class _EntropyCoder:
 
 def default_entropy_coder():
     from compressai import get_entropy_coder
+
     return get_entropy_coder()
 
 
@@ -62,10 +67,10 @@ class EntropyModel(nn.Module):
             one if None
         entropy_coder_precision (int): set the entropy coder precision
     """
-    def __init__(self,
-                 likelihood_bound=1e-9,
-                 entropy_coder=None,
-                 entropy_coder_precision=16):
+
+    def __init__(
+        self, likelihood_bound=1e-9, entropy_coder=None, entropy_coder_precision=16
+    ):
         super().__init__()
 
         if entropy_coder is None:
@@ -78,9 +83,9 @@ class EntropyModel(nn.Module):
             self.likelihood_lower_bound = LowerBound(likelihood_bound)
 
         # to be filled on update()
-        self.register_buffer('_offset', torch.IntTensor())
-        self.register_buffer('_quantized_cdf', torch.IntTensor())
-        self.register_buffer('_cdf_length', torch.IntTensor())
+        self.register_buffer("_offset", torch.IntTensor())
+        self.register_buffer("_quantized_cdf", torch.IntTensor())
+        self.register_buffer("_cdf_length", torch.IntTensor())
 
     def forward(self, *args):
         raise NotImplementedError()
@@ -89,18 +94,18 @@ class EntropyModel(nn.Module):
     def _get_noise_cached(self, x):
         # use simple caching method to avoid creating a new tensor every call
         half = float(0.5)
-        if not hasattr(self, '_noise'):
-            setattr(self, '_noise', x.new(x.size()))
+        if not hasattr(self, "_noise"):
+            setattr(self, "_noise", x.new(x.size()))
         self._noise.resize_(x.size())
         self._noise.uniform_(-half, half)
         return self._noise
 
     def _quantize(self, inputs, mode, means=None):
         # type: (Tensor, str, Optional[Tensor]) -> Tensor
-        if mode not in ('noise', 'dequantize', 'symbols'):
+        if mode not in ("noise", "dequantize", "symbols"):
             raise ValueError(f'Invalid quantization mode: "{mode}"')
 
-        if mode == 'noise':
+        if mode == "noise":
             if torch.jit.is_scripting():
                 half = float(0.5)
                 noise = torch.empty_like(inputs).uniform_(-half, half)
@@ -115,12 +120,12 @@ class EntropyModel(nn.Module):
 
         outputs = torch.round(outputs)
 
-        if mode == 'dequantize':
+        if mode == "dequantize":
             if means is not None:
                 outputs += means
             return outputs
 
-        assert mode == 'symbols', mode
+        assert mode == "symbols", mode
         outputs = outputs.int()
         return outputs
 
@@ -136,31 +141,31 @@ class EntropyModel(nn.Module):
     def _pmf_to_cdf(self, pmf, tail_mass, pmf_length, max_length):
         cdf = torch.zeros((len(pmf_length), max_length + 2), dtype=torch.int32)
         for i, p in enumerate(pmf):
-            prob = torch.cat((p[:pmf_length[i]], tail_mass[i]), dim=0)
+            prob = torch.cat((p[: pmf_length[i]], tail_mass[i]), dim=0)
             _cdf = pmf_to_quantized_cdf(prob, self.entropy_coder_precision)
-            cdf[i, :_cdf.size(0)] = _cdf
+            cdf[i, : _cdf.size(0)] = _cdf
         return cdf
 
     def _check_cdf_size(self):
         if self._quantized_cdf.numel() == 0:
-            raise ValueError('Uninitialized CDFs. Run update() first')
+            raise ValueError("Uninitialized CDFs. Run update() first")
 
         if len(self._quantized_cdf.size()) != 2:
-            raise ValueError(f'Invalid CDF size {self._quantized_cdf.size()}')
+            raise ValueError(f"Invalid CDF size {self._quantized_cdf.size()}")
 
     def _check_offsets_size(self):
         if self._offset.numel() == 0:
-            raise ValueError('Uninitialized offsets. Run update() first')
+            raise ValueError("Uninitialized offsets. Run update() first")
 
         if len(self._offset.size()) != 1:
-            raise ValueError(f'Invalid offsets size {self._offset.size()}')
+            raise ValueError(f"Invalid offsets size {self._offset.size()}")
 
     def _check_cdf_length(self):
         if self._cdf_length.numel() == 0:
-            raise ValueError('Uninitialized CDF lengths. Run update() first')
+            raise ValueError("Uninitialized CDF lengths. Run update() first")
 
         if len(self._cdf_length.size()) != 1:
-            raise ValueError(f'Invalid offsets size {self._cdf_length.size()}')
+            raise ValueError(f"Invalid offsets size {self._cdf_length.size()}")
 
     def compress(self, inputs, indexes, means=None):
         """
@@ -171,14 +176,13 @@ class EntropyModel(nn.Module):
             indexes (torch.IntTensor): tensors CDF indexes
             means (torch.Tensor, optional): optional tensor means
         """
-        symbols = self._quantize(inputs, 'symbols', means)
+        symbols = self._quantize(inputs, "symbols", means)
 
         if len(inputs.size()) != 4:
-            raise ValueError('Invalid `inputs` size. Expected a 4-D tensor.')
+            raise ValueError("Invalid `inputs` size. Expected a 4-D tensor.")
 
         if inputs.size() != indexes.size():
-            raise ValueError(
-                '`inputs` and `indexes` should have the same size.')
+            raise ValueError("`inputs` and `indexes` should have the same size.")
 
         self._check_cdf_size()
         self._check_cdf_length()
@@ -191,7 +195,8 @@ class EntropyModel(nn.Module):
                 indexes[i].reshape(-1).int().tolist(),
                 self._quantized_cdf.tolist(),
                 self._cdf_length.reshape(-1).int().tolist(),
-                self._offset.reshape(-1).int().tolist())
+                self._offset.reshape(-1).int().tolist(),
+            )
             strings.append(rv)
         return strings
 
@@ -206,13 +211,13 @@ class EntropyModel(nn.Module):
         """
 
         if not isinstance(strings, (tuple, list)):
-            raise ValueError('Invalid `strings` parameter type.')
+            raise ValueError("Invalid `strings` parameter type.")
 
         if not len(strings) == indexes.size(0):
-            raise ValueError('Invalid strings or indexes parameters')
+            raise ValueError("Invalid strings or indexes parameters")
 
         if len(indexes.size()) != 4:
-            raise ValueError('Invalid `indexes` size. Expected a 4-D tensor.')
+            raise ValueError("Invalid `indexes` size. Expected a 4-D tensor.")
 
         self._check_cdf_size()
         self._check_cdf_length()
@@ -220,19 +225,23 @@ class EntropyModel(nn.Module):
 
         if means is not None:
             if means.size()[:-2] != indexes.size()[:-2]:
-                raise ValueError('Invalid means or indexes parameters')
-            if means.size() != indexes.size() and \
-                    (means.size(2) != 1 or means.size(3) != 1):
-                raise ValueError('Invalid means parameters')
+                raise ValueError("Invalid means or indexes parameters")
+            if means.size() != indexes.size() and (
+                means.size(2) != 1 or means.size(3) != 1
+            ):
+                raise ValueError("Invalid means parameters")
 
         cdf = self._quantized_cdf
         outputs = cdf.new(indexes.size())
 
         for i, s in enumerate(strings):
             values = self.entropy_coder.decode_with_indexes(
-                s, indexes[i].reshape(-1).int().tolist(), cdf.tolist(),
+                s,
+                indexes[i].reshape(-1).int().tolist(),
+                cdf.tolist(),
                 self._cdf_length.reshape(-1).int().tolist(),
-                self._offset.reshape(-1).int().tolist())
+                self._offset.reshape(-1).int().tolist(),
+            )
             outputs[i] = torch.Tensor(values).reshape(outputs[i].size())
         outputs = self._dequantize(outputs, means)
         return outputs
@@ -249,13 +258,16 @@ class EntropyBottleneck(EntropyModel):
     <https://tensorflow.github.io/compression/docs/entropy_bottleneck.html>`_
     for an introduction.
     """
-    def __init__(self,
-                 channels,
-                 *args,
-                 tail_mass=1e-9,
-                 init_scale=10,
-                 filters=(3, 3, 3, 3),
-                 **kwargs):
+
+    def __init__(
+        self,
+        channels,
+        *args,
+        tail_mass=1e-9,
+        init_scale=10,
+        filters=(3, 3, 3, 3),
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
 
         self.channels = int(channels)
@@ -268,8 +280,8 @@ class EntropyBottleneck(EntropyModel):
         self._factors = nn.ParameterList()
         self._matrices = nn.ParameterList()
 
-        filters = (1, ) + self.filters + (1, )
-        scale = self.init_scale**(1 / (len(self.filters) + 1))
+        filters = (1,) + self.filters + (1,)
+        scale = self.init_scale ** (1 / (len(self.filters) + 1))
         channels = self.channels
 
         for i in range(len(self.filters) + 1):
@@ -292,7 +304,7 @@ class EntropyBottleneck(EntropyModel):
         self.quantiles.data = init.repeat(self.quantiles.size(0), 1, 1)
 
         target = np.log(2 / self.tail_mass - 1)
-        self.register_buffer('target', torch.Tensor([-target, 0, target]))
+        self.register_buffer("target", torch.Tensor([-target, 0, target]))
 
     def _medians(self):
         medians = self.quantiles[:, :, 1:2]
@@ -329,15 +341,12 @@ class EntropyBottleneck(EntropyModel):
         lower = self._logits_cumulative(samples - half, stop_gradient=True)
         upper = self._logits_cumulative(samples + half, stop_gradient=True)
         sign = -torch.sign(lower + upper)
-        pmf = torch.abs(
-            torch.sigmoid(sign * upper) - torch.sigmoid(sign * lower))
+        pmf = torch.abs(torch.sigmoid(sign * upper) - torch.sigmoid(sign * lower))
 
         pmf = pmf[:, 0, :]
-        tail_mass = torch.sigmoid(lower[:, 0, :1]) +\
-            torch.sigmoid(-upper[:, 0, -1:])
+        tail_mass = torch.sigmoid(lower[:, 0, :1]) + torch.sigmoid(-upper[:, 0, -1:])
 
-        quantized_cdf = self._pmf_to_cdf(pmf, tail_mass, pmf_length,
-                                         max_length)
+        quantized_cdf = self._pmf_to_cdf(pmf, tail_mass, pmf_length, max_length)
         self._quantized_cdf = quantized_cdf
         self._cdf_length = pmf_length + 2
 
@@ -377,7 +386,8 @@ class EntropyBottleneck(EntropyModel):
         sign = -torch.sign(lower + upper)
         sign = sign.detach()
         likelihood = torch.abs(
-            torch.sigmoid(sign * upper) - torch.sigmoid(sign * lower))
+            torch.sigmoid(sign * upper) - torch.sigmoid(sign * lower)
+        )
         return likelihood
 
     def forward(self, x):
@@ -388,9 +398,9 @@ class EntropyBottleneck(EntropyModel):
 
         # Add noise or quantize
 
-        outputs = self._quantize(values,
-                                 'noise' if self.training else 'dequantize',
-                                 self._medians())
+        outputs = self._quantize(
+            values, "noise" if self.training else "dequantize", self._medians()
+        )
 
         if not torch.jit.is_scripting():
             likelihood = self._likelihood(outputs)
@@ -422,8 +432,7 @@ class EntropyBottleneck(EntropyModel):
         return super().compress(x, indexes, medians)
 
     def decompress(self, strings, size):
-        output_size = (len(strings), self._quantized_cdf.size(0), size[0],
-                       size[1])
+        output_size = (len(strings), self._quantized_cdf.size(0), size[0], size[1])
         indexes = self._build_indexes(output_size)
         medians = self._medians().detach().view(1, -1, 1, 1)
         return super().decompress(strings, indexes, medians)
@@ -438,35 +447,30 @@ class GaussianConditional(EntropyModel):
     *tensorflow/compression*. See the `tensorflow documentation
     <https://tensorflow.github.io/compression/docs/api_docs/python/tfc/GaussianConditional.html>`_.
     """
-    def __init__(self,
-                 scale_table,
-                 *args,
-                 scale_bound=0.11,
-                 tail_mass=1e-9,
-                 **kwargs):
+
+    def __init__(self, scale_table, *args, scale_bound=0.11, tail_mass=1e-9, **kwargs):
         super().__init__(*args, **kwargs)
 
         if not isinstance(scale_table, (type(None), list, tuple)):
-            raise ValueError(
-                f'Invalid type for scale_table "{type(scale_table)}"')
+            raise ValueError(f'Invalid type for scale_table "{type(scale_table)}"')
 
         if isinstance(scale_table, (list, tuple)) and len(scale_table) < 1:
-            raise ValueError(
-                f'Invalid scale_table length "{len(scale_table)}"')
+            raise ValueError(f'Invalid scale_table length "{len(scale_table)}"')
 
-        if scale_table and \
-                (scale_table != sorted(scale_table) or any(s <= 0 for s in scale_table)):
+        if scale_table and (
+            scale_table != sorted(scale_table) or any(s <= 0 for s in scale_table)
+        ):
             raise ValueError(f'Invalid scale_table "({scale_table})"')
 
         self.register_buffer(
-            'scale_table',
-            self._prepare_scale_table(scale_table)
-            if scale_table else torch.Tensor())
+            "scale_table",
+            self._prepare_scale_table(scale_table) if scale_table else torch.Tensor(),
+        )
 
         self.register_buffer(
-            'scale_bound',
-            torch.Tensor([float(scale_bound)])
-            if scale_bound is not None else None)
+            "scale_bound",
+            torch.Tensor([float(scale_bound)]) if scale_bound is not None else None,
+        )
 
         self.tail_mass = float(tail_mass)
         if scale_bound is None and scale_table:
@@ -474,7 +478,7 @@ class GaussianConditional(EntropyModel):
         elif scale_bound > 0:
             self.lower_bound_scale = LowerBound(scale_bound)
         else:
-            raise ValueError('Invalid parameters')
+            raise ValueError("Invalid parameters")
 
     @staticmethod
     def _prepare_scale_table(scale_table):
@@ -483,7 +487,7 @@ class GaussianConditional(EntropyModel):
     def _standardized_cumulative(self, inputs):
         # type: (Tensor) -> Tensor
         half = float(0.5)
-        const = float(-(2**-0.5))
+        const = float(-(2 ** -0.5))
         # Using the complementary error function maximizes numerical precision.
         return half * torch.erfc(const * inputs)
 
@@ -506,20 +510,18 @@ class GaussianConditional(EntropyModel):
         pmf_length = 2 * pmf_center + 1
         max_length = torch.max(pmf_length).item()
 
-        samples = torch.abs(
-            torch.arange(max_length).int() - pmf_center[:, None])
+        samples = torch.abs(torch.arange(max_length).int() - pmf_center[:, None])
         samples_scale = self.scale_table.unsqueeze(1)
         samples = samples.float()
         samples_scale = samples_scale.float()
-        upper = self._standardized_cumulative((.5 - samples) / samples_scale)
-        lower = self._standardized_cumulative((-.5 - samples) / samples_scale)
+        upper = self._standardized_cumulative((0.5 - samples) / samples_scale)
+        lower = self._standardized_cumulative((-0.5 - samples) / samples_scale)
         pmf = upper - lower
 
         tail_mass = 2 * lower[:, :1]
 
         quantized_cdf = torch.Tensor(len(pmf_length), max_length + 2)
-        quantized_cdf = self._pmf_to_cdf(pmf, tail_mass, pmf_length,
-                                         max_length)
+        quantized_cdf = self._pmf_to_cdf(pmf, tail_mass, pmf_length, max_length)
         self._quantized_cdf = quantized_cdf
         self._offset = -pmf_center
         self._cdf_length = pmf_length + 2
@@ -544,9 +546,9 @@ class GaussianConditional(EntropyModel):
 
     def forward(self, inputs, scales, means=None):
         # type: (Tensor, Tensor, Optional[Tensor]) -> Tuple[Tensor, Tensor]
-        outputs = self._quantize(inputs,
-                                 'noise' if self.training else 'dequantize',
-                                 means)
+        outputs = self._quantize(
+            inputs, "noise" if self.training else "dequantize", means
+        )
         likelihood = self._likelihood(outputs, scales, means)
         if self.use_likelihood_bound:
             likelihood = self.likelihood_lower_bound(likelihood)
@@ -554,8 +556,7 @@ class GaussianConditional(EntropyModel):
 
     def build_indexes(self, scales):
         scales = self.lower_bound_scale(scales)
-        indexes = scales.new_full(scales.size(),
-                                  len(self.scale_table) - 1).int()
+        indexes = scales.new_full(scales.size(), len(self.scale_table) - 1).int()
         for s in self.scale_table[:-1]:
             indexes -= (scales <= s).int()
         return indexes
