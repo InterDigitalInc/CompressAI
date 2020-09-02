@@ -31,6 +31,26 @@ pylint:compressai:
     tags:
         - docker
 
+black:compressai:
+    stage: static-analysis
+    before_script:
+        - python --version
+        - pip install black
+    script:
+        - black --check --diff compressai examples tests
+    tags:
+        - docker
+
+isort:compressai:
+    stage: static-analysis
+    before_script:
+        - python --version
+        - pip install isort
+    script:
+        - isort --check-only -v compressai examples tests
+    tags:
+        - docker
+
 test:compressai:pytorch-1.4:
     stage: test
     before_script:
