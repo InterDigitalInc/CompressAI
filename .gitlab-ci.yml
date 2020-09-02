@@ -58,7 +58,12 @@ test:compressai:pytorch-1.4:
         - pip install compressai --find-links=dist/
         - pip install click pytest codecov pytest-cov
     script:
-        - pytest --cov=compressai -s tests
+        - >
+          if [ "$CI_COMMIT_BRANCH" == "master" ]; then
+            pytest --cov=compressai -s tests
+          else
+            pytest --cov=compressai -m "not pretrained" -s tests
+          fi
     tags:
         - docker
 
