@@ -70,8 +70,13 @@ def get_extensions():
     return ext_modules
 
 
-TEST_REQUIRES = ["pytest", "pytest-cov"]
-DEV_REQUIRES = TEST_REQUIRES + ["pylint", "black", "isort", "sphinx"]
+TEST_REQUIRES = ["pytest>=5.4.3", "pytest-cov>=2.9.0"]
+DEV_REQUIRES = TEST_REQUIRES + [
+    "pylint>=2.6.0",
+    "black>=20.8b1",
+    "isort>=5.4.2",
+    "sphinx>=3.0.3",
+]
 
 
 def get_extra_requirements():
