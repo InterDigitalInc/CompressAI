@@ -37,3 +37,8 @@ max-line-length = "88"
 [tool.pylint.typecheck]
 ignored-modules = "torch"
 extension-pkg-whitelist = "compressai.ans,compressai._cxx,range_coder"
+
+[tool.pytest.ini_options]
+markers = [
+    "pretrained: download and check pretrained models (slow, deselect with '-m \"not pretrained\"')",
+]
