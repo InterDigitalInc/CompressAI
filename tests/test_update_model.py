@@ -15,18 +15,15 @@
 import importlib
 import io
 
-from contextlib import redirect_stdout, redirect_stderr
-
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
-import torch
-
 import pytest
+import torch
 
 from compressai.models.priors import FactorizedPrior
 
-update_model_module = importlib.import_module(
-    'compressai.utils.update_model.__main__')
+update_model_module = importlib.import_module("compressai.utils.update_model.__main__")
 
 
 def run_update_model(*args):
@@ -48,86 +45,90 @@ def test_invalid_filepath(tmpdir):
         run_update_model(tmpdir)
 
     # empty/invalid file
-    p = tmpdir.join('hello.txt')
-    p.write('')
+    p = tmpdir.join("hello.txt")
+    p.write("")
     with pytest.raises((EOFError, TypeError)):
         run_update_model(p)
 
 
 def test_valid(tmpdir):
-    p = tmpdir.join('model.pth.tar').strpath
+    p = tmpdir.join("model.pth.tar").strpath
 
     net = FactorizedPrior(32, 64)
     torch.save(net.state_dict(), p)
 
-    stdout, stderr = run_update_model(p, '--architecture', 'factorized-prior',
-                                      '--dir', tmpdir)
+    stdout, stderr = run_update_model(
+        p, "--architecture", "factorized-prior", "--dir", tmpdir
+    )
     assert len(stdout) == 0
     assert len(stderr) == 0
 
-    files = list(Path(tmpdir).glob('*.pth.tar'))
+    files = list(Path(tmpdir).glob("*.pth.tar"))
     assert len(files) == 1
 
-    cdf_len = net.state_dict()['entropy_bottleneck._cdf_length']
-    new_cdf_len = torch.load(files[0])['entropy_bottleneck._cdf_length']
+    cdf_len = net.state_dict()["entropy_bottleneck._cdf_length"]
+    new_cdf_len = torch.load(files[0])["entropy_bottleneck._cdf_length"]
     assert cdf_len.size(0) != new_cdf_len.size(0)
 
 
 def test_valid_name(tmpdir):
-    p = tmpdir.join('model.pth.tar').strpath
+    p = tmpdir.join("model.pth.tar").strpath
 
     net = FactorizedPrior(32, 64)
     torch.save(net.state_dict(), p)
 
-    stdout, stderr = run_update_model(p, '--architecture', 'factorized-prior',
-                                      '--dir', tmpdir, '--name', 'yolo')
+    stdout, stderr = run_update_model(
+        p, "--architecture", "factorized-prior", "--dir", tmpdir, "--name", "yolo"
+    )
     assert len(stdout) == 0
     assert len(stderr) == 0
 
-    files = sorted(list(Path(tmpdir).glob('*.pth.tar')))
+    files = sorted(list(Path(tmpdir).glob("*.pth.tar")))
     assert len(files) == 2
 
-    assert files[0].name == 'model.pth.tar'
-    assert files[1].name[:5] == 'yolo-'
+    assert files[0].name == "model.pth.tar"
+    assert files[1].name[:5] == "yolo-"
 
 
 def test_valid_no_update(tmpdir):
-    p = tmpdir.join('model.pth.tar').strpath
+    p = tmpdir.join("model.pth.tar").strpath
 
     net = FactorizedPrior(32, 64)
     torch.save(net.state_dict(), p)
 
-    stdout, stderr = run_update_model(p, '--architecture', 'factorized-prior',
-                                      '--dir', tmpdir, '--no-update')
+    stdout, stderr = run_update_model(
+        p, "--architecture", "factorized-prior", "--dir", tmpdir, "--no-update"
+    )
     assert len(stdout) == 0
     assert len(stderr) == 0
 
-    files = list(Path(tmpdir).glob('*.pth.tar'))
+    files = list(Path(tmpdir).glob("*.pth.tar"))
     assert len(files) == 1
 
-    cdf_len = net.state_dict()['entropy_bottleneck._cdf_length']
-    new_cdf_len = torch.load(files[0])['entropy_bottleneck._cdf_length']
+    cdf_len = net.state_dict()["entropy_bottleneck._cdf_length"]
+    new_cdf_len = torch.load(files[0])["entropy_bottleneck._cdf_length"]
     assert cdf_len.size(0) == new_cdf_len.size(0)
 
 
 def test_invalid_model(tmpdir):
-    p = tmpdir.join('model.pth.tar').strpath
+    p = tmpdir.join("model.pth.tar").strpath
 
     net = FactorizedPrior(32, 64)
     torch.save(net.state_dict(), p)
 
     with pytest.raises(SystemExit):
-        run_update_model(p, '--architecture', 'foobar')
+        run_update_model(p, "--architecture", "foobar")
 
 
 def test_load(tmpdir):
-    p = tmpdir.join('model.pth.tar').strpath
+    p = tmpdir.join("model.pth.tar").strpath
 
     net = FactorizedPrior(32, 64)
 
-    for k in ['network', 'state_dict']:
+    for k in ["network", "state_dict"]:
         torch.save({k: net.state_dict()}, p)
-        stdout, stderr = run_update_model(p, '--architecture',
-                                          'factorized-prior', '--dir', tmpdir)
+        stdout, stderr = run_update_model(
+            p, "--architecture", "factorized-prior", "--dir", tmpdir
+        )
         assert len(stdout) == 0
         assert len(stderr) == 0

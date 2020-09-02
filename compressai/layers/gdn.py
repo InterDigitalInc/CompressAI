@@ -31,11 +31,8 @@ class GDN(nn.Module):
        y[i] = \frac{x[i]}{\sqrt{\beta[i] + \sum_j(\gamma[j, i] * x[j]^2)}}
 
     """
-    def __init__(self,
-                 in_channels,
-                 inverse=False,
-                 beta_min=1e-6,
-                 gamma_init=0.1):
+
+    def __init__(self, in_channels, inverse=False, beta_min=1e-6, gamma_init=0.1):
         super().__init__()
 
         beta_min = float(beta_min)
@@ -58,7 +55,7 @@ class GDN(nn.Module):
         beta = self.beta_reparam(self.beta)
         gamma = self.gamma_reparam(self.gamma)
         gamma = gamma.reshape(C, C, 1, 1)
-        norm = F.conv2d(x**2, gamma, beta)
+        norm = F.conv2d(x ** 2, gamma, beta)
 
         if self.inverse:
             norm = torch.sqrt(norm)
@@ -73,14 +70,16 @@ class GDN(nn.Module):
 class GDN1(GDN):
     r"""Simplified GDN layer.
 
-    Introduced in `"Computationally Efficient Neural Image Compression" <http://arxiv.org/abs/1912.08771>`_,
-    by Johnston, Nick, Elad Eban, Ariel Gordon, and Johannes Ballé, (2019).
+    Introduced in `"Computationally Efficient Neural Image Compression"
+    <http://arxiv.org/abs/1912.08771>`_, by Johnston, Nick, Elad Eban, Ariel
+    Gordon, and Johannes Ballé, (2019).
 
     .. math::
 
         y[i] = \frac{x[i]}{\beta[i] + \sum_j(\gamma[j, i] * |x[j]|}
 
     """
+
     def forward(self, x):
         _, C, _, _ = x.size()
 
@@ -90,7 +89,7 @@ class GDN1(GDN):
         norm = F.conv2d(torch.abs(x), gamma, beta)
 
         if not self.inverse:
-            norm = 1. / norm
+            norm = 1.0 / norm
 
         out = x * norm
 

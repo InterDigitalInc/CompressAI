@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 import torch
 
-import pytest
-
-from compressai.entropy_models import (EntropyBottleneck, EntropyModel,
-                                       GaussianConditional)
-
+from compressai.entropy_models import (
+    EntropyBottleneck,
+    EntropyModel,
+    GaussianConditional,
+)
 from compressai.models.priors import FactorizedPrior
 
 
@@ -31,11 +32,11 @@ class TestEntropyModel:
     def test_quantize_invalid(self, entropy_model):
         x = torch.rand(1, 3, 4, 4)
         with pytest.raises(ValueError):
-            entropy_model._quantize(x, mode='toto')
+            entropy_model._quantize(x, mode="toto")
 
     def test_quantize_noise(self, entropy_model):
         x = torch.rand(1, 3, 4, 4)
-        y = entropy_model._quantize(x, 'noise')
+        y = entropy_model._quantize(x, "noise")
 
         assert y.shape == x.shape
         assert ((y - x) <= 0.5).all()
@@ -44,7 +45,7 @@ class TestEntropyModel:
 
     def test_quantize_symbols(self, entropy_model):
         x = torch.rand(1, 3, 4, 4)
-        y = entropy_model._quantize(x, 'symbols')
+        y = entropy_model._quantize(x, "symbols")
 
         assert y.shape == x.shape
         assert (y == torch.round(x).int()).all()
@@ -52,7 +53,7 @@ class TestEntropyModel:
     def test_quantize_dequantize(self, entropy_model):
         x = torch.rand(1, 3, 4, 4)
         means = torch.rand(1, 3, 4, 4)
-        y = entropy_model._quantize(x, 'dequantize', means)
+        y = entropy_model._quantize(x, "dequantize", means)
 
         assert y.shape == x.shape
         assert (y == torch.round(x - means) + means).all()
@@ -71,10 +72,10 @@ class TestEntropyModel:
 
     def test_invalid_coder(self):
         with pytest.raises(ValueError):
-            entropy_model = EntropyModel(entropy_coder='huffman')
+            entropy_model = EntropyModel(entropy_coder="huffman")
 
         with pytest.raises(ValueError):
-            entropy_model = EntropyModel(entropy_coder=0xff)
+            entropy_model = EntropyModel(entropy_coder=0xFF)
 
     def test_invalid_inputs(self, entropy_model):
         with pytest.raises(TypeError):
@@ -112,20 +113,19 @@ class TestEntropyModel:
 
     def test_invalid_decompress(self, entropy_model):
         with pytest.raises(TypeError):
-            entropy_model.decompress(['ssss'])
+            entropy_model.decompress(["ssss"])
 
         with pytest.raises(ValueError):
-            entropy_model.decompress('sss', torch.rand(1, 3, 4, 4))
+            entropy_model.decompress("sss", torch.rand(1, 3, 4, 4))
 
         with pytest.raises(ValueError):
-            entropy_model.decompress(['sss'], torch.rand(1, 4, 4))
+            entropy_model.decompress(["sss"], torch.rand(1, 4, 4))
 
         with pytest.raises(ValueError):
-            entropy_model.decompress(['sss'], torch.rand(2, 4, 4))
+            entropy_model.decompress(["sss"], torch.rand(2, 4, 4))
 
         with pytest.raises(ValueError):
-            entropy_model.decompress(['sss'], torch.rand(1, 4, 4),
-                                     torch.rand(2, 4, 4))
+            entropy_model.decompress(["sss"], torch.rand(1, 4, 4), torch.rand(2, 4, 4))
 
 
 class TestEntropyBottleneck:

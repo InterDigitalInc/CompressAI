@@ -1,10 +1,10 @@
 from . import functional as F_transforms
 
 __all__ = [
-    'RGB2YCbCr',
-    'YCbCr2RGB',
-    'YUV444To420',
-    'YUV420To444',
+    "RGB2YCbCr",
+    "YCbCr2RGB",
+    "YUV444To420",
+    "YUV420To444",
 ]
 
 
@@ -13,6 +13,7 @@ class RGB2YCbCr:
     The tensor is expected to be in the [0, 1] floating point range, with a
     shape of (3xHxW) or (Nx3xHxW).
     """
+
     def __call__(self, rgb):
         """
         Args:
@@ -24,7 +25,7 @@ class RGB2YCbCr:
         return F_transforms.rgb2ycbcr(rgb)
 
     def ___repr__(self):
-        return f'{self.__class__.__name__}()'
+        return f"{self.__class__.__name__}()"
 
 
 class YCbCr2RGB:
@@ -32,6 +33,7 @@ class YCbCr2RGB:
     The tensor is expected to be in the [0, 1] floating point range, with a
     shape of (3xHxW) or (Nx3xHxW).
     """
+
     def __call__(self, ycbcr):
         """
         Args:
@@ -43,14 +45,15 @@ class YCbCr2RGB:
         return F_transforms.ycbcr2rgb(ycbcr)
 
     def ___repr__(self):
-        return f'{self.__class__.__name__}()'
+        return f"{self.__class__.__name__}()"
 
 
 class YUV444To420:
     """Convert a YUV 444 tensor to a 420 representation.
 
     Args:
-        mode (str): algorithm used for downsampling: ``'avg_pool'`` |. Default ``'avg_pool'``
+        mode (str): algorithm used for downsampling: ``'avg_pool'`` |. Default
+            ``'avg_pool'``
 
     Example:
         >>> x = torch.rand(1, 3, 32, 32)
@@ -58,7 +61,8 @@ class YUV444To420:
         >>> y.size()  # 1, 1, 32, 32
         >>> u.size()  # 1, 1, 16, 16
     """
-    def __init__(self, mode: str = 'avg_pool'):
+
+    def __init__(self, mode: str = "avg_pool"):
         self.mode = str(mode)
 
     def __call__(self, yuv):
@@ -74,7 +78,7 @@ class YUV444To420:
         return F_transforms.yuv_444_to_420(yuv, mode=self.mode)
 
     def ___repr__(self):
-        return f'{self.__class__.__name__}()'
+        return f"{self.__class__.__name__}()"
 
 
 class YUV420To444:
@@ -93,7 +97,8 @@ class YUV420To444:
         >>> x = YUV420To444()((y, u, v))
         >>> x.size()  # 1, 3, 32, 32
     """
-    def __init__(self, mode: str = 'bilinear', return_tuple: bool = False):
+
+    def __init__(self, mode: str = "bilinear", return_tuple: bool = False):
         self.mode = str(mode)
         self.return_tuple = bool(return_tuple)
 
@@ -110,4 +115,4 @@ class YUV420To444:
         return F_transforms.yuv_420_to_444(yuv, return_tuple=self.return_tuple)
 
     def ___repr__(self):
-        return f'{self.__class__.__name__}(return_tuple={self.return_tuple})'
+        return f"{self.__class__.__name__}(return_tuple={self.return_tuple})"

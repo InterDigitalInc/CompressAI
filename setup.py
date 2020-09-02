@@ -66,7 +66,7 @@ def get_extensions():
 
 
 TEST_REQUIRES = ['pytest', 'pytest-cov']
-DEV_REQUIRES = TEST_REQUIRES + ['pylint', 'yapf', 'sphinx']
+DEV_REQUIRES = TEST_REQUIRES + ['pylint', 'black', 'isort', 'sphinx']
 
 def get_extra_requirements():
     extras_require = {

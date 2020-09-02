@@ -13,16 +13,18 @@
 # limitations under the License.
 
 import pytest
-
 import torch
 
-from compressai.transforms.functional import (rgb2ycbcr, ycbcr2rgb,
-                                              yuv_444_to_420, yuv_420_to_444)
-from compressai.transforms import (RGB2YCbCr, YCbCr2RGB, YUV444To420,
-                                   YUV420To444)
+from compressai.transforms import RGB2YCbCr, YCbCr2RGB, YUV420To444, YUV444To420
+from compressai.transforms.functional import (
+    rgb2ycbcr,
+    ycbcr2rgb,
+    yuv_420_to_444,
+    yuv_444_to_420,
+)
 
 
-@pytest.mark.parametrize('func', (rgb2ycbcr, ycbcr2rgb))
+@pytest.mark.parametrize("func", (rgb2ycbcr, ycbcr2rgb))
 def test_invalid_input(func):
     with pytest.raises(ValueError):
         func(torch.rand(1, 3).numpy())
@@ -37,7 +39,7 @@ def test_invalid_input(func):
         func(torch.rand(1, 3, 4, 4).int())
 
 
-@pytest.mark.parametrize('func', (rgb2ycbcr, ycbcr2rgb))
+@pytest.mark.parametrize("func", (rgb2ycbcr, ycbcr2rgb))
 def test_ok(func):
     x = torch.rand(1, 3, 32, 32)
     rv = func(x)
