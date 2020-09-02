@@ -5,7 +5,7 @@ requires = ['setuptools', 'wheel', 'torch>=1.4.0', 'numpy']
 line-length = 88
 target-version = ['py36', 'py37', 'py38']
 include = '\.pyi?$'
-exclude = ''
+exclude = '''
 /(
 		\.eggs
 		| \.git
@@ -14,8 +14,8 @@ exclude = ''
 		| _build
 		| build
 		| dist
- )/
-''
+)/
+'''
 
 [tool.isort]
 multi_line_output = 3
@@ -36,5 +36,3 @@ max-line-length = "88"
 [tool.pylint.typecheck]
 ignored-modules = "torch"
 extension-pkg-whitelist = "compressai.ans,compressai._cxx,range_coder"
-
-[MESSAGES CONTROL]
