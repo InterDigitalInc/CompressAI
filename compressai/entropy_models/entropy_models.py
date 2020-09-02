@@ -4,12 +4,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# pylint: disable=E0611,E0401
 from compressai._CXX import (
     pmf_to_quantized_cdf as _pmf_to_quantized_cdf,
-)
-
-# pylint: enable=E0611,E0401
+)  # pylint: disable=E0611,E0401
 
 from compressai.ops import LowerBound
 
