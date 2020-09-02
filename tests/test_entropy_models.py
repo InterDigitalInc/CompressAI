@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 import torch
 
-import pytest
-
-from compressai.entropy_models import (EntropyBottleneck, EntropyModel,
-                                       GaussianConditional)
-
+from compressai.entropy_models import (
+    EntropyBottleneck,
+    EntropyModel,
+    GaussianConditional,
+)
 from compressai.models.priors import FactorizedPrior
 
 

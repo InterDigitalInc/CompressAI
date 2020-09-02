@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Union, Tuple
-
 import io
 import os
 import platform
@@ -21,13 +19,13 @@ import sys
 import time
 
 from tempfile import mkstemp
-
-import PIL
-import PIL.Image as Image
+from typing import Tuple, Union
 
 import numpy as np
-
+import PIL
+import PIL.Image as Image
 import torch
+
 from pytorch_msssim import ms_ssim
 
 # from torchvision.datasets.folder

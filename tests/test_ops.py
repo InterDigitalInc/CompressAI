@@ -14,7 +14,7 @@
 
 import torch
 
-from compressai.ops import (LowerBound, NonNegativeParametrizer, ste_round)
+from compressai.ops import LowerBound, NonNegativeParametrizer, ste_round
 
 
 class TestSTERound:

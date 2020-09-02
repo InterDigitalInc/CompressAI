@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
-
 import compressai
+import pytest
 
 
 def test_get_entropy_coder():

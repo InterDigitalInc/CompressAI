@@ -18,19 +18,21 @@ Update the CDFs parameters of a trained model.
 To be called on a model checkpoint after training. This will update the internal
 CDFs related buffers required for entropy coding.
 """
-from typing import Dict
-
 import argparse
 import hashlib
 import sys
 
 from pathlib import Path
+from typing import Dict
 
 import torch
 
-from compressai.models.priors import (FactorizedPrior, MeanScaleHyperprior,
-                                      ScaleHyperprior,
-                                      JointAutoregressiveHierarchicalPriors)
+from compressai.models.priors import (
+    FactorizedPrior,
+    JointAutoregressiveHierarchicalPriors,
+    MeanScaleHyperprior,
+    ScaleHyperprior,
+)
 
 
 def sha256_file(filepath: Path, len_hash_prefix: int = 8) -> str:

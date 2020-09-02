@@ -1,12 +1,12 @@
 import numpy as np
 import scipy.stats
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from compressai._CXX import \
-    pmf_to_quantized_cdf as _pmf_to_quantized_cdf  # pylint: disable=E0611,E0401
+from compressai._CXX import (
+    pmf_to_quantized_cdf as _pmf_to_quantized_cdf,  # pylint: disable=E0611,E0401
+)
 from compressai.ops import LowerBound
 
 

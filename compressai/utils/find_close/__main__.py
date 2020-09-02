@@ -20,15 +20,13 @@ Example usages:
     * :code:`python -m compressai.utils.find_close jpeg ~/picture.png 35 --metric psnr --save`
 """
 
-from typing import List, Tuple, Dict
-
 import argparse
 import sys
 
-from PIL import Image
+from typing import Dict, List, Tuple
 
-from compressai.utils.bench.codecs import (Codec, JPEG, WebP, JPEG2000, BPG,
-                                           VTM, HM, AV1)
+from compressai.utils.bench.codecs import AV1, BPG, HM, JPEG, JPEG2000, VTM, Codec, WebP
+from PIL import Image
 
 
 def get_codec_q_bounds(codec: Codec) -> Tuple[bool, int, int]:

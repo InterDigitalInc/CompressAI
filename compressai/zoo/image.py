@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from compressai.models import (
+    Cheng2020Anchor,
+    Cheng2020Attention,
+    FactorizedPrior,
+    JointAutoregressiveHierarchicalPriors,
+    MeanScaleHyperprior,
+    ScaleHyperprior,
+)
 from torch.hub import load_state_dict_from_url
-
-from compressai.models import (FactorizedPrior, ScaleHyperprior,
-                               MeanScaleHyperprior,
-                               JointAutoregressiveHierarchicalPriors,
-                               Cheng2020Anchor, Cheng2020Attention)
 
 __all__ = [
     'bmshj2018_factorized',

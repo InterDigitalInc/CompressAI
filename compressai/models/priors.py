@@ -18,11 +18,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from compressai.entropy_models import (EntropyBottleneck, GaussianConditional)
+from compressai.ans import BufferedRansEncoder  # pylint: disable=E0611,E0401
+from compressai.ans import RansDecoder
+from compressai.entropy_models import EntropyBottleneck, GaussianConditional
 from compressai.layers import GDN, MaskedConv2d
-from compressai.ans import BufferedRansEncoder, RansDecoder  # pylint: disable=E0611,E0401
 
-from .utils import update_registered_buffers, conv, deconv
+from .utils import conv, deconv, update_registered_buffers
 
 __all__ = [
     'CompressionModel',

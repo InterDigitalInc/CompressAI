@@ -19,17 +19,15 @@ import shutil
 import sys
 
 import torch
-import torch.optim as optim
 import torch.nn as nn
-
-from torch.utils.data import DataLoader
-
-from torchvision import transforms
+import torch.optim as optim
 
 from compressai.datasets import ImageFolder
 from compressai.layers import GDN
 from compressai.models import CompressionModel
 from compressai.models.utils import conv, deconv
+from torch.utils.data import DataLoader
+from torchvision import transforms
 
 
 class AutoEncoder(CompressionModel):

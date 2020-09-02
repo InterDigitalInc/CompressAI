@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import torch
-
 import pytest
+import torch
 
 from compressai.layers import GDN, GDN1, MaskedConv2d
 

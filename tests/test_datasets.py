@@ -13,13 +13,11 @@
 # limitations under the License.
 
 import pytest
-
 import torch
 
-from torchvision import transforms
-from PIL import Image
-
 from compressai.datasets import ImageFolder
+from PIL import Image
+from torchvision import transforms
 
 
 def save_fake_image(filepath, size=(512, 512)):

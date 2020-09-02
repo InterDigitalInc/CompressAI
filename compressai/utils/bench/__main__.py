@@ -15,19 +15,17 @@
 Collect performance metrics of published traditional or end-to-end image
 codecs.
 """
-from typing import List
-
 import argparse
 import json
+import multiprocessing as mp
 import os
 import sys
 
-import multiprocessing as mp
-
 from collections import defaultdict
 from itertools import starmap
+from typing import List
 
-from .codecs import Codec, JPEG, WebP, JPEG2000, BPG, TFCI, VTM, HM, AV1
+from .codecs import AV1, BPG, HM, JPEG, JPEG2000, TFCI, VTM, Codec, WebP
 
 # from torchvision.datasets.folder
 IMG_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif',

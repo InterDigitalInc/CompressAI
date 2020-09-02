@@ -14,9 +14,14 @@
 
 import torch.nn as nn
 
-from compressai.layers import (conv3x3, subpel_conv3x3,
-                               ResidualBlockWithStride, ResidualBlockUpsample,
-                               ResidualBlock, AttentionBlock)
+from compressai.layers import (
+    AttentionBlock,
+    ResidualBlock,
+    ResidualBlockUpsample,
+    ResidualBlockWithStride,
+    conv3x3,
+    subpel_conv3x3,
+)
 
 from .priors import JointAutoregressiveHierarchicalPriors
 

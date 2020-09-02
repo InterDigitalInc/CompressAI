@@ -12,26 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 import torch
 import torch.nn as nn
 
-import pytest
-
-from compressai.zoo import (bmshj2018_factorized, bmshj2018_hyperprior,
-                            mbt2018_mean, mbt2018, cheng2020_anchor,
-                            cheng2020_attn)
-from compressai.zoo.image import _load_model
-
-from compressai.models.priors import (SCALES_LEVELS, SCALES_MAX, SCALES_MIN,
-                                      CompressionModel, FactorizedPrior,
-                                      MeanScaleHyperprior, ScaleHyperprior,
-                                      JointAutoregressiveHierarchicalPriors,
-                                      get_scale_table)
 from compressai.models import Cheng2020Anchor, Cheng2020Attention
-
-from compressai.models.utils import (find_named_module,
-                                     update_registered_buffers,
-                                     _update_registered_buffer)
+from compressai.models.priors import (
+    SCALES_LEVELS,
+    SCALES_MAX,
+    SCALES_MIN,
+    CompressionModel,
+    FactorizedPrior,
+    JointAutoregressiveHierarchicalPriors,
+    MeanScaleHyperprior,
+    ScaleHyperprior,
+    get_scale_table,
+)
+from compressai.models.utils import (
+    _update_registered_buffer,
+    find_named_module,
+    update_registered_buffers,
+)
+from compressai.zoo import (
+    bmshj2018_factorized,
+    bmshj2018_hyperprior,
+    cheng2020_anchor,
+    cheng2020_attn,
+    mbt2018,
+    mbt2018_mean,
+)
+from compressai.zoo.image import _load_model
 
 
 class TestCompressionModel:
