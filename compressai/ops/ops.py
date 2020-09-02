@@ -20,7 +20,8 @@ def ste_round(x):
     Rounding with non-zero gradients. Gradients are approximated by replacing
     the derivative by the identity function.
 
-    Used in `"Lossy Image Compression with Compressive Autoencoders" <https://arxiv.org/abs/1703.00395>`_
+    Used in `"Lossy Image Compression with Compressive Autoencoders"
+    <https://arxiv.org/abs/1703.00395>`_
 
     .. note::
 

@@ -15,9 +15,10 @@
 import pytest
 import torch
 
-from compressai.datasets import ImageFolder
 from PIL import Image
 from torchvision import transforms
+
+from compressai.datasets import ImageFolder
 
 
 def save_fake_image(filepath, size=(512, 512)):

@@ -23,14 +23,16 @@ import time
 
 from collections import defaultdict
 
-import compressai
 import torch
 import torch.nn.functional as F
 
-from compressai.zoo import models
 from PIL import Image
 from pytorch_msssim import ms_ssim
 from torchvision import transforms
+
+import compressai
+
+from compressai.zoo import models
 
 # from torchvision.datasets.folder
 IMG_EXTENSIONS = (

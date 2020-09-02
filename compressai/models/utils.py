@@ -89,7 +89,8 @@ def update_registered_buffers(
         module_name (str): module name in the state dict
         buffer_names (list(str)): list of the buffer names to resize in the module
         state_dict (dict): the state dict
-        policy (str): Update policy, choose from ('resize_if_empty', 'resize', 'register')
+        policy (str): Update policy, choose from
+            ('resize_if_empty', 'resize', 'register')
         dtype (dtype): Type of buffer to be registered (when policy is 'register')
     """
     valid_buffer_names = [n for n, _ in module.named_buffers()]

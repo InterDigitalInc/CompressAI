@@ -19,13 +19,15 @@ import time
 
 from pathlib import Path
 
-import compressai
 import torch
 import torch.nn.functional as F
 
-from compressai.zoo import models
 from PIL import Image
 from torchvision.transforms import ToPILImage, ToTensor
+
+import compressai
+
+from compressai.zoo import models
 
 model_ids = {k: i for i, k in enumerate(models.keys())}
 

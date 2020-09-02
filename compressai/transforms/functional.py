@@ -75,7 +75,8 @@ def yuv_444_to_420(
         yuv (torch.Tensor or (torch.Tensor, torch.Tensor, torch.Tensor)): 444
             input to be downsampled. Takes either a (Nx3xHxW) tensor or a tuple
             of 3 (Nx1xHxW) tensors.
-        mode (str): algorithm used for downsampling: ``'avg_pool'`` |. Default ``'avg_pool'``
+        mode (str): algorithm used for downsampling: ``'avg_pool'`` |. Default
+            ``'avg_pool'``
 
     Returns:
         (torch.Tensor, torch.Tensor, torch.Tensor): Converted 420
@@ -106,7 +107,8 @@ def yuv_420_to_444(
     Args:
         yuv (torch.Tensor, torch.Tensor, torch.Tensor): 420 input frames in
             (Nx1xHxW) format
-        mode (str): algorithm used for upsampling: ``'bilinear'`` | ``'nearest'`` Default ``'bilinear'``
+        mode (str): algorithm used for upsampling: ``'bilinear'`` |
+            ``'nearest'`` Default ``'bilinear'``
         return_tuple (bool): return input as tuple of tensors instead of a
             concatenated tensor, 3 (Nx1xHxW) tensors instead of one (Nx3xHxW)
             tensor (default: False)

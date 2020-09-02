@@ -52,7 +52,8 @@ class YUV444To420:
     """Convert a YUV 444 tensor to a 420 representation.
 
     Args:
-        mode (str): algorithm used for downsampling: ``'avg_pool'`` |. Default ``'avg_pool'``
+        mode (str): algorithm used for downsampling: ``'avg_pool'`` |. Default
+            ``'avg_pool'``
 
     Example:
         >>> x = torch.rand(1, 3, 32, 32)

@@ -22,12 +22,13 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+from torch.utils.data import DataLoader
+from torchvision import transforms
+
 from compressai.datasets import ImageFolder
 from compressai.layers import GDN
 from compressai.models import CompressionModel
 from compressai.models.utils import conv, deconv
-from torch.utils.data import DataLoader
-from torchvision import transforms
 
 
 class AutoEncoder(CompressionModel):

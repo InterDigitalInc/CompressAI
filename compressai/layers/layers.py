@@ -22,11 +22,12 @@ class MaskedConv2d(nn.Conv2d):
     r"""Masked 2D convolution implementation, mask future "unseen" pixels.
     Useful for building auto-regressive network components.
 
-    Introduced in `"Conditional Image Generation with PixelCNN Decoders" <https://arxiv.org/abs/1606.05328>`_.
+    Introduced in `"Conditional Image Generation with PixelCNN Decoders"
+    <https://arxiv.org/abs/1606.05328>`_.
 
     Inherits the same arguments as a `nn.Conv2d`. Use `mask_type='A'` for the
-    first layer (which also masks the "current pixel"), `mask_type='B'` for the following
-    layers.
+    first layer (which also masks the "current pixel"), `mask_type='B'` for the
+    following layers.
     """
 
     def __init__(self, *args, mask_type="A", **kwargs):

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from torch.hub import load_state_dict_from_url
+
 from compressai.models import (
     Cheng2020Anchor,
     Cheng2020Attention,
@@ -20,7 +22,6 @@ from compressai.models import (
     MeanScaleHyperprior,
     ScaleHyperprior,
 )
-from torch.hub import load_state_dict_from_url
 
 __all__ = [
     "bmshj2018_factorized",

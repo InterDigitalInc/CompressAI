@@ -342,7 +342,10 @@ class BPG(BinaryCodec):
 
     @property
     def name(self):
-        return f"BPG {self.bitdepth}b {self.subsampling_mode} {self.encoder} {self.color_mode}"
+        return (
+            f"BPG {self.bitdepth}b {self.subsampling_mode} {self.encoder} "
+            f"{self.color_mode}"
+        )
 
     @property
     def description(self):

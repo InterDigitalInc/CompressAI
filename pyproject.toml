@@ -25,7 +25,7 @@ force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
 line_length = 88
-known_third_party = "compressai,torchvision,torch"
+known_third_party = "PIL,pytorch_msssim,torchvision,torch"
 
 [tool.pylint.messages_control]
 disable = "C0330,C0326,bad-continuation,C0103,C0304,W0221,R0902,R0914,C0114,W0511,C0116,W0201,C0415,R0401,R0201,R0913,R0903,R0801"

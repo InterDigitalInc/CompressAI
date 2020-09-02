@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# pylint: disable=line-too-long
 """
 Find the closest codec quality parameter to reach a given metric (bpp, ms-ssim,
 or psnr).
@@ -19,14 +21,16 @@ Example usages:
     * :code:`python -m compressai.utils.find_close webp ~/picture.png 0.5 --metric bpp`
     * :code:`python -m compressai.utils.find_close jpeg ~/picture.png 35 --metric psnr --save`
 """
+# pylint: enable=line-too-long
 
 import argparse
 import sys
 
 from typing import Dict, List, Tuple
 
-from compressai.utils.bench.codecs import AV1, BPG, HM, JPEG, JPEG2000, VTM, Codec, WebP
 from PIL import Image
+
+from compressai.utils.bench.codecs import AV1, BPG, HM, JPEG, JPEG2000, VTM, Codec, WebP
 
 
 def get_codec_q_bounds(codec: Codec) -> Tuple[bool, int, int]:
