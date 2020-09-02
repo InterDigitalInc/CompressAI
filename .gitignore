@@ -1,8 +1,10 @@
+compressai/version.py
 tags
+builds
 *.inc
 *.bin
-compressai/version.py
-venv-*/
+venv/
+venv*/
 
 # Created by gitignore.io
 ### Python ###

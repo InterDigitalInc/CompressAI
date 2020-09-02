@@ -25,47 +25,47 @@ import compressai.utils
 def get_utils():
     rootdir = Path(compressai.utils.__file__).parent
     for d in rootdir.iterdir():
-        if d.is_dir() and (d / '__main__.py').is_file():
+        if d.is_dir() and (d / "__main__.py").is_file():
             yield d
 
 
 def main():
-    fout = open('cli_usage.inc', 'w')
+    fout = open("cli_usage.inc", "w")
 
     for p in get_utils():
         try:
-            m = importlib.import_module(f'compressai.utils.{p.name}.__main__')
+            m = importlib.import_module(f"compressai.utils.{p.name}.__main__")
         except ImportError:
             continue
 
-        if not hasattr(m, 'setup_args'):
+        if not hasattr(m, "setup_args"):
             continue
 
         fout.write(p.name)
-        fout.write('\n')
-        fout.write('-' * len(p.name))
-        fout.write('\n')
+        fout.write("\n")
+        fout.write("-" * len(p.name))
+        fout.write("\n")
 
         doc = m.__doc__
         if doc:
             fout.write(doc)
-            fout.write('\n')
+            fout.write("\n")
 
-        fout.write('.. code-block:: text\n\n')
+        fout.write(".. code-block:: text\n\n")
         capture = io.StringIO()
         parser = m.setup_args()
         if isinstance(parser, tuple):
             parser = parser[0]
-        parser.prog = f'python -m compression.utils.{p.name}'
+        parser.prog = f"python -m compression.utils.{p.name}"
         parser.print_help(capture)
 
-        for line in capture.getvalue().split('\n'):
-            fout.write(f'\t{line}\n')
+        for line in capture.getvalue().split("\n"):
+            fout.write(f"\t{line}\n")
 
-        fout.write('\n\n')
+        fout.write("\n\n")
 
     fout.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
