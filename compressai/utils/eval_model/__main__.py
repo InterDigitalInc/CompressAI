@@ -238,7 +238,7 @@ def main(argv):
     compressai.set_entropy_coder(args.entropy_coder)
 
     if args.source == "pretrained":
-        runs = args.qualities
+        runs = sorted(args.qualities)
         opts = (args.arch, args.metric)
         load_func = load_pretrained
         log_fmt = "\rEvaluating {0} | {run:d}"
