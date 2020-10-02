@@ -82,7 +82,7 @@ To evaluate a pre-trained model on your own dataset, CompressAI provides an
 evaluation script:
 
 ```bash
-python3 -m compressai.utils.eval_model MODEL_NAME /path/to/images/folder/
+python3 -m compressai.utils.eval_model checkpoint /path/to/images/folder/ -a $ARCH -p $MODEL_CHECKPOINT...
 ```
 
 To evaluate published classical or machine-learning based image/video
