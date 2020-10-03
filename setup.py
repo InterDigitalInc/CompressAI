@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import subprocess
 
 from pathlib import Path
 
@@ -22,6 +23,16 @@ from torch.utils.cpp_extension import BuildExtension, CppExtension
 cwd = Path(__file__).resolve().parent
 package_name = "compressai"
 version = "1.0.3"
+
+
+try:
+    version = (
+        subprocess.check_output(["git", "describe", "--first-parent"])
+        .decode()
+        .strip()[1:]
+    )
+except subprocess.CalledProcessError:
+    pass
 
 
 def write_version_file():
