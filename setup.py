@@ -21,15 +21,15 @@ from setuptools import find_packages, setup
 from torch.utils.cpp_extension import BuildExtension, CppExtension
 
 cwd = Path(__file__).resolve().parent
+
 package_name = "compressai"
 version = "1.0.3"
+git_hash = "unknown"
 
 
 try:
-    version = (
-        subprocess.check_output(["git", "describe", "--first-parent"])
-        .decode()
-        .strip()[1:]
+    git_hash = (
+        subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=cwd).decode().strip()
     )
 except subprocess.CalledProcessError:
     pass
@@ -39,6 +39,7 @@ def write_version_file():
     path = cwd / package_name / "version.py"
     with path.open("w") as f:
         f.write(f'__version__ = "{version}"\n')
+        f.write(f'git_version = "{git_hash}"\n')
 
 
 write_version_file()
