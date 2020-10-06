@@ -24,12 +24,13 @@ end-to-end compression research.
    :caption: Library API
 
    compressai
+   ans
    datasets
    entropy_models
-   ans
    layers
    models
    ops
+   transforms
 
 .. toctree::
    :maxdepth: 2

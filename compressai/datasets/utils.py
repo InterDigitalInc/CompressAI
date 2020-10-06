@@ -15,7 +15,6 @@
 from pathlib import Path
 
 from PIL import Image
-
 from torch.utils.data import Dataset
 
 
@@ -36,7 +35,8 @@ class ImageFolder(Dataset):
             PIL image and returns a transformed version
         split (string): split mode ('train' or 'val')
     """
-    def __init__(self, root, transform=None, split='train'):
+
+    def __init__(self, root, transform=None, split="train"):
         splitdir = Path(root) / split
 
         if not splitdir.is_dir():
@@ -54,7 +54,7 @@ class ImageFolder(Dataset):
         Returns:
             img: `PIL.Image.Image` or transformed `PIL.Image.Image`.
         """
-        img = Image.open(self.samples[index]).convert('RGB')
+        img = Image.open(self.samples[index]).convert("RGB")
         if self.transform:
             return self.transform(img)
         return img

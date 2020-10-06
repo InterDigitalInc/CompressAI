@@ -24,15 +24,16 @@ class NonNegativeParametrizer(nn.Module):
 
     Used for stability during training.
     """
-    def __init__(self, minimum=0, reparam_offset=2**-18):
+
+    def __init__(self, minimum=0, reparam_offset=2 ** -18):
         super().__init__()
 
         self.minimum = float(minimum)
         self.reparam_offset = float(reparam_offset)
 
-        pedestal = self.reparam_offset**2
-        self.register_buffer('pedestal', torch.Tensor([pedestal]))
-        bound = (self.minimum + self.reparam_offset**2)**.5
+        pedestal = self.reparam_offset ** 2
+        self.register_buffer("pedestal", torch.Tensor([pedestal]))
+        bound = (self.minimum + self.reparam_offset ** 2) ** 0.5
         self.lower_bound = LowerBound(bound)
 
     def init(self, x):
@@ -40,5 +41,5 @@ class NonNegativeParametrizer(nn.Module):
 
     def forward(self, x):
         out = self.lower_bound(x)
-        out = out**2 - self.pedestal
+        out = out ** 2 - self.pedestal
         return out

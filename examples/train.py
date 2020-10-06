@@ -34,6 +34,7 @@ from compressai.models.utils import conv, deconv
 
 class AutoEncoder(CompressionModel):
     """Simple autoencoder with a factorized prior """
+
     def __init__(self, N=128):
         super().__init__(entropy_bottleneck_channels=N)
 
@@ -58,15 +59,16 @@ class AutoEncoder(CompressionModel):
         y_hat, y_likelihoods = self.entropy_bottleneck(y)
         x_hat = self.decode(y_hat)
         return {
-            'x_hat': x_hat,
-            'likelihoods': {
-                'y': y_likelihoods,
-            }
+            "x_hat": x_hat,
+            "likelihoods": {
+                "y": y_likelihoods,
+            },
         }
 
 
 class RateDistortionLoss(nn.Module):
     """Custom rate distortion loss with a Lagrangian parameter."""
+
     def __init__(self, lmbda=1e-2):
         super().__init__()
         self.mse = nn.MSELoss()
@@ -77,17 +79,19 @@ class RateDistortionLoss(nn.Module):
         out = {}
         num_pixels = N * H * W
 
-        out['bpp_loss'] = sum(
+        out["bpp_loss"] = sum(
             (torch.log(likelihoods).sum() / (-math.log(2) * num_pixels))
-            for likelihoods in output['likelihoods'].values())
-        out['mse_loss'] = self.mse(output['x_hat'], target)
-        out['loss'] = self.lmbda * 255**2 * out['mse_loss'] + out['bpp_loss']
+            for likelihoods in output["likelihoods"].values()
+        )
+        out["mse_loss"] = self.mse(output["x_hat"], target)
+        out["loss"] = self.lmbda * 255 ** 2 * out["mse_loss"] + out["bpp_loss"]
 
         return out
 
 
 class AverageMeter:
     """Compute running average."""
+
     def __init__(self):
         self.val = 0
         self.avg = 0
@@ -101,8 +105,9 @@ class AverageMeter:
         self.avg = self.sum / self.count
 
 
-def train_one_epoch(model, criterion, train_dataloader, optimizer,
-                    aux_optimizer, epoch, clip_max_norm):
+def train_one_epoch(
+    model, criterion, train_dataloader, optimizer, aux_optimizer, epoch, clip_max_norm
+):
     model.train()
     device = next(model.parameters()).device
 
@@ -115,7 +120,7 @@ def train_one_epoch(model, criterion, train_dataloader, optimizer,
         out_net = model(d)
 
         out_criterion = criterion(out_net, d)
-        out_criterion['loss'].backward()
+        out_criterion["loss"].backward()
         if clip_max_norm > 0:
             torch.nn.utils.clip_grad_norm_(model.parameters(), clip_max_norm)
         optimizer.step()
@@ -125,13 +130,15 @@ def train_one_epoch(model, criterion, train_dataloader, optimizer,
         aux_optimizer.step()
 
         if i % 10 == 0:
-            print(f'Train epoch {epoch}: ['
-                  f'{i*len(d)}/{len(train_dataloader.dataset)}'
-                  f' ({100. * i / len(train_dataloader):.0f}%)]'
-                  f'\tLoss: {out_criterion["loss"].item():.3f} |'
-                  f'\tMSE loss: {out_criterion["mse_loss"].item():.3f} |'
-                  f'\tBpp loss: {out_criterion["bpp_loss"].item():.2f} |'
-                  f'\tAux loss: {aux_loss.item():.2f}')
+            print(
+                f"Train epoch {epoch}: ["
+                f"{i*len(d)}/{len(train_dataloader.dataset)}"
+                f" ({100. * i / len(train_dataloader):.0f}%)]"
+                f'\tLoss: {out_criterion["loss"].item():.3f} |'
+                f'\tMSE loss: {out_criterion["mse_loss"].item():.3f} |'
+                f'\tBpp loss: {out_criterion["bpp_loss"].item():.2f} |'
+                f"\tAux loss: {aux_loss.item():.2f}"
+            )
 
 
 def test_epoch(epoch, test_dataloader, model, criterion):
@@ -150,27 +157,29 @@ def test_epoch(epoch, test_dataloader, model, criterion):
             out_criterion = criterion(out_net, d)
 
             aux_loss.update(model.aux_loss())
-            bpp_loss.update(out_criterion['bpp_loss'])
-            loss.update(out_criterion['loss'])
-            mse_loss.update(out_criterion['mse_loss'])
+            bpp_loss.update(out_criterion["bpp_loss"])
+            loss.update(out_criterion["loss"])
+            mse_loss.update(out_criterion["mse_loss"])
 
-    print(f'Test epoch {epoch}: Average losses:'
-          f'\tLoss: {loss.avg:.3f} |'
-          f'\tMSE loss: {mse_loss.avg:.3f} |'
-          f'\tBpp loss: {bpp_loss.avg:.2f} |'
-          f'\tAux loss: {aux_loss.avg:.2f}\n')
+    print(
+        f"Test epoch {epoch}: Average losses:"
+        f"\tLoss: {loss.avg:.3f} |"
+        f"\tMSE loss: {mse_loss.avg:.3f} |"
+        f"\tBpp loss: {bpp_loss.avg:.2f} |"
+        f"\tAux loss: {aux_loss.avg:.2f}\n"
+    )
 
     return loss.avg
 
 
-def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
+def save_checkpoint(state, is_best, filename="checkpoint.pth.tar"):
     torch.save(state, filename)
     if is_best:
-        shutil.copyfile(filename, 'checkpoint_best_loss.pth.tar')
+        shutil.copyfile(filename, "checkpoint_best_loss.pth.tar")
 
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(description='Example training script')
+    parser = argparse.ArgumentParser(description="Example training script")
     # yapf: disable
     parser.add_argument(
         '-d',
@@ -251,33 +260,33 @@ def main(argv):
         random.seed(args.seed)
 
     train_transforms = transforms.Compose(
-        [transforms.RandomCrop(args.patch_size),
-         transforms.ToTensor()])
+        [transforms.RandomCrop(args.patch_size), transforms.ToTensor()]
+    )
 
     test_transforms = transforms.Compose(
-        [transforms.CenterCrop(args.patch_size),
-         transforms.ToTensor()])
+        [transforms.CenterCrop(args.patch_size), transforms.ToTensor()]
+    )
 
-    train_dataset = ImageFolder(args.dataset,
-                                split='train',
-                                transform=train_transforms)
-    test_dataset = ImageFolder(args.dataset,
-                               split='test',
-                               transform=test_transforms)
+    train_dataset = ImageFolder(args.dataset, split="train", transform=train_transforms)
+    test_dataset = ImageFolder(args.dataset, split="test", transform=test_transforms)
 
-    train_dataloader = DataLoader(train_dataset,
-                                  batch_size=args.batch_size,
-                                  num_workers=args.num_workers,
-                                  shuffle=True,
-                                  pin_memory=True)
+    train_dataloader = DataLoader(
+        train_dataset,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+        shuffle=True,
+        pin_memory=True,
+    )
 
-    test_dataloader = DataLoader(test_dataset,
-                                 batch_size=args.test_batch_size,
-                                 num_workers=args.num_workers,
-                                 shuffle=False,
-                                 pin_memory=True)
+    test_dataloader = DataLoader(
+        test_dataset,
+        batch_size=args.test_batch_size,
+        num_workers=args.num_workers,
+        shuffle=False,
+        pin_memory=True,
+    )
 
-    device = 'cuda' if args.cuda and torch.cuda.is_available() else 'cpu'
+    device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
     net = AutoEncoder()
     net = net.to(device)
     optimizer = optim.Adam(net.parameters(), lr=args.learning_rate)
@@ -286,8 +295,15 @@ def main(argv):
 
     best_loss = 1e10
     for epoch in range(args.epochs):
-        train_one_epoch(net, criterion, train_dataloader, optimizer,
-                        aux_optimizer, epoch, args.clip_max_norm)
+        train_one_epoch(
+            net,
+            criterion,
+            train_dataloader,
+            optimizer,
+            aux_optimizer,
+            epoch,
+            args.clip_max_norm,
+        )
 
         loss = test_epoch(epoch, test_dataloader, net, criterion)
 
@@ -296,13 +312,15 @@ def main(argv):
         if args.save:
             save_checkpoint(
                 {
-                    'epoch': epoch + 1,
-                    'state_dict': net.state_dict(),
-                    'loss': loss,
-                    'optimizer': optimizer.state_dict(),
-                    'aux_optimizer': aux_optimizer.state_dict(),
-                }, is_best)
+                    "epoch": epoch + 1,
+                    "state_dict": net.state_dict(),
+                    "loss": loss,
+                    "optimizer": optimizer.state_dict(),
+                    "aux_optimizer": aux_optimizer.state_dict(),
+                },
+                is_best,
+            )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main(sys.argv[1:])

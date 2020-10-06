@@ -27,22 +27,23 @@ def test_train_example():
     rootdir = cwd.parent
 
     spec = importlib.util.spec_from_file_location(
-        'examples.train', rootdir / 'examples/train.py')
+        "examples.train", rootdir / "examples/train.py"
+    )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
 
     argv = [
-        '-d',
-        str(rootdir / 'tests/assets/fakedata/imagefolder'),
-        '-e',
-        '10',
-        '--batch-size',
-        '1',
-        '--patch-size',
-        '48',
-        '128',
-        '--seed',
-        '3.14',
+        "-d",
+        str(rootdir / "tests/assets/fakedata/imagefolder"),
+        "-e",
+        "10",
+        "--batch-size",
+        "1",
+        "--patch-size",
+        "48",
+        "128",
+        "--seed",
+        "3.14",
     ]
 
     f = io.StringIO()
@@ -50,8 +51,8 @@ def test_train_example():
         module.main(argv)
     log = f.getvalue()
 
-    logpath = cwd / 'expected' / 'train_log_3.14.txt'
-    with logpath.open('r') as f:
+    logpath = cwd / "expected" / "train_log_3.14.txt"
+    with logpath.open("r") as f:
         expected = f.read()
 
     test_values = [

@@ -31,6 +31,26 @@ pylint:compressai:
     tags:
         - docker
 
+black:compressai:
+    stage: static-analysis
+    before_script:
+        - python --version
+        - pip install black
+    script:
+        - black --check --diff compressai examples tests
+    tags:
+        - docker
+
+isort:compressai:
+    stage: static-analysis
+    before_script:
+        - python --version
+        - pip install isort
+    script:
+        - isort --check-only -v compressai examples tests
+    tags:
+        - docker
+
 test:compressai:pytorch-1.4:
     stage: test
     before_script:
@@ -38,13 +58,22 @@ test:compressai:pytorch-1.4:
         - pip install compressai --find-links=dist/
         - pip install click pytest codecov pytest-cov
     script:
-        - pytest --cov=compressai -s tests
+        - >
+          if [ "$CI_COMMIT_BRANCH" == "master" ]; then
+            pytest --cov=compressai -s tests
+          else
+            pytest --cov=compressai -m "not pretrained" -s tests
+          fi
     tags:
         - docker
 
-test:compressai:pytorch-1.5:
+test:compressai:pytorch-1.5.1:
     extends: test:compressai:pytorch-1.4
-    image: pytorch/pytorch:1.5-cuda10.1-cudnn7-runtime
+    image: pytorch/pytorch:1.5.1-cuda10.1-cudnn7-runtime
+
+test:compressai:pytorch-1.6.0:
+    extends: test:compressai:pytorch-1.4
+    image: pytorch/pytorch:1.6.0-cuda10.1-cudnn7-runtime
 
 doc:compressai:
     stage: doc

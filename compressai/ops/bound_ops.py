@@ -17,8 +17,8 @@ import torch.nn as nn
 
 
 class LowerBoundFunction(torch.autograd.Function):
-    """Autograd function for the `LowerBound` operator.
-    """
+    """Autograd function for the `LowerBound` operator."""
+
     @staticmethod
     def forward(ctx, input_, bound):
         ctx.save_for_backward(input_, bound)
@@ -38,9 +38,10 @@ class LowerBound(nn.Module):
     The derivative is replaced by the identity function when `x` is moved
     towards the `bound`, otherwise the gradient is kept to zero.
     """
+
     def __init__(self, bound):
         super().__init__()
-        self.register_buffer('bound', torch.Tensor([float(bound)]))
+        self.register_buffer("bound", torch.Tensor([float(bound)]))
 
     @torch.jit.unused
     def lower_bound(self, x):
