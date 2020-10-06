@@ -6,11 +6,13 @@ end-to-end compression research.
 CompressAI currently provides:
 
 * custom operations, layers and models for deep learning based data compression
-* a partial port of the official [TensorFlow compression
-  ](https://github.com/tensorflow/compression) library
+* a partial port of the official [TensorFlow compression](https://github.com/tensorflow/compression) library
 * pre-trained end-to-end compression models for learned image compression
 * evaluation scripts to compare learned models against classical image/video
   compression codecs
+
+![PSNR performances plot on Kodak](assets/kodak-psnr.png)
+
 
 ## Installation
 
@@ -78,15 +80,14 @@ jupyter notebook examples/
 
 ### Evaluation
 
-To evaluate a pre-trained model on your own dataset, CompressAI provides an
+To evaluate a trained model on your own dataset, CompressAI provides an
 evaluation script:
 
 ```bash
 python3 -m compressai.utils.eval_model checkpoint /path/to/images/folder/ -a $ARCH -p $MODEL_CHECKPOINT...
 ```
 
-To evaluate published classical or machine-learning based image/video
-codec solutions:
+To evaluate traditional image/video codecs:
 
 ```bash
 python3 -m compressai.utils.bench --help
@@ -107,13 +108,13 @@ Before contributing, please read the CONTRIBUTING.md file.
 
 ## Authors
 
-* Jean Bégaint, Fabien Racapé, Simon Feltman and Akshay Pushparaja, from the InterDigital AI Lab.
+* Jean Bégaint, Fabien Racapé, Simon Feltman and Akshay Pushparaja, InterDigital AI Lab.
 * *Contact*: firstname.lastname@interdigital.com
 
 ## Citation
 
-If you use this project, please cite the relevant publications for the
-original models and datasets, and cite this project as:
+If you use this project, please cite the relevant original publications for the
+models and datasets, and cite this project as:
 
 ```
 @misc{CompressAI,
