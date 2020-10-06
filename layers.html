@@ -37,7 +37,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="compressai.models" href="models.html" />
-    <link rel="prev" title="compressai.ans" href="ans.html" /> 
+    <link rel="prev" title="compressai.entropy_models" href="entropy_models.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -93,9 +93,9 @@
 <p class="caption"><span class="caption-text">Library API</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="compressai.html">compressai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ans.html">compressai.ans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">compressai.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="entropy_models.html">compressai.entropy_models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ans.html">compressai.ans</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">compressai.layers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#maskedconv2d">MaskedConv2d</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gdn">GDN</a></li>
@@ -108,6 +108,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">compressai.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">compressai.transforms</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Model Zoo</span></p>
 <ul>
@@ -191,8 +192,8 @@
 Useful for building auto-regressive network components.</p>
 <p>Introduced in <a class="reference external" href="https://arxiv.org/abs/1606.05328">“Conditional Image Generation with PixelCNN Decoders”</a>.</p>
 <p>Inherits the same arguments as a <cite>nn.Conv2d</cite>. Use <cite>mask_type=’A’</cite> for the
-first layer (which also masks the “current pixel”), <cite>mask_type=’B’</cite> for the following
-layers.</p>
+first layer (which also masks the “current pixel”), <cite>mask_type=’B’</cite> for the
+following layers.</p>
 </dd></dl>
 
 </div>
@@ -216,8 +217,8 @@ by Balle Johannes, Valero Laparra, and Eero P. Simoncelli, (2016).</p>
 <dt id="compressai.layers.GDN1">
 <em class="property">class </em><code class="sig-prename descclassname">compressai.layers.</code><code class="sig-name descname">GDN1</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_channels</span></em>, <em class="sig-param"><span class="n">inverse</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">beta_min</span><span class="o">=</span><span class="default_value">1e-06</span></em>, <em class="sig-param"><span class="n">gamma_init</span><span class="o">=</span><span class="default_value">0.1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/gdn.html#GDN1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.layers.GDN1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simplified GDN layer.</p>
-<p>Introduced in <a class="reference external" href="http://arxiv.org/abs/1912.08771">“Computationally Efficient Neural Image Compression”</a>,
-by Johnston, Nick, Elad Eban, Ariel Gordon, and Johannes Ballé, (2019).</p>
+<p>Introduced in <a class="reference external" href="http://arxiv.org/abs/1912.08771">“Computationally Efficient Neural Image Compression”</a>, by Johnston, Nick, Elad Eban, Ariel
+Gordon, and Johannes Ballé, (2019).</p>
 <div class="math notranslate nohighlight">
 \[y[i] = \frac{x[i]}{\beta[i] + \sum_j(\gamma[j, i] * |x[j]|}\]</div>
 </dd></dl>
@@ -306,7 +307,7 @@ Takeuchi, Jiro Katto.</p>
         <a href="models.html" class="btn btn-neutral float-right" title="compressai.models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="ans.html" class="btn btn-neutral float-left" title="compressai.ans" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="entropy_models.html" class="btn btn-neutral float-left" title="compressai.entropy_models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

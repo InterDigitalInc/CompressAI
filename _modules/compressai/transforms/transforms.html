@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compressai.transforms.transforms &mdash; compressai  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> compressai
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CompressAI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial_intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial_installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial_train.html">Training</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Library API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../compressai.html">compressai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ans.html">compressai.ans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">compressai.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">compressai.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ops.html">compressai.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">compressai.transforms</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Model Zoo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../zoo.html">Image compression</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Utils</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli_usage.html">Command line usage</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">compressai</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../compressai.html">compressai</a> &raquo;</li>
+        
+      <li>compressai.transforms.transforms</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compressai.transforms.transforms</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F_transforms</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;RGB2YCbCr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;YCbCr2RGB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;YUV444To420&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;YUV420To444&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="RGB2YCbCr"><a class="viewcode-back" href="../../../transforms.html#compressai.transforms.RGB2YCbCr">[docs]</a><span class="k">class</span> <span class="nc">RGB2YCbCr</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Convert a RGB tensor to YCbCr.</span>
+<span class="sd">    The tensor is expected to be in the [0, 1] floating point range, with a</span>
+<span class="sd">    shape of (3xHxW) or (Nx3xHxW).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rgb</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            rgb (torch.Tensor): 3D or 4D floating point RGB tensor</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ycbcr(torch.Tensor): converted tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">F_transforms</span><span class="o">.</span><span class="n">rgb2ycbcr</span><span class="p">(</span><span class="n">rgb</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">___repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">()&quot;</span></div>
+
+
+<div class="viewcode-block" id="YCbCr2RGB"><a class="viewcode-back" href="../../../transforms.html#compressai.transforms.YCbCr2RGB">[docs]</a><span class="k">class</span> <span class="nc">YCbCr2RGB</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Convert a YCbCr tensor to RGB.</span>
+<span class="sd">    The tensor is expected to be in the [0, 1] floating point range, with a</span>
+<span class="sd">    shape of (3xHxW) or (Nx3xHxW).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ycbcr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            ycbcr(torch.Tensor): 3D or 4D floating point RGB tensor</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            rgb(torch.Tensor): converted tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">F_transforms</span><span class="o">.</span><span class="n">ycbcr2rgb</span><span class="p">(</span><span class="n">ycbcr</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">___repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">()&quot;</span></div>
+
+
+<div class="viewcode-block" id="YUV444To420"><a class="viewcode-back" href="../../../transforms.html#compressai.transforms.YUV444To420">[docs]</a><span class="k">class</span> <span class="nc">YUV444To420</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Convert a YUV 444 tensor to a 420 representation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mode (str): algorithm used for downsampling: ``&#39;avg_pool&#39;`` |. Default</span>
+<span class="sd">            ``&#39;avg_pool&#39;``</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; x = torch.rand(1, 3, 32, 32)</span>
+<span class="sd">        &gt;&gt;&gt; y, u, v = YUV444To420()(x)</span>
+<span class="sd">        &gt;&gt;&gt; y.size()  # 1, 1, 32, 32</span>
+<span class="sd">        &gt;&gt;&gt; u.size()  # 1, 1, 16, 16</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;avg_pool&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yuv</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            yuv (torch.Tensor or (torch.Tensor, torch.Tensor, torch.Tensor)):</span>
+<span class="sd">                444 input to be downsampled. Takes either a (Nx3xHxW) tensor or</span>
+<span class="sd">                a tuple of 3 (Nx1xHxW) tensors.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (torch.Tensor, torch.Tensor, torch.Tensor): Converted 420</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">F_transforms</span><span class="o">.</span><span class="n">yuv_444_to_420</span><span class="p">(</span><span class="n">yuv</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">___repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">()&quot;</span></div>
+
+
+<div class="viewcode-block" id="YUV420To444"><a class="viewcode-back" href="../../../transforms.html#compressai.transforms.YUV420To444">[docs]</a><span class="k">class</span> <span class="nc">YUV420To444</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Convert a YUV 420 input to a 444 representation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mode (str): algorithm used for upsampling: ``&#39;bilinear&#39;`` | ``&#39;nearest&#39;``.</span>
+<span class="sd">            Default ``&#39;bilinear&#39;``</span>
+<span class="sd">        return_tuple (bool): return input as tuple of tensors instead of a</span>
+<span class="sd">            concatenated tensor, 3 (Nx1xHxW) tensors instead of one (Nx3xHxW)</span>
+<span class="sd">            tensor (default: False)</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; y = torch.rand(1, 1, 32, 32)</span>
+<span class="sd">        &gt;&gt;&gt; u, v = torch.rand(1, 1, 16, 16), torch.rand(1, 1, 16, 16)</span>
+<span class="sd">        &gt;&gt;&gt; x = YUV420To444()((y, u, v))</span>
+<span class="sd">        &gt;&gt;&gt; x.size()  # 1, 3, 32, 32</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bilinear&quot;</span><span class="p">,</span> <span class="n">return_tuple</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">return_tuple</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">return_tuple</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yuv</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            yuv (torch.Tensor, torch.Tensor, torch.Tensor): 420 input frames in</span>
+<span class="sd">                (Nx1xHxW) format</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (torch.Tensor or (torch.Tensor, torch.Tensor, torch.Tensor)): Converted</span>
+<span class="sd">                444</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">F_transforms</span><span class="o">.</span><span class="n">yuv_420_to_444</span><span class="p">(</span><span class="n">yuv</span><span class="p">,</span> <span class="n">return_tuple</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">return_tuple</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">___repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(return_tuple=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">return_tuple</span><span class="si">}</span><span class="s2">)&quot;</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, InterDigital Communications, Inc.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

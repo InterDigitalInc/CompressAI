@@ -92,12 +92,13 @@
 <p class="caption"><span class="caption-text">Library API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compressai.html">compressai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ans.html">compressai.ans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">compressai.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="entropy_models.html">compressai.entropy_models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ans.html">compressai.ans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layers.html">compressai.layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">compressai.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">compressai.transforms</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Model Zoo</span></p>
 <ul>
@@ -187,6 +188,7 @@
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#U"><strong>U</strong></a>
+ | <a href="#Y"><strong>Y</strong></a>
  
 </div>
 <h2 id="A">A</h2>
@@ -226,15 +228,22 @@
 </li>
       <li><a href="models.html#compressai.models.Cheng2020Anchor">Cheng2020Anchor (class in compressai.models)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="models.html#compressai.models.Cheng2020Attention">Cheng2020Attention (class in compressai.models)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     compressai
 
       <ul>
         <li><a href="compressai.html#module-compressai">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai.transforms.functional
+
+      <ul>
+        <li><a href="transforms.html#module-compressai.transforms.functional">module</a>
 </li>
       </ul></li>
       <li><a href="models.html#compressai.models.CompressionModel">CompressionModel (class in compressai.models)</a>
@@ -351,6 +360,8 @@
       <ul>
         <li><a href="compressai.html#module-compressai">compressai</a>
 </li>
+        <li><a href="transforms.html#module-compressai.transforms.functional">compressai.transforms.functional</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -378,13 +389,17 @@
 </li>
       <li><a href="ans.html#compressai.ans.RansEncoder">RansEncoder (class in compressai.ans)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="layers.html#compressai.layers.ResidualBlock">ResidualBlock (class in compressai.layers)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="layers.html#compressai.layers.ResidualBlockUpsample">ResidualBlockUpsample (class in compressai.layers)</a>
 </li>
       <li><a href="layers.html#compressai.layers.ResidualBlockWithStride">ResidualBlockWithStride (class in compressai.layers)</a>
+</li>
+      <li><a href="transforms.html#compressai.transforms.RGB2YCbCr">RGB2YCbCr (class in compressai.transforms)</a>
+</li>
+      <li><a href="transforms.html#compressai.transforms.functional.rgb2ycbcr">rgb2ycbcr() (in module compressai.transforms.functional)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -414,6 +429,26 @@
         <li><a href="models.html#compressai.models.ScaleHyperprior.update">(compressai.models.ScaleHyperprior method)</a>
 </li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Y">Y</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="transforms.html#compressai.transforms.YCbCr2RGB">YCbCr2RGB (class in compressai.transforms)</a>
+</li>
+      <li><a href="transforms.html#compressai.transforms.functional.ycbcr2rgb">ycbcr2rgb() (in module compressai.transforms.functional)</a>
+</li>
+      <li><a href="transforms.html#compressai.transforms.YUV420To444">YUV420To444 (class in compressai.transforms)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="transforms.html#compressai.transforms.YUV444To420">YUV444To420 (class in compressai.transforms)</a>
+</li>
+      <li><a href="transforms.html#compressai.transforms.functional.yuv_420_to_444">yuv_420_to_444() (in module compressai.transforms.functional)</a>
+</li>
+      <li><a href="transforms.html#compressai.transforms.functional.yuv_444_to_420">yuv_444_to_420() (in module compressai.transforms.functional)</a>
+</li>
   </ul></td>
 </tr></table>
 

@@ -91,12 +91,13 @@
 <p class="caption"><span class="caption-text">Library API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../compressai.html">compressai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ans.html">compressai.ans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html">compressai.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../entropy_models.html">compressai.entropy_models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ans.html">compressai.ans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../layers.html">compressai.layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.html">compressai.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ops.html">compressai.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transforms.html">compressai.transforms</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Model Zoo</span></p>
 <ul>
@@ -189,12 +190,13 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="k">pass</span>
 
-<span class="n">_entropy_coder</span> <span class="o">=</span> <span class="s1">&#39;ans&#39;</span>
+<span class="n">_entropy_coder</span> <span class="o">=</span> <span class="s2">&quot;ans&quot;</span>
 <span class="n">_available_entropy_coders</span> <span class="o">=</span> <span class="p">[</span><span class="n">_entropy_coder</span><span class="p">]</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">range_coder</span>
-    <span class="n">_available_entropy_coders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rangecoder&#39;</span><span class="p">)</span>
+
+    <span class="n">_available_entropy_coders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;rangecoder&quot;</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="k">pass</span>
 
@@ -212,7 +214,8 @@
     <span class="k">if</span> <span class="n">entropy_coder</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_available_entropy_coders</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s1">&#39;Invalid entropy coder &quot;</span><span class="si">{</span><span class="n">entropy_coder</span><span class="si">}</span><span class="s1">&quot;, choose from&#39;</span>
-            <span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_available_entropy_coders</span><span class="p">)</span><span class="si">}</span><span class="s1">).&#39;</span><span class="p">)</span>
+            <span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_available_entropy_coders</span><span class="p">)</span><span class="si">}</span><span class="s1">).&#39;</span>
+        <span class="p">)</span>
     <span class="n">_entropy_coder</span> <span class="o">=</span> <span class="n">entropy_coder</span></div>
 
 
