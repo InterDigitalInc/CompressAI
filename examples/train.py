@@ -19,11 +19,10 @@ import shutil
 import sys
 
 import torch
-import torch.optim as optim
 import torch.nn as nn
+import torch.optim as optim
 
 from torch.utils.data import DataLoader
-
 from torchvision import transforms
 
 from compressai.datasets import ImageFolder
