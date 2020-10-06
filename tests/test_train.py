@@ -55,11 +55,9 @@ def test_train_example():
     with logpath.open("r") as f:
         expected = f.read()
 
-    test_values = [
-        m[0] for m in re.findall(r'(?P<number>([0-9]*[.])?[0-9]+)', log)
-    ]
+    test_values = [m[0] for m in re.findall(r"(?P<number>([0-9]*[.])?[0-9]+)", log)]
     expected_values = [
-        m[0] for m in re.findall(r'(?P<number>([0-9]*[.])?[0-9]+)', expected)
+        m[0] for m in re.findall(r"(?P<number>([0-9]*[.])?[0-9]+)", expected)
     ]
 
     assert len(test_values) == len(expected_values)
