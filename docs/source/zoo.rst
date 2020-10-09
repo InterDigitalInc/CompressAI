@@ -38,7 +38,7 @@ Training
 ~~~~~~~~
 
 Unless specified otherwise, networks were trained for 4-5M steps on *256x256*
-image patches randomly extracted and cropped from the `Vime90K
+image patches randomly extracted and cropped from the `Vimeo90K
 <http://toflow.csail.mit.edu/>`_ dataset [xue2019video]_.
 
 Models were trained with a batch size of 16 or 32, and an initial learning rate
