@@ -38,7 +38,7 @@ Training
 ~~~~~~~~
 
 Unless specified otherwise, networks were trained for 4-5M steps on *256x256*
-image patches randomly cropped and extracted from the `Vime90K
+image patches randomly extracted and cropped from the `Vime90K
 <http://toflow.csail.mit.edu/>`_ dataset [xue2019video]_.
 
 Models were trained with a batch size of 16 or 32, and an initial learning rate
@@ -71,7 +71,7 @@ distortion and the mean estimated bit-rate.
 
 .. note:: The number of channels for the convolutionnal layers and the entropy
    bottleneck depends on the architecture and the quality parameter (~targeted
-   bit-rate). For low bit-rates (< 1bpp), the litterature usually recommends 192
+   bit-rate). For low bit-rates (<0.5 bpp), the literature usually recommends 192
    channels for the entropy bottleneck, and 320 channels for higher bitrates.
    The detailed list of configurations can be found in
    :obj:`compressai.zoo.image.cfgs`.
