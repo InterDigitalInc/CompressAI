@@ -591,7 +591,7 @@ class VTM(Codec):
             "decoding_time": dec_time,
         }
         if return_rec:
-            rec = Image.fromarray((rec_arr.transpose(1, 2, 0) * 255.0).astype(np.uint8))
+            rec = Image.fromarray((rec_arr.clip(0, 1).transpose(1, 2, 0) * 255.0).astype(np.uint8))
             return out, rec
         return out
 
@@ -734,7 +734,7 @@ class HM(Codec):
             "decoding_time": dec_time,
         }
         if return_rec:
-            rec = Image.fromarray((rec_arr.transpose(1, 2, 0) * 255.0).astype(np.uint8))
+            rec = Image.fromarray((rec_arr.clip(0, 1).transpose(1, 2, 0) * 255.0).astype(np.uint8))
             return out, rec
         return out
 
@@ -864,6 +864,6 @@ class AV1(Codec):
             "decoding_time": dec_time,
         }
         if return_rec:
-            rec = Image.fromarray((rec_arr.transpose(1, 2, 0) * 255.0).astype(np.uint8))
+            rec = Image.fromarray((rec_arr.clip(0, 1).transpose(1, 2, 0) * 255.0).astype(np.uint8))
             return out, rec
         return out
