@@ -1,5 +1,5 @@
 {
-  "name": "bmshj2018-factorized",
+  "name": "bmshj2018-factorized (MS-SSIM)",
   "description": "Inference (ans)",
   "results": {
     "psnr": [

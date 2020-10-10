@@ -1,5 +1,5 @@
 {
-  "name": "bmshj2018-hyperprior",
+  "name": "bmshj2018-hyperprior (MS-SSIM)",
   "description": "Inference (ans)",
   "results": {
     "psnr": [
