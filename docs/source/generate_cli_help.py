@@ -56,7 +56,7 @@ def main():
         parser = m.setup_args()
         if isinstance(parser, tuple):
             parser = parser[0]
-        parser.prog = f"python -m compression.utils.{p.name}"
+        parser.prog = f"python -m compressai.utils.{p.name}"
         parser.print_help(capture)
 
         for line in capture.getvalue().split("\n"):
