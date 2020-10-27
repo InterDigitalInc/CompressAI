@@ -31,7 +31,7 @@ try:
     git_hash = (
         subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=cwd).decode().strip()
     )
-except subprocess.CalledProcessError:
+except (subprocess.CalledProcessError, FileNotFoundError):
     pass
 
 
