@@ -174,6 +174,7 @@ def setup_args():
         type=str,
         choices=pretrained_models.keys(),
         help="model architecture",
+        required=True,
     )
     parent_parser.add_argument(
         "-c",
