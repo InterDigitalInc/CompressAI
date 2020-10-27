@@ -72,4 +72,7 @@ You can also build your own pip package:
 Docker
 ~~~~~~
 
-We are planning to provide docker images in the future.
+We are planning to publish docker images in the future.
+
+For now, a Makefile is provided to build docker images locally.
+Run :code:`make help` in the source code directory to list the available options.

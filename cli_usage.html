@@ -184,7 +184,7 @@
 <h2>bench<a class="headerlink" href="#bench" title="Permalink to this headline">¶</a></h2>
 <p>Collect performance metrics of published traditional or end-to-end image
 codecs.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compression.utils.bench [-h] {} ...
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.bench [-h] {} ...
 
 Collect codec metrics.
 
@@ -200,9 +200,9 @@ optional arguments:
 <h2>plot<a class="headerlink" href="#plot" title="Permalink to this headline">¶</a></h2>
 <p>Simple plotting utility to display Rate-Distortion curves (RD) comparison
 between codecs.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compression.utils.plot [-h] -f [[...]] [-m] [-t] [-o]
-                                        [--figsize ] [--axes   ] [--backend]
-                                        [--show]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.plot [-h] -f [[...]] [-m] [-t] [-o]
+                                       [--figsize ] [--axes   ] [--backend]
+                                       [--show]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -221,7 +221,7 @@ optional arguments:
 <div class="section" id="eval-model">
 <h2>eval_model<a class="headerlink" href="#eval-model" title="Permalink to this headline">¶</a></h2>
 <p>Evaluate an end-to-end compression model on an image dataset.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compression.utils.eval_model [-h] {pretrained,checkpoint} ...
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.eval_model [-h] {pretrained,checkpoint} ...
 
 Evaluate a model on an image dataset.
 
@@ -245,9 +245,9 @@ or psnr).</p>
 </ul>
 </dd>
 </dl>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compression.utils.find_close [-h] [-m {bpp,psnr,ms-ssim}]
-                                              [--save]
-                                              {} ... image target
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.find_close [-h] [-m {bpp,psnr,ms-ssim}]
+                                             [--save]
+                                             {} ... image target
 
 Collect codec metrics and performances.
 
@@ -268,10 +268,10 @@ optional arguments:
 <p>Update the CDFs parameters of a trained model.</p>
 <p>To be called on a model checkpoint after training. This will update the internal
 CDFs related buffers required for entropy coding.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compression.utils.update_model [-h] [-n NAME] [-d DIR]
-                                                [--no-update]
-                                                [--architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior}]
-                                                filepath
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.update_model [-h] [-n NAME] [-d DIR]
+                                               [--no-update]
+                                               [--architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior}]
+                                               filepath
 
 Export a trained model to a new checkpoint with an updated CDFs parameters and
 a hash prefix, so that it can be loaded later via `load_state_dict_from_url`.

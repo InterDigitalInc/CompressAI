@@ -242,7 +242,7 @@ and <a class="reference external" href="https://pytorch.org/docs/stable/nn.html?
 <div class="section" id="training">
 <h2><a class="toc-backref" href="#id16">Training</a><a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h2>
 <p>Unless specified otherwise, networks were trained for 4-5M steps on <em>256x256</em>
-image patches randomly cropped and extracted from the <a class="reference external" href="http://toflow.csail.mit.edu/">Vime90K</a> dataset <a class="reference internal" href="#xue2019video" id="id1"><span>[xue2019video]</span></a>.</p>
+image patches randomly extracted and cropped from the <a class="reference external" href="http://toflow.csail.mit.edu/">Vimeo90K</a> dataset <a class="reference internal" href="#xue2019video" id="id1"><span>[xue2019video]</span></a>.</p>
 <p>Models were trained with a batch size of 16 or 32, and an initial learning rate
 of 1e-4 for approximately 1-2M steps. The learning rate is then divided by 2
 when the evaluation loss reaches a plateau (we use a patience of 20 epochs).</p>
@@ -322,7 +322,7 @@ distortion and the mean estimated bit-rate.</p>
 <p class="admonition-title">Note</p>
 <p>The number of channels for the convolutionnal layers and the entropy
 bottleneck depends on the architecture and the quality parameter (~targeted
-bit-rate). For low bit-rates (&lt; 1bpp), the litterature usually recommends 192
+bit-rate). For low bit-rates (&lt;0.5 bpp), the literature usually recommends 192
 channels for the entropy bottleneck, and 320 channels for higher bitrates.
 The detailed list of configurations can be found in
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">compressai.zoo.image.cfgs</span></code>.</p>
