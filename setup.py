@@ -31,7 +31,7 @@ try:
     git_hash = (
         subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=cwd).decode().strip()
     )
-except subprocess.CalledProcessError:
+except (FileNotFoundError, subprocess.CalledProcessError):
     pass
 
 
@@ -105,6 +105,9 @@ setup(
     name=package_name,
     version=version,
     description="A PyTorch library and evaluation platform for end-to-end compression research",
+    url="https://github.com/InterDigitalInc/CompressAI",
+    author="InterDigital AI Lab",
+    author_email="compressai@interdigital.com",
     packages=find_packages(exclude=("tests",)),
     zip_safe=False,
     python_requires=">=3.6",

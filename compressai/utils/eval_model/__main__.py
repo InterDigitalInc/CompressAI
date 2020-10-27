@@ -174,6 +174,7 @@ def setup_args():
         type=str,
         choices=pretrained_models.keys(),
         help="model architecture",
+        required=True,
     )
     parent_parser.add_argument(
         "-c",
@@ -197,7 +198,9 @@ def setup_args():
     parser = argparse.ArgumentParser(
         description="Evaluate a model on an image dataset.", add_help=True
     )
-    subparsers = parser.add_subparsers(help="model source", dest="source")
+    subparsers = parser.add_subparsers(
+        help="model source", dest="source", required=True
+    )
 
     # Options for pretrained models
     pretrained_parser = subparsers.add_parser("pretrained", parents=[parent_parser])
@@ -210,7 +213,12 @@ def setup_args():
         help="metric trained against (default: %(default)s)",
     )
     pretrained_parser.add_argument(
-        "-q", "--quality", dest="qualities", nargs="+", type=int, default=range(1, 9)
+        "-q",
+        "--quality",
+        dest="qualities",
+        nargs="+",
+        type=int,
+        default=(1,),
     )
 
     checkpoint_parser = subparsers.add_parser("checkpoint", parents=[parent_parser])
