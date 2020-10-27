@@ -1,0 +1,29 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} as base
+
+RUN pip install torch==1.6.0+cpu torchvision==0.7.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+
+FROM base as builder
+WORKDIR /tmp/compressai
+COPY compressai.tar.gz .
+RUN tar xzf compressai.tar.gz && \
+		python3 setup.py sdist bdist_wheel
+
+FROM base
+
+LABEL maintainer="compressai@interdigital.com"
+
+WORKDIR /tmp
+COPY --from=builder /tmp/compressai/dist/compressai-*.whl .
+RUN pip install compressai-*.whl && \
+		python3 -c 'import compressai'
+
+# Install jupyter?
+ARG WITH_JUPYTER=0
+RUN if [ "$WITH_JUPYTER" = "1" ]; then \
+		pip3 install jupyter ipywidgets && \
+		jupyter nbextension enable --py widgetsnbextension \
+		; fi
+
+WORKDIR /workspace
+CMD ["bash"]
