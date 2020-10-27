@@ -75,7 +75,7 @@ def yuv_444_to_420(
         yuv (torch.Tensor or (torch.Tensor, torch.Tensor, torch.Tensor)): 444
             input to be downsampled. Takes either a (Nx3xHxW) tensor or a tuple
             of 3 (Nx1xHxW) tensors.
-        mode (str): algorithm used for downsampling: ``'avg_pool'`` |. Default
+        mode (str): algorithm used for downsampling: ``'avg_pool'``. Default
             ``'avg_pool'``
 
     Returns:

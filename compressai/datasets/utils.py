@@ -20,7 +20,10 @@ from torch.utils.data import Dataset
 
 class ImageFolder(Dataset):
     """Load an image folder database. Training and testing image samples
-    are respectively stored in separate directories: ::
+    are respectively stored in separate directories:
+
+    .. code-block::
+
         - rootdir/
             - train/
                 - img000.png
