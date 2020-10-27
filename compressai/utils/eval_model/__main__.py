@@ -197,7 +197,9 @@ def setup_args():
     parser = argparse.ArgumentParser(
         description="Evaluate a model on an image dataset.", add_help=True
     )
-    subparsers = parser.add_subparsers(help="model source", dest="source")
+    subparsers = parser.add_subparsers(
+        help="model source", dest="source", required=True
+    )
 
     # Options for pretrained models
     pretrained_parser = subparsers.add_parser("pretrained", parents=[parent_parser])
