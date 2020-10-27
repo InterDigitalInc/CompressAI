@@ -213,7 +213,12 @@ def setup_args():
         help="metric trained against (default: %(default)s)",
     )
     pretrained_parser.add_argument(
-        "-q", "--quality", dest="qualities", nargs="+", type=int, default=(1,),
+        "-q",
+        "--quality",
+        dest="qualities",
+        nargs="+",
+        type=int,
+        default=(1,),
     )
 
     checkpoint_parser = subparsers.add_parser("checkpoint", parents=[parent_parser])
