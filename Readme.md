@@ -117,13 +117,11 @@ If you use this project, please cite the relevant original publications for the
 models and datasets, and cite this project as:
 
 ```
-@misc{CompressAI,
-	title = {{CompressAI}: A PyTorch library and evaluation platform for end-to-end compression research},
-	author = "{Jean Bégaint, Fabien Racapé, Simon Feltman, Akshay Pushparaja}",
-	howpublished = {\url{https://github.com/InterDigitalInc/CompressAI}},
-	url = "https://github.com/InterDigitalInc/CompressAI",
-	year = 2020,
-	note = "[Online; accessed 24-June-2020]"
+@article{begaint2020compressai,
+	title={CompressAI: a PyTorch library and evaluation platform for end-to-end compression research},
+	author={B{\'e}gaint, Jean and Racap{\'e}, Fabien and Feltman, Simon and Pushparaja, Akshay},
+	year={2020},
+	journal={arXiv preprint arXiv:2011.03029},
 }
 
 ```
