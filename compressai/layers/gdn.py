@@ -71,7 +71,7 @@ class GDN1(GDN):
     r"""Simplified GDN layer.
 
     Introduced in `"Computationally Efficient Neural Image Compression"
-    <http://arxiv.org/abs/1912.08771>`_, by Johnston, Nick, Elad Eban, Ariel
+    <http://arxiv.org/abs/1912.08771>`_, by Johnston Nick, Elad Eban, Ariel
     Gordon, and Johannes Ballé, (2019).
 
     .. math::
