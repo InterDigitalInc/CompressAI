@@ -109,7 +109,6 @@ Before contributing, please read the CONTRIBUTING.md file.
 ## Authors
 
 * Jean Bégaint, Fabien Racapé, Simon Feltman and Akshay Pushparaja, InterDigital AI Lab.
-* *Contact*: firstname.lastname@interdigital.com
 
 ## Citation
 
