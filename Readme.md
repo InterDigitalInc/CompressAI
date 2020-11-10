@@ -49,7 +49,7 @@ supported.
 
 ## Usage
 
-> **Note**: Multi-GPU support is not yet supported but will be addressed in a
+> **Note**: Multi-GPU support is not yet available but will be addressed in a
 > future release.
 
 
