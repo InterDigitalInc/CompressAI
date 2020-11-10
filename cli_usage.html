@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,12 +11,18 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -25,15 +30,11 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Image compression" href="zoo.html" /> 
@@ -50,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> compressai
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> compressai
           
 
           
@@ -73,6 +74,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -119,6 +121,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -157,7 +160,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Command line usage</li>
     
@@ -200,9 +203,7 @@ optional arguments:
 <h2>plot<a class="headerlink" href="#plot" title="Permalink to this headline">¶</a></h2>
 <p>Simple plotting utility to display Rate-Distortion curves (RD) comparison
 between codecs.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.plot [-h] -f [[...]] [-m] [-t] [-o]
-                                       [--figsize ] [--axes   ] [--backend]
-                                       [--show]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.plot [-h] -f [[...]] [-m] [-t] [-o] [--figsize ] [--axes   ] [--backend] [--show]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -211,8 +212,7 @@ optional arguments:
   -t , --title          Plot title
   -o , --output         Output file name
   --figsize             Figure relative size (width, height), default: (9, 6)
-  --axes                Axes limit (xmin, xmax, ymin, ymax), default: (0, 2,
-                        28, 43)
+  --axes                Axes limit (xmin, xmax, ymin, ymax), default: (0, 2, 28, 43)
   --backend             Change plot backend (default: matplotlib)
   --show                Open plot figure
 </pre></div>
@@ -245,9 +245,7 @@ or psnr).</p>
 </ul>
 </dd>
 </dl>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.find_close [-h] [-m {bpp,psnr,ms-ssim}]
-                                             [--save]
-                                             {} ... image target
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.find_close [-h] [-m {bpp,psnr,ms-ssim}] [--save] {} ... image target
 
 Collect codec metrics and performances.
 
@@ -268,13 +266,9 @@ optional arguments:
 <p>Update the CDFs parameters of a trained model.</p>
 <p>To be called on a model checkpoint after training. This will update the internal
 CDFs related buffers required for entropy coding.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.update_model [-h] [-n NAME] [-d DIR]
-                                               [--no-update]
-                                               [--architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior}]
-                                               filepath
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.update_model [-h] [-n NAME] [-d DIR] [--no-update] [--architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior}] filepath
 
-Export a trained model to a new checkpoint with an updated CDFs parameters and
-a hash prefix, so that it can be loaded later via `load_state_dict_from_url`.
+Export a trained model to a new checkpoint with an updated CDFs parameters and a hash prefix, so that it can be loaded later via `load_state_dict_from_url`.
 
 positional arguments:
   filepath              Path to the checkpoint model to be exported.
@@ -309,11 +303,19 @@ optional arguments:
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, InterDigital Communications, Inc.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -324,7 +326,6 @@ optional arguments:
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {
