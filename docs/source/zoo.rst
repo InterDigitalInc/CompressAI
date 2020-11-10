@@ -132,7 +132,7 @@ Original paper: [cheng2020]_
 
 .. autofunction:: cheng2020_attn
 
-.. warning:: Pre-trained weights are not yet available
+.. warning:: Pre-trained weights are not yet available for this architecture.
 
 ....
 
@@ -213,6 +213,9 @@ Original paper: [cheng2020]_
 
 Performances
 ~~~~~~~~~~~~
+
+.. note:: See the `CompressAI paper <https://arxiv.org/abs/2011.03029>`_ on
+   arXiv for more comparisons and evaluations.
 
 all models
 ----------
