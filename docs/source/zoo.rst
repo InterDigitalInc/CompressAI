@@ -84,6 +84,13 @@ distortion and the mean estimated bit-rate.
 Models
 ~~~~~~
 
+.. warning:: All the models are currently implemented using floating point
+   operations only. As such operations are not reproducible and
+   encoding/decoding on different devices is not supported. See the following
+   paper, `"Integer Networks for Data Compression with Latent-Variable Models"
+   <https://openreview.net/forum?id=S1zz2i0cY7>`_ by Ballé *et al.*, for
+   solutions to implement cross-platform encoding and decoding.
+
 bmshj2018_factorized
 --------------------
 Original paper: [bmshj2018]_
@@ -125,7 +132,7 @@ Original paper: [cheng2020]_
 
 .. autofunction:: cheng2020_attn
 
-.. warning:: Pre-trained weights are not yet available
+.. warning:: Pre-trained weights are not yet available for this architecture.
 
 ....
 
@@ -206,6 +213,9 @@ Original paper: [cheng2020]_
 
 Performances
 ~~~~~~~~~~~~
+
+.. note:: See the `CompressAI paper <https://arxiv.org/abs/2011.03029>`_ on
+   arXiv for more comparisons and evaluations.
 
 all models
 ----------

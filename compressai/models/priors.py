@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import math
+import warnings
 
 import torch
 import torch.nn as nn
@@ -489,6 +490,12 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
         return net
 
     def compress(self, x):
+        if next(self.parameters()).device != torch.device("cpu"):
+            warnings.warn(
+                "Inference on GPU is not recommended for the autoregressive "
+                "models (the entropy coder is run sequentially on CPU)."
+            )
+
         y = self.g_a(x)
         z = self.h_a(y)
 
@@ -558,6 +565,13 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
 
     def decompress(self, strings, shape):
         assert isinstance(strings, list) and len(strings) == 2
+
+        if next(self.parameters()).device != torch.device("cpu"):
+            warnings.warn(
+                "Inference on GPU is not recommended for the autoregressive "
+                "models (the entropy coder is run sequentially on CPU)."
+            )
+
         # FIXME: we don't respect the default entropy coder and directly call the
         # range ANS decoder
 
