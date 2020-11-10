@@ -49,6 +49,10 @@ supported.
 
 ## Usage
 
+> **Note**: Multi-GPU support is not yet supported but will be addressed in a
+> future release.
+
+
 ### Examples
 
 Script and notebook examples can be found in the `examples/` directory.
