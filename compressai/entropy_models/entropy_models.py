@@ -333,7 +333,8 @@ class EntropyBottleneck(EntropyModel):
         pmf_length = maxima + minima + 1
 
         max_length = pmf_length.max()
-        samples = torch.arange(max_length)
+        device = pmf_start.device
+        samples = torch.arange(max_length, device=device)
 
         samples = samples[None, :] + pmf_start[:, None, None]
 
@@ -512,7 +513,10 @@ class GaussianConditional(EntropyModel):
         pmf_length = 2 * pmf_center + 1
         max_length = torch.max(pmf_length).item()
 
-        samples = torch.abs(torch.arange(max_length).int() - pmf_center[:, None])
+        device = pmf_center.device
+        samples = torch.abs(
+            torch.arange(max_length, device=device).int() - pmf_center[:, None]
+        )
         samples_scale = self.scale_table.unsqueeze(1)
         samples = samples.float()
         samples_scale = samples_scale.float()
