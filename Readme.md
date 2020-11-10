@@ -14,6 +14,9 @@ CompressAI currently provides:
 ![PSNR performances plot on Kodak](assets/kodak-psnr.png)
 
 
+> **Note**: Multi-GPU support is not yet available but will be addressed in a
+> future release.
+
 ## Installation
 
 CompressAI only supports python 3.6+ and PyTorch 1.4+. A C++17 compiler, a
@@ -48,10 +51,6 @@ supported.
 
 
 ## Usage
-
-> **Note**: Multi-GPU support is not yet available but will be addressed in a
-> future release.
-
 
 ### Examples
 
