@@ -546,7 +546,9 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
                     scales_hat, means_hat = gaussian_params.chunk(2, 1)
 
                     indexes = self.gaussian_conditional.build_indexes(scales_hat)
-                    y_q = torch.round(y_crop - means_hat)
+                    y_q = self.gaussian_conditional._quantize(  # pylint: disable=protected-access
+                        y_crop, "symbols", means_hat
+                    )
                     y_hat[i, :, h + padding, w + padding] = (y_q + means_hat)[
                         i, :, padding, padding
                     ]
