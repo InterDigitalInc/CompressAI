@@ -1,3 +1,6 @@
+
+![ID-CompressAI-logo](assets/ID-compressAI-logo-750x140.png)
+
 # CompressAI
 
 CompressAI (_compress-ay_) is a PyTorch library and evaluation platform for
