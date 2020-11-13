@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import scipy.stats
 import torch
@@ -88,6 +90,18 @@ class EntropyModel(nn.Module):
         self.register_buffer("_quantized_cdf", torch.IntTensor())
         self.register_buffer("_cdf_length", torch.IntTensor())
 
+    @property
+    def offset(self):
+        return self._offset
+
+    @property
+    def quantized_cdf(self):
+        return self._quantized_cdf
+
+    @property
+    def cdf_length(self):
+        return self._cdf_length
+
     def forward(self, *args):
         raise NotImplementedError()
 
@@ -101,7 +115,7 @@ class EntropyModel(nn.Module):
         self._noise.uniform_(-half, half)
         return self._noise
 
-    def _quantize(self, inputs, mode, means=None):
+    def quantize(self, inputs, mode, means=None):
         # type: (Tensor, str, Optional[Tensor]) -> Tensor
         if mode not in ("noise", "dequantize", "symbols"):
             raise ValueError(f'Invalid quantization mode: "{mode}"')
@@ -130,14 +144,23 @@ class EntropyModel(nn.Module):
         outputs = outputs.int()
         return outputs
 
+    def _quantize(self, inputs, mode, means=None):
+        warnings.warn("_quantize is deprecated. Use quantize instead.")
+        return self.quantize(inputs, mode, means)
+
     @staticmethod
-    def _dequantize(inputs, means=None):
+    def dequantize(inputs, means=None):
         if means is not None:
             outputs = inputs.type_as(means)
             outputs += means
         else:
             outputs = inputs.float()
         return outputs
+
+    @classmethod
+    def _dequantize(cls, inputs, means=None):
+        warnings.warn("_dequantize. Use dequantize instead.")
+        return cls.dequantize(inputs, means)
 
     def _pmf_to_cdf(self, pmf, tail_mass, pmf_length, max_length):
         cdf = torch.zeros((len(pmf_length), max_length + 2), dtype=torch.int32)
@@ -177,7 +200,7 @@ class EntropyModel(nn.Module):
             indexes (torch.IntTensor): tensors CDF indexes
             means (torch.Tensor, optional): optional tensor means
         """
-        symbols = self._quantize(inputs, "symbols", means)
+        symbols = self.quantize(inputs, "symbols", means)
 
         if len(inputs.size()) != 4:
             raise ValueError("Invalid `inputs` size. Expected a 4-D tensor.")
@@ -244,7 +267,7 @@ class EntropyModel(nn.Module):
                 self._offset.reshape(-1).int().tolist(),
             )
             outputs[i] = torch.Tensor(values).reshape(outputs[i].size())
-        outputs = self._dequantize(outputs, means)
+        outputs = self.dequantize(outputs, means)
         return outputs
 
 
@@ -400,7 +423,7 @@ class EntropyBottleneck(EntropyModel):
 
         # Add noise or quantize
 
-        outputs = self._quantize(
+        outputs = self.quantize(
             values, "noise" if self.training else "dequantize", self._medians()
         )
 
@@ -552,7 +575,7 @@ class GaussianConditional(EntropyModel):
 
     def forward(self, inputs, scales, means=None):
         # type: (Tensor, Tensor, Optional[Tensor]) -> Tuple[Tensor, Tensor]
-        outputs = self._quantize(
+        outputs = self.quantize(
             inputs, "noise" if self.training else "dequantize", means
         )
         likelihood = self._likelihood(outputs, scales, means)

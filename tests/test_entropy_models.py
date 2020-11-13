@@ -61,7 +61,7 @@ class TestEntropyModel:
     def test_dequantize(self, entropy_model):
         x = torch.randint(-32, 32, (1, 3, 4, 4))
         means = torch.rand(1, 3, 4, 4)
-        y = entropy_model._dequantize(x, means)
+        y = entropy_model.dequantize(x, means)
 
         assert y.shape == x.shape
         assert y.type() == means.type()
