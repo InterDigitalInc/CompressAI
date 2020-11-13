@@ -464,7 +464,7 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
         z_hat, z_likelihoods = self.entropy_bottleneck(z)
         params = self.h_s(z_hat)
 
-        y_hat = self.gaussian_conditional._quantize(  # pylint: disable=protected-access
+        y_hat = self.gaussian_conditional.quantize(
             y, "noise" if self.training else "dequantize"
         )
         ctx_params = self.context_prediction(y_hat)
@@ -513,57 +513,57 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
 
         y_hat = F.pad(y, (padding, padding, padding, padding))
 
-        # pylint: disable=protected-access
-        cdf = self.gaussian_conditional._quantized_cdf.tolist()
-        cdf_lengths = self.gaussian_conditional._cdf_length.reshape(-1).int().tolist()
-        offsets = self.gaussian_conditional._offset.reshape(-1).int().tolist()
-        # pylint: enable=protected-access
-
         y_strings = []
         for i in range(y.size(0)):
-            encoder = BufferedRansEncoder()
-            # Warning, this is slow...
-            # TODO: profile the calls to the bindings...
-            symbols_list = []
-            indexes_list = []
-            for h in range(y_height):
-                for w in range(y_width):
-                    y_crop = y_hat[
-                        i : i + 1, :, h : h + kernel_size, w : w + kernel_size
-                    ]
-                    ctx_p = F.conv2d(
-                        y_crop,
-                        self.context_prediction.weight,
-                        bias=self.context_prediction.bias,
-                    )
-
-                    # 1x1 conv for the entropy parameters prediction network, so
-                    # we only keep the elements in the "center"
-                    p = params[i : i + 1, :, h : h + 1, w : w + 1]
-                    gaussian_params = self.entropy_parameters(
-                        torch.cat((p, ctx_p), dim=1)
-                    )
-                    scales_hat, means_hat = gaussian_params.chunk(2, 1)
-
-                    indexes = self.gaussian_conditional.build_indexes(scales_hat)
-                    y_q = self.gaussian_conditional._quantize(  # pylint: disable=protected-access
-                        y_crop, "symbols", means_hat
-                    )
-                    y_hat[i, :, h + padding, w + padding] = (y_q + means_hat)[
-                        i, :, padding, padding
-                    ]
-
-                    symbols_list.extend(y_q[i, :, padding, padding].int().tolist())
-                    indexes_list.extend(indexes[i, :].squeeze().int().tolist())
-
-            encoder.encode_with_indexes(
-                symbols_list, indexes_list, cdf, cdf_lengths, offsets
+            string = self._compress_ar(
+                y_hat[i : i + 1], params, y_height, y_width, kernel_size, padding
             )
-
-            string = encoder.flush()
             y_strings.append(string)
 
         return {"strings": [y_strings, z_strings], "shape": z.size()[-2:]}
+
+    def _compress_ar(self, y_hat, params, height, width, kernel_size, padding):
+        cdf = self.gaussian_conditional.quantized_cdf.tolist()
+        cdf_lengths = self.gaussian_conditional.cdf_length.tolist()
+        offsets = self.gaussian_conditional.offset.tolist()
+
+        encoder = BufferedRansEncoder()
+        symbols_list = []
+        indexes_list = []
+
+        # Warning, this is slow...
+        # TODO: profile the calls to the bindings...
+        for h in range(height):
+            for w in range(width):
+                y_crop = y_hat[:, :, h : h + kernel_size, w : w + kernel_size]
+                ctx_p = F.conv2d(
+                    y_crop,
+                    self.context_prediction.weight,
+                    bias=self.context_prediction.bias,
+                )
+
+                # 1x1 conv for the entropy parameters prediction network, so
+                # we only keep the elements in the "center"
+                p = params[:, :, h : h + 1, w : w + 1]
+                gaussian_params = self.entropy_parameters(torch.cat((p, ctx_p), dim=1))
+                gaussian_params = gaussian_params.squeeze(3).squeeze(2)
+                scales_hat, means_hat = gaussian_params.chunk(2, 1)
+
+                indexes = self.gaussian_conditional.build_indexes(scales_hat)
+
+                y_crop = y_crop[:, :, padding, padding]
+                y_q = self.gaussian_conditional.quantize(y_crop, "symbols", means_hat)
+                y_hat[:, :, h + padding, w + padding] = y_q + means_hat
+
+                symbols_list.extend(y_q.squeeze().tolist())
+                indexes_list.extend(indexes.squeeze().tolist())
+
+        encoder.encode_with_indexes(
+            symbols_list, indexes_list, cdf, cdf_lengths, offsets
+        )
+
+        string = encoder.flush()
+        return string
 
     def decompress(self, strings, shape):
         assert isinstance(strings, list) and len(strings) == 2
@@ -593,62 +593,61 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
             (z_hat.size(0), self.M, y_height + 2 * padding, y_width + 2 * padding),
             device=z_hat.device,
         )
-        decoder = RansDecoder()
 
-        # pylint: disable=protected-access
-        cdf = self.gaussian_conditional._quantized_cdf.tolist()
-        cdf_lengths = self.gaussian_conditional._cdf_length.reshape(-1).int().tolist()
-        offsets = self.gaussian_conditional._offset.reshape(-1).int().tolist()
+        for i, y_string in enumerate(strings[0]):
+            self._decompress_ar(
+                y_string,
+                y_hat[i : i + 1],
+                params,
+                y_height,
+                y_width,
+                kernel_size,
+                padding,
+            )
+
+        y_hat = F.pad(y_hat, (-padding, -padding, -padding, -padding))
+        x_hat = self.g_s(y_hat).clamp_(0, 1)
+        return {"x_hat": x_hat}
+
+    def _decompress_ar(
+        self, y_string, y_hat, params, height, width, kernel_size, padding
+    ):
+        cdf = self.gaussian_conditional.quantized_cdf.tolist()
+        cdf_lengths = self.gaussian_conditional.cdf_length.tolist()
+        offsets = self.gaussian_conditional.offset.tolist()
+
+        decoder = RansDecoder()
+        decoder.set_stream(y_string)
 
         # Warning: this is slow due to the auto-regressive nature of the
         # decoding... See more recent publication where they use an
         # auto-regressive module on chunks of channels for faster decoding...
-        for i, y_string in enumerate(strings[0]):
-            decoder.set_stream(y_string)
+        for h in range(height):
+            for w in range(width):
+                # only perform the 5x5 convolution on a cropped tensor
+                # centered in (h, w)
+                y_crop = y_hat[:, :, h : h + kernel_size, w : w + kernel_size]
+                ctx_p = F.conv2d(
+                    y_crop,
+                    self.context_prediction.weight,
+                    bias=self.context_prediction.bias,
+                )
+                # 1x1 conv for the entropy parameters prediction network, so
+                # we only keep the elements in the "center"
+                p = params[:, :, h : h + 1, w : w + 1]
+                gaussian_params = self.entropy_parameters(torch.cat((p, ctx_p), dim=1))
+                scales_hat, means_hat = gaussian_params.chunk(2, 1)
 
-            for h in range(y_height):
-                for w in range(y_width):
-                    # only perform the 5x5 convolution on a cropped tensor
-                    # centered in (h, w)
-                    y_crop = y_hat[
-                        i : i + 1, :, h : h + kernel_size, w : w + kernel_size
-                    ]
-                    ctx_p = F.conv2d(
-                        y_crop,
-                        self.context_prediction.weight,
-                        bias=self.context_prediction.bias,
-                    )
-                    # 1x1 conv for the entropy parameters prediction network, so
-                    # we only keep the elements in the "center"
-                    p = params[i : i + 1, :, h : h + 1, w : w + 1]
-                    gaussian_params = self.entropy_parameters(
-                        torch.cat((p, ctx_p), dim=1)
-                    )
-                    scales_hat, means_hat = gaussian_params.chunk(2, 1)
+                indexes = self.gaussian_conditional.build_indexes(scales_hat)
+                rv = decoder.decode_stream(
+                    indexes.squeeze().tolist(), cdf, cdf_lengths, offsets
+                )
+                rv = torch.Tensor(rv).reshape(1, -1, 1, 1)
+                rv = self.gaussian_conditional.dequantize(rv, means_hat)
 
-                    indexes = self.gaussian_conditional.build_indexes(scales_hat)
-
-                    rv = decoder.decode_stream(
-                        indexes[i, :].squeeze().int().tolist(),
-                        cdf,
-                        cdf_lengths,
-                        offsets,
-                    )
-                    rv = torch.Tensor(rv).reshape(1, -1, 1, 1)
-
-                    rv = self.gaussian_conditional._dequantize(rv, means_hat)
-
-                    y_hat[
-                        i,
-                        :,
-                        h + padding : h + padding + 1,
-                        w + padding : w + padding + 1,
-                    ] = rv
-        y_hat = y_hat[:, :, padding:-padding, padding:-padding]
-        # pylint: enable=protected-access
-
-        x_hat = self.g_s(y_hat).clamp_(0, 1)
-        return {"x_hat": x_hat}
+                hp = h + padding
+                wp = w + padding
+                y_hat[:, :, hp : hp + 1, wp : wp + 1] = rv
 
     def update(self, scale_table=None, force=False):
         if scale_table is None:
