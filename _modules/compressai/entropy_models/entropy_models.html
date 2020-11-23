@@ -174,7 +174,9 @@
            <div itemprop="articleBody">
             
   <h1>Source code for compressai.entropy_models.entropy_models</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.stats</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
@@ -264,6 +266,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;_quantized_cdf&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;_cdf_length&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">())</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">quantized_cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quantized_cdf</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cdf_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cdf_length</span>
+
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
@@ -277,7 +291,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_noise</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="o">-</span><span class="n">half</span><span class="p">,</span> <span class="n">half</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_noise</span>
 
-    <span class="k">def</span> <span class="nf">_quantize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">quantize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># type: (Tensor, str, Optional[Tensor]) -&gt; Tensor</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;noise&quot;</span><span class="p">,</span> <span class="s2">&quot;dequantize&quot;</span><span class="p">,</span> <span class="s2">&quot;symbols&quot;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid quantization mode: &quot;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
@@ -306,14 +320,23 @@
         <span class="n">outputs</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">outputs</span>
 
+    <span class="k">def</span> <span class="nf">_quantize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;_quantize is deprecated. Use quantize instead.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">means</span><span class="p">)</span>
+
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_dequantize</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">dequantize</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">means</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">outputs</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">type_as</span><span class="p">(</span><span class="n">means</span><span class="p">)</span>
             <span class="n">outputs</span> <span class="o">+=</span> <span class="n">means</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">outputs</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">outputs</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_dequantize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;_dequantize. Use dequantize instead.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">dequantize</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">means</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_pmf_to_cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pmf</span><span class="p">,</span> <span class="n">tail_mass</span><span class="p">,</span> <span class="n">pmf_length</span><span class="p">,</span> <span class="n">max_length</span><span class="p">):</span>
         <span class="n">cdf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">pmf_length</span><span class="p">),</span> <span class="n">max_length</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
@@ -353,7 +376,7 @@
 <span class="sd">            indexes (torch.IntTensor): tensors CDF indexes</span>
 <span class="sd">            means (torch.Tensor, optional): optional tensor means</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">symbols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quantize</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="s2">&quot;symbols&quot;</span><span class="p">,</span> <span class="n">means</span><span class="p">)</span>
+        <span class="n">symbols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="s2">&quot;symbols&quot;</span><span class="p">,</span> <span class="n">means</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid `inputs` size. Expected a 4-D tensor.&quot;</span><span class="p">)</span>
@@ -420,7 +443,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
             <span class="p">)</span>
             <span class="n">outputs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
-        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dequantize</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">means</span><span class="p">)</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dequantize</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">means</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">outputs</span>
 
 
@@ -576,7 +599,7 @@
 
         <span class="c1"># Add noise or quantize</span>
 
-        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quantize</span><span class="p">(</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span>
             <span class="n">values</span><span class="p">,</span> <span class="s2">&quot;noise&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span> <span class="k">else</span> <span class="s2">&quot;dequantize&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_medians</span><span class="p">()</span>
         <span class="p">)</span>
 
@@ -728,7 +751,7 @@
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># type: (Tensor, Tensor, Optional[Tensor]) -&gt; Tuple[Tensor, Tensor]</span>
-        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quantize</span><span class="p">(</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span>
             <span class="n">inputs</span><span class="p">,</span> <span class="s2">&quot;noise&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span> <span class="k">else</span> <span class="s2">&quot;dequantize&quot;</span><span class="p">,</span> <span class="n">means</span>
         <span class="p">)</span>
         <span class="n">likelihood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_likelihood</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">)</span>

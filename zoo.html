@@ -247,8 +247,9 @@ and <a class="reference external" href="https://pytorch.org/docs/stable/nn.html?
 <p>Unless specified otherwise, networks were trained for 4-5M steps on <em>256x256</em>
 image patches randomly extracted and cropped from the <a class="reference external" href="http://toflow.csail.mit.edu/">Vimeo90K</a> dataset <a class="reference internal" href="#xue2019video" id="id1"><span>[xue2019video]</span></a>.</p>
 <p>Models were trained with a batch size of 16 or 32, and an initial learning rate
-of 1e-4 for approximately 1-2M steps. The learning rate is then divided by 2
-when the evaluation loss reaches a plateau (we use a patience of 20 epochs).</p>
+of 1e-4 for approximately 1-2M steps. The learning rate of the main optimizer is
+then divided by 2 when the evaluation loss reaches a plateau (we use a patience
+of 20 epochs). This can be implemented by using PyTorch <a class="reference external" href="https://pytorch.org/docs/stable/optim.html?highlight=reducelronplateau#torch.optim.lr_scheduler.ReduceLROnPlateau">ReduceLROnPlateau</a> learning rate scheduler.</p>
 <p>Training usually take between one or two weeks to reach state-of-the-art
 performances, depending on the model, the number of channels and the GPU
 architecture used.</p>
@@ -321,6 +322,11 @@ distortion and the mean estimated bit-rate.</p>
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>MS-SSIM optimized networks were fine-tuned from pre-trained MSE
+networks (with a learning rate of 1e-5 for both optimizers).</p>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The number of channels for the convolutionnal layers and the entropy
