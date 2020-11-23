@@ -42,8 +42,9 @@ image patches randomly extracted and cropped from the `Vimeo90K
 <http://toflow.csail.mit.edu/>`_ dataset [xue2019video]_.
 
 Models were trained with a batch size of 16 or 32, and an initial learning rate
-of 1e-4 for approximately 1-2M steps. The learning rate is then divided by 2
-when the evaluation loss reaches a plateau (we use a patience of 20 epochs).
+of 1e-4 for approximately 1-2M steps. The learning rate of the main optimizer is
+then divided by 2 when the evaluation loss reaches a plateau (we use a patience
+of 20 epochs). This can be implemented by using PyTorch `ReduceLROnPlateau <https://pytorch.org/docs/stable/optim.html?highlight=reducelronplateau#torch.optim.lr_scheduler.ReduceLROnPlateau>`_ learning rate scheduler.
 
 Training usually take between one or two weeks to reach state-of-the-art
 performances, depending on the model, the number of channels and the GPU
@@ -68,6 +69,9 @@ distortion and the mean estimated bit-rate.
 
     MSE, 0.0018, 0.0035, 0.0067, 0.0130, 0.0250, 0.0483, 0.0932, 0.1800
     MS-SSIM, 2.40, 4.58, 8.73, 16.64, 31.73, 60.50, 115.37, 220.00
+
+.. note:: MS-SSIM optimized networks were fine-tuned from pre-trained MSE
+   networks (with a learning rate of 1e-5 for both optimizers).
 
 .. note:: The number of channels for the convolutionnal layers and the entropy
    bottleneck depends on the architecture and the quality parameter (~targeted
