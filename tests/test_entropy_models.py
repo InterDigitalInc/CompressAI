@@ -32,7 +32,7 @@ class TestEntropyModel:
     def test_quantize_invalid(self, entropy_model):
         x = torch.rand(1, 3, 4, 4)
         with pytest.raises(ValueError):
-            entropy_model._quantize(x, mode="toto")
+            entropy_model.quantize(x, mode="toto")
 
     def test_quantize_noise(self, entropy_model):
         x = torch.rand(1, 3, 4, 4)
