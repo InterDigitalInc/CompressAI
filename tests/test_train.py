@@ -22,6 +22,7 @@ from pathlib import Path
 import pytest
 
 
+@pytest.mark.slow
 def test_train_example():
     cwd = Path(__file__).resolve().parent
     rootdir = cwd.parent

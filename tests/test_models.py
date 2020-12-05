@@ -240,6 +240,7 @@ class TestBmshj2018Factorized:
         with pytest.raises(ValueError):
             bmshj2018_factorized(1, metric="ssim")
 
+    @pytest.mark.slow
     @pytest.mark.pretrained
     @pytest.mark.parametrize(
         "metric", [("mse",), ("ms-ssim",)]
@@ -284,6 +285,7 @@ class TestBmshj2018Hyperprior:
         with pytest.raises(ValueError):
             bmshj2018_hyperprior(1, metric="ssim")
 
+    @pytest.mark.slow
     @pytest.mark.pretrained
     def test_pretrained(self):
         # test we can load the correct models from the urls
@@ -325,6 +327,7 @@ class TestMbt2018Mean:
         with pytest.raises(ValueError):
             mbt2018_mean(1, metric="ssim")
 
+    @pytest.mark.slow
     @pytest.mark.pretrained
     def test_pretrained(self):
         # test we can load the correct models from the urls
@@ -366,6 +369,7 @@ class TestMbt2018:
         with pytest.raises(ValueError):
             mbt2018(1, metric="ssim")
 
+    @pytest.mark.slow
     @pytest.mark.pretrained
     def test_pretrained(self):
         # test we can load the correct models from the urls
@@ -399,6 +403,7 @@ class TestCheng2020:
             assert isinstance(net, cls)
             assert net.state_dict()["g_a.0.conv1.weight"].size(0) == 192
 
+    @pytest.mark.slow
     @pytest.mark.pretrained
     def test_pretrained(self):
         for i in range(1, 4):
