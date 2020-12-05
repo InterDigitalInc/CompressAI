@@ -143,6 +143,13 @@ class FactorizedPrior(CompressionModel):
             deconv(N, 3),
         )
 
+        self.N = N
+        self.M = M
+
+    @property
+    def downsampling_factor(self) -> int:
+        return 2 ** 4
+
     def forward(self, x):
         y = self.g_a(x)
         y_hat, y_likelihoods = self.entropy_bottleneck(y)
@@ -253,6 +260,10 @@ class ScaleHyperprior(CompressionModel):
         self.gaussian_conditional = GaussianConditional(None)
         self.N = int(N)
         self.M = int(M)
+
+    @property
+    def downsampling_factor(self) -> int:
+        return 2 ** (4 + 2)
 
     def forward(self, x):
         y = self.g_a(x)
@@ -457,6 +468,10 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
         self.gaussian_conditional = GaussianConditional(None)
         self.N = int(N)
         self.M = int(M)
+
+    @property
+    def downsampling_factor(self) -> int:
+        return 2 ** (4 + 2)
 
     def forward(self, x):
         y = self.g_a(x)
