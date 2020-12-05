@@ -453,13 +453,13 @@ class EntropyBottleneck(EntropyModel):
 
     def compress(self, x):
         indexes = self._build_indexes(x.size())
-        medians = self._medians().detach().view(1, -1, 1, 1)
+        medians = self._medians().detach().expand(x.size(0), -1, 1, 1)
         return super().compress(x, indexes, medians)
 
     def decompress(self, strings, size):
         output_size = (len(strings), self._quantized_cdf.size(0), size[0], size[1])
         indexes = self._build_indexes(output_size)
-        medians = self._medians().detach().view(1, -1, 1, 1)
+        medians = self._medians().detach().expand(len(strings), -1, 1, 1)
         return super().decompress(strings, indexes, medians)
 
 
