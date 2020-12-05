@@ -36,7 +36,7 @@ class TestEntropyModel:
 
     def test_quantize_noise(self, entropy_model):
         x = torch.rand(1, 3, 4, 4)
-        y = entropy_model._quantize(x, "noise")
+        y = entropy_model.quantize(x, "noise")
 
         assert y.shape == x.shape
         assert ((y - x) <= 0.5).all()
@@ -45,7 +45,7 @@ class TestEntropyModel:
 
     def test_quantize_symbols(self, entropy_model):
         x = torch.rand(1, 3, 4, 4)
-        y = entropy_model._quantize(x, "symbols")
+        y = entropy_model.quantize(x, "symbols")
 
         assert y.shape == x.shape
         assert (y == torch.round(x).int()).all()
@@ -53,7 +53,7 @@ class TestEntropyModel:
     def test_quantize_dequantize(self, entropy_model):
         x = torch.rand(1, 3, 4, 4)
         means = torch.rand(1, 3, 4, 4)
-        y = entropy_model._quantize(x, "dequantize", means)
+        y = entropy_model.quantize(x, "dequantize", means)
 
         assert y.shape == x.shape
         assert (y == torch.round(x - means) + means).all()
