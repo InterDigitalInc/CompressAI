@@ -20,13 +20,13 @@ except ImportError:
 realimport = builtins.__import__
 
 
-def monkeypatched_import(name, *args):
+def monkeypatched_import(name, *args, **kwargs):
     # raise ImportError
     if name == "compressai.version":
         raise ImportError
     if name == "range_coder":
         raise ImportError
-    return realimport(name, *args)
+    return realimport(name, *args, **kwargs)
 
 
 builtins.__import__ = monkeypatched_import
