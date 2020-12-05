@@ -516,7 +516,12 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
         y_strings = []
         for i in range(y.size(0)):
             string = self._compress_ar(
-                y_hat[i : i + 1], params, y_height, y_width, kernel_size, padding
+                y_hat[i : i + 1],
+                params[i : i + 1],
+                y_height,
+                y_width,
+                kernel_size,
+                padding,
             )
             y_strings.append(string)
 
@@ -598,7 +603,7 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
             self._decompress_ar(
                 y_string,
                 y_hat[i : i + 1],
-                params,
+                params[i : i + 1],
                 y_height,
                 y_width,
                 kernel_size,
