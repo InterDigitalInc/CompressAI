@@ -21,6 +21,7 @@ from compressai.entropy_models import (
     GaussianConditional,
 )
 from compressai.models.priors import FactorizedPrior
+from compressai.zoo import bmshj2018_factorized, bmshj2018_hyperprior
 
 
 @pytest.fixture
@@ -42,6 +43,17 @@ class TestEntropyModel:
         assert ((y - x) <= 0.5).all()
         assert ((y - x) >= -0.5).all()
         assert (y != torch.round(x)).any()
+
+    def test__quantize(self, entropy_model):
+        x = torch.rand(1, 3, 4, 4)
+        s = torch.rand(1).item()
+        torch.manual_seed(s)
+        y0 = entropy_model.quantize(x, "noise")
+        torch.manual_seed(s)
+
+        with pytest.warns(UserWarning):
+            y1 = entropy_model._quantize(x, "noise")
+        assert (y0 == y1).all()
 
     def test_quantize_symbols(self, entropy_model):
         x = torch.rand(1, 3, 4, 4)
@@ -65,6 +77,10 @@ class TestEntropyModel:
 
         assert y.shape == x.shape
         assert y.type() == means.type()
+
+        with pytest.warns(UserWarning):
+            yy = entropy_model._dequantize(x, means)
+        assert (yy == y).all()
 
     def test_forward(self, entropy_model):
         with pytest.raises(NotImplementedError):
@@ -175,6 +191,20 @@ class TestEntropyBottleneck:
         assert torch.allclose(y0[0], y1[0])
         assert torch.all(y1[1] == 0)  # not yet supported
 
+    def test_update(self):
+        # get a pretrained model
+        net = bmshj2018_factorized(quality=1, pretrained=True).eval()
+        assert not net.update()
+        assert not net.update(force=False)
+        assert net.update(force=True)
+
+    def test_script(self):
+        eb = EntropyBottleneck(32)
+        eb = torch.jit.script(eb)
+        x = torch.rand(1, 32, 4, 4)
+        x_q, likelihoods = eb(x)
+        assert (likelihoods == torch.zeros_like(x_q)).all()
+
 
 class TestGaussianConditional:
     def test_invalid_scale_table(self):
@@ -198,6 +228,9 @@ class TestGaussianConditional:
 
         with pytest.raises(ValueError):
             GaussianConditional([], scale_bound=None)
+
+        with pytest.raises(ValueError):
+            GaussianConditional([], scale_bound=-0.1)
 
     def test_forward_training(self):
         gaussian_conditional = GaussianConditional(None)
@@ -268,3 +301,21 @@ class TestGaussianConditional:
 
         assert torch.allclose(y0[0], y1[0])
         assert torch.allclose(y0[1], y1[1])
+
+    def test_update(self):
+        # get a pretrained model
+        net = bmshj2018_hyperprior(quality=1, pretrained=True).eval()
+        assert not net.update()
+        assert not net.update(force=False)
+
+        quantized_cdf = net.gaussian_conditional._quantized_cdf
+        offset = net.gaussian_conditional._offset
+        cdf_length = net.gaussian_conditional._cdf_length
+        assert net.update(force=True)
+
+        def approx(a, b):
+            return ((a - b).abs() <= 2).all()
+
+        assert approx(net.gaussian_conditional._cdf_length, cdf_length)
+        assert approx(net.gaussian_conditional._offset, offset)
+        assert approx(net.gaussian_conditional._quantized_cdf, quantized_cdf)

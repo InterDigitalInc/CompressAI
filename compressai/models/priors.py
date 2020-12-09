@@ -101,11 +101,17 @@ class CompressionModel(nn.Module):
         Args:
             force (bool): overwrite previous values (default: False)
 
+        Returns:
+            updated (bool): True if one of the EntropyBottlenecks was updated.
+
         """
+        updated = False
         for m in self.children():
             if not isinstance(m, EntropyBottleneck):
                 continue
-            m.update(force=force)
+            rv = m.update(force=force)
+            updated |= rv
+        return updated
 
 
 class FactorizedPrior(CompressionModel):
@@ -306,8 +312,9 @@ class ScaleHyperprior(CompressionModel):
     def update(self, scale_table=None, force=False):
         if scale_table is None:
             scale_table = get_scale_table()
-        self.gaussian_conditional.update_scale_table(scale_table, force=force)
-        super().update(force=force)
+        updated = self.gaussian_conditional.update_scale_table(scale_table, force=force)
+        updated |= super().update(force=force)
+        return updated
 
     def compress(self, x):
         y = self.g_a(x)
@@ -672,8 +679,9 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
     def update(self, scale_table=None, force=False):
         if scale_table is None:
             scale_table = get_scale_table()
-        self.gaussian_conditional.update_scale_table(scale_table, force=force)
-        super().update(force=force)
+        updated = self.gaussian_conditional.update_scale_table(scale_table, force=force)
+        updated |= super().update(force=force)
+        return updated
 
     def load_state_dict(self, state_dict):
         # Dynamically update the entropy bottleneck buffers related to the CDFs

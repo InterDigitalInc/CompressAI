@@ -79,10 +79,10 @@ class ResidualBlockWithStride(nn.Module):
         self.leaky_relu = nn.LeakyReLU(inplace=True)
         self.conv2 = conv3x3(out_ch, out_ch)
         self.gdn = GDN(out_ch)
-        if stride != 1:
-            self.downsample = conv1x1(in_ch, out_ch, stride=stride)
+        if stride != 1 or in_ch != out_ch:
+            self.skip = conv1x1(in_ch, out_ch, stride=stride)
         else:
-            self.downsample = None
+            self.skip = None
 
     def forward(self, x):
         identity = x
@@ -91,8 +91,8 @@ class ResidualBlockWithStride(nn.Module):
         out = self.conv2(out)
         out = self.gdn(out)
 
-        if self.downsample is not None:
-            identity = self.downsample(x)
+        if self.skip is not None:
+            identity = self.skip(x)
 
         out += identity
         return out
@@ -139,6 +139,10 @@ class ResidualBlock(nn.Module):
         self.conv1 = conv3x3(in_ch, out_ch)
         self.leaky_relu = nn.LeakyReLU(inplace=True)
         self.conv2 = conv3x3(out_ch, out_ch)
+        if in_ch != out_ch:
+            self.skip = conv1x1(in_ch, out_ch)
+        else:
+            self.skip = None
 
     def forward(self, x):
         identity = x
@@ -147,6 +151,9 @@ class ResidualBlock(nn.Module):
         out = self.leaky_relu(out)
         out = self.conv2(out)
         out = self.leaky_relu(out)
+
+        if self.skip is not None:
+            identity = self.skip(x)
 
         out = out + identity
         return out

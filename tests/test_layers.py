@@ -15,7 +15,15 @@
 import pytest
 import torch
 
-from compressai.layers import GDN, GDN1, MaskedConv2d
+from compressai.layers import (
+    GDN,
+    GDN1,
+    AttentionBlock,
+    MaskedConv2d,
+    ResidualBlock,
+    ResidualBlockUpsample,
+    ResidualBlockWithStride,
+)
 
 
 class TestMaskedConv2d:
@@ -147,15 +155,34 @@ class TestGDN:
         y_ref = x / (1 + 0.1 * torch.abs(x))
         assert torch.allclose(y_ref, y)
 
-    def test_igdn(self):
-        g = GDN1(32, inverse=True)
-        x = torch.rand(1, 32, 16, 16, requires_grad=True)
-        y = g(x)
-        y.backward(x)
 
-        assert y.shape == x.shape
-        assert x.grad is not None
-        assert x.grad.shape == x.shape
+def test_ResidualBlockWithStride():
+    layer = ResidualBlockWithStride(32, 64, stride=1)
+    layer(torch.rand(1, 32, 4, 4))
 
-        y_ref = x * (1 + 0.1 * torch.abs(x))
-        assert torch.allclose(y_ref, y)
+    layer = ResidualBlockWithStride(32, 32, stride=1)
+    layer(torch.rand(1, 32, 4, 4))
+
+    layer = ResidualBlockWithStride(32, 32, stride=2)
+    layer(torch.rand(1, 32, 4, 4))
+
+    layer = ResidualBlockWithStride(32, 64, stride=2)
+    layer(torch.rand(1, 32, 4, 4))
+
+
+def test_ResidualBlockUpsample():
+    layer = ResidualBlockUpsample(8, 16)
+    layer(torch.rand(1, 8, 4, 4))
+
+
+def test_ResidualBlock():
+    layer = ResidualBlock(8, 8)
+    layer(torch.rand(1, 8, 4, 4))
+
+    layer = ResidualBlock(8, 16)
+    layer(torch.rand(1, 8, 4, 4))
+
+
+def test_AttentionBlock():
+    layer = AttentionBlock(8)
+    layer(torch.rand(1, 8, 4, 4))

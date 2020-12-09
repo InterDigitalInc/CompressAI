@@ -35,9 +35,12 @@ class TestLowerBound:
         x = torch.rand(16)
         bound = torch.rand(1)
         lower_bound = LowerBound(bound)
-
         assert (lower_bound(x) == torch.max(x, bound)).all()
 
+    def test_lower_bound_script(self):
+        x = torch.rand(16)
+        bound = torch.rand(1)
+        lower_bound = LowerBound(bound)
         scripted = torch.jit.script(lower_bound)
         assert (scripted(x) == torch.max(x, bound)).all()
 

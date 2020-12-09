@@ -24,7 +24,7 @@ class RGB2YCbCr:
         """
         return F_transforms.rgb2ycbcr(rgb)
 
-    def ___repr__(self):
+    def __repr__(self):
         return f"{self.__class__.__name__}()"
 
 
@@ -44,7 +44,7 @@ class YCbCr2RGB:
         """
         return F_transforms.ycbcr2rgb(ycbcr)
 
-    def ___repr__(self):
+    def __repr__(self):
         return f"{self.__class__.__name__}()"
 
 
@@ -77,7 +77,7 @@ class YUV444To420:
         """
         return F_transforms.yuv_444_to_420(yuv, mode=self.mode)
 
-    def ___repr__(self):
+    def __repr__(self):
         return f"{self.__class__.__name__}()"
 
 
@@ -114,5 +114,5 @@ class YUV420To444:
         """
         return F_transforms.yuv_420_to_444(yuv, return_tuple=self.return_tuple)
 
-    def ___repr__(self):
+    def __repr__(self):
         return f"{self.__class__.__name__}(return_tuple={self.return_tuple})"
