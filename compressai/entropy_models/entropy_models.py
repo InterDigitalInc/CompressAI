@@ -1,10 +1,14 @@
 import warnings
 
+from typing import Optional
+
 import numpy as np
 import scipy.stats
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+from torch import Tensor
 
 # isort: off; pylint: disable=E0611,E0401
 from compressai._CXX import pmf_to_quantized_cdf as _pmf_to_quantized_cdf
@@ -115,8 +119,9 @@ class EntropyModel(nn.Module):
         self._noise.uniform_(-half, half)
         return self._noise
 
-    def quantize(self, inputs, mode, means=None):
-        # type: (Tensor, str, Optional[Tensor]) -> Tensor
+    def quantize(
+        self, inputs: Tensor, mode: str, means: Optional[Tensor] = None
+    ) -> Tensor:
         if mode not in ("noise", "dequantize", "symbols"):
             raise ValueError(f'Invalid quantization mode: "{mode}"')
 
@@ -338,7 +343,7 @@ class EntropyBottleneck(EntropyModel):
         # Check if we need to update the bottleneck parameters, the offsets are
         # only computed and stored when the conditonal model is update()'d.
         if self._offset.numel() > 0 and not force:  # pylint: disable=E0203
-            return
+            return False
 
         medians = self.quantiles[:, 0, 1]
 
@@ -374,6 +379,7 @@ class EntropyBottleneck(EntropyModel):
         quantized_cdf = self._pmf_to_cdf(pmf, tail_mass, pmf_length, max_length)
         self._quantized_cdf = quantized_cdf
         self._cdf_length = pmf_length + 2
+        return True
 
     def loss(self):
         logits = self._logits_cumulative(self.quantiles, stop_gradient=True)
@@ -488,6 +494,14 @@ class GaussianConditional(EntropyModel):
         ):
             raise ValueError(f'Invalid scale_table "({scale_table})"')
 
+        self.tail_mass = float(tail_mass)
+        if scale_bound is None and scale_table:
+            self.lower_bound_scale = LowerBound(self.scale_table[0])
+        elif scale_bound > 0:
+            self.lower_bound_scale = LowerBound(scale_bound)
+        else:
+            raise ValueError("Invalid parameters")
+
         self.register_buffer(
             "scale_table",
             self._prepare_scale_table(scale_table) if scale_table else torch.Tensor(),
@@ -497,14 +511,6 @@ class GaussianConditional(EntropyModel):
             "scale_bound",
             torch.Tensor([float(scale_bound)]) if scale_bound is not None else None,
         )
-
-        self.tail_mass = float(tail_mass)
-        if scale_bound is None and scale_table:
-            self.lower_bound_scale = LowerBound(self.scale_table[0])
-        elif scale_bound > 0:
-            self.lower_bound_scale = LowerBound(scale_bound)
-        else:
-            raise ValueError("Invalid parameters")
 
     @staticmethod
     def _prepare_scale_table(scale_table):
@@ -526,9 +532,10 @@ class GaussianConditional(EntropyModel):
         # offsets are only computed and stored when the conditonal model is
         # updated.
         if self._offset.numel() > 0 and not force:
-            return
+            return False
         self.scale_table = self._prepare_scale_table(scale_table)
         self.update()
+        return True
 
     def update(self):
         multiplier = -self._standardized_quantile(self.tail_mass / 2)

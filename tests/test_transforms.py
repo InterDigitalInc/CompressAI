@@ -73,11 +73,22 @@ def test_444_to_420():
 
     assert (x[:, [0]] == y).all()
 
+    with pytest.raises(ValueError):
+        y, u, v = yuv_444_to_420(x, mode="toto")
+
+    y, u, v = yuv_444_to_420(x.chunk(3, 1))
+
 
 def test_420_to_444():
     y = torch.rand(1, 1, 32, 32)
     u = torch.rand(1, 1, 16, 16)
     v = torch.rand(1, 1, 16, 16)
+
+    with pytest.raises(ValueError):
+        yuv_420_to_444((y, u))
+
+    with pytest.raises(ValueError):
+        yuv_420_to_444((y, u, v), mode="bilateral")
 
     rv = yuv_420_to_444((y, u, v))
     assert isinstance(rv, torch.Tensor)
@@ -93,12 +104,16 @@ def test_transforms():
     x = torch.rand(1, 3, 32, 32)
     rv = RGB2YCbCr()(x)
     assert rv.size() == x.size()
+    repr(RGB2YCbCr())
 
     rv = YCbCr2RGB()(x)
     assert rv.size() == x.size()
+    repr(YCbCr2RGB())
 
     rv = YUV444To420()(x)
     assert len(rv) == 3
+    repr(YUV444To420())
 
     rv = YUV420To444()(rv)
     assert rv.size() == x.size()
+    repr(YUV420To444())

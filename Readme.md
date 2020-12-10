@@ -52,6 +52,15 @@ supported.
 * [Training your own model](https://interdigitalinc.github.io/CompressAI/tutorial_train.html)
 * [List of available models (model zoo)](https://interdigitalinc.github.io/CompressAI/zoo.html)
 
+## Tests
+
+Run tests with `pytest`:
+
+```bash
+pytest -sx --cov=compressai --cov-append --cov-report term-missing tests
+```
+
+Slow tests can be skipped with the `-m "not slow"` option.
 
 ## Usage
 
