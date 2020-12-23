@@ -243,7 +243,7 @@ def parse_args(argv):
         type=float,
         help='Set random seed for reproducibility')
     parser.add_argument('--clip_max_norm',
-                        default=0.1,
+                        default=1.0,
                         type=float,
                         help='gradient clipping max norm')
     # yapf: enable
