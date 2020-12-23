@@ -195,7 +195,7 @@ class FactorizedPrior(CompressionModel):
     def decompress(self, strings, shape):
         assert isinstance(strings, list) and len(strings) == 1
         y_hat = self.entropy_bottleneck.decompress(strings[0], shape)
-        x_hat = self.g_s(y_hat)
+        x_hat = self.g_s(y_hat).clamp_(0, 1)
         return {"x_hat": x_hat}
 
 
