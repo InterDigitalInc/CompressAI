@@ -168,7 +168,7 @@ class EntropyModel(nn.Module):
         return cls.dequantize(inputs, means)
 
     def _pmf_to_cdf(self, pmf, tail_mass, pmf_length, max_length):
-        cdf = torch.zeros((len(pmf_length), max_length + 2), dtype=torch.int32)
+        cdf = torch.zeros((len(pmf_length), max_length + 2), dtype=torch.int32, device=pmf.device)
         for i, p in enumerate(pmf):
             prob = torch.cat((p[: pmf_length[i]], tail_mass[i]), dim=0)
             _cdf = pmf_to_quantized_cdf(prob, self.entropy_coder_precision)
@@ -464,7 +464,7 @@ class EntropyBottleneck(EntropyModel):
 
     def decompress(self, strings, size):
         output_size = (len(strings), self._quantized_cdf.size(0), size[0], size[1])
-        indexes = self._build_indexes(output_size)
+        indexes = self._build_indexes(output_size).to(self._quantized_cdf.device)
         medians = self._medians().detach().expand(len(strings), -1, 1, 1)
         return super().decompress(strings, indexes, medians)
 
@@ -533,7 +533,8 @@ class GaussianConditional(EntropyModel):
         # updated.
         if self._offset.numel() > 0 and not force:
             return False
-        self.scale_table = self._prepare_scale_table(scale_table)
+        device = self.scale_table.device
+        self.scale_table = self._prepare_scale_table(scale_table).to(device)
         self.update()
         return True
 
