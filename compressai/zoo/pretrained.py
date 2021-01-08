@@ -16,6 +16,10 @@
 def rename_key(key):
     """Rename state_dict key."""
 
+    # Deal with modules trained with DataParallel
+    if key.startswith('module.'):
+        key = key[7:]
+
     # ResidualBlockWithStride: 'downsample' -> 'skip'
     if ".downsample." in key:
         return key.replace("downsample", "skip")
