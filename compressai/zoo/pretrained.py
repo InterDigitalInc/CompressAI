@@ -17,19 +17,19 @@ def rename_key(key):
     """Rename state_dict key."""
 
     # ResidualBlockWithStride: 'downsample' -> 'skip'
-    if '.downsample.' in key:
+    if ".downsample." in key:
         return key.replace("downsample", "skip")
 
     # EntropyBottleneck: nn.ParameterList to nn.Parameters
-    if key.startswith('entropy_bottleneck.'):
-        if key.startswith('entropy_bottleneck._biases.'):
-            return f'entropy_bottleneck._bias{key[-1]}'
+    if key.startswith("entropy_bottleneck."):
+        if key.startswith("entropy_bottleneck._biases."):
+            return f"entropy_bottleneck._bias{key[-1]}"
 
-        if key.startswith('entropy_bottleneck._matrices.'):
-            return f'entropy_bottleneck._matrix{key[-1]}'
+        if key.startswith("entropy_bottleneck._matrices."):
+            return f"entropy_bottleneck._matrix{key[-1]}"
 
-        if key.startswith('entropy_bottleneck._factors.'):
-            return f'entropy_bottleneck._factor{key[-1]}'
+        if key.startswith("entropy_bottleneck._factors."):
+            return f"entropy_bottleneck._factor{key[-1]}"
 
     return key
 

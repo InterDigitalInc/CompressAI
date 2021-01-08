@@ -388,18 +388,18 @@ class EntropyBottleneck(EntropyModel):
         # TorchScript not yet working (nn.Mmodule indexing not supported)
         logits = inputs
         for i in range(len(self.filters) + 1):
-            matrix = getattr(self, f'_matrix{i:d}')
+            matrix = getattr(self, f"_matrix{i:d}")
             if stop_gradient:
                 matrix = matrix.detach()
             logits = torch.matmul(F.softplus(matrix), logits)
 
-            bias = getattr(self, f'_bias{i:d}')
+            bias = getattr(self, f"_bias{i:d}")
             if stop_gradient:
                 bias = bias.detach()
             logits += bias
 
             if i < len(self.filters):
-                factor = getattr(self, f'_factor{i:d}')
+                factor = getattr(self, f"_factor{i:d}")
                 if stop_gradient:
                     factor = factor.detach()
                 logits += torch.tanh(factor) * torch.tanh(logits)
