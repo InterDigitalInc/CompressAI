@@ -105,6 +105,15 @@ class AverageMeter:
         self.avg = self.sum / self.count
 
 
+# We need a custom DataParallel to access our custom module methods
+class CustomDataParallel(nn.DataParallel):
+    def __getattr__(self, key):
+        try:
+            return super().__getattr__(key)
+        except AttributeError:
+            return getattr(self.module, key)
+
+
 def configure_optimizers(net, args):
     """Separate parameters for the main optimizer and the auxiliary optimizer.
     Return two optimizers"""
@@ -322,7 +331,7 @@ def main(argv):
     net = net.to(device)
 
     if args.cuda and torch.cuda.device_count() > 1:
-        net = nn.DataParallel(net)
+        net = CustomDataParallel(net)
 
     optimizer, aux_optimizer = configure_optimizers(net, args)
     criterion = RateDistortionLoss(lmbda=args.lmbda)
