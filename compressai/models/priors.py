@@ -73,25 +73,6 @@ class CompressionModel(nn.Module):
     def forward(self, *args):
         raise NotImplementedError()
 
-    def parameters(self):
-        """Returns an iterator over the model parameters."""
-        for m in self.children():
-            if isinstance(m, EntropyBottleneck):
-                continue
-            for p in m.parameters():
-                yield p
-
-    def aux_parameters(self):
-        """
-        Returns an iterator over the entropy bottleneck(s) parameters for
-        the auxiliary loss.
-        """
-        for m in self.children():
-            if not isinstance(m, EntropyBottleneck):
-                continue
-            for p in m.parameters():
-                yield p
-
     def update(self, force=False):
         """Updates the entropy bottleneck(s) CDF values.
 
