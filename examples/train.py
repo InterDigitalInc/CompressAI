@@ -26,7 +26,6 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 from compressai.datasets import ImageFolder
-from compressai.entropy_models import EntropyBottleneck
 from compressai.layers import GDN
 from compressai.models import CompressionModel
 from compressai.models.utils import conv, deconv
@@ -105,8 +104,9 @@ class AverageMeter:
         self.avg = self.sum / self.count
 
 
-# We need a custom DataParallel to access our custom module methods
 class CustomDataParallel(nn.DataParallel):
+    """Custom DataParallel to access the module methods.
+    """
     def __getattr__(self, key):
         try:
             return super().__getattr__(key)
@@ -126,7 +126,7 @@ def configure_optimizers(net, args):
     )
 
     # Make sure we don't have an intersection of parameters
-    params_dict = {n: p for n, p in net.named_parameters()}
+    params_dict = dict(net.named_parameters())
     inter_params = parameters & aux_parameters
     union_params = parameters | aux_parameters
 
