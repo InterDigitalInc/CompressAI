@@ -70,6 +70,7 @@ def read_image(filepath: str) -> torch.Tensor:
     return transforms.ToTensor()(img)
 
 
+@torch.no_grad()
 def inference(model, x):
     x = x.unsqueeze(0)
 
@@ -88,14 +89,13 @@ def inference(model, x):
         value=0,
     )
 
-    with torch.no_grad():
-        start = time.time()
-        out_enc = model.compress(x_padded)
-        enc_time = time.time() - start
+    start = time.time()
+    out_enc = model.compress(x_padded)
+    enc_time = time.time() - start
 
-        start = time.time()
-        out_dec = model.decompress(out_enc["strings"], out_enc["shape"])
-        dec_time = time.time() - start
+    start = time.time()
+    out_dec = model.decompress(out_enc["strings"], out_enc["shape"])
+    dec_time = time.time() - start
 
     out_dec["x_hat"] = F.pad(
         out_dec["x_hat"], (-padding_left, -padding_right, -padding_top, -padding_bottom)
@@ -113,13 +113,13 @@ def inference(model, x):
     }
 
 
+@torch.no_grad()
 def inference_entropy_estimation(model, x):
     x = x.unsqueeze(0)
 
-    with torch.no_grad():
-        start = time.time()
-        out_net = model.forward(x)
-        elapsed_time = time.time() - start
+    start = time.time()
+    out_net = model.forward(x)
+    elapsed_time = time.time() - start
 
     num_pixels = x.size(0) * x.size(2) * x.size(3)
     bpp = sum(
