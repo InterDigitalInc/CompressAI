@@ -184,6 +184,11 @@ def setup_args():
         help="entropy coder (default: %(default)s)",
     )
     parent_parser.add_argument(
+        "--cuda",
+        action="store_true",
+        help="enable CUDA",
+    )
+    parent_parser.add_argument(
         "--entropy-estimation",
         action="store_true",
         help="use evaluated entropy estimation (no entropy coding)",
@@ -262,6 +267,8 @@ def main(argv):
             sys.stderr.write(log_fmt.format(*opts, run=run))
             sys.stderr.flush()
         model = load_func(*opts, run)
+        if args.cuda and torch.cuda.is_available():
+            model = model.to("cuda")
         metrics = eval_model(model, filepaths, args.entropy_estimation)
         for k, v in metrics.items():
             results[k].append(v)
