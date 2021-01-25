@@ -145,12 +145,15 @@ def load_checkpoint(arch: str, checkpoint_path: str) -> nn.Module:
     return architectures[arch].from_state_dict(torch.load(checkpoint_path)).eval()
 
 
-def eval_model(model, filepaths, entropy_estimation=False):
+def eval_model(model, filepaths, entropy_estimation=False, half=False):
     device = next(model.parameters()).device
     metrics = defaultdict(float)
     for f in filepaths:
         x = read_image(f).to(device)
         if not entropy_estimation:
+            if half:
+                model = model.half()
+                x = x.half()
             rv = inference(model, x)
         else:
             rv = inference_entropy_estimation(model, x)
@@ -187,6 +190,11 @@ def setup_args():
         "--cuda",
         action="store_true",
         help="enable CUDA",
+    )
+    parent_parser.add_argument(
+        "--half",
+        action="store_true",
+        help="convert model to half floating point (fp16)",
     )
     parent_parser.add_argument(
         "--entropy-estimation",
@@ -269,7 +277,7 @@ def main(argv):
         model = load_func(*opts, run)
         if args.cuda and torch.cuda.is_available():
             model = model.to("cuda")
-        metrics = eval_model(model, filepaths, args.entropy_estimation)
+        metrics = eval_model(model, filepaths, args.entropy_estimation, args.half)
         for k, v in metrics.items():
             results[k].append(v)
 
