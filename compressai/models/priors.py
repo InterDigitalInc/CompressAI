@@ -73,25 +73,6 @@ class CompressionModel(nn.Module):
     def forward(self, *args):
         raise NotImplementedError()
 
-    def parameters(self):
-        """Returns an iterator over the model parameters."""
-        for m in self.children():
-            if isinstance(m, EntropyBottleneck):
-                continue
-            for p in m.parameters():
-                yield p
-
-    def aux_parameters(self):
-        """
-        Returns an iterator over the entropy bottleneck(s) parameters for
-        the auxiliary loss.
-        """
-        for m in self.children():
-            if not isinstance(m, EntropyBottleneck):
-                continue
-            for p in m.parameters():
-                yield p
-
     def update(self, force=False):
         """Updates the entropy bottleneck(s) CDF values.
 
@@ -112,6 +93,16 @@ class CompressionModel(nn.Module):
             rv = m.update(force=force)
             updated |= rv
         return updated
+
+    def load_state_dict(self, state_dict):
+        # Dynamically update the entropy bottleneck buffers related to the CDFs
+        update_registered_buffers(
+            self.entropy_bottleneck,
+            "entropy_bottleneck",
+            ["_quantized_cdf", "_offset", "_cdf_length"],
+            state_dict,
+        )
+        super().load_state_dict(state_dict)
 
 
 class FactorizedPrior(CompressionModel):
@@ -167,16 +158,6 @@ class FactorizedPrior(CompressionModel):
                 "y": y_likelihoods,
             },
         }
-
-    def load_state_dict(self, state_dict):
-        # Dynamically update the entropy bottleneck buffers related to the CDFs
-        update_registered_buffers(
-            self.entropy_bottleneck,
-            "entropy_bottleneck",
-            ["_quantized_cdf", "_offset", "_cdf_length"],
-            state_dict,
-        )
-        super().load_state_dict(state_dict)
 
     @classmethod
     def from_state_dict(cls, state_dict):
@@ -285,13 +266,6 @@ class ScaleHyperprior(CompressionModel):
         }
 
     def load_state_dict(self, state_dict):
-        # Dynamically update the entropy bottleneck buffers related to the CDFs
-        update_registered_buffers(
-            self.entropy_bottleneck,
-            "entropy_bottleneck",
-            ["_quantized_cdf", "_offset", "_cdf_length"],
-            state_dict,
-        )
         update_registered_buffers(
             self.gaussian_conditional,
             "gaussian_conditional",
@@ -409,7 +383,7 @@ class MeanScaleHyperprior(ScaleHyperprior):
         return {"x_hat": x_hat}
 
 
-class JointAutoregressiveHierarchicalPriors(CompressionModel):
+class JointAutoregressiveHierarchicalPriors(MeanScaleHyperprior):
     r"""Joint Autoregressive Hierarchical Priors model from D.
     Minnen, J. Balle, G.D. Toderici: `"Joint Autoregressive and Hierarchical
     Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_,
@@ -422,7 +396,7 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
     """
 
     def __init__(self, N=192, M=192, **kwargs):
-        super().__init__(entropy_bottleneck_channels=N, **kwargs)
+        super().__init__(N=N, M=M, **kwargs)
 
         self.g_a = nn.Sequential(
             conv(3, N, kernel_size=5, stride=2),
@@ -675,26 +649,3 @@ class JointAutoregressiveHierarchicalPriors(CompressionModel):
                 hp = h + padding
                 wp = w + padding
                 y_hat[:, :, hp : hp + 1, wp : wp + 1] = rv
-
-    def update(self, scale_table=None, force=False):
-        if scale_table is None:
-            scale_table = get_scale_table()
-        updated = self.gaussian_conditional.update_scale_table(scale_table, force=force)
-        updated |= super().update(force=force)
-        return updated
-
-    def load_state_dict(self, state_dict):
-        # Dynamically update the entropy bottleneck buffers related to the CDFs
-        update_registered_buffers(
-            self.entropy_bottleneck,
-            "entropy_bottleneck",
-            ["_quantized_cdf", "_offset", "_cdf_length"],
-            state_dict,
-        )
-        update_registered_buffers(
-            self.gaussian_conditional,
-            "gaussian_conditional",
-            ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
-            state_dict,
-        )
-        super().load_state_dict(state_dict)
