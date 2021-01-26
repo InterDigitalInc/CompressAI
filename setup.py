@@ -23,7 +23,7 @@ from torch.utils.cpp_extension import BuildExtension, CppExtension
 cwd = Path(__file__).resolve().parent
 
 package_name = "compressai"
-version = "1.0.9"
+version = "1.1.0"
 git_hash = "unknown"
 
 
