@@ -17,8 +17,7 @@ CompressAI currently provides:
 ![PSNR performances plot on Kodak](assets/kodak-psnr.png)
 
 
-> **Note**: Multi-GPU support is not yet available but will be addressed in a
-> future release.
+> **Note**: Multi-GPU support is now experimental.
 
 ## Installation
 
