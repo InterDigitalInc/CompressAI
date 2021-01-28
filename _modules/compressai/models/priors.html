@@ -1,7 +1,8 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
   
@@ -11,18 +12,12 @@
   
 
   
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-
-  
   
   
   
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -30,11 +25,15 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
     
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
@@ -50,7 +49,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> compressai
+            <a href="../../../index.html" class="icon icon-home"> compressai
           
 
           
@@ -73,7 +72,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -113,7 +111,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -152,7 +149,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
@@ -249,25 +246,6 @@
 <div class="viewcode-block" id="CompressionModel.forward"><a class="viewcode-back" href="../../../models.html#compressai.models.CompressionModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="CompressionModel.parameters"><a class="viewcode-back" href="../../../models.html#compressai.models.CompressionModel.parameters">[docs]</a>    <span class="k">def</span> <span class="nf">parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns an iterator over the model parameters.&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">():</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">EntropyBottleneck</span><span class="p">):</span>
-                <span class="k">continue</span>
-            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
-                <span class="k">yield</span> <span class="n">p</span></div>
-
-<div class="viewcode-block" id="CompressionModel.aux_parameters"><a class="viewcode-back" href="../../../models.html#compressai.models.CompressionModel.aux_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">aux_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns an iterator over the entropy bottleneck(s) parameters for</span>
-<span class="sd">        the auxiliary loss.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">EntropyBottleneck</span><span class="p">):</span>
-                <span class="k">continue</span>
-            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
-                <span class="k">yield</span> <span class="n">p</span></div>
-
 <div class="viewcode-block" id="CompressionModel.update"><a class="viewcode-back" href="../../../models.html#compressai.models.CompressionModel.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Updates the entropy bottleneck(s) CDF values.</span>
 
@@ -277,11 +255,27 @@
 <span class="sd">        Args:</span>
 <span class="sd">            force (bool): overwrite previous values (default: False)</span>
 
+<span class="sd">        Returns:</span>
+<span class="sd">            updated (bool): True if one of the EntropyBottlenecks was updated.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">updated</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">EntropyBottleneck</span><span class="p">):</span>
                 <span class="k">continue</span>
-            <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span></div></div>
+            <span class="n">rv</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
+            <span class="n">updated</span> <span class="o">|=</span> <span class="n">rv</span>
+        <span class="k">return</span> <span class="n">updated</span></div>
+
+<div class="viewcode-block" id="CompressionModel.load_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.CompressionModel.load_state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
+        <span class="c1"># Dynamically update the entropy bottleneck buffers related to the CDFs</span>
+        <span class="n">update_registered_buffers</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">,</span>
+            <span class="s2">&quot;entropy_bottleneck&quot;</span><span class="p">,</span>
+            <span class="p">[</span><span class="s2">&quot;_quantized_cdf&quot;</span><span class="p">,</span> <span class="s2">&quot;_offset&quot;</span><span class="p">,</span> <span class="s2">&quot;_cdf_length&quot;</span><span class="p">],</span>
+            <span class="n">state_dict</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="FactorizedPrior"><a class="viewcode-back" href="../../../models.html#compressai.models.FactorizedPrior">[docs]</a><span class="k">class</span> <span class="nc">FactorizedPrior</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">):</span>
@@ -319,6 +313,13 @@
             <span class="n">deconv</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
         <span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="n">N</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">M</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">downsampling_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">4</span>
+
 <div class="viewcode-block" id="FactorizedPrior.forward"><a class="viewcode-back" href="../../../models.html#compressai.models.FactorizedPrior.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
@@ -330,16 +331,6 @@
                 <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y_likelihoods</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">}</span></div>
-
-<div class="viewcode-block" id="FactorizedPrior.load_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.FactorizedPrior.load_state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
-        <span class="c1"># Dynamically update the entropy bottleneck buffers related to the CDFs</span>
-        <span class="n">update_registered_buffers</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">,</span>
-            <span class="s2">&quot;entropy_bottleneck&quot;</span><span class="p">,</span>
-            <span class="p">[</span><span class="s2">&quot;_quantized_cdf&quot;</span><span class="p">,</span> <span class="s2">&quot;_offset&quot;</span><span class="p">,</span> <span class="s2">&quot;_cdf_length&quot;</span><span class="p">],</span>
-            <span class="n">state_dict</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FactorizedPrior.from_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.FactorizedPrior.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
@@ -358,7 +349,7 @@
     <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">strings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">)</span>
-        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;x_hat&quot;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">}</span></div>
 
 
@@ -430,6 +421,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">downsampling_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">4</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+
 <div class="viewcode-block" id="ScaleHyperprior.forward"><a class="viewcode-back" href="../../../models.html#compressai.models.ScaleHyperprior.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
@@ -444,13 +439,6 @@
         <span class="p">}</span></div>
 
 <div class="viewcode-block" id="ScaleHyperprior.load_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.ScaleHyperprior.load_state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
-        <span class="c1"># Dynamically update the entropy bottleneck buffers related to the CDFs</span>
-        <span class="n">update_registered_buffers</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">,</span>
-            <span class="s2">&quot;entropy_bottleneck&quot;</span><span class="p">,</span>
-            <span class="p">[</span><span class="s2">&quot;_quantized_cdf&quot;</span><span class="p">,</span> <span class="s2">&quot;_offset&quot;</span><span class="p">,</span> <span class="s2">&quot;_cdf_length&quot;</span><span class="p">],</span>
-            <span class="n">state_dict</span><span class="p">,</span>
-        <span class="p">)</span>
         <span class="n">update_registered_buffers</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="p">,</span>
             <span class="s2">&quot;gaussian_conditional&quot;</span><span class="p">,</span>
@@ -471,8 +459,9 @@
 <div class="viewcode-block" id="ScaleHyperprior.update"><a class="viewcode-back" href="../../../models.html#compressai.models.ScaleHyperprior.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_table</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">scale_table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">scale_table</span> <span class="o">=</span> <span class="n">get_scale_table</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">update_scale_table</span><span class="p">(</span><span class="n">scale_table</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span></div>
+        <span class="n">updated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">update_scale_table</span><span class="p">(</span><span class="n">scale_table</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
+        <span class="n">updated</span> <span class="o">|=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">updated</span></div>
 
     <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -567,7 +556,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;x_hat&quot;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="JointAutoregressiveHierarchicalPriors"><a class="viewcode-back" href="../../../models.html#compressai.models.JointAutoregressiveHierarchicalPriors">[docs]</a><span class="k">class</span> <span class="nc">JointAutoregressiveHierarchicalPriors</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">):</span>
+<div class="viewcode-block" id="JointAutoregressiveHierarchicalPriors"><a class="viewcode-back" href="../../../models.html#compressai.models.JointAutoregressiveHierarchicalPriors">[docs]</a><span class="k">class</span> <span class="nc">JointAutoregressiveHierarchicalPriors</span><span class="p">(</span><span class="n">MeanScaleHyperprior</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Joint Autoregressive Hierarchical Priors model from D.</span>
 <span class="sd">    Minnen, J. Balle, G.D. Toderici: `&quot;Joint Autoregressive and Hierarchical</span>
 <span class="sd">    Priors for Learned Image Compression&quot; &lt;https://arxiv.org/abs/1809.02736&gt;`_,</span>
@@ -580,7 +569,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">192</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">192</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">entropy_bottleneck_channels</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
             <span class="n">conv</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
@@ -633,6 +622,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span> <span class="o">=</span> <span class="n">GaussianConditional</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">downsampling_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">4</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
 
 <div class="viewcode-block" id="JointAutoregressiveHierarchicalPriors.forward"><a class="viewcode-back" href="../../../models.html#compressai.models.JointAutoregressiveHierarchicalPriors.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -692,7 +685,12 @@
         <span class="n">y_strings</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
             <span class="n">string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compress_ar</span><span class="p">(</span>
-                <span class="n">y_hat</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">params</span><span class="p">,</span> <span class="n">y_height</span><span class="p">,</span> <span class="n">y_width</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">padding</span>
+                <span class="n">y_hat</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+                <span class="n">params</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+                <span class="n">y_height</span><span class="p">,</span>
+                <span class="n">y_width</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="p">,</span>
+                <span class="n">padding</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">y_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
 
@@ -774,7 +772,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_decompress_ar</span><span class="p">(</span>
                 <span class="n">y_string</span><span class="p">,</span>
                 <span class="n">y_hat</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
-                <span class="n">params</span><span class="p">,</span>
+                <span class="n">params</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
                 <span class="n">y_height</span><span class="p">,</span>
                 <span class="n">y_width</span><span class="p">,</span>
                 <span class="n">kernel_size</span><span class="p">,</span>
@@ -823,29 +821,7 @@
 
                 <span class="n">hp</span> <span class="o">=</span> <span class="n">h</span> <span class="o">+</span> <span class="n">padding</span>
                 <span class="n">wp</span> <span class="o">=</span> <span class="n">w</span> <span class="o">+</span> <span class="n">padding</span>
-                <span class="n">y_hat</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">hp</span> <span class="p">:</span> <span class="n">hp</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wp</span> <span class="p">:</span> <span class="n">wp</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rv</span>
-
-<div class="viewcode-block" id="JointAutoregressiveHierarchicalPriors.update"><a class="viewcode-back" href="../../../models.html#compressai.models.JointAutoregressiveHierarchicalPriors.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_table</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">scale_table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">scale_table</span> <span class="o">=</span> <span class="n">get_scale_table</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">update_scale_table</span><span class="p">(</span><span class="n">scale_table</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="JointAutoregressiveHierarchicalPriors.load_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.JointAutoregressiveHierarchicalPriors.load_state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
-        <span class="c1"># Dynamically update the entropy bottleneck buffers related to the CDFs</span>
-        <span class="n">update_registered_buffers</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">,</span>
-            <span class="s2">&quot;entropy_bottleneck&quot;</span><span class="p">,</span>
-            <span class="p">[</span><span class="s2">&quot;_quantized_cdf&quot;</span><span class="p">,</span> <span class="s2">&quot;_offset&quot;</span><span class="p">,</span> <span class="s2">&quot;_cdf_length&quot;</span><span class="p">],</span>
-            <span class="n">state_dict</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">update_registered_buffers</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="p">,</span>
-            <span class="s2">&quot;gaussian_conditional&quot;</span><span class="p">,</span>
-            <span class="p">[</span><span class="s2">&quot;_quantized_cdf&quot;</span><span class="p">,</span> <span class="s2">&quot;_offset&quot;</span><span class="p">,</span> <span class="s2">&quot;_cdf_length&quot;</span><span class="p">,</span> <span class="s2">&quot;scale_table&quot;</span><span class="p">],</span>
-            <span class="n">state_dict</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span></div></div>
+                <span class="n">y_hat</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">hp</span> <span class="p">:</span> <span class="n">hp</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wp</span> <span class="p">:</span> <span class="n">wp</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rv</span></div>
 </pre></div>
 
            </div>
@@ -858,19 +834,11 @@
 
   <div role="contentinfo">
     <p>
-        
         &copy; Copyright 2020, InterDigital Communications, Inc.
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -881,6 +849,7 @@
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {
