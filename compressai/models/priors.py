@@ -534,12 +534,13 @@ class JointAutoregressiveHierarchicalPriors(MeanScaleHyperprior):
 
         # Warning, this is slow...
         # TODO: profile the calls to the bindings...
+        masked_weight = self.context_prediction.weight * self.context_prediction.mask
         for h in range(height):
             for w in range(width):
                 y_crop = y_hat[:, :, h : h + kernel_size, w : w + kernel_size]
                 ctx_p = F.conv2d(
                     y_crop,
-                    self.context_prediction.weight,
+                    masked_weight,
                     bias=self.context_prediction.bias,
                 )
 
