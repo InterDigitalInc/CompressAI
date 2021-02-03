@@ -104,6 +104,46 @@ class AverageMeter:
         self.avg = self.sum / self.count
 
 
+class CustomDataParallel(nn.DataParallel):
+    """Custom DataParallel to access the module methods."""
+
+    def __getattr__(self, key):
+        try:
+            return super().__getattr__(key)
+        except AttributeError:
+            return getattr(self.module, key)
+
+
+def configure_optimizers(net, args):
+    """Separate parameters for the main optimizer and the auxiliary optimizer.
+    Return two optimizers"""
+
+    parameters = set(
+        p for n, p in net.named_parameters() if not n.endswith(".quantiles")
+    )
+    aux_parameters = set(
+        p for n, p in net.named_parameters() if n.endswith(".quantiles")
+    )
+
+    # Make sure we don't have an intersection of parameters
+    params_dict = dict(net.named_parameters())
+    inter_params = parameters & aux_parameters
+    union_params = parameters | aux_parameters
+
+    assert len(inter_params) == 0
+    assert len(union_params) - len(params_dict.keys()) == 0
+
+    optimizer = optim.Adam(
+        (p for p in parameters if p.requires_grad),
+        lr=args.learning_rate,
+    )
+    aux_optimizer = optim.Adam(
+        (p for p in aux_parameters if p.requires_grad),
+        lr=args.aux_learning_rate,
+    )
+    return optimizer, aux_optimizer
+
+
 def train_one_epoch(
     model, criterion, train_dataloader, optimizer, aux_optimizer, epoch, clip_max_norm
 ):
@@ -286,10 +326,14 @@ def main(argv):
     )
 
     device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
+
     net = AutoEncoder()
     net = net.to(device)
-    optimizer = optim.Adam(net.parameters(), lr=args.learning_rate)
-    aux_optimizer = optim.Adam(net.aux_parameters(), lr=args.aux_learning_rate)
+
+    if args.cuda and torch.cuda.device_count() > 1:
+        net = CustomDataParallel(net)
+
+    optimizer, aux_optimizer = configure_optimizers(net, args)
     criterion = RateDistortionLoss(lmbda=args.lmbda)
 
     best_loss = 1e10

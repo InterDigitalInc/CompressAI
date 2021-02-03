@@ -70,6 +70,7 @@ def read_image(filepath: str) -> torch.Tensor:
     return transforms.ToTensor()(img)
 
 
+@torch.no_grad()
 def inference(model, x):
     x = x.unsqueeze(0)
 
@@ -88,14 +89,13 @@ def inference(model, x):
         value=0,
     )
 
-    with torch.no_grad():
-        start = time.time()
-        out_enc = model.compress(x_padded)
-        enc_time = time.time() - start
+    start = time.time()
+    out_enc = model.compress(x_padded)
+    enc_time = time.time() - start
 
-        start = time.time()
-        out_dec = model.decompress(out_enc["strings"], out_enc["shape"])
-        dec_time = time.time() - start
+    start = time.time()
+    out_dec = model.decompress(out_enc["strings"], out_enc["shape"])
+    dec_time = time.time() - start
 
     out_dec["x_hat"] = F.pad(
         out_dec["x_hat"], (-padding_left, -padding_right, -padding_top, -padding_bottom)
@@ -113,13 +113,13 @@ def inference(model, x):
     }
 
 
+@torch.no_grad()
 def inference_entropy_estimation(model, x):
     x = x.unsqueeze(0)
 
-    with torch.no_grad():
-        start = time.time()
-        out_net = model.forward(x)
-        elapsed_time = time.time() - start
+    start = time.time()
+    out_net = model.forward(x)
+    elapsed_time = time.time() - start
 
     num_pixels = x.size(0) * x.size(2) * x.size(3)
     bpp = sum(
@@ -145,12 +145,15 @@ def load_checkpoint(arch: str, checkpoint_path: str) -> nn.Module:
     return architectures[arch].from_state_dict(torch.load(checkpoint_path)).eval()
 
 
-def eval_model(model, filepaths, entropy_estimation=False):
+def eval_model(model, filepaths, entropy_estimation=False, half=False):
     device = next(model.parameters()).device
     metrics = defaultdict(float)
     for f in filepaths:
         x = read_image(f).to(device)
         if not entropy_estimation:
+            if half:
+                model = model.half()
+                x = x.half()
             rv = inference(model, x)
         else:
             rv = inference_entropy_estimation(model, x)
@@ -182,6 +185,16 @@ def setup_args():
         choices=compressai.available_entropy_coders(),
         default=compressai.available_entropy_coders()[0],
         help="entropy coder (default: %(default)s)",
+    )
+    parent_parser.add_argument(
+        "--cuda",
+        action="store_true",
+        help="enable CUDA",
+    )
+    parent_parser.add_argument(
+        "--half",
+        action="store_true",
+        help="convert model to half floating point (fp16)",
     )
     parent_parser.add_argument(
         "--entropy-estimation",
@@ -262,7 +275,9 @@ def main(argv):
             sys.stderr.write(log_fmt.format(*opts, run=run))
             sys.stderr.flush()
         model = load_func(*opts, run)
-        metrics = eval_model(model, filepaths, args.entropy_estimation)
+        if args.cuda and torch.cuda.is_available():
+            model = model.to("cuda")
+        metrics = eval_model(model, filepaths, args.entropy_estimation, args.half)
         for k, v in metrics.items():
             results[k].append(v)
 

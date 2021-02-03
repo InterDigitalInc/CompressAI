@@ -37,14 +37,9 @@ from compressai.models.utils import (
 class TestCompressionModel:
     def test_parameters(self):
         model = CompressionModel(32)
-        assert len(list(model.parameters())) == 0
+        assert len(list(model.parameters())) == 15
         with pytest.raises(NotImplementedError):
             model(torch.rand(1))
-
-    def test_aux_parameters(self):
-        model = CompressionModel(32)
-        for m in model.aux_parameters():
-            assert m.shape[0] == 32  # channel-based
 
     def test_init(self):
         class Model(CompressionModel):
