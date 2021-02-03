@@ -150,7 +150,7 @@ class PillowCodec(Codec):
     def _load_img(self, img):
         return read_image(img)
 
-    def _run(self, img, quality, return_rec=False):
+    def _run(self, img, quality, return_rec=False, have_metrics=True):
         start = time.time()
         tmp = io.BytesIO()
         img.save(tmp, format=self.fmt, quality=int(quality))
@@ -163,16 +163,21 @@ class PillowCodec(Codec):
         rec.load()
         dec_time = time.time() - start
 
-        psnr_val, msssim_val = compute_metrics(rec, img)
+
         bpp_val = float(size) * 8 / (img.size[0] * img.size[1])
 
         out = {
-            "psnr": psnr_val,
-            "ms-ssim": msssim_val,
             "bpp": bpp_val,
             "encoding_time": enc_time,
             "decoding_time": dec_time,
         }
+
+
+        if have_metrics:
+            psnr_val, msssim_val = compute_metrics(rec, img)
+            out["psnr"] = psnr_val
+            out["ms-ssim"] = msssim_val
+
         if return_rec:
             return out, rec
         return out
@@ -205,7 +210,7 @@ class BinaryCodec(Codec):
 
     fmt = None
 
-    def _run(self, img, quality, return_rec=False):
+    def _run(self, img, quality, return_rec=False, have_metrics=True):
         fd0, png_filepath = mkstemp(suffix=".png")
         fd1, out_filepath = mkstemp(suffix=self.fmt)
 
@@ -228,16 +233,19 @@ class BinaryCodec(Codec):
         os.close(fd1)
         os.remove(out_filepath)
 
-        psnr_val, msssim_val = compute_metrics(rec, img)
         bpp_val = float(size) * 8 / (img.size[0] * img.size[1])
 
         out = {
-            "psnr": psnr_val,
-            "ms-ssim": msssim_val,
             "bpp": bpp_val,
             "encoding_time": enc_time,
             "decoding_time": dec_time,
         }
+
+        if have_metrics:
+            psnr_val, msssim_val = compute_metrics(rec, img)
+            out["psnr"] = psnr_val
+            out["ms-ssim"] = msssim_val
+
         if return_rec:
             return out, rec
         return out
@@ -492,7 +500,7 @@ class VTM(Codec):
         self.rgb = args.rgb
         return args
 
-    def _run(self, img, quality, return_rec=False):
+    def _run(self, img, quality, return_rec=False, have_metrics=True):
         if not 0 <= quality <= 63:
             raise ValueError(f"Invalid quality value: {quality} (0,63)")
 
@@ -575,7 +583,6 @@ class VTM(Codec):
             arr = ycbcr2rgb(torch.from_numpy(arr.copy())).numpy()
             rec_arr = ycbcr2rgb(torch.from_numpy(rec_arr.copy())).numpy()
 
-        psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.0)
 
         bpp = filesize(out_filepath) * 8.0 / (height * width)
 
@@ -584,12 +591,16 @@ class VTM(Codec):
         os.unlink(out_filepath)
 
         out = {
-            "psnr": psnr_val,
-            "ms-ssim": msssim_val,
             "bpp": bpp,
             "encoding_time": enc_time,
             "decoding_time": dec_time,
         }
+
+        if have_metrics:
+            psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.0)
+            out["psnr"] = psnr_val
+            out["ms-ssim"] = msssim_val
+
         if return_rec:
             rec = Image.fromarray(
                 (rec_arr.clip(0, 1).transpose(1, 2, 0) * 255.0).astype(np.uint8)
@@ -637,7 +648,7 @@ class HM(Codec):
         self.rgb = args.rgb
         return args
 
-    def _run(self, img, quality, return_rec=False):
+    def _run(self, img, quality, return_rec=False, have_metrics=True):
         if not 0 <= quality <= 51:
             raise ValueError(f"Invalid quality value: {quality} (0,51)")
 
@@ -720,7 +731,7 @@ class HM(Codec):
         if not self.rgb:
             arr = ycbcr2rgb(torch.from_numpy(arr.copy())).numpy()
             rec_arr = ycbcr2rgb(torch.from_numpy(rec_arr.copy())).numpy()
-        psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.0)
+
 
         bpp = filesize(out_filepath) * 8.0 / (height * width)
 
@@ -729,12 +740,16 @@ class HM(Codec):
         os.unlink(out_filepath)
 
         out = {
-            "psnr": psnr_val,
-            "ms-ssim": msssim_val,
             "bpp": bpp,
             "encoding_time": enc_time,
             "decoding_time": dec_time,
         }
+
+        if have_metrics:
+            psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.0)
+            out["psnr"] = psnr_val
+            out["ms-ssim"] = msssim_val
+
         if return_rec:
             rec = Image.fromarray(
                 (rec_arr.clip(0, 1).transpose(1, 2, 0) * 255.0).astype(np.uint8)
@@ -774,7 +789,7 @@ class AV1(Codec):
         self.decoder_path = os.path.join(args.build_dir, "aomdec")
         return args
 
-    def _run(self, img, quality, return_rec=False):
+    def _run(self, img, quality, return_rec=False, have_metrics=True):
         if not 0 <= quality <= 63:
             raise ValueError(f"Invalid quality value: {quality} (0,63)")
 
@@ -852,8 +867,6 @@ class AV1(Codec):
         arr = ycbcr2rgb(torch.from_numpy(arr.copy())).numpy()
         rec_arr = ycbcr2rgb(torch.from_numpy(rec_arr.copy())).numpy()
 
-        psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.0)
-
         bpp = filesize(out_filepath) * 8.0 / (height * width)
 
         # Cleanup
@@ -861,12 +874,16 @@ class AV1(Codec):
         os.unlink(out_filepath)
 
         out = {
-            "psnr": psnr_val,
-            "ms-ssim": msssim_val,
             "bpp": bpp,
             "encoding_time": enc_time,
             "decoding_time": dec_time,
         }
+
+        if have_metrics:
+            psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.0)
+            out["psnr"] = psnr_val
+            out["ms-ssim"] = msssim_val
+
         if return_rec:
             rec = Image.fromarray(
                 (rec_arr.clip(0, 1).transpose(1, 2, 0) * 255.0).astype(np.uint8)
