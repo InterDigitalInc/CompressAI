@@ -64,3 +64,26 @@ jobs:
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.TWINE_TOKEN }}
+
+  linux-wheels:
+    runs-on: ubuntu-latest
+    container: quay.io/pypa/manylinux2014_x86_64
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: /opt/python/${{ matrix.python-version }}/bin/python -m pip install build
+    - name: Build wheel
+      run: /opt/python/${{ matrix.python-version }}/bin/python -m build --wheel .
+    - name: Run auditwheel for manylinux wheel
+      run: auditwheel repair -w dist dist/*
+    - name: Remove linux wheel
+      run: rm dist/*-linux_x86_64.whl
+    - name: Publish wheel
+      run: |
+        python3 -m twine upload --skip-existing dist/*
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.TWINE_TOKEN }}
