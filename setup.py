@@ -24,7 +24,7 @@ from pybind11.setup_helpers import Pybind11Extension, build_ext
 cwd = Path(__file__).resolve().parent
 
 package_name = "compressai"
-version = "1.1.1b4"
+version = "1.1.1b5"
 git_hash = "unknown"
 
 
