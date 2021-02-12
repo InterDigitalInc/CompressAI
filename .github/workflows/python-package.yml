@@ -74,7 +74,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
-      run: /opt/python/${{ matrix.python-version }}/bin/python -m pip install build
+      run: /opt/python/${{ matrix.python-version }}/bin/python -m pip install build twine
     - name: Build wheel
       run: /opt/python/${{ matrix.python-version }}/bin/python -m build --wheel .
     - name: Run auditwheel for manylinux wheel
