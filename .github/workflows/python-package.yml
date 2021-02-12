@@ -70,7 +70,7 @@ jobs:
     container: quay.io/pypa/manylinux2014_x86_64
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [cp36-cp36m, cp37-cp37m, cp38-cp38]
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
