@@ -102,14 +102,10 @@ def get_extra_requirements():
     return extras_require
 
 
-with open('Readme.md') as f:
-    readme = f.read()
-
 setup(
     name=package_name,
     version=version,
     description="A PyTorch library and evaluation platform for end-to-end compression research",
-    long_description=readme,
     url="https://github.com/InterDigitalInc/CompressAI",
     author="InterDigital AI Lab",
     author_email="compressai@interdigital.com",
