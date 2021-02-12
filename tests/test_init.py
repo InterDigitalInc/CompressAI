@@ -41,4 +41,4 @@ def test_version():
     builtins.__import__ = realimport
     from compressai.version import __version__
 
-    assert len(__version__) == 5
+    assert 5 <= len(__version__) <= 7

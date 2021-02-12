@@ -15,14 +15,24 @@ wheel:3.8:
   image: python:3.8-buster
   stage: build
   before_script:
-    - pip install -U pip setuptools wheel ninja
-    - pip install torch
+    - pip install build
   script:
-    - python3 setup.py bdist_wheel
+    - python -m build --wheel .
   artifacts:
     paths:
       - dist/
     expire_in: 1 day
+  tags:
+    - docker
+
+sdist:
+  image: python:3.8-buster
+  stage: build
+  before_script:
+    - pip install build
+  script:
+    - python -m build --sdist .
+    - pip install compressai --find-links=dist/
   tags:
     - docker
 

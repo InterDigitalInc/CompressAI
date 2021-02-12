@@ -1,5 +1,6 @@
 [build-system]
-requires = ['setuptools', 'wheel', 'torch>=1.4.0', 'numpy']
+requires = ["setuptools>=42", "wheel", "pybind11>=2.6.0",]
+build-backend = "setuptools.build_meta"
 
 [tool.black]
 line-length = 88

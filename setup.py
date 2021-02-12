@@ -18,12 +18,13 @@ import subprocess
 from pathlib import Path
 
 from setuptools import find_packages, setup
-from torch.utils.cpp_extension import BuildExtension, CppExtension
+
+from pybind11.setup_helpers import Pybind11Extension, build_ext
 
 cwd = Path(__file__).resolve().parent
 
 package_name = "compressai"
-version = "1.1.0"
+version = "1.1.1a6"
 git_hash = "unknown"
 
 
@@ -59,7 +60,7 @@ def get_extensions():
     else:
         extra_compile_args += ["-O3"]
     ext_modules.append(
-        CppExtension(
+        Pybind11Extension(
             name=f"{package_name}.ans",
             sources=[str(s) for s in rans_ext_dir.glob("*.cpp")],
             language="c++",
@@ -71,7 +72,7 @@ def get_extensions():
     # Add ops
     ops_ext_dir = ext_dirs / "ops"
     ext_modules.append(
-        CppExtension(
+        Pybind11Extension(
             name=f"{package_name}._CXX",
             sources=[str(s) for s in ops_ext_dir.glob("*.cpp")],
             language="c++",
@@ -82,12 +83,11 @@ def get_extensions():
     return ext_modules
 
 
-TEST_REQUIRES = ["pytest>=6.0.1", "pytest-cov>=2.10.1"]
+TEST_REQUIRES = ["pytest", "pytest-cov"]
 DEV_REQUIRES = TEST_REQUIRES + [
-    "pylint>=2.6.0",
-    "black>=20.8b1",
-    "isort>=5.4.2",
-    "sphinx>=3.0.3",
+    "pylint",
+    "black",
+    "isort",
 ]
 
 
@@ -95,6 +95,7 @@ def get_extra_requirements():
     extras_require = {
         "test": TEST_REQUIRES,
         "dev": DEV_REQUIRES,
+        "doc": ["sphinx", "sphinx-rtd-theme"],
         "tutorials": ["jupyter", "ipywidgets"],
     }
     extras_require["all"] = set(req for reqs in extras_require.values() for req in reqs)
@@ -115,9 +116,9 @@ setup(
         "numpy",
         "scipy",
         "matplotlib",
-        "torch>=1.4.0",
-        "torchvision>=0.5.0",
-        "pytorch-msssim==0.2.0",
+        "torch",
+        "torchvision",
+        "pytorch-msssim",
     ],
     extras_require=get_extra_requirements(),
     license="Apache-2",
@@ -133,6 +134,6 @@ setup(
     ],
     ext_modules=get_extensions(),
     cmdclass={
-        "build_ext": BuildExtension,
+        "build_ext": build_ext
     },
 )
