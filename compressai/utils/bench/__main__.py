@@ -107,7 +107,7 @@ def setup_common_args(parser):
         "-q",
         "--quality",
         dest="qualities",
-        metavar="",
+        metavar="Q",
         default=[75],
         nargs="*",
         type=int,

@@ -473,7 +473,6 @@ class VTM(Codec):
         parser.add_argument(
             "-b",
             "--build-dir",
-            metavar="",
             type=str,
             required=True,
             help="VTM build dir",
@@ -481,7 +480,6 @@ class VTM(Codec):
         parser.add_argument(
             "-c",
             "--config",
-            metavar="",
             type=str,
             required=True,
             help="VTM config file",
@@ -625,13 +623,12 @@ class HM(Codec):
         parser.add_argument(
             "-b",
             "--build-dir",
-            metavar="",
             type=str,
             required=True,
             help="HM build dir",
         )
         parser.add_argument(
-            "-c", "--config", metavar="", type=str, required=True, help="HM config file"
+            "-c", "--config", type=str, required=True, help="HM config file"
         )
         parser.add_argument(
             "--rgb", action="store_true", help="Use RGB color space (over YCbCr)"
@@ -773,7 +770,6 @@ class AV1(Codec):
         parser.add_argument(
             "-b",
             "--build-dir",
-            metavar="",
             type=str,
             required=True,
             help="AOM binaries dir",
