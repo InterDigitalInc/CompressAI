@@ -17,9 +17,8 @@ import subprocess
 
 from pathlib import Path
 
-from setuptools import find_packages, setup
-
 from pybind11.setup_helpers import Pybind11Extension, build_ext
+from setuptools import find_packages, setup
 
 cwd = Path(__file__).resolve().parent
 
@@ -133,7 +132,5 @@ setup(
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
     ext_modules=get_extensions(),
-    cmdclass={
-        "build_ext": build_ext
-    },
+    cmdclass={"build_ext": build_ext},
 )
