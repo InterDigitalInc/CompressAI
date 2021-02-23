@@ -1,10 +1,12 @@
+*.bin
+*.inc
+*.sh
+*.tar.gz
+builds
 compressai/version.py
 tags
-builds
-*.inc
-*.bin
-venv/
 venv*/
+venv/
 
 # Created by gitignore.io
 ### Python ###
