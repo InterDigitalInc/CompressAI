@@ -26,43 +26,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 from compressai.datasets import ImageFolder
-from compressai.layers import GDN
-from compressai.models import CompressionModel
-from compressai.models.utils import conv, deconv
-
-
-class AutoEncoder(CompressionModel):
-    """Simple autoencoder with a factorized prior """
-
-    def __init__(self, N=128):
-        super().__init__(entropy_bottleneck_channels=N)
-
-        self.encode = nn.Sequential(
-            conv(3, N, kernel_size=9, stride=4),
-            GDN(N),
-            conv(N, N),
-            GDN(N),
-            conv(N, N),
-        )
-
-        self.decode = nn.Sequential(
-            deconv(N, N),
-            GDN(N, inverse=True),
-            deconv(N, N),
-            GDN(N, inverse=True),
-            deconv(N, 3, kernel_size=9, stride=4),
-        )
-
-    def forward(self, x):
-        y = self.encode(x)
-        y_hat, y_likelihoods = self.entropy_bottleneck(y)
-        x_hat = self.decode(y_hat)
-        return {
-            "x_hat": x_hat,
-            "likelihoods": {
-                "y": y_likelihoods,
-            },
-        }
+from compressai.zoo import models
 
 
 class RateDistortionLoss(nn.Module):
@@ -218,75 +182,77 @@ def save_checkpoint(state, is_best, filename="checkpoint.pth.tar"):
 
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(description="Example training script")
-    # yapf: disable
+    parser = argparse.ArgumentParser(description="Example training script.")
     parser.add_argument(
-        '-d',
-        '--dataset',
-        type=str,
-        required=True,
-        help='Training dataset')
+        "-m",
+        "--model",
+        default="bmshj2018-factorized",
+        choices=models.keys(),
+        help="Model architecture (default: %(default)s)",
+    )
     parser.add_argument(
-        '-e',
-        '--epochs',
+        "-d", "--dataset", type=str, required=True, help="Training dataset"
+    )
+    parser.add_argument(
+        "-e",
+        "--epochs",
         default=100,
         type=int,
-        help='Number of epochs (default: %(default)s)')
+        help="Number of epochs (default: %(default)s)",
+    )
     parser.add_argument(
-        '-lr',
-        '--learning-rate',
+        "-lr",
+        "--learning-rate",
         default=1e-4,
         type=float,
-        help='Learning rate (default: %(default)s)')
+        help="Learning rate (default: %(default)s)",
+    )
     parser.add_argument(
-        '-n',
-        '--num-workers',
+        "-n",
+        "--num-workers",
         type=int,
-        default=3,
-        help='Dataloaders threads (default: %(default)s)')
+        default=30,
+        help="Dataloaders threads (default: %(default)s)",
+    )
     parser.add_argument(
-        '--lambda',
-        dest='lmbda',
+        "--lambda",
+        dest="lmbda",
         type=float,
         default=1e-2,
-        help='Bit-rate distortion parameter (default: %(default)s)')
+        help="Bit-rate distortion parameter (default: %(default)s)",
+    )
     parser.add_argument(
-        '--batch-size',
-        type=int,
-        default=16,
-        help='Batch size (default: %(default)s)')
+        "--batch-size", type=int, default=16, help="Batch size (default: %(default)s)"
+    )
     parser.add_argument(
-        '--test-batch-size',
+        "--test-batch-size",
         type=int,
         default=64,
-        help='Test batch size (default: %(default)s)')
+        help="Test batch size (default: %(default)s)",
+    )
     parser.add_argument(
-        '--aux-learning-rate',
+        "--aux-learning-rate",
         default=1e-3,
-        help='Auxiliary loss learning rate (default: %(default)s)')
+        help="Auxiliary loss learning rate (default: %(default)s)",
+    )
     parser.add_argument(
-        '--patch-size',
+        "--patch-size",
         type=int,
         nargs=2,
         default=(256, 256),
-        help='Size of the patches to be cropped (default: %(default)s)')
+        help="Size of the patches to be cropped (default: %(default)s)",
+    )
+    parser.add_argument("--cuda", action="store_true", help="Use cuda")
+    parser.add_argument("--save", action="store_true", help="Save model to disk")
     parser.add_argument(
-        '--cuda',
-        action='store_true',
-        help='Use cuda')
+        "--seed", type=float, help="Set random seed for reproducibility"
+    )
     parser.add_argument(
-        '--save',
-        action='store_true',
-        help='Save model to disk')
-    parser.add_argument(
-        '--seed',
+        "--clip_max_norm",
+        default=1.0,
         type=float,
-        help='Set random seed for reproducibility')
-    parser.add_argument('--clip_max_norm',
-                        default=1.0,
-                        type=float,
-                        help='gradient clipping max norm')
-    # yapf: enable
+        help="gradient clipping max norm (default: %(default)s",
+    )
     args = parser.parse_args(argv)
     return args
 
@@ -327,17 +293,19 @@ def main(argv):
 
     device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
 
-    net = AutoEncoder()
+    net = models[args.model](quality=3)
     net = net.to(device)
 
     if args.cuda and torch.cuda.device_count() > 1:
         net = CustomDataParallel(net)
 
     optimizer, aux_optimizer = configure_optimizers(net, args)
+    lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min")
     criterion = RateDistortionLoss(lmbda=args.lmbda)
 
     best_loss = 1e10
     for epoch in range(args.epochs):
+        print(f"Learning rate: {optimizer.param_groups[0]['lr']}")
         train_one_epoch(
             net,
             criterion,
@@ -349,6 +317,7 @@ def main(argv):
         )
 
         loss = test_epoch(epoch, test_dataloader, net, criterion)
+        lr_scheduler.step(loss)
 
         is_best = loss < best_loss
         best_loss = min(loss, best_loss)
@@ -360,6 +329,7 @@ def main(argv):
                     "loss": loss,
                     "optimizer": optimizer.state_dict(),
                     "aux_optimizer": aux_optimizer.state_dict(),
+                    "lr_scheduler": lr_scheduler.state_dict(),
                 },
                 is_best,
             )
