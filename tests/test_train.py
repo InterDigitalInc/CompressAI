@@ -53,6 +53,10 @@ def test_train_example():
     log = f.getvalue()
 
     logpath = cwd / "expected" / "train_log_3.14.txt"
+    if not logpath.is_file():
+        with logpath.open("w") as f:
+            f.write(log)
+
     with logpath.open("r") as f:
         expected = f.read()
 
