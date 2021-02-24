@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>compressai.layers &mdash; compressai  documentation</title>
   
 
   
-  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="compressai.models" href="models.html" />
@@ -74,6 +77,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -122,6 +126,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -156,18 +161,20 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>compressai.layers</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/layers.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -187,7 +194,7 @@
 <h2>MaskedConv2d<a class="headerlink" href="#maskedconv2d" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compressai.layers.MaskedConv2d">
-<em class="property">class </em><code class="sig-prename descclassname">compressai.layers.</code><code class="sig-name descname">MaskedConv2d</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">mask_type</span><span class="o">=</span><span class="default_value">'A'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#MaskedConv2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.layers.MaskedConv2d" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.layers.</span></code><code class="sig-name descname"><span class="pre">MaskedConv2d</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'A'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#MaskedConv2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.MaskedConv2d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Masked 2D convolution implementation, mask future “unseen” pixels.
 Useful for building auto-regressive network components.</p>
 <p>Introduced in <a class="reference external" href="https://arxiv.org/abs/1606.05328">“Conditional Image Generation with PixelCNN Decoders”</a>.</p>
@@ -201,7 +208,7 @@ following layers.</p>
 <h2>GDN<a class="headerlink" href="#gdn" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compressai.layers.GDN">
-<em class="property">class </em><code class="sig-prename descclassname">compressai.layers.</code><code class="sig-name descname">GDN</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_channels</span></em>, <em class="sig-param"><span class="n">inverse</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">beta_min</span><span class="o">=</span><span class="default_value">1e-06</span></em>, <em class="sig-param"><span class="n">gamma_init</span><span class="o">=</span><span class="default_value">0.1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/gdn.html#GDN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.layers.GDN" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.layers.</span></code><code class="sig-name descname"><span class="pre">GDN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/gdn.html#GDN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.GDN" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generalized Divisive Normalization layer.</p>
 <p>Introduced in <a class="reference external" href="https://arxiv.org/abs/1511.06281">“Density Modeling of Images Using a Generalized Normalization
 Transformation”</a>,
@@ -215,7 +222,7 @@ by Balle Johannes, Valero Laparra, and Eero P. Simoncelli, (2016).</p>
 <h2>GDN1<a class="headerlink" href="#gdn1" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compressai.layers.GDN1">
-<em class="property">class </em><code class="sig-prename descclassname">compressai.layers.</code><code class="sig-name descname">GDN1</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_channels</span></em>, <em class="sig-param"><span class="n">inverse</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">beta_min</span><span class="o">=</span><span class="default_value">1e-06</span></em>, <em class="sig-param"><span class="n">gamma_init</span><span class="o">=</span><span class="default_value">0.1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/gdn.html#GDN1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.layers.GDN1" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.layers.</span></code><code class="sig-name descname"><span class="pre">GDN1</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/gdn.html#GDN1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.GDN1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simplified GDN layer.</p>
 <p>Introduced in <a class="reference external" href="http://arxiv.org/abs/1912.08771">“Computationally Efficient Neural Image Compression”</a>, by Johnston Nick, Elad Eban, Ariel
 Gordon, and Johannes Ballé, (2019).</p>
@@ -228,7 +235,7 @@ Gordon, and Johannes Ballé, (2019).</p>
 <h2>ResidualBlock<a class="headerlink" href="#residualblock" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compressai.layers.ResidualBlock">
-<em class="property">class </em><code class="sig-prename descclassname">compressai.layers.</code><code class="sig-name descname">ResidualBlock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_ch</span></em>, <em class="sig-param"><span class="n">out_ch</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#ResidualBlock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.layers.ResidualBlock" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.layers.</span></code><code class="sig-name descname"><span class="pre">ResidualBlock</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_ch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_ch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#ResidualBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.ResidualBlock" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple residual block with two 3x3 convolutions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -245,7 +252,7 @@ Gordon, and Johannes Ballé, (2019).</p>
 <h2>ResidualBlockWithStride<a class="headerlink" href="#residualblockwithstride" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compressai.layers.ResidualBlockWithStride">
-<em class="property">class </em><code class="sig-prename descclassname">compressai.layers.</code><code class="sig-name descname">ResidualBlockWithStride</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_ch</span></em>, <em class="sig-param"><span class="n">out_ch</span></em>, <em class="sig-param"><span class="n">stride</span><span class="o">=</span><span class="default_value">2</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#ResidualBlockWithStride"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.layers.ResidualBlockWithStride" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.layers.</span></code><code class="sig-name descname"><span class="pre">ResidualBlockWithStride</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_ch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_ch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#ResidualBlockWithStride"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.ResidualBlockWithStride" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual block with a stride on the first convolution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -263,7 +270,7 @@ Gordon, and Johannes Ballé, (2019).</p>
 <h2>ResidualBlockUpsample<a class="headerlink" href="#residualblockupsample" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compressai.layers.ResidualBlockUpsample">
-<em class="property">class </em><code class="sig-prename descclassname">compressai.layers.</code><code class="sig-name descname">ResidualBlockUpsample</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_ch</span></em>, <em class="sig-param"><span class="n">out_ch</span></em>, <em class="sig-param"><span class="n">upsample</span><span class="o">=</span><span class="default_value">2</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#ResidualBlockUpsample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.layers.ResidualBlockUpsample" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.layers.</span></code><code class="sig-name descname"><span class="pre">ResidualBlockUpsample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_ch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_ch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upsample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#ResidualBlockUpsample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.ResidualBlockUpsample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual block with sub-pixel upsampling on the last convolution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -281,7 +288,7 @@ Gordon, and Johannes Ballé, (2019).</p>
 <h2>AttentionBlock<a class="headerlink" href="#attentionblock" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compressai.layers.AttentionBlock">
-<em class="property">class </em><code class="sig-prename descclassname">compressai.layers.</code><code class="sig-name descname">AttentionBlock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">N</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#AttentionBlock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.layers.AttentionBlock" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.layers.</span></code><code class="sig-name descname"><span class="pre">AttentionBlock</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#AttentionBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.AttentionBlock" title="Permalink to this definition">¶</a></dt>
 <dd><p>Self attention block.</p>
 <p>Simplified variant from <a class="reference external" href="https://arxiv.org/abs/2001.01568">“Learned Image Compression with
 Discretized Gaussian Mixture Likelihoods and Attention Modules”</a>, by Zhengxue Cheng, Heming Sun, Masaru
@@ -301,29 +308,29 @@ Takeuchi, Jiro Katto.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="models.html" class="btn btn-neutral float-right" title="compressai.models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="entropy_models.html" class="btn btn-neutral float-left" title="compressai.entropy_models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="models.html" class="btn btn-neutral float-right" title="compressai.models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="entropy_models.html" class="btn btn-neutral float-left" title="compressai.entropy_models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, InterDigital Communications, Inc.
+        &#169; Copyright 2020, InterDigital Communications, Inc..
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -331,7 +338,6 @@ Takeuchi, Jiro Katto.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

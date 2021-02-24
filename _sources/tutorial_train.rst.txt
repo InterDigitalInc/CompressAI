@@ -168,9 +168,10 @@ Loss functions
 
     import torch.optim as optim
 
-    optimizer = optim.Adam(net.parameters(), lr=1e-4)
-    aux_optimizer = optim.Adam(net.aux_parameters(), lr=1e-3)
-
+    parameters = set(p for n, p in net.named_parameters() if not n.endswith(".quantiles"))
+    aux_parameters = set(p for n, p in net.named_parameters() if n.endswith(".quantiles"))
+    optimizer = optim.Adam(parameters, lr=1e-4)
+    aux_optimizer = optim.Adam(aux_parameters, lr=1e-3)
 
   And write a training loop:
 

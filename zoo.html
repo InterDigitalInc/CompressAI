@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Image compression &mdash; compressai  documentation</title>
   
 
   
-  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Command line usage" href="cli_usage.html" />
@@ -74,6 +77,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -133,6 +137,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -167,18 +172,20 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Image compression</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/zoo.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -355,7 +362,7 @@ solutions to implement cross-platform encoding and decoding.</p>
 <p>Original paper: <a class="reference internal" href="#bmshj2018" id="id2"><span>[bmshj2018]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.bmshj2018_factorized">
-<code class="sig-prename descclassname">compressai.zoo.</code><code class="sig-name descname">bmshj2018_factorized</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'mse'</span></em>, <em class="sig-param"><span class="n">pretrained</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#bmshj2018_factorized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.zoo.bmshj2018_factorized" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></code><code class="sig-name descname"><span class="pre">bmshj2018_factorized</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#bmshj2018_factorized"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.bmshj2018_factorized" title="Permalink to this definition">¶</a></dt>
 <dd><p>Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
 N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational Image Compression with a Scale Hyperprior”</a>, Int Conf. on Learning Representations
 (ICLR), 2018.</p>
@@ -377,7 +384,7 @@ N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.0143
 <p>Original paper: <a class="reference internal" href="#bmshj2018" id="id3"><span>[bmshj2018]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.bmshj2018_hyperprior">
-<code class="sig-prename descclassname">compressai.zoo.</code><code class="sig-name descname">bmshj2018_hyperprior</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'mse'</span></em>, <em class="sig-param"><span class="n">pretrained</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#bmshj2018_hyperprior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.zoo.bmshj2018_hyperprior" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></code><code class="sig-name descname"><span class="pre">bmshj2018_hyperprior</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#bmshj2018_hyperprior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.bmshj2018_hyperprior" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
 N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational Image Compression with a Scale Hyperprior”</a> Int. Conf. on Learning Representations
 (ICLR), 2018.</p>
@@ -399,7 +406,7 @@ N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.0143
 <p>Original paper: <a class="reference internal" href="#id11" id="id5"><span>[mbt2018]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.mbt2018_mean">
-<code class="sig-prename descclassname">compressai.zoo.</code><code class="sig-name descname">mbt2018_mean</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'mse'</span></em>, <em class="sig-param"><span class="n">pretrained</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#mbt2018_mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.zoo.mbt2018_mean" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></code><code class="sig-name descname"><span class="pre">mbt2018_mean</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#mbt2018_mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.mbt2018_mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scale Hyperprior with non zero-mean Gaussian conditionals from D.
 Minnen, J. Balle, G.D. Toderici: <a class="reference external" href="https://arxiv.org/abs/1809.02736">“Joint Autoregressive and Hierarchical
 Priors for Learned Image Compression”</a>,
@@ -422,7 +429,7 @@ Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</p>
 <p>Original paper: <a class="reference internal" href="#id11" id="id6"><span>[mbt2018]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.mbt2018">
-<code class="sig-prename descclassname">compressai.zoo.</code><code class="sig-name descname">mbt2018</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'mse'</span></em>, <em class="sig-param"><span class="n">pretrained</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#mbt2018"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.zoo.mbt2018" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></code><code class="sig-name descname"><span class="pre">mbt2018</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#mbt2018"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.mbt2018" title="Permalink to this definition">¶</a></dt>
 <dd><p>Joint Autoregressive Hierarchical Priors model from D.
 Minnen, J. Balle, G.D. Toderici: <a class="reference external" href="https://arxiv.org/abs/1809.02736">“Joint Autoregressive and Hierarchical
 Priors for Learned Image Compression”</a>,
@@ -445,7 +452,7 @@ Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</p>
 <p>Original paper: <a class="reference internal" href="#cheng2020" id="id8"><span>[cheng2020]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.cheng2020_anchor">
-<code class="sig-prename descclassname">compressai.zoo.</code><code class="sig-name descname">cheng2020_anchor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'mse'</span></em>, <em class="sig-param"><span class="n">pretrained</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#cheng2020_anchor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.zoo.cheng2020_anchor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></code><code class="sig-name descname"><span class="pre">cheng2020_anchor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#cheng2020_anchor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.cheng2020_anchor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Anchor model variant from <a class="reference external" href="https://arxiv.org/abs/2001.01568">“Learned Image Compression with
 Discretized Gaussian Mixture Likelihoods and Attention Modules”</a>, by Zhengxue Cheng, Heming Sun, Masaru
 Takeuchi, Jiro Katto.</p>
@@ -467,7 +474,7 @@ Takeuchi, Jiro Katto.</p>
 <p>Original paper: <a class="reference internal" href="#cheng2020" id="id9"><span>[cheng2020]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.cheng2020_attn">
-<code class="sig-prename descclassname">compressai.zoo.</code><code class="sig-name descname">cheng2020_attn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">quality</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'mse'</span></em>, <em class="sig-param"><span class="n">pretrained</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#cheng2020_attn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compressai.zoo.cheng2020_attn" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></code><code class="sig-name descname"><span class="pre">cheng2020_attn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#cheng2020_attn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.cheng2020_attn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Self-attention model variant from <a class="reference external" href="https://arxiv.org/abs/2001.01568">“Learned Image Compression with
 Discretized Gaussian Mixture Likelihoods and Attention Modules”</a>, by Zhengxue Cheng, Heming Sun, Masaru
 Takeuchi, Jiro Katto.</p>
@@ -596,29 +603,29 @@ arXiv for more comparisons and evaluations.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="cli_usage.html" class="btn btn-neutral float-right" title="Command line usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="transforms.html" class="btn btn-neutral float-left" title="compressai.transforms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="cli_usage.html" class="btn btn-neutral float-right" title="Command line usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="transforms.html" class="btn btn-neutral float-left" title="compressai.transforms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, InterDigital Communications, Inc.
+        &#169; Copyright 2020, InterDigital Communications, Inc..
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -626,7 +633,6 @@ arXiv for more comparisons and evaluations.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {
