@@ -1,6 +1,6 @@
 import warnings
 
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 import scipy.stats
@@ -419,7 +419,9 @@ class EntropyBottleneck(EntropyModel):
         )
         return likelihood
 
-    def forward(self, x):
+    def forward(self, x: Tensor, training: Optional[bool] = None):
+        if training is None:
+            training = self.training
         # Convert to (channels, ... , batch) format
         x = x.permute(1, 2, 3, 0).contiguous()
         shape = x.size()
@@ -428,7 +430,7 @@ class EntropyBottleneck(EntropyModel):
         # Add noise or quantize
 
         outputs = self.quantize(
-            values, "noise" if self.training else "dequantize", self._get_medians()
+            values, "noise" if training else "dequantize", self._get_medians()
         )
 
         if not torch.jit.is_scripting():
@@ -579,11 +581,16 @@ class GaussianConditional(EntropyModel):
 
         return likelihood
 
-    def forward(self, inputs, scales, means=None):
-        # type: (Tensor, Tensor, Optional[Tensor]) -> Tuple[Tensor, Tensor]
-        outputs = self.quantize(
-            inputs, "noise" if self.training else "dequantize", means
-        )
+    def forward(
+        self,
+        inputs: Tensor,
+        scales: Tensor,
+        means: Optional[Tensor] = None,
+        training: Optional[bool] = None,
+    ) -> Tuple[Tensor, Tensor]:
+        if training is None:
+            training = self.training
+        outputs = self.quantize(inputs, "noise" if training else "dequantize", means)
         likelihood = self._likelihood(outputs, scales, means)
         if self.use_likelihood_bound:
             likelihood = self.likelihood_lower_bound(likelihood)
