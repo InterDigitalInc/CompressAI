@@ -83,10 +83,14 @@ def configure_optimizers(net, args):
     Return two optimizers"""
 
     parameters = set(
-        p for n, p in net.named_parameters() if not n.endswith(".quantiles")
+        n
+        for n, p in net.named_parameters()
+        if not n.endswith(".quantiles") and p.requires_grad
     )
     aux_parameters = set(
-        p for n, p in net.named_parameters() if n.endswith(".quantiles")
+        n
+        for n, p in net.named_parameters()
+        if n.endswith(".quantiles") and p.requires_grad
     )
 
     # Make sure we don't have an intersection of parameters
@@ -98,11 +102,11 @@ def configure_optimizers(net, args):
     assert len(union_params) - len(params_dict.keys()) == 0
 
     optimizer = optim.Adam(
-        (p for p in parameters if p.requires_grad),
+        (params_dict[n] for n in sorted(list(parameters))),
         lr=args.learning_rate,
     )
     aux_optimizer = optim.Adam(
-        (p for p in aux_parameters if p.requires_grad),
+        (params_dict[n] for n in sorted(list(aux_parameters))),
         lr=args.aux_learning_rate,
     )
     return optimizer, aux_optimizer
@@ -253,6 +257,7 @@ def parse_args(argv):
         type=float,
         help="gradient clipping max norm (default: %(default)s",
     )
+    parser.add_argument("--checkpoint", type=str, help="Path to a checkpoint")
     args = parser.parse_args(argv)
     return args
 
@@ -275,12 +280,14 @@ def main(argv):
     train_dataset = ImageFolder(args.dataset, split="train", transform=train_transforms)
     test_dataset = ImageFolder(args.dataset, split="test", transform=test_transforms)
 
+    device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
+
     train_dataloader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
         shuffle=True,
-        pin_memory=True,
+        pin_memory=(device == "cuda"),
     )
 
     test_dataloader = DataLoader(
@@ -288,10 +295,8 @@ def main(argv):
         batch_size=args.test_batch_size,
         num_workers=args.num_workers,
         shuffle=False,
-        pin_memory=True,
+        pin_memory=(device == "cuda"),
     )
-
-    device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
 
     net = models[args.model](quality=3)
     net = net.to(device)
@@ -303,8 +308,18 @@ def main(argv):
     lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min")
     criterion = RateDistortionLoss(lmbda=args.lmbda)
 
-    best_loss = 1e10
-    for epoch in range(args.epochs):
+    last_epoch = 0
+    if args.checkpoint:  # load from previous checkpoint
+        print("Loading", args.checkpoint)
+        checkpoint = torch.load(args.checkpoint, map_location=device)
+        last_epoch = checkpoint["epoch"] + 1
+        net.load_state_dict(checkpoint["state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer"])
+        aux_optimizer.load_state_dict(checkpoint["aux_optimizer"])
+        lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
+
+    best_loss = float("inf")
+    for epoch in range(last_epoch, args.epochs):
         print(f"Learning rate: {optimizer.param_groups[0]['lr']}")
         train_one_epoch(
             net,
@@ -315,16 +330,16 @@ def main(argv):
             epoch,
             args.clip_max_norm,
         )
-
         loss = test_epoch(epoch, test_dataloader, net, criterion)
         lr_scheduler.step(loss)
 
         is_best = loss < best_loss
         best_loss = min(loss, best_loss)
+
         if args.save:
             save_checkpoint(
                 {
-                    "epoch": epoch + 1,
+                    "epoch": epoch,
                     "state_dict": net.state_dict(),
                     "loss": loss,
                     "optimizer": optimizer.state_dict(),
