@@ -21,12 +21,19 @@ CompressAI currently provides:
 
 ## Installation
 
-CompressAI only supports python 3.6+ (currently <3.9 for PyTorch support) and PyTorch 1.4+.
-A C++17 compiler, a recent version of pip (19.0+), and common python packages (see `setup.py` for
+CompressAI supports python 3.6+ and PyTorch 1.4+. A C++17 compiler, a
+recent version of pip (19.0+), and common python packages (see `setup.py` for
 the full list) are also required.
 
-To get started and install CompressAI, run the following commands in a [virtual
-environment](https://docs.python.org/3.6/library/venv.html):
+pip:
+
+```bash
+pip install compressai
+```
+
+From source:
+To get started locally and install the development version of CompressAI, run
+the following commands in a [virtual environment](https://docs.python.org/3.6/library/venv.html):
 
 ```bash
 git clone https://github.com/InterDigitalInc/CompressAI compressai
@@ -39,10 +46,8 @@ For a custom installation, you can also run one of the following commands:
 * `pip install -e '.[tutorials]'`: install the packages required for the tutorials (notebooks)
 * `pip install -e '.[all]'`: install all the optional packages
 
-This is the currently recommended installation method. Docker images and PyPI
-packages will be released in the future. Conda environments are not officially
-supported.
-
+Docker images will be released in the future. Conda environments are not
+officially supported.
 
 ## Documentation
 
