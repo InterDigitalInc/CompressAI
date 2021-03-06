@@ -1,4 +1,3 @@
-
 ![ID-CompressAI-logo](assets/ID-compressAI-logo-750x140.png)
 
 # CompressAI
@@ -21,17 +20,19 @@ CompressAI currently provides:
 
 ## Installation
 
-CompressAI supports python 3.6+ and PyTorch 1.4+. A C++17 compiler, a
-recent version of pip (19.0+), and common python packages (see `setup.py` for
-the full list) are also required.
+CompressAI supports python 3.6+ and PyTorch 1.4+.
 
-pip:
+A C++17 compiler, a recent version of pip (19.0+), and common python packages
+are also required (see `setup.py` for the full list).
+
+**pip**:
 
 ```bash
 pip install compressai
 ```
 
-From source:
+**From source**:
+
 To get started locally and install the development version of CompressAI, run
 the following commands in a [virtual environment](https://docs.python.org/3.6/library/venv.html):
 
@@ -46,7 +47,7 @@ For a custom installation, you can also run one of the following commands:
 * `pip install -e '.[tutorials]'`: install the packages required for the tutorials (notebooks)
 * `pip install -e '.[all]'`: install all the optional packages
 
-Docker images will be released in the future. Conda environments are not
+> **Note**: Docker images will be released in the future. Conda environments are not
 officially supported.
 
 ## Documentation
@@ -55,16 +56,6 @@ officially supported.
 * [CompressAI API](https://interdigitalinc.github.io/CompressAI/)
 * [Training your own model](https://interdigitalinc.github.io/CompressAI/tutorial_train.html)
 * [List of available models (model zoo)](https://interdigitalinc.github.io/CompressAI/zoo.html)
-
-## Tests
-
-Run tests with `pytest`:
-
-```bash
-pytest -sx --cov=compressai --cov-append --cov-report term-missing tests
-```
-
-Slow tests can be skipped with the `-m "not slow"` option.
 
 ## Usage
 
@@ -114,6 +105,17 @@ python3 -m compressai.utils.bench bpg --help
 python3 -m compressai.utils.bench vtm --help
 ```
 
+## Tests
+
+Run tests with `pytest`:
+
+```bash
+pytest -sx --cov=compressai --cov-append --cov-report term-missing tests
+```
+
+Slow tests can be skipped with the `-m "not slow"` option.
+
+
 ## License
 
 CompressAI is licensed under the Apache License, Version 2.0
@@ -152,3 +154,4 @@ models and datasets, and cite this project as:
  * AOM AV1 reference software: https://aomedia.googlesource.com/aom
  * Z. Cheng et al. 2020: https://github.com/ZhengxueCheng/Learned-Image-Compression-with-GMM-and-Attention
  * Kodak image dataset: http://r0k.us/graphics/kodak/
+
