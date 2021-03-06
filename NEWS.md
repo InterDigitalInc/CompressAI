@@ -1,3 +1,5 @@
+2021-03-05: CompressAI is now available on PyPI!
+
 2021-01-26: Experimental multi-GPU support
 * `aux_parameters` was dropped to support data parallel
 * see the updated example/train.py
