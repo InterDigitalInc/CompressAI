@@ -28,7 +28,7 @@ CompressAI supports python 3.6+ and PyTorch 1.4+.
 pip install compressai
 ```
 
-> **Note**: wheels are available for Linux and MacOS
+> **Note**: wheels are available for Linux and MacOS.
 
 **From source**:
 
