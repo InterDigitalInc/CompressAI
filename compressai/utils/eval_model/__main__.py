@@ -34,6 +34,7 @@ from torchvision import transforms
 
 import compressai
 
+from compressai.zoo import load_state_dict
 from compressai.zoo import models as pretrained_models
 from compressai.zoo.image import model_architectures as architectures
 
@@ -142,7 +143,8 @@ def load_pretrained(model: str, metric: str, quality: int) -> nn.Module:
 
 
 def load_checkpoint(arch: str, checkpoint_path: str) -> nn.Module:
-    return architectures[arch].from_state_dict(torch.load(checkpoint_path)).eval()
+    state_dict = load_state_dict(torch.load(checkpoint_path))
+    return architectures[arch].from_state_dict(state_dict).eval()
 
 
 def eval_model(model, filepaths, entropy_estimation=False, half=False):

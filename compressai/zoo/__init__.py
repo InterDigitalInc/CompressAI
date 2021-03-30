@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .image import *
+from .pretrained import load_pretrained as load_state_dict
 
 models = {
     "bmshj2018-factorized": bmshj2018_factorized,
