@@ -91,7 +91,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="tutorial_intro.html">Introduction</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#python-package">Python package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#from-pypi">From PyPI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#from-source">From source</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#virtual-environment">Virtual environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#using-pip">Using pip</a></li>
@@ -190,14 +191,21 @@
             
   <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>CompressAI only supports python3. We also recommend to use a virtual
-environment to isolate project packages from the base system installation.</p>
-<div class="section" id="python-package">
-<h2>Python package<a class="headerlink" href="#python-package" title="Permalink to this headline">¶</a></h2>
+<p>CompressAI supports python 3.6+ and PyTorch 1.4+.</p>
+<div class="section" id="from-pypi">
+<h2>From PyPI<a class="headerlink" href="#from-pypi" title="Permalink to this headline">¶</a></h2>
+<p>This is the recommended method to get started.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install compressai
+</pre></div>
+</div>
+</div>
+<div class="section" id="from-source">
+<h2>From source<a class="headerlink" href="#from-source" title="Permalink to this headline">¶</a></h2>
+<p>We recommend to use a virtual environment to isolate project packages from the
+base system installation.</p>
 <div class="section" id="requirements">
 <h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>python 3.6 or later (<cite>python3-dev</cite>, <cite>python3-pip</cite>, <cite>python3-venv</cite>)</p></li>
 <li><p>pip 19.0 or later</p></li>
 <li><p>a C++17 compiler (tested with <cite>gcc</cite> and <cite>clang</cite>)</p></li>
 <li><p>python packages: <cite>numpy</cite>, <cite>scipy</cite>, <cite>torch</cite>, <cite>torchvision</cite></p></li>

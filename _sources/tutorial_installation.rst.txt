@@ -1,17 +1,27 @@
 Installation
 ============
 
-CompressAI only supports python3. We also recommend to use a virtual
-environment to isolate project packages from the base system installation.
+CompressAI supports python 3.6+ and PyTorch 1.4+.
+
+From PyPI
+~~~~~~~~~~~
+
+This is the recommended method to get started.
+
+.. code-block:: bash
+
+   pip install compressai
 
 
-Python package
-~~~~~~~~~~~~~~
+From source
+~~~~~~~~~~~
+
+We recommend to use a virtual environment to isolate project packages from the
+base system installation.
 
 Requirements
 ------------
 
-* python 3.6 or later (`python3-dev`, `python3-pip`, `python3-venv`)
 * pip 19.0 or later
 * a C++17 compiler (tested with `gcc` and `clang`)
 * python packages: `numpy`, `scipy`, `torch`, `torchvision`
