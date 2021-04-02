@@ -109,16 +109,6 @@ class EntropyModel(nn.Module):
     def forward(self, *args):
         raise NotImplementedError()
 
-    @torch.jit.unused
-    def _get_noise_cached(self, x):
-        # use simple caching method to avoid creating a new tensor every call
-        half = float(0.5)
-        if not hasattr(self, "_noise"):
-            setattr(self, "_noise", x.new(x.size()))
-        self._noise.resize_(x.size())
-        self._noise.uniform_(-half, half)
-        return self._noise
-
     def quantize(
         self, inputs: Tensor, mode: str, means: Optional[Tensor] = None
     ) -> Tensor:
@@ -126,11 +116,8 @@ class EntropyModel(nn.Module):
             raise ValueError(f'Invalid quantization mode: "{mode}"')
 
         if mode == "noise":
-            if torch.jit.is_scripting():
-                half = float(0.5)
-                noise = torch.empty_like(inputs).uniform_(-half, half)
-            else:
-                noise = self._get_noise_cached(inputs)
+            half = float(0.5)
+            noise = torch.empty_like(inputs).uniform_(-half, half)
             inputs = inputs + noise
             return inputs
 
