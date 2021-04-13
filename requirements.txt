@@ -2,7 +2,7 @@ alabaster==0.7.12
 appdirs==1.4.4
 appnope==0.1.2
 argon2-cffi==20.1.0
-astroid==2.4.2
+astroid==2.5.2
 async-generator==1.10
 attrs==20.3.0
 Babel==2.9.0
@@ -63,7 +63,7 @@ ptyprocess==0.7.0
 py==1.10.0
 pycparser==2.20
 Pygments==2.7.4
-pylint==2.6.0
+pylint==2.7.4
 pyparsing==2.4.7
 pyrsistent==0.17.3
 pytest==6.2.2
@@ -97,7 +97,7 @@ tornado==6.1
 traitlets==5.0.5
 typed-ast==1.4.2
 typing-extensions==3.7.4.3
-urllib3==1.26.3
+urllib3==1.26.4
 wcwidth==0.2.5
 webencodings==0.5.1
 widgetsnbextension==3.5.1
