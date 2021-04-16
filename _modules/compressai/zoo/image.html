@@ -1,91 +1,119 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-
-<!DOCTYPE html>
-<html class="writer-html5" lang="en" >
-<head>
-  <meta charset="utf-8" />
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>compressai.zoo.image &mdash; compressai  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
+    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
+        <title>compressai.zoo.image - CompressAI</title>
+      <link rel="stylesheet" href="../../../_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
+    <link rel="stylesheet" href="../../../_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../../../_static/pygments_dark.css">
     
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/doctools.js"></script>
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --color-brand-primary: #00aaee;
+  --color-brand-content: #00aaee;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --color-brand-primary: #00aaee;
+  --color-brand-content: #00aaee;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" href="../../../_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+  <body dir="">
     
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
 
-    
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
-</head>
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
 
-<body class="wy-body-for-nav">
 
-   
-  <div class="wy-grid-for-nav">
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
 
-          
-            <a href="../../../index.html" class="icon icon-home"> compressai
-          
-
-          
-          </a>
-
-          
-            
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CompressAI</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Tutorials</span></p>
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">CompressAI</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand centered" href="../../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../../_static/logo.png" alt="Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorial_intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorial_installation.html">Installation</a></li>
@@ -111,82 +139,29 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../cli_usage.html">Command line usage</a></li>
 </ul>
 
-            
-          
-        </div>
-        
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">compressai</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-        
-          <li><a href="../../compressai.html">compressai</a> &raquo;</li>
-        
-      <li>compressai.zoo.image</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
-        
-      </li>
-    
-  </ul>
-
-  
-  <hr/>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
-  <h1>Source code for compressai.zoo.image</h1><div class="highlight"><pre>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <h1>Source code for compressai.zoo.image</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright 2020 InterDigital Communications, Inc.</span>
 <span class="c1">#</span>
-<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the "License");</span>
 <span class="c1"># you may not use this file except in compliance with the License.</span>
 <span class="c1"># You may obtain a copy of the License at</span>
 <span class="c1">#</span>
 <span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
 <span class="c1">#</span>
 <span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
-<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># distributed under the License is distributed on an "AS IS" BASIS,</span>
 <span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
@@ -205,110 +180,110 @@
 <span class="kn">from</span> <span class="nn">.pretrained</span> <span class="kn">import</span> <span class="n">load_pretrained</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;bmshj2018_factorized&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;bmshj2018_hyperprior&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;mbt2018&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;mbt2018_mean&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;cheng2020_anchor&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;cheng2020_attn&quot;</span><span class="p">,</span>
+    <span class="s2">"bmshj2018_factorized"</span><span class="p">,</span>
+    <span class="s2">"bmshj2018_hyperprior"</span><span class="p">,</span>
+    <span class="s2">"mbt2018"</span><span class="p">,</span>
+    <span class="s2">"mbt2018_mean"</span><span class="p">,</span>
+    <span class="s2">"cheng2020_anchor"</span><span class="p">,</span>
+    <span class="s2">"cheng2020_attn"</span><span class="p">,</span>
 <span class="p">]</span>
 
 <span class="n">model_architectures</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="p">:</span> <span class="n">FactorizedPrior</span><span class="p">,</span>
-    <span class="s2">&quot;bmshj2018-hyperprior&quot;</span><span class="p">:</span> <span class="n">ScaleHyperprior</span><span class="p">,</span>
-    <span class="s2">&quot;mbt2018-mean&quot;</span><span class="p">:</span> <span class="n">MeanScaleHyperprior</span><span class="p">,</span>
-    <span class="s2">&quot;mbt2018&quot;</span><span class="p">:</span> <span class="n">JointAutoregressiveHierarchicalPriors</span><span class="p">,</span>
-    <span class="s2">&quot;cheng2020-anchor&quot;</span><span class="p">:</span> <span class="n">Cheng2020Anchor</span><span class="p">,</span>
-    <span class="s2">&quot;cheng2020-attn&quot;</span><span class="p">:</span> <span class="n">Cheng2020Attention</span><span class="p">,</span>
+    <span class="s2">"bmshj2018-factorized"</span><span class="p">:</span> <span class="n">FactorizedPrior</span><span class="p">,</span>
+    <span class="s2">"bmshj2018-hyperprior"</span><span class="p">:</span> <span class="n">ScaleHyperprior</span><span class="p">,</span>
+    <span class="s2">"mbt2018-mean"</span><span class="p">:</span> <span class="n">MeanScaleHyperprior</span><span class="p">,</span>
+    <span class="s2">"mbt2018"</span><span class="p">:</span> <span class="n">JointAutoregressiveHierarchicalPriors</span><span class="p">,</span>
+    <span class="s2">"cheng2020-anchor"</span><span class="p">:</span> <span class="n">Cheng2020Anchor</span><span class="p">,</span>
+    <span class="s2">"cheng2020-attn"</span><span class="p">:</span> <span class="n">Cheng2020Attention</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">root_url</span> <span class="o">=</span> <span class="s2">&quot;https://compressai.s3.amazonaws.com/models/v1&quot;</span>
+<span class="n">root_url</span> <span class="o">=</span> <span class="s2">"https://compressai.s3.amazonaws.com/models/v1"</span>
 <span class="n">model_urls</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;mse&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="mi">1</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-1-446d5c7f.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">2</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-2-87279a02.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">3</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-3-5c6f152b.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">4</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-4-1ed4405a.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">5</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-5-866ba797.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">6</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-6-9b02ea3a.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">7</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-7-6dfd6734.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">8</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-8-5232faa3.pth.tar&quot;</span><span class="p">,</span>
+    <span class="s2">"bmshj2018-factorized"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"mse"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-1-446d5c7f.pth.tar"</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-2-87279a02.pth.tar"</span><span class="p">,</span>
+            <span class="mi">3</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-3-5c6f152b.pth.tar"</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-4-1ed4405a.pth.tar"</span><span class="p">,</span>
+            <span class="mi">5</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-5-866ba797.pth.tar"</span><span class="p">,</span>
+            <span class="mi">6</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-6-9b02ea3a.pth.tar"</span><span class="p">,</span>
+            <span class="mi">7</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-7-6dfd6734.pth.tar"</span><span class="p">,</span>
+            <span class="mi">8</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-prior-8-5232faa3.pth.tar"</span><span class="p">,</span>
         <span class="p">},</span>
-        <span class="s2">&quot;ms-ssim&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="mi">1</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-1-9781d705.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">2</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-2-4a584386.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">3</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-3-5352f123.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">4</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-4-4f91b847.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">5</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-5-b3a88897.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">6</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-6-ee028763.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">7</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-7-8c265a29.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">8</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-8-8811bd14.pth.tar&quot;</span><span class="p">,</span>
-        <span class="p">},</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;bmshj2018-hyperprior&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;mse&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="mi">1</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-1-7eb97409.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">2</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-2-93677231.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">3</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-3-6d87be32.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">4</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-4-de1b779c.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">5</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-5-f8b614e1.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">6</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-6-1ab9c41e.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">7</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-7-3804dcbd.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">8</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-8-a583f0cf.pth.tar&quot;</span><span class="p">,</span>
-        <span class="p">},</span>
-        <span class="s2">&quot;ms-ssim&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="mi">1</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-1-5cf249be.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">2</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-2-1ff60d1f.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">3</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-3-92dd7878.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">4</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-4-4377354e.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">5</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-5-c34afc8d.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">6</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-6-3a6d8229.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">7</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-7-8747d3bc.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">8</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-8-cc15b5f3.pth.tar&quot;</span><span class="p">,</span>
+        <span class="s2">"ms-ssim"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-1-9781d705.pth.tar"</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-2-4a584386.pth.tar"</span><span class="p">,</span>
+            <span class="mi">3</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-3-5352f123.pth.tar"</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-4-4f91b847.pth.tar"</span><span class="p">,</span>
+            <span class="mi">5</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-5-b3a88897.pth.tar"</span><span class="p">,</span>
+            <span class="mi">6</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-6-ee028763.pth.tar"</span><span class="p">,</span>
+            <span class="mi">7</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-7-8c265a29.pth.tar"</span><span class="p">,</span>
+            <span class="mi">8</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-factorized-ms-ssim-8-8811bd14.pth.tar"</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">},</span>
-    <span class="s2">&quot;mbt2018-mean&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;mse&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="mi">1</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-1-e522738d.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">2</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-2-e54a039d.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">3</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-3-723404a8.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">4</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-4-6dba02a3.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">5</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-5-d504e8eb.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">6</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-6-a19628ab.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">7</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-7-d5d441d1.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">8</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-8-8089ae3e.pth.tar&quot;</span><span class="p">,</span>
+    <span class="s2">"bmshj2018-hyperprior"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"mse"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-1-7eb97409.pth.tar"</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-2-93677231.pth.tar"</span><span class="p">,</span>
+            <span class="mi">3</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-3-6d87be32.pth.tar"</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-4-de1b779c.pth.tar"</span><span class="p">,</span>
+            <span class="mi">5</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-5-f8b614e1.pth.tar"</span><span class="p">,</span>
+            <span class="mi">6</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-6-1ab9c41e.pth.tar"</span><span class="p">,</span>
+            <span class="mi">7</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-7-3804dcbd.pth.tar"</span><span class="p">,</span>
+            <span class="mi">8</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-8-a583f0cf.pth.tar"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">"ms-ssim"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-1-5cf249be.pth.tar"</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-2-1ff60d1f.pth.tar"</span><span class="p">,</span>
+            <span class="mi">3</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-3-92dd7878.pth.tar"</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-4-4377354e.pth.tar"</span><span class="p">,</span>
+            <span class="mi">5</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-5-c34afc8d.pth.tar"</span><span class="p">,</span>
+            <span class="mi">6</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-6-3a6d8229.pth.tar"</span><span class="p">,</span>
+            <span class="mi">7</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-7-8747d3bc.pth.tar"</span><span class="p">,</span>
+            <span class="mi">8</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/bmshj2018-hyperprior-ms-ssim-8-cc15b5f3.pth.tar"</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">},</span>
-    <span class="s2">&quot;mbt2018&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;mse&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="mi">1</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-1-3f36cd77.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">2</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-2-43b70cdd.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">3</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-3-22901978.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">4</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-4-456e2af9.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">5</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-5-b4a046dd.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">6</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-6-7052e5ea.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">7</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-7-8ba2bf82.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">8</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-8-dd0097aa.pth.tar&quot;</span><span class="p">,</span>
+    <span class="s2">"mbt2018-mean"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"mse"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-1-e522738d.pth.tar"</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-2-e54a039d.pth.tar"</span><span class="p">,</span>
+            <span class="mi">3</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-3-723404a8.pth.tar"</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-4-6dba02a3.pth.tar"</span><span class="p">,</span>
+            <span class="mi">5</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-5-d504e8eb.pth.tar"</span><span class="p">,</span>
+            <span class="mi">6</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-6-a19628ab.pth.tar"</span><span class="p">,</span>
+            <span class="mi">7</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-7-d5d441d1.pth.tar"</span><span class="p">,</span>
+            <span class="mi">8</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-mean-8-8089ae3e.pth.tar"</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">},</span>
-    <span class="s2">&quot;cheng2020-anchor&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;mse&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="mi">1</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/cheng2020-anchor-1-dad2ebff.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">2</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/cheng2020-anchor-2-a29008eb.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">3</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/cheng2020-anchor-3-e49be189.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">4</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/cheng2020-anchor-4-98b0b468.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">5</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/cheng2020-anchor-5-23852949.pth.tar&quot;</span><span class="p">,</span>
-            <span class="mi">6</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/cheng2020-anchor-6-4c052b1a.pth.tar&quot;</span><span class="p">,</span>
+    <span class="s2">"mbt2018"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"mse"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-1-3f36cd77.pth.tar"</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-2-43b70cdd.pth.tar"</span><span class="p">,</span>
+            <span class="mi">3</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-3-22901978.pth.tar"</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-4-456e2af9.pth.tar"</span><span class="p">,</span>
+            <span class="mi">5</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-5-b4a046dd.pth.tar"</span><span class="p">,</span>
+            <span class="mi">6</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-6-7052e5ea.pth.tar"</span><span class="p">,</span>
+            <span class="mi">7</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-7-8ba2bf82.pth.tar"</span><span class="p">,</span>
+            <span class="mi">8</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/mbt2018-8-dd0097aa.pth.tar"</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">},</span>
-    <span class="s2">&quot;cheng2020-attn&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;mse&quot;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="s2">"cheng2020-anchor"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"mse"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/cheng2020-anchor-1-dad2ebff.pth.tar"</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/cheng2020-anchor-2-a29008eb.pth.tar"</span><span class="p">,</span>
+            <span class="mi">3</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/cheng2020-anchor-3-e49be189.pth.tar"</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/cheng2020-anchor-4-98b0b468.pth.tar"</span><span class="p">,</span>
+            <span class="mi">5</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/cheng2020-anchor-5-23852949.pth.tar"</span><span class="p">,</span>
+            <span class="mi">6</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">/cheng2020-anchor-6-4c052b1a.pth.tar"</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">"cheng2020-attn"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"mse"</span><span class="p">:</span> <span class="p">{},</span>
     <span class="p">},</span>
 <span class="p">}</span>
 
 <span class="n">cfgs</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"bmshj2018-factorized"</span><span class="p">:</span> <span class="p">{</span>
         <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">192</span><span class="p">),</span>
         <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">192</span><span class="p">),</span>
         <span class="mi">3</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">192</span><span class="p">),</span>
@@ -318,7 +293,7 @@
         <span class="mi">7</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">320</span><span class="p">),</span>
         <span class="mi">8</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">320</span><span class="p">),</span>
     <span class="p">},</span>
-    <span class="s2">&quot;bmshj2018-hyperprior&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"bmshj2018-hyperprior"</span><span class="p">:</span> <span class="p">{</span>
         <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">192</span><span class="p">),</span>
         <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">192</span><span class="p">),</span>
         <span class="mi">3</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">192</span><span class="p">),</span>
@@ -328,7 +303,7 @@
         <span class="mi">7</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">320</span><span class="p">),</span>
         <span class="mi">8</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">320</span><span class="p">),</span>
     <span class="p">},</span>
-    <span class="s2">&quot;mbt2018-mean&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"mbt2018-mean"</span><span class="p">:</span> <span class="p">{</span>
         <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">192</span><span class="p">),</span>
         <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">192</span><span class="p">),</span>
         <span class="mi">3</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">192</span><span class="p">),</span>
@@ -338,7 +313,7 @@
         <span class="mi">7</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">320</span><span class="p">),</span>
         <span class="mi">8</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">320</span><span class="p">),</span>
     <span class="p">},</span>
-    <span class="s2">&quot;mbt2018&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"mbt2018"</span><span class="p">:</span> <span class="p">{</span>
         <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">192</span><span class="p">),</span>
         <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">192</span><span class="p">),</span>
         <span class="mi">3</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">192</span><span class="p">),</span>
@@ -348,7 +323,7 @@
         <span class="mi">7</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">320</span><span class="p">),</span>
         <span class="mi">8</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">320</span><span class="p">),</span>
     <span class="p">},</span>
-    <span class="s2">&quot;cheng2020-anchor&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"cheng2020-anchor"</span><span class="p">:</span> <span class="p">{</span>
         <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,),</span>
         <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,),</span>
         <span class="mi">3</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,),</span>
@@ -356,7 +331,7 @@
         <span class="mi">5</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,),</span>
         <span class="mi">6</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,),</span>
     <span class="p">},</span>
-    <span class="s2">&quot;cheng2020-attn&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"cheng2020-attn"</span><span class="p">:</span> <span class="p">{</span>
         <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,),</span>
         <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,),</span>
         <span class="mi">3</span><span class="p">:</span> <span class="p">(</span><span class="mi">128</span><span class="p">,),</span>
@@ -371,10 +346,10 @@
     <span class="n">architecture</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">):</span>
     <span class="k">if</span> <span class="n">architecture</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">model_architectures</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid architecture name &quot;</span><span class="si">{</span><span class="n">architecture</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid architecture name "</span><span class="si">{</span><span class="n">architecture</span><span class="si">}</span><span class="s1">"'</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">quality</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cfgs</span><span class="p">[</span><span class="n">architecture</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid quality value &quot;</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid quality value "</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">"'</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">pretrained</span><span class="p">:</span>
         <span class="k">if</span> <span class="p">(</span>
@@ -382,7 +357,7 @@
             <span class="ow">or</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">model_urls</span><span class="p">[</span><span class="n">architecture</span><span class="p">]</span>
             <span class="ow">or</span> <span class="n">quality</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">model_urls</span><span class="p">[</span><span class="n">architecture</span><span class="p">][</span><span class="n">metric</span><span class="p">]</span>
         <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Pre-trained model not yet available&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Pre-trained model not yet available"</span><span class="p">)</span>
 
         <span class="n">url</span> <span class="o">=</span> <span class="n">model_urls</span><span class="p">[</span><span class="n">architecture</span><span class="p">][</span><span class="n">metric</span><span class="p">][</span><span class="n">quality</span><span class="p">]</span>
         <span class="n">state_dict</span> <span class="o">=</span> <span class="n">load_state_dict_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
@@ -395,184 +370,166 @@
 
 
 <div class="viewcode-block" id="bmshj2018_factorized"><a class="viewcode-back" href="../../../zoo.html#compressai.zoo.bmshj2018_factorized">[docs]</a><span class="k">def</span> <span class="nf">bmshj2018_factorized</span><span class="p">(</span>
-    <span class="n">quality</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="n">quality</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">"mse"</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,</span>
-<span class="sd">    N. Johnston: `&quot;Variational Image Compression with a Scale Hyperprior&quot;</span>
+    <span class="sa">r</span><span class="sd">"""Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,</span>
+<span class="sd">    N. Johnston: `"Variational Image Compression with a Scale Hyperprior"</span>
 <span class="sd">    &lt;https://arxiv.org/abs/1802.01436&gt;`_, Int Conf. on Learning Representations</span>
 <span class="sd">    (ICLR), 2018.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        quality (int): Quality levels (1: lowest, highest: 8)</span>
-<span class="sd">        metric (str): Optimized metric, choose from (&#39;mse&#39;)</span>
+<span class="sd">        metric (str): Optimized metric, choose from ('mse')</span>
 <span class="sd">        pretrained (bool): If True, returns a pre-trained model</span>
 <span class="sd">        progress (bool): If True, displays a progress bar of the download to stderr</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="s2">&quot;ms-ssim&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid metric &quot;</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"mse"</span><span class="p">,</span> <span class="s2">"ms-ssim"</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid metric "</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">"'</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">quality</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">quality</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid quality &quot;</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">&quot;, should be between (1, 8)&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid quality "</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">", should be between (1, 8)'</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span>
-        <span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="s2">"bmshj2018-factorized"</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="bmshj2018_hyperprior"><a class="viewcode-back" href="../../../zoo.html#compressai.zoo.bmshj2018_hyperprior">[docs]</a><span class="k">def</span> <span class="nf">bmshj2018_hyperprior</span><span class="p">(</span>
-    <span class="n">quality</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="n">quality</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">"mse"</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,</span>
-<span class="sd">    N. Johnston: `&quot;Variational Image Compression with a Scale Hyperprior&quot;</span>
+    <span class="sa">r</span><span class="sd">"""Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,</span>
+<span class="sd">    N. Johnston: `"Variational Image Compression with a Scale Hyperprior"</span>
 <span class="sd">    &lt;https://arxiv.org/abs/1802.01436&gt;`_ Int. Conf. on Learning Representations</span>
 <span class="sd">    (ICLR), 2018.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        quality (int): Quality levels (1: lowest, highest: 8)</span>
-<span class="sd">        metric (str): Optimized metric, choose from (&#39;mse&#39;)</span>
+<span class="sd">        metric (str): Optimized metric, choose from ('mse')</span>
 <span class="sd">        pretrained (bool): If True, returns a pre-trained model</span>
 <span class="sd">        progress (bool): If True, displays a progress bar of the download to stderr</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="s2">&quot;ms-ssim&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid metric &quot;</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"mse"</span><span class="p">,</span> <span class="s2">"ms-ssim"</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid metric "</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">"'</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">quality</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">quality</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid quality &quot;</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">&quot;, should be between (1, 8)&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid quality "</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">", should be between (1, 8)'</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span>
-        <span class="s2">&quot;bmshj2018-hyperprior&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="s2">"bmshj2018-hyperprior"</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="mbt2018_mean"><a class="viewcode-back" href="../../../zoo.html#compressai.zoo.mbt2018_mean">[docs]</a><span class="k">def</span> <span class="nf">mbt2018_mean</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scale Hyperprior with non zero-mean Gaussian conditionals from D.</span>
-<span class="sd">    Minnen, J. Balle, G.D. Toderici: `&quot;Joint Autoregressive and Hierarchical</span>
-<span class="sd">    Priors for Learned Image Compression&quot; &lt;https://arxiv.org/abs/1809.02736&gt;`_,</span>
+<div class="viewcode-block" id="mbt2018_mean"><a class="viewcode-back" href="../../../zoo.html#compressai.zoo.mbt2018_mean">[docs]</a><span class="k">def</span> <span class="nf">mbt2018_mean</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">"mse"</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">"""Scale Hyperprior with non zero-mean Gaussian conditionals from D.</span>
+<span class="sd">    Minnen, J. Balle, G.D. Toderici: `"Joint Autoregressive and Hierarchical</span>
+<span class="sd">    Priors for Learned Image Compression" &lt;https://arxiv.org/abs/1809.02736&gt;`_,</span>
 <span class="sd">    Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        quality (int): Quality levels (1: lowest, highest: 8)</span>
-<span class="sd">        metric (str): Optimized metric, choose from (&#39;mse&#39;)</span>
+<span class="sd">        metric (str): Optimized metric, choose from ('mse')</span>
 <span class="sd">        pretrained (bool): If True, returns a pre-trained model</span>
 <span class="sd">        progress (bool): If True, displays a progress bar of the download to stderr</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;mse&quot;</span><span class="p">,):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid metric &quot;</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"mse"</span><span class="p">,):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid metric "</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">"'</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">quality</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">quality</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid quality &quot;</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">&quot;, should be between (1, 8)&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid quality "</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">", should be between (1, 8)'</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="s2">&quot;mbt2018-mean&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="s2">"mbt2018-mean"</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="mbt2018"><a class="viewcode-back" href="../../../zoo.html#compressai.zoo.mbt2018">[docs]</a><span class="k">def</span> <span class="nf">mbt2018</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Joint Autoregressive Hierarchical Priors model from D.</span>
-<span class="sd">    Minnen, J. Balle, G.D. Toderici: `&quot;Joint Autoregressive and Hierarchical</span>
-<span class="sd">    Priors for Learned Image Compression&quot; &lt;https://arxiv.org/abs/1809.02736&gt;`_,</span>
+<div class="viewcode-block" id="mbt2018"><a class="viewcode-back" href="../../../zoo.html#compressai.zoo.mbt2018">[docs]</a><span class="k">def</span> <span class="nf">mbt2018</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">"mse"</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">"""Joint Autoregressive Hierarchical Priors model from D.</span>
+<span class="sd">    Minnen, J. Balle, G.D. Toderici: `"Joint Autoregressive and Hierarchical</span>
+<span class="sd">    Priors for Learned Image Compression" &lt;https://arxiv.org/abs/1809.02736&gt;`_,</span>
 <span class="sd">    Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        quality (int): Quality levels (1: lowest, highest: 8)</span>
-<span class="sd">        metric (str): Optimized metric, choose from (&#39;mse&#39;)</span>
+<span class="sd">        metric (str): Optimized metric, choose from ('mse')</span>
 <span class="sd">        pretrained (bool): If True, returns a pre-trained model</span>
 <span class="sd">        progress (bool): If True, displays a progress bar of the download to stderr</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;mse&quot;</span><span class="p">,):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid metric &quot;</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"mse"</span><span class="p">,):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid metric "</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">"'</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">quality</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">quality</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid quality &quot;</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">&quot;, should be between (1, 8)&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid quality "</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">", should be between (1, 8)'</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="s2">&quot;mbt2018&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span><span class="s2">"mbt2018"</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="cheng2020_anchor"><a class="viewcode-back" href="../../../zoo.html#compressai.zoo.cheng2020_anchor">[docs]</a><span class="k">def</span> <span class="nf">cheng2020_anchor</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Anchor model variant from `&quot;Learned Image Compression with</span>
-<span class="sd">    Discretized Gaussian Mixture Likelihoods and Attention Modules&quot;</span>
+<div class="viewcode-block" id="cheng2020_anchor"><a class="viewcode-back" href="../../../zoo.html#compressai.zoo.cheng2020_anchor">[docs]</a><span class="k">def</span> <span class="nf">cheng2020_anchor</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">"mse"</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">"""Anchor model variant from `"Learned Image Compression with</span>
+<span class="sd">    Discretized Gaussian Mixture Likelihoods and Attention Modules"</span>
 <span class="sd">    &lt;https://arxiv.org/abs/2001.01568&gt;`_, by Zhengxue Cheng, Heming Sun, Masaru</span>
 <span class="sd">    Takeuchi, Jiro Katto.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        quality (int): Quality levels (1: lowest, highest: 6)</span>
-<span class="sd">        metric (str): Optimized metric, choose from (&#39;mse&#39;)</span>
+<span class="sd">        metric (str): Optimized metric, choose from ('mse')</span>
 <span class="sd">        pretrained (bool): If True, returns a pre-trained model</span>
 <span class="sd">        progress (bool): If True, displays a progress bar of the download to stderr</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;mse&quot;</span><span class="p">,):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid metric &quot;</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"mse"</span><span class="p">,):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid metric "</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">"'</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">quality</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">quality</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid quality &quot;</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">&quot;, should be between (1, 6)&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid quality "</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">", should be between (1, 6)'</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span>
-        <span class="s2">&quot;cheng2020-anchor&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="s2">"cheng2020-anchor"</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="cheng2020_attn"><a class="viewcode-back" href="../../../zoo.html#compressai.zoo.cheng2020_attn">[docs]</a><span class="k">def</span> <span class="nf">cheng2020_attn</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;mse&quot;</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Self-attention model variant from `&quot;Learned Image Compression with</span>
-<span class="sd">    Discretized Gaussian Mixture Likelihoods and Attention Modules&quot;</span>
+<div class="viewcode-block" id="cheng2020_attn"><a class="viewcode-back" href="../../../zoo.html#compressai.zoo.cheng2020_attn">[docs]</a><span class="k">def</span> <span class="nf">cheng2020_attn</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">"mse"</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">"""Self-attention model variant from `"Learned Image Compression with</span>
+<span class="sd">    Discretized Gaussian Mixture Likelihoods and Attention Modules"</span>
 <span class="sd">    &lt;https://arxiv.org/abs/2001.01568&gt;`_, by Zhengxue Cheng, Heming Sun, Masaru</span>
 <span class="sd">    Takeuchi, Jiro Katto.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        quality (int): Quality levels (1: lowest, highest: 6)</span>
-<span class="sd">        metric (str): Optimized metric, choose from (&#39;mse&#39;)</span>
+<span class="sd">        metric (str): Optimized metric, choose from ('mse')</span>
 <span class="sd">        pretrained (bool): If True, returns a pre-trained model</span>
 <span class="sd">        progress (bool): If True, displays a progress bar of the download to stderr</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;mse&quot;</span><span class="p">,):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid metric &quot;</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"mse"</span><span class="p">,):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid metric "</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s1">"'</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">quality</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">quality</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid quality &quot;</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">&quot;, should be between (1, 6)&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid quality "</span><span class="si">{</span><span class="n">quality</span><span class="si">}</span><span class="s1">", should be between (1, 6)'</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span>
-        <span class="s2">&quot;cheng2020-attn&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="s2">"cheng2020-attn"</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span></div>
 </pre></div>
-
-           </div>
-           
-          </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &#169; Copyright 2020, InterDigital Communications, Inc..
-
-    </p>
-  </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
         </div>
-      </div>
 
-    </section>
-
-  </div>
-  
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
-    
-   
-
-</body>
+        <div class="related-information">
+              Copyright &#169; 2021, InterDigital Communications, Inc.
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </main>
+</div>
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
 </html>

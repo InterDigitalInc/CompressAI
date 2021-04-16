@@ -1,94 +1,119 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Command line usage" href="cli_usage.html" /><link rel="prev" title="compressai.transforms" href="transforms.html" />
 
-
-<!DOCTYPE html>
-<html class="writer-html5" lang="en" >
-<head>
-  <meta charset="utf-8" />
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Image compression &mdash; compressai  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
+    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
+        <title>Image compression - CompressAI</title>
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
+    <link rel="stylesheet" href="_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
     
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --color-brand-primary: #00aaee;
+  --color-brand-content: #00aaee;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --color-brand-primary: #00aaee;
+  --color-brand-content: #00aaee;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+  <body dir="">
     
-    <script type="text/javascript" src="_static/js/theme.js"></script>
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
 
-    
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Command line usage" href="cli_usage.html" />
-    <link rel="prev" title="compressai.transforms" href="transforms.html" /> 
-</head>
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
 
-<body class="wy-body-for-nav">
 
-   
-  <div class="wy-grid-for-nav">
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
 
-          
-            <a href="index.html" class="icon icon-home"> compressai
-          
-
-          
-          </a>
-
-          
-            
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="index.html">CompressAI</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Tutorials</span></p>
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">CompressAI</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand centered" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/logo.png" alt="Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="search.html">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorial_intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial_installation.html">Installation</a></li>
@@ -107,99 +132,26 @@
 </ul>
 <p class="caption"><span class="caption-text">Model Zoo</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Image compression</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#training">Training</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#models">Models</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#bmshj2018-factorized">bmshj2018_factorized</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#bmshj2018-hyperprior">bmshj2018_hyperprior</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#mbt2018-mean">mbt2018_mean</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#mbt2018">mbt2018</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cheng2020-anchor">cheng2020_anchor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cheng2020-attn">cheng2020_attn</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#performances">Performances</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#all-models">all models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id12">bmshj2018 factorized</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id13">bmshj2018 hyperprior</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id14">mbt2018 mean</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id15">mbt2018</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Image compression</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Utils</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="cli_usage.html">Command line usage</a></li>
 </ul>
 
-            
-          
-        </div>
-        
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">compressai</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-      <li>Image compression</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="_sources/zoo.rst.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
-    
-  </ul>
-
-  
-  <hr/>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
-  <div class="section" id="image-compression">
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <div class="section" id="image-compression">
 <h1>Image compression<a class="headerlink" href="#image-compression" title="Permalink to this headline">¶</a></h1>
 <p>This is the list of the pre-trained models for end-to-end image compression
 available in CompressAI.</p>
@@ -221,33 +173,8 @@ example, the quantization operations may be performed differently. You can use
 documentation for more information on
 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html?highlight=train#torch.nn.Module.train">train</a>
 and <a class="reference external" href="https://pytorch.org/docs/stable/nn.html?highlight=eval#torch.nn.Module.eval">eval</a>.</p>
-<div class="contents local topic" id="table-of-content">
-<p class="topic-title">Table of content</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="#training" id="id16">Training</a></p></li>
-<li><p><a class="reference internal" href="#models" id="id17">Models</a></p>
-<ul>
-<li><p><a class="reference internal" href="#bmshj2018-factorized" id="id18">bmshj2018_factorized</a></p></li>
-<li><p><a class="reference internal" href="#bmshj2018-hyperprior" id="id19">bmshj2018_hyperprior</a></p></li>
-<li><p><a class="reference internal" href="#mbt2018-mean" id="id20">mbt2018_mean</a></p></li>
-<li><p><a class="reference internal" href="#mbt2018" id="id21">mbt2018</a></p></li>
-<li><p><a class="reference internal" href="#cheng2020-anchor" id="id22">cheng2020_anchor</a></p></li>
-<li><p><a class="reference internal" href="#cheng2020-attn" id="id23">cheng2020_attn</a></p></li>
-</ul>
-</li>
-<li><p><a class="reference internal" href="#performances" id="id24">Performances</a></p>
-<ul>
-<li><p><a class="reference internal" href="#all-models" id="id25">all models</a></p></li>
-<li><p><a class="reference internal" href="#id12" id="id26">bmshj2018 factorized</a></p></li>
-<li><p><a class="reference internal" href="#id13" id="id27">bmshj2018 hyperprior</a></p></li>
-<li><p><a class="reference internal" href="#id14" id="id28">mbt2018 mean</a></p></li>
-<li><p><a class="reference internal" href="#id15" id="id29">mbt2018</a></p></li>
-</ul>
-</li>
-</ul>
-</div>
 <div class="section" id="training">
-<h2><a class="toc-backref" href="#id16">Training</a><a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h2>
+<h2>Training<a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h2>
 <p>Unless specified otherwise, networks were trained for 4-5M steps on <em>256x256</em>
 image patches randomly extracted and cropped from the <a class="reference external" href="http://toflow.csail.mit.edu/">Vimeo90K</a> dataset <a class="reference internal" href="#xue2019video" id="id1"><span>[xue2019video]</span></a>.</p>
 <p>Models were trained with a batch size of 16 or 32, and an initial learning rate
@@ -258,10 +185,10 @@ of 20 epochs). This can be implemented by using PyTorch <a class="reference exte
 performances, depending on the model, the number of channels and the GPU
 architecture used.</p>
 <p>The following loss functions and lambda values were used for training:</p>
-<table class="colwidths-given docutils align-default">
+<div class="table-wrapper"><table class="colwidths-given docutils align-default">
 <colgroup>
-<col style="width: 17%" />
-<col style="width: 83%" />
+<col style="width: 17%"/>
+<col style="width: 83%"/>
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Metric</p></th>
@@ -276,20 +203,20 @@ architecture used.</p>
 <td><p><span class="math notranslate nohighlight">\(\mathcal{L} = \lambda * (1 - \mathcal{D}) + \mathcal{R}\)</span></p></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>with <span class="math notranslate nohighlight">\(\mathcal{D}\)</span> and <span class="math notranslate nohighlight">\(\mathcal{R}\)</span> respectively the mean
 distortion and the mean estimated bit-rate.</p>
-<table class="colwidths-given docutils align-default">
+<div class="table-wrapper"><table class="colwidths-given docutils align-default">
 <colgroup>
-<col style="width: 20%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
+<col style="width: 20%"/>
+<col style="width: 10%"/>
+<col style="width: 10%"/>
+<col style="width: 10%"/>
+<col style="width: 10%"/>
+<col style="width: 10%"/>
+<col style="width: 10%"/>
+<col style="width: 10%"/>
+<col style="width: 10%"/>
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Quality</p></th>
@@ -325,7 +252,7 @@ distortion and the mean estimated bit-rate.</p>
 <td><p>220.00</p></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>MS-SSIM optimized networks were fine-tuned from pre-trained MSE
@@ -346,9 +273,9 @@ The detailed list of configurations can be found in
 quality parameters.</p>
 </div>
 </div>
-<hr class="docutils" />
+<hr class="docutils"/>
 <div class="section" id="models">
-<h2><a class="toc-backref" href="#id17">Models</a><a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>All the models are currently implemented using floating point
@@ -358,7 +285,7 @@ paper, <a class="reference external" href="https://openreview.net/forum?id=S1zz2
 solutions to implement cross-platform encoding and decoding.</p>
 </div>
 <div class="section" id="bmshj2018-factorized">
-<h3><a class="toc-backref" href="#id18">bmshj2018_factorized</a><a class="headerlink" href="#bmshj2018-factorized" title="Permalink to this headline">¶</a></h3>
+<h3>bmshj2018_factorized<a class="headerlink" href="#bmshj2018-factorized" title="Permalink to this headline">¶</a></h3>
 <p>Original paper: <a class="reference internal" href="#bmshj2018" id="id2"><span>[bmshj2018]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.bmshj2018_factorized">
@@ -377,10 +304,9 @@ N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.0143
 </dd>
 </dl>
 </dd></dl>
-
 </div>
 <div class="section" id="bmshj2018-hyperprior">
-<h3><a class="toc-backref" href="#id19">bmshj2018_hyperprior</a><a class="headerlink" href="#bmshj2018-hyperprior" title="Permalink to this headline">¶</a></h3>
+<h3>bmshj2018_hyperprior<a class="headerlink" href="#bmshj2018-hyperprior" title="Permalink to this headline">¶</a></h3>
 <p>Original paper: <a class="reference internal" href="#bmshj2018" id="id3"><span>[bmshj2018]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.bmshj2018_hyperprior">
@@ -399,11 +325,10 @@ N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.0143
 </dd>
 </dl>
 </dd></dl>
-
 </div>
 <div class="section" id="mbt2018-mean">
-<h3><a class="toc-backref" href="#id20">mbt2018_mean</a><a class="headerlink" href="#mbt2018-mean" title="Permalink to this headline">¶</a></h3>
-<p>Original paper: <a class="reference internal" href="#id11" id="id5"><span>[mbt2018]</span></a></p>
+<h3>mbt2018_mean<a class="headerlink" href="#mbt2018-mean" title="Permalink to this headline">¶</a></h3>
+<p>Original paper: <a class="reference internal" href="#id19" id="id5"><span>[mbt2018]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.mbt2018_mean">
 <code class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></code><code class="sig-name descname"><span class="pre">mbt2018_mean</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#mbt2018_mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.mbt2018_mean" title="Permalink to this definition">¶</a></dt>
@@ -422,11 +347,10 @@ Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</p>
 </dd>
 </dl>
 </dd></dl>
-
 </div>
 <div class="section" id="mbt2018">
-<h3><a class="toc-backref" href="#id21">mbt2018</a><a class="headerlink" href="#mbt2018" title="Permalink to this headline">¶</a></h3>
-<p>Original paper: <a class="reference internal" href="#id11" id="id6"><span>[mbt2018]</span></a></p>
+<h3>mbt2018<a class="headerlink" href="#mbt2018" title="Permalink to this headline">¶</a></h3>
+<p>Original paper: <a class="reference internal" href="#id19" id="id6"><span>[mbt2018]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.mbt2018">
 <code class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></code><code class="sig-name descname"><span class="pre">mbt2018</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#mbt2018"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.mbt2018" title="Permalink to this definition">¶</a></dt>
@@ -445,10 +369,9 @@ Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</p>
 </dd>
 </dl>
 </dd></dl>
-
 </div>
 <div class="section" id="cheng2020-anchor">
-<h3><a class="toc-backref" href="#id22">cheng2020_anchor</a><a class="headerlink" href="#cheng2020-anchor" title="Permalink to this headline">¶</a></h3>
+<h3>cheng2020_anchor<a class="headerlink" href="#cheng2020-anchor" title="Permalink to this headline">¶</a></h3>
 <p>Original paper: <a class="reference internal" href="#cheng2020" id="id8"><span>[cheng2020]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.cheng2020_anchor">
@@ -467,10 +390,9 @@ Takeuchi, Jiro Katto.</p>
 </dd>
 </dl>
 </dd></dl>
-
 </div>
 <div class="section" id="cheng2020-attn">
-<h3><a class="toc-backref" href="#id23">cheng2020_attn</a><a class="headerlink" href="#cheng2020-attn" title="Permalink to this headline">¶</a></h3>
+<h3>cheng2020_attn<a class="headerlink" href="#cheng2020-attn" title="Permalink to this headline">¶</a></h3>
 <p>Original paper: <a class="reference internal" href="#cheng2020" id="id9"><span>[cheng2020]</span></a></p>
 <dl class="py function">
 <dt id="compressai.zoo.cheng2020_attn">
@@ -489,17 +411,51 @@ Takeuchi, Jiro Katto.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Pre-trained weights are not yet available for this architecture.</p>
 </div>
-<hr class="docutils" />
+</div>
+</div>
+<hr class="docutils"/>
+<div class="section" id="performances">
+<h2>Performances<a class="headerlink" href="#performances" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See the <a class="reference external" href="https://arxiv.org/abs/2011.03029">CompressAI paper</a> on
+arXiv for more comparisons and evaluations.</p>
+</div>
+<div class="section" id="all-models">
+<h3>all models<a class="headerlink" href="#all-models" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/compressai.png" src="_images/compressai.png"/>
+<img alt="_images/compressai-clic2020-mobile.png" src="_images/compressai-clic2020-mobile.png"/>
+<img alt="_images/compressai-clic2020-pro.png" src="_images/compressai-clic2020-pro.png"/>
+</div>
+<div class="section" id="id11">
+<h3>bmshj2018 factorized<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>From: <a class="reference internal" href="#bmshj2018" id="id12"><span>[bmshj2018]</span></a>.</p>
+<img alt="_images/bmshj2018-factorized-mse.png" src="_images/bmshj2018-factorized-mse.png"/>
+</div>
+<div class="section" id="id13">
+<h3>bmshj2018 hyperprior<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>From: <a class="reference internal" href="#bmshj2018" id="id14"><span>[bmshj2018]</span></a>.</p>
+<img alt="_images/bmshj2018-hyperprior-mse.png" src="_images/bmshj2018-hyperprior-mse.png"/>
+</div>
+<div class="section" id="id15">
+<h3>mbt2018 mean<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<p>From: <a class="reference internal" href="#id19" id="id16"><span>[mbt2018]</span></a>.</p>
+<img alt="_images/mbt2018-mean-mse.png" src="_images/mbt2018-mean-mse.png"/>
+</div>
+<div class="section" id="id17">
+<h3>mbt2018<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<p>From: <a class="reference internal" href="#id19" id="id18"><span>[mbt2018]</span></a>.</p>
+<img alt="_images/mbt2018-mse.png" src="_images/mbt2018-mse.png"/>
+<hr class="docutils"/>
 <p class="rubric">Citations</p>
 <dl class="citation">
-<dt class="label" id="bmshj2018"><span class="brackets">bmshj2018</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id3">2</a>)</span></dt>
+<dt class="label" id="bmshj2018"><span class="brackets">bmshj2018</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id3">2</a>,<a href="#id12">3</a>,<a href="#id14">4</a>)</span></dt>
 <dd><div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@inproceedings</span><span class="p">{</span><span class="nl">ballemshj18</span><span class="p">,</span>
-  <span class="na">author</span>    <span class="p">=</span> <span class="s">{Johannes Ball{\&#39;{e}} and</span>
+  <span class="na">author</span>    <span class="p">=</span> <span class="s">{Johannes Ball{\'{e}} and</span>
 <span class="s">               David Minnen and</span>
 <span class="s">               Saurabh Singh and</span>
 <span class="s">               Sung Jin Hwang and</span>
@@ -513,10 +469,10 @@ Takeuchi, Jiro Katto.</p>
 </pre></div>
 </div>
 </dd>
-<dt class="label" id="id11"><span class="brackets">mbt2018</span><span class="fn-backref">(<a href="#id5">1</a>,<a href="#id6">2</a>)</span></dt>
+<dt class="label" id="id19"><span class="brackets">mbt2018</span><span class="fn-backref">(<a href="#id5">1</a>,<a href="#id6">2</a>,<a href="#id16">3</a>,<a href="#id18">4</a>)</span></dt>
 <dd><div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@inproceedings</span><span class="p">{</span><span class="nl">minnenbt18</span><span class="p">,</span>
   <span class="na">author</span>    <span class="p">=</span> <span class="s">{David Minnen and</span>
-<span class="s">               Johannes Ball{\&#39;{e}} and</span>
+<span class="s">               Johannes Ball{\'{e}} and</span>
 <span class="s">               George Toderici}</span><span class="p">,</span>
   <span class="na">editor</span>    <span class="p">=</span> <span class="s">{Samy Bengio and</span>
 <span class="s">               Hanna M. Wallach and</span>
@@ -527,7 +483,7 @@ Takeuchi, Jiro Katto.</p>
   <span class="na">title</span>     <span class="p">=</span> <span class="s">{Joint Autoregressive and Hierarchical Priors for Learned Image Compression}</span><span class="p">,</span>
   <span class="na">booktitle</span> <span class="p">=</span> <span class="s">{Advances in Neural Information Processing Systems 31: Annual Conference</span>
 <span class="s">               on Neural Information Processing Systems 2018, NeurIPS 2018, 3-8 December</span>
-<span class="s">               2018, Montr{\&#39;{e}}al, Canada}</span><span class="p">,</span>
+<span class="s">               2018, Montr{\'{e}}al, Canada}</span><span class="p">,</span>
   <span class="na">pages</span>     <span class="p">=</span> <span class="s">{10794--10803}</span><span class="p">,</span>
   <span class="na">year</span>      <span class="p">=</span> <span class="s">{2018}</span><span class="p">,</span>
 <span class="p">}</span>
@@ -555,8 +511,8 @@ Takeuchi, Jiro Katto.</p>
 <span class="s">    Likelihoods and Attention Modules}</span><span class="p">,</span>
     <span class="na">author</span><span class="p">=</span><span class="s">{Cheng, Zhengxue and Sun, Heming and Takeuchi, Masaru and Katto,</span>
 <span class="s">    Jiro}</span><span class="p">,</span>
-    <span class="na">booktitle</span><span class="p">=</span> <span class="s">&quot;Proceedings of the IEEE Conference on Computer Vision and</span>
-<span class="s">    Pattern Recognition (CVPR)&quot;</span><span class="p">,</span>
+    <span class="na">booktitle</span><span class="p">=</span> <span class="s">"Proceedings of the IEEE Conference on Computer Vision and</span>
+<span class="s">    Pattern Recognition (CVPR)"</span><span class="p">,</span>
     <span class="na">year</span><span class="p">=</span><span class="s">{2020}</span>
 <span class="p">}</span><span class="c">]</span>
 </pre></div>
@@ -565,85 +521,92 @@ Takeuchi, Jiro Katto.</p>
 </dl>
 </div>
 </div>
-<hr class="docutils" />
-<div class="section" id="performances">
-<h2><a class="toc-backref" href="#id24">Performances</a><a class="headerlink" href="#performances" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>See the <a class="reference external" href="https://arxiv.org/abs/2011.03029">CompressAI paper</a> on
-arXiv for more comparisons and evaluations.</p>
-</div>
-<div class="section" id="all-models">
-<h3><a class="toc-backref" href="#id25">all models</a><a class="headerlink" href="#all-models" title="Permalink to this headline">¶</a></h3>
-<img alt="_images/compressai.png" src="_images/compressai.png" />
-<img alt="_images/compressai-clic2020-mobile.png" src="_images/compressai-clic2020-mobile.png" />
-<img alt="_images/compressai-clic2020-pro.png" src="_images/compressai-clic2020-pro.png" />
-</div>
-<div class="section" id="id12">
-<h3><a class="toc-backref" href="#id26">bmshj2018 factorized</a><a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
-<img alt="_images/bmshj2018-factorized-mse.png" src="_images/bmshj2018-factorized-mse.png" />
-</div>
-<div class="section" id="id13">
-<h3><a class="toc-backref" href="#id27">bmshj2018 hyperprior</a><a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
-<img alt="_images/bmshj2018-hyperprior-mse.png" src="_images/bmshj2018-hyperprior-mse.png" />
-</div>
-<div class="section" id="id14">
-<h3><a class="toc-backref" href="#id28">mbt2018 mean</a><a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
-<img alt="_images/mbt2018-mean-mse.png" src="_images/mbt2018-mean-mse.png" />
-</div>
-<div class="section" id="id15">
-<h3><a class="toc-backref" href="#id29">mbt2018</a><a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
-<img alt="_images/mbt2018-mse.png" src="_images/mbt2018-mse.png" />
-</div>
-</div>
 </div>
 
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="cli_usage.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Command line usage</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="transforms.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">compressai.transforms</div>
+                
+              </div>
+            </a>
+        </div>
 
-           </div>
-           
-          </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="cli_usage.html" class="btn btn-neutral float-right" title="Command line usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="transforms.html" class="btn btn-neutral float-left" title="compressai.transforms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <div class="related-information">
+              Copyright &#169; 2021, InterDigital Communications, Inc.
+            |
+            <a class="muted-link" href="_sources/zoo.rst.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
     </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Image compression</a><ul>
+<li><a class="reference internal" href="#training">Training</a></li>
+<li><a class="reference internal" href="#models">Models</a><ul>
+<li><a class="reference internal" href="#bmshj2018-factorized">bmshj2018_factorized</a></li>
+<li><a class="reference internal" href="#bmshj2018-hyperprior">bmshj2018_hyperprior</a></li>
+<li><a class="reference internal" href="#mbt2018-mean">mbt2018_mean</a></li>
+<li><a class="reference internal" href="#mbt2018">mbt2018</a></li>
+<li><a class="reference internal" href="#cheng2020-anchor">cheng2020_anchor</a></li>
+<li><a class="reference internal" href="#cheng2020-attn">cheng2020_attn</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#performances">Performances</a><ul>
+<li><a class="reference internal" href="#all-models">all models</a></li>
+<li><a class="reference internal" href="#id11">bmshj2018 factorized</a></li>
+<li><a class="reference internal" href="#id13">bmshj2018 hyperprior</a></li>
+<li><a class="reference internal" href="#id15">mbt2018 mean</a></li>
+<li><a class="reference internal" href="#id17">mbt2018</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &#169; Copyright 2020, InterDigital Communications, Inc..
-
-    </p>
-  </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
+          </div>
         </div>
       </div>
-
-    </section>
-
-  </div>
-  
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
-    
-   
-
-</body>
+      
+      
+    </aside>
+  </main>
+</div>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
 </html>
