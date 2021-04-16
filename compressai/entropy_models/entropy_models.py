@@ -422,8 +422,20 @@ class EntropyBottleneck(EntropyModel):
     def forward(self, x: Tensor, training: Optional[bool] = None):
         if training is None:
             training = self.training
-        # Convert to (channels, ... , batch) format
-        x = x.permute(1, 2, 3, 0).contiguous()
+
+        if not torch.jit.is_scripting():
+            # x from B x C x ... to C x B x ...
+            perm = np.arange(len(x.shape))
+            perm[0], perm[1] = perm[1], perm[0]
+            # Compute inverse permutation
+            inv_perm = np.arange(len(x.shape))[np.argsort(perm)]
+        else:
+            # TorchScript in 2D for static inference
+            # Convert to (channels, ... , batch) format
+            perm = (1, 2, 3, 0)
+            inv_perm = (3, 0, 1, 2)
+
+        x = x.permute(*perm).contiguous()
         shape = x.size()
         values = x.reshape(x.size(0), 1, -1)
 
@@ -443,10 +455,10 @@ class EntropyBottleneck(EntropyModel):
 
         # Convert back to input tensor shape
         outputs = outputs.reshape(shape)
-        outputs = outputs.permute(3, 0, 1, 2).contiguous()
+        outputs = outputs.permute(*inv_perm).contiguous()
 
         likelihood = likelihood.reshape(shape)
-        likelihood = likelihood.permute(3, 0, 1, 2).contiguous()
+        likelihood = likelihood.permute(*inv_perm).contiguous()
 
         return outputs, likelihood
 
