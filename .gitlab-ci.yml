@@ -32,13 +32,12 @@ sdist:
     - pip install build
   script:
     - python -m build --sdist .
-    - pip install compressai --find-links=dist/
   tags:
     - docker
 
 wheel:3.9:
   extends: wheel:3.8
-  image: python:3.7-buster
+  image: python:3.9-buster
 
 wheel:3.7:
   extends: wheel:3.8
@@ -53,8 +52,8 @@ pylint:
   image: pytorch/pytorch:1.8.1-cuda11.1-cudnn8-runtime
   before_script:
     - python --version
-    - pip install pylint
     - pip install compressai --find-links=dist/
+    - pip install pylint
   script:
     - pylint compressai examples
   tags:
@@ -65,6 +64,7 @@ black:
   image: python:3-buster
   before_script:
     - python --version
+    - pip install compressai --find-links=dist/
     - pip install black
   script:
     - black --check --diff compressai examples tests
@@ -76,6 +76,7 @@ isort:
   image: python:3-buster
   before_script:
     - python --version
+    - pip install compressai --find-links=dist/
     - pip install isort
   script:
     - isort --check-only -v compressai examples tests
@@ -84,10 +85,10 @@ isort:
 
 test:pytorch-1.5.1:
   stage: test
-  image: pytorch/pytorch:1.5.1-cuda10.1-cudnn7-runtime
+  image: pytorch/pytorch:1.5.1-cuda10.1-cudnn7-devel
   before_script:
     - python --version
-    - pip install compressai --find-links=dist/
+    - pip install -e .
     - pip install click pytest codecov pytest-cov
   script:
     - >
@@ -101,22 +102,22 @@ test:pytorch-1.5.1:
 
 test:pytorch-1.6.0:
   extends: test:pytorch-1.5.1
-  image: pytorch/pytorch:1.6.0-cuda10.1-cudnn7-runtime
+  image: pytorch/pytorch:1.6.0-cuda10.1-cudnn7-devel
 
 test:pytorch-1.7.1:
   extends: test:pytorch-1.5.1
-  image: pytorch/pytorch:1.7.1-cuda11.0-cudnn8-runtime
+  image: pytorch/pytorch:1.7.1-cuda11.0-cudnn8-devel
 
 test:pytorch-1.8.1:
   extends: test:pytorch-1.5.1
-  image: pytorch/pytorch:1.8.1-cuda11.1-cudnn8-runtime
+  image: pytorch/pytorch:1.8.1-cuda11.1-cudnn8-devel
 
 doc:
   stage: doc
   image: pytorch/pytorch:1.8.1-cuda11.1-cudnn8-devel
   before_script:
     - python --version
-    - pip install compressai --find-links=dist/
+    - pip install -e .
     - cd docs
   script:
     - pip install -r requirements.txt
