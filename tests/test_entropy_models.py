@@ -158,6 +158,17 @@ class TestEntropyBottleneck:
         assert ((y - x) >= -0.5).all()
         assert (y != torch.round(x)).any()
 
+    def test_forward_inference_0D(self):
+        entropy_bottleneck = EntropyBottleneck(128)
+        entropy_bottleneck.eval()
+        x = torch.rand(1, 128)
+        y, y_likelihoods = entropy_bottleneck(x)
+
+        assert y.shape == x.shape
+        assert y_likelihoods.shape == x.shape
+
+        assert (y == torch.round(x)).all()
+
     def test_forward_inference_2D(self):
         entropy_bottleneck = EntropyBottleneck(128)
         entropy_bottleneck.eval()
