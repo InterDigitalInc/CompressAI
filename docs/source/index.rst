@@ -4,11 +4,7 @@ CompressAI
 CompressAI (*compress-ay*) is a PyTorch library and evaluation platform for
 end-to-end compression research.
 
-.. toctree::
-   :hidden:
-
-   self
-
+.. image:: ../../assets/kodak-psnr.png
 
 .. toctree::
    :maxdepth: 1
@@ -43,10 +39,3 @@ end-to-end compression research.
   :caption: Utils
 
   cli_usage
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`

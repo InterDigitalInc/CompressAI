@@ -94,7 +94,7 @@ def get_extra_requirements():
     extras_require = {
         "test": TEST_REQUIRES,
         "dev": DEV_REQUIRES,
-        "doc": ["sphinx", "sphinx-rtd-theme"],
+        "doc": ["sphinx", "furo"],
         "tutorials": ["jupyter", "ipywidgets"],
     }
     extras_require["all"] = set(req for reqs in extras_require.values() for req in reqs)

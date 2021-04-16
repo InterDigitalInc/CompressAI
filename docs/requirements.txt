@@ -1,5 +1,5 @@
 Sphinx==3.0.3
-sphinx-rtd-theme==0.4.3
+furo==2021.4.11b34
 sphinxcontrib-applehelp==1.0.2
 sphinxcontrib-devhelp==1.0.2
 sphinxcontrib-htmlhelp==1.0.3

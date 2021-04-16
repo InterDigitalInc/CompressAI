@@ -31,9 +31,6 @@ documentation for more information on
 and `eval <https://pytorch.org/docs/stable/nn.html?highlight=eval#torch.nn.Module.eval>`_.
 
 
-.. contents:: Table of content
-   :local:
-
 Training
 ~~~~~~~~
 
@@ -141,6 +138,50 @@ Original paper: [cheng2020]_
 ....
 
 
+Performances
+~~~~~~~~~~~~
+
+.. note:: See the `CompressAI paper <https://arxiv.org/abs/2011.03029>`_ on
+   arXiv for more comparisons and evaluations.
+
+all models
+----------
+.. image:: media/images/compressai.png
+
+.. image:: media/images/compressai-clic2020-mobile.png
+
+.. image:: media/images/compressai-clic2020-pro.png
+
+bmshj2018 factorized 
+--------------------
+
+From: [bmshj2018]_.
+
+.. image:: media/images/bmshj2018-factorized-mse.png
+
+bmshj2018 hyperprior
+--------------------
+
+From: [bmshj2018]_.
+
+.. image:: media/images/bmshj2018-hyperprior-mse.png
+
+mbt2018 mean
+------------
+
+From: [mbt2018]_.
+
+.. image:: media/images/mbt2018-mean-mse.png
+
+mbt2018
+-------
+
+From: [mbt2018]_.
+
+.. image:: media/images/mbt2018-mse.png
+
+....
+
 .. rubric:: Citations
 
 .. [bmshj2018]
@@ -212,35 +253,3 @@ Original paper: [cheng2020]_
             Pattern Recognition (CVPR)",
             year={2020}
         }]
-
-....
-
-Performances
-~~~~~~~~~~~~
-
-.. note:: See the `CompressAI paper <https://arxiv.org/abs/2011.03029>`_ on
-   arXiv for more comparisons and evaluations.
-
-all models
-----------
-.. image:: media/images/compressai.png
-
-.. image:: media/images/compressai-clic2020-mobile.png
-
-.. image:: media/images/compressai-clic2020-pro.png
-
-bmshj2018 factorized
---------------------
-.. image:: media/images/bmshj2018-factorized-mse.png
-
-bmshj2018 hyperprior
---------------------
-.. image:: media/images/bmshj2018-hyperprior-mse.png
-
-mbt2018 mean
-------------
-.. image:: media/images/mbt2018-mean-mse.png
-
-mbt2018
--------
-.. image:: media/images/mbt2018-mse.png

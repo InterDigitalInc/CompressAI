@@ -32,7 +32,7 @@ sys.path.insert(0, os.path.abspath("../compressai/"))
 # -- Project information -----------------------------------------------------
 
 project = "compressai"
-copyright = "2020, InterDigital Communications, Inc."
+copyright = "2021, InterDigital Communications, Inc."
 author = "InterDigital Communications, Inc."
 
 # -- General configuration ---------------------------------------------------
@@ -62,7 +62,18 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+# html_theme = "sphinx_rtd_theme"
+html_theme = "furo"
+html_title = "CompressAI"
+html_logo = "_static/logo.png"
+html_show_sphinx = False
+html_theme_options = {
+    "sidebar_hide_name": True,
+    "light_css_variables": {
+        "color-brand-primary": "#00aaee",
+        "color-brand-content": "#00aaee",
+    }
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
