@@ -43,6 +43,7 @@ class _EntropyCoder:
             encoder = range_coder.RangeEncoder()
             decoder = range_coder.RangeDecoder()
 
+        self.name = method
         self._encoder = encoder
         self._decoder = decoder
 
@@ -93,6 +94,15 @@ class EntropyModel(nn.Module):
         self.register_buffer("_offset", torch.IntTensor())
         self.register_buffer("_quantized_cdf", torch.IntTensor())
         self.register_buffer("_cdf_length", torch.IntTensor())
+
+    def __getstate__(self):
+        attributes = self.__dict__.copy()
+        attributes["entropy_coder"] = self.entropy_coder.name
+        return attributes
+
+    def __setstate__(self, state):
+        self.__dict__ = state
+        self.entropy_coder = _EntropyCoder(self.__dict__.pop("entropy_coder"))
 
     @property
     def offset(self):
