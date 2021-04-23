@@ -72,7 +72,7 @@ html_theme_options = {
     "light_css_variables": {
         "color-brand-primary": "#00aaee",
         "color-brand-content": "#00aaee",
-    }
+    },
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
