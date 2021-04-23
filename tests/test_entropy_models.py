@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import copy
+
 import pytest
 import torch
 
@@ -344,3 +346,30 @@ class TestGaussianConditional:
         assert approx(net.gaussian_conditional._cdf_length, cdf_length)
         assert approx(net.gaussian_conditional._offset, offset)
         assert approx(net.gaussian_conditional._quantized_cdf, quantized_cdf)
+
+
+@pytest.mark.parametrize(
+    "model_cls,args",
+    (
+        (EntropyBottleneck, (128,)),
+        (GaussianConditional, ([0.11, 1.0, 2.0],)),
+        (GaussianConditional, (None,)),
+    ),
+)
+def test_deepcopy(model_cls, args):
+    model = model_cls(*args)
+    model_copy = copy.deepcopy(model)
+    x = torch.rand(1, 128, 32, 32)
+
+    if isinstance(model, GaussianConditional):
+        opts = (torch.rand_like(x), torch.rand_like(x))
+    else:
+        opts = ()
+
+    torch.manual_seed(32)
+    y0 = model(x, *opts)
+
+    torch.manual_seed(32)
+    y1 = model_copy(x, *opts)
+
+    assert torch.allclose(y0[0], y1[0])

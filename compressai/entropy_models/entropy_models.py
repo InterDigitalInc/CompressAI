@@ -43,6 +43,7 @@ class _EntropyCoder:
             encoder = range_coder.RangeEncoder()
             decoder = range_coder.RangeDecoder()
 
+        self.name = method
         self._encoder = encoder
         self._decoder = decoder
 
@@ -94,6 +95,15 @@ class EntropyModel(nn.Module):
         self.register_buffer("_quantized_cdf", torch.IntTensor())
         self.register_buffer("_cdf_length", torch.IntTensor())
 
+    def __getstate__(self):
+        attributes = self.__dict__.copy()
+        attributes["entropy_coder"] = self.entropy_coder.name
+        return attributes
+
+    def __setstate__(self, state):
+        self.__dict__ = state
+        self.entropy_coder = _EntropyCoder(self.__dict__.pop("entropy_coder"))
+
     @property
     def offset(self):
         return self._offset
@@ -109,16 +119,6 @@ class EntropyModel(nn.Module):
     def forward(self, *args):
         raise NotImplementedError()
 
-    @torch.jit.unused
-    def _get_noise_cached(self, x):
-        # use simple caching method to avoid creating a new tensor every call
-        half = float(0.5)
-        if not hasattr(self, "_noise"):
-            setattr(self, "_noise", x.new(x.size()))
-        self._noise.resize_(x.size())
-        self._noise.uniform_(-half, half)
-        return self._noise
-
     def quantize(
         self, inputs: Tensor, mode: str, means: Optional[Tensor] = None
     ) -> Tensor:
@@ -126,11 +126,8 @@ class EntropyModel(nn.Module):
             raise ValueError(f'Invalid quantization mode: "{mode}"')
 
         if mode == "noise":
-            if torch.jit.is_scripting():
-                half = float(0.5)
-                noise = torch.empty_like(inputs).uniform_(-half, half)
-            else:
-                noise = self._get_noise_cached(inputs)
+            half = float(0.5)
+            noise = torch.empty_like(inputs).uniform_(-half, half)
             inputs = inputs + noise
             return inputs
 
