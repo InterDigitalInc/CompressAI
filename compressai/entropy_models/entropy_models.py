@@ -1,6 +1,6 @@
 import warnings
 
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats
@@ -66,6 +66,10 @@ def pmf_to_quantized_cdf(pmf: Tensor, precision: int = 16) -> Tensor:
     return cdf
 
 
+def _forward(self, *args: Any) -> Any:
+    raise NotImplementedError()
+
+
 class EntropyModel(nn.Module):
     r"""Entropy model base class.
 
@@ -118,6 +122,9 @@ class EntropyModel(nn.Module):
     @property
     def cdf_length(self):
         return self._cdf_length
+
+    # See: https://github.com/python/mypy/issues/8795
+    forward: Callable[..., Any] = _forward
 
     def quantize(
         self, inputs: Tensor, mode: str, means: Optional[Tensor] = None

@@ -7,7 +7,7 @@ end-to-end compression research.
 .. image:: ../../assets/kodak-psnr.png
 
 .. toctree::
-   :hidden:
+   :maxdepth: 1
 
    intro
    installation
@@ -42,3 +42,9 @@ end-to-end compression research.
   :caption: Utils
 
   cli_usage
+
+
+.. toctree::
+   :caption: Development
+
+   Github repository <https://github.com/InterDigitalInc/CompressAI/>

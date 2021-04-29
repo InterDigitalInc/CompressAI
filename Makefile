@@ -23,7 +23,7 @@ check-black: ## Run black checks
 
 check-isort: ## Run isort checks
 	@echo "--> Running isort checks"
-	@isort --check-only -v $(src_dirs)
+	@isort --check-only $(src_dirs)
 
 check-mypy: ## Run mypy checks
 	@echo "--> Running mypy checks"
