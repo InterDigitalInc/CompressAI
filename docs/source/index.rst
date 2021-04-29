@@ -7,13 +7,16 @@ end-to-end compression research.
 .. image:: ../../assets/kodak-psnr.png
 
 .. toctree::
+   :hidden:
+
+   intro
+   installation
+
+.. toctree::
    :maxdepth: 1
    :caption: Tutorials
 
-   tutorial_intro
-   tutorial_installation
-   tutorial_train
-
+   tutorials/tutorial_train
 
 .. toctree::
    :maxdepth: 1
