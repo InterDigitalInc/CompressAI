@@ -1,18 +1,71 @@
-PYTORCH_DOCKER_IMAGE = pytorch/pytorch:1.6.0-cuda10.1-cudnn7
+.DEFAULT_GOAL := help
+
+PYTORCH_DOCKER_IMAGE = pytorch/pytorch:1.8.1-cuda11.1-cudnn8
 PYTHON_DOCKER_IMAGE = python:3.8-buster
 
 GIT_DESCRIBE = $(shell git describe --first-parent)
 ARCHIVE = compressai.tar.gz
 
+src_dirs := compressai tests examples docs
+
 .PHONY: help
-help:
-	@echo  'Docker targets:'
-	@echo  '  docker          - based on latest pytorch image (with GPU support)'
-	@echo  '  docker-cpu      - based on latest python3 image (smaller image without GPU support)'
+help: ## Show this message
+	@echo "Usage: make COMMAND\n\nCommands:"
+	@grep '\s##\s' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}' | cat
 
 
-.PHONY: docker
-docker:
+# Check style and linting
+.PHONY: check-black check-isort check-mypy static-analysis
+
+check-black: ## Run black checks
+	@echo "--> Running black checks"
+	@black --check --diff $(src_dirs)
+
+check-isort: ## Run isort checks
+	@echo "--> Running isort checks"
+	@isort --check-only -v $(src_dirs)
+
+check-mypy: ## Run mypy checks
+	@echo "--> Running mypy checks"
+	@mypy
+
+static-analysis: check-black check-isort check-mypy ## Run all static checks
+
+
+# Apply styling
+.PHONY: style
+
+style: ## Apply style formating
+	@echo "--> Running black"
+	@black $(src_dirs)
+	@echo "--> Running isort"
+	@isort $(src_dirs)
+
+
+# Run tests
+.PHONY: tests coverage
+
+tests:  ## Run tests
+	@echo "--> Running Python tests"
+	@pytest -sx -m "not slow" --cov compressai --cov-append --cov-report= ./tests/
+
+coverage: ## Run coverage
+	@echo "--> Running Python coverage"
+	@coverage report
+	@coverage html
+
+
+# Build docs
+.PHONY: docs
+
+docs: ## Build docs
+	@echo "--> Building docs"
+	@cd docs && SPHINXOPTS="-W" make html
+
+
+# Docker images
+.PHONY: docker docker-cpu
+docker: ## Build docker image
 	@git archive --format=tar.gz HEAD > docker/${ARCHIVE}
 	@cd docker && \
 		docker build \
@@ -22,9 +75,7 @@ docker:
 		-t compressai:${GIT_DESCRIBE} .
 	@rm docker/${ARCHIVE}
 
-
-.PHONY: docker-cpu
-docker-cpu:
+docker-cpu: ## Build docker image (cpu only)
 	@git archive --format=tar.gz HEAD > docker/${ARCHIVE}
 	@cd docker && \
 		docker build \
