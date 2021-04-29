@@ -16,6 +16,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from torch import Tensor
+
 from compressai.ops.parametrizers import NonNegativeParametrizer
 
 
@@ -32,7 +34,13 @@ class GDN(nn.Module):
 
     """
 
-    def __init__(self, in_channels, inverse=False, beta_min=1e-6, gamma_init=0.1):
+    def __init__(
+        self,
+        in_channels: int,
+        inverse: bool = False,
+        beta_min: float = 1e-6,
+        gamma_init: float = 0.1,
+    ):
         super().__init__()
 
         beta_min = float(beta_min)
@@ -49,7 +57,7 @@ class GDN(nn.Module):
         gamma = self.gamma_reparam.init(gamma)
         self.gamma = nn.Parameter(gamma)
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         _, C, _, _ = x.size()
 
         beta = self.beta_reparam(self.beta)
@@ -80,7 +88,7 @@ class GDN1(GDN):
 
     """
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         _, C, _, _ = x.size()
 
         beta = self.beta_reparam(self.beta)

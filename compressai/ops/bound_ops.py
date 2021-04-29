@@ -15,6 +15,8 @@
 import torch
 import torch.nn as nn
 
+from torch import Tensor
+
 
 class LowerBoundFunction(torch.autograd.Function):
     """Autograd function for the `LowerBound` operator."""
@@ -39,15 +41,17 @@ class LowerBound(nn.Module):
     towards the `bound`, otherwise the gradient is kept to zero.
     """
 
-    def __init__(self, bound):
+    bound: Tensor
+
+    def __init__(self, bound: float):
         super().__init__()
         self.register_buffer("bound", torch.Tensor([float(bound)]))
 
     @torch.jit.unused
-    def lower_bound(self, x):
+    def lower_bound(self, x: Tensor) -> Tensor:
         return LowerBoundFunction.apply(x, self.bound)
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         if torch.jit.is_scripting():
             return torch.max(x, self.bound)
         return self.lower_bound(x)

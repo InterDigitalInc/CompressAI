@@ -12,8 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Any
+
 import torch
 import torch.nn as nn
+
+from torch import Tensor
 
 from .gdn import GDN
 
@@ -30,7 +34,7 @@ class MaskedConv2d(nn.Conv2d):
     following layers.
     """
 
-    def __init__(self, *args, mask_type="A", **kwargs):
+    def __init__(self, *args: Any, mask_type: str = "A", **kwargs: Any):
         super().__init__(*args, **kwargs)
 
         if mask_type not in ("A", "B"):
@@ -41,25 +45,25 @@ class MaskedConv2d(nn.Conv2d):
         self.mask[:, :, h // 2, w // 2 + (mask_type == "B") :] = 0
         self.mask[:, :, h // 2 + 1 :] = 0
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         # TODO(begaintj): weight assigment is not supported by torchscript
         self.weight.data *= self.mask
         return super().forward(x)
 
 
-def conv3x3(in_ch, out_ch, stride=1):
+def conv3x3(in_ch: int, out_ch: int, stride: int = 1) -> nn.Module:
     """3x3 convolution with padding."""
     return nn.Conv2d(in_ch, out_ch, kernel_size=3, stride=stride, padding=1)
 
 
-def subpel_conv3x3(in_ch, out_ch, r=1):
+def subpel_conv3x3(in_ch: int, out_ch: int, r: int = 1) -> nn.Sequential:
     """3x3 sub-pixel convolution for up-sampling."""
     return nn.Sequential(
         nn.Conv2d(in_ch, out_ch * r ** 2, kernel_size=3, padding=1), nn.PixelShuffle(r)
     )
 
 
-def conv1x1(in_ch, out_ch, stride=1):
+def conv1x1(in_ch: int, out_ch: int, stride: int = 1) -> nn.Module:
     """1x1 convolution."""
     return nn.Conv2d(in_ch, out_ch, kernel_size=1, stride=stride)
 
@@ -73,7 +77,7 @@ class ResidualBlockWithStride(nn.Module):
         stride (int): stride value (default: 2)
     """
 
-    def __init__(self, in_ch, out_ch, stride=2):
+    def __init__(self, in_ch: int, out_ch: int, stride: int = 2):
         super().__init__()
         self.conv1 = conv3x3(in_ch, out_ch, stride=stride)
         self.leaky_relu = nn.LeakyReLU(inplace=True)
@@ -84,7 +88,7 @@ class ResidualBlockWithStride(nn.Module):
         else:
             self.skip = None
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         identity = x
         out = self.conv1(x)
         out = self.leaky_relu(out)
@@ -107,7 +111,7 @@ class ResidualBlockUpsample(nn.Module):
         upsample (int): upsampling factor (default: 2)
     """
 
-    def __init__(self, in_ch, out_ch, upsample=2):
+    def __init__(self, in_ch: int, out_ch: int, upsample: int = 2):
         super().__init__()
         self.subpel_conv = subpel_conv3x3(in_ch, out_ch, upsample)
         self.leaky_relu = nn.LeakyReLU(inplace=True)
@@ -115,7 +119,7 @@ class ResidualBlockUpsample(nn.Module):
         self.igdn = GDN(out_ch, inverse=True)
         self.upsample = subpel_conv3x3(in_ch, out_ch, upsample)
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         identity = x
         out = self.subpel_conv(x)
         out = self.leaky_relu(out)
@@ -134,7 +138,7 @@ class ResidualBlock(nn.Module):
         out_ch (int): number of output channels
     """
 
-    def __init__(self, in_ch, out_ch):
+    def __init__(self, in_ch: int, out_ch: int):
         super().__init__()
         self.conv1 = conv3x3(in_ch, out_ch)
         self.leaky_relu = nn.LeakyReLU(inplace=True)
@@ -144,7 +148,7 @@ class ResidualBlock(nn.Module):
         else:
             self.skip = None
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         identity = x
 
         out = self.conv1(x)
@@ -171,7 +175,7 @@ class AttentionBlock(nn.Module):
         N (int): Number of channels)
     """
 
-    def __init__(self, N):
+    def __init__(self, N: int):
         super().__init__()
 
         class ResidualUnit(nn.Module):
@@ -188,7 +192,7 @@ class AttentionBlock(nn.Module):
                 )
                 self.relu = nn.ReLU(inplace=True)
 
-            def forward(self, x):
+            def forward(self, x: Tensor) -> Tensor:
                 identity = x
                 out = self.conv(x)
                 out += identity
@@ -204,7 +208,7 @@ class AttentionBlock(nn.Module):
             conv1x1(N, N),
         )
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         identity = x
         a = self.conv_a(x)
         b = self.conv_b(x)

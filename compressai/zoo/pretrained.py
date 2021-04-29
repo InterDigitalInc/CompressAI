@@ -13,7 +13,12 @@
 # limitations under the License.
 
 
-def rename_key(key):
+from typing import Dict
+
+from torch import Tensor
+
+
+def rename_key(key: str) -> str:
     """Rename state_dict key."""
 
     # Deal with modules trained with DataParallel
@@ -38,7 +43,7 @@ def rename_key(key):
     return key
 
 
-def load_pretrained(state_dict):
+def load_pretrained(state_dict: Dict[str, Tensor]) -> Dict[str, Tensor]:
     """Convert state_dict keys."""
     state_dict = {rename_key(k): v for k, v in state_dict.items()}
     return state_dict

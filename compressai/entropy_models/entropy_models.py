@@ -1,6 +1,6 @@
 import warnings
 
-from typing import Optional, Tuple
+from typing import Any, List, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats
@@ -60,7 +60,7 @@ def default_entropy_coder():
     return get_entropy_coder()
 
 
-def pmf_to_quantized_cdf(pmf, precision=16):
+def pmf_to_quantized_cdf(pmf: Tensor, precision: int = 16) -> Tensor:
     cdf = _pmf_to_quantized_cdf(pmf.tolist(), precision)
     cdf = torch.IntTensor(cdf)
     return cdf
@@ -77,7 +77,10 @@ class EntropyModel(nn.Module):
     """
 
     def __init__(
-        self, likelihood_bound=1e-9, entropy_coder=None, entropy_coder_precision=16
+        self,
+        likelihood_bound: float = 1e-9,
+        entropy_coder: Optional[str] = None,
+        entropy_coder_precision: int = 16,
     ):
         super().__init__()
 
@@ -116,9 +119,6 @@ class EntropyModel(nn.Module):
     def cdf_length(self):
         return self._cdf_length
 
-    def forward(self, *args):
-        raise NotImplementedError()
-
     def quantize(
         self, inputs: Tensor, mode: str, means: Optional[Tensor] = None
     ) -> Tensor:
@@ -146,12 +146,14 @@ class EntropyModel(nn.Module):
         outputs = outputs.int()
         return outputs
 
-    def _quantize(self, inputs, mode, means=None):
+    def _quantize(
+        self, inputs: Tensor, mode: str, means: Optional[Tensor] = None
+    ) -> Tensor:
         warnings.warn("_quantize is deprecated. Use quantize instead.")
         return self.quantize(inputs, mode, means)
 
     @staticmethod
-    def dequantize(inputs, means=None):
+    def dequantize(inputs: Tensor, means: Optional[Tensor] = None) -> Tensor:
         if means is not None:
             outputs = inputs.type_as(means)
             outputs += means
@@ -160,7 +162,7 @@ class EntropyModel(nn.Module):
         return outputs
 
     @classmethod
-    def _dequantize(cls, inputs, means=None):
+    def _dequantize(cls, inputs: Tensor, means: Optional[Tensor] = None) -> Tensor:
         warnings.warn("_dequantize. Use dequantize instead.")
         return cls.dequantize(inputs, means)
 
@@ -291,14 +293,16 @@ class EntropyBottleneck(EntropyModel):
     for an introduction.
     """
 
+    _offset: Tensor
+
     def __init__(
         self,
-        channels,
-        *args,
-        tail_mass=1e-9,
-        init_scale=10,
-        filters=(3, 3, 3, 3),
-        **kwargs,
+        channels: int,
+        *args: Any,
+        tail_mass: float = 1e-9,
+        init_scale: float = 10,
+        filters: Tuple[int, ...] = (3, 3, 3, 3),
+        **kwargs: Any,
     ):
         super().__init__(*args, **kwargs)
 
@@ -334,11 +338,11 @@ class EntropyBottleneck(EntropyModel):
         target = np.log(2 / self.tail_mass - 1)
         self.register_buffer("target", torch.Tensor([-target, 0, target]))
 
-    def _get_medians(self):
+    def _get_medians(self) -> Tensor:
         medians = self.quantiles[:, :, 1:2]
         return medians
 
-    def update(self, force=False):
+    def update(self, force: bool = False) -> bool:
         # Check if we need to update the bottleneck parameters, the offsets are
         # only computed and stored when the conditonal model is update()'d.
         if self._offset.numel() > 0 and not force:  # pylint: disable=E0203
@@ -359,7 +363,7 @@ class EntropyBottleneck(EntropyModel):
         pmf_start = medians - minima
         pmf_length = maxima + minima + 1
 
-        max_length = pmf_length.max()
+        max_length = pmf_length.max().item()
         device = pmf_start.device
         samples = torch.arange(max_length, device=device)
 
@@ -380,12 +384,12 @@ class EntropyBottleneck(EntropyModel):
         self._cdf_length = pmf_length + 2
         return True
 
-    def loss(self):
+    def loss(self) -> Tensor:
         logits = self._logits_cumulative(self.quantiles, stop_gradient=True)
         loss = torch.abs(logits - self.target).sum()
         return loss
 
-    def _logits_cumulative(self, inputs, stop_gradient):
+    def _logits_cumulative(self, inputs: Tensor, stop_gradient: bool) -> Tensor:
         # TorchScript not yet working (nn.Mmodule indexing not supported)
         logits = inputs
         for i in range(len(self.filters) + 1):
@@ -407,7 +411,7 @@ class EntropyBottleneck(EntropyModel):
         return logits
 
     @torch.jit.unused
-    def _likelihood(self, inputs):
+    def _likelihood(self, inputs: Tensor) -> Tensor:
         half = float(0.5)
         v0 = inputs - half
         v1 = inputs + half
@@ -420,7 +424,9 @@ class EntropyBottleneck(EntropyModel):
         )
         return likelihood
 
-    def forward(self, x: Tensor, training: Optional[bool] = None):
+    def forward(
+        self, x: Tensor, training: Optional[bool] = None
+    ) -> Tuple[Tensor, Tensor]:
         if training is None:
             training = self.training
 
@@ -507,7 +513,14 @@ class GaussianConditional(EntropyModel):
     for more information.
     """
 
-    def __init__(self, scale_table, *args, scale_bound=0.11, tail_mass=1e-9, **kwargs):
+    def __init__(
+        self,
+        scale_table: Optional[Union[List, Tuple]],
+        *args: Any,
+        scale_bound: float = 0.11,
+        tail_mass: float = 1e-9,
+        **kwargs: Any,
+    ):
         super().__init__(*args, **kwargs)
 
         if not isinstance(scale_table, (type(None), list, tuple)):
@@ -523,11 +536,10 @@ class GaussianConditional(EntropyModel):
 
         self.tail_mass = float(tail_mass)
         if scale_bound is None and scale_table:
-            self.lower_bound_scale = LowerBound(self.scale_table[0])
-        elif scale_bound > 0:
-            self.lower_bound_scale = LowerBound(scale_bound)
-        else:
+            scale_bound = self.scale_table[0]
+        if scale_bound <= 0:
             raise ValueError("Invalid parameters")
+        self.lower_bound_scale = LowerBound(scale_bound)
 
         self.register_buffer(
             "scale_table",
@@ -543,8 +555,7 @@ class GaussianConditional(EntropyModel):
     def _prepare_scale_table(scale_table):
         return torch.Tensor(tuple(float(s) for s in scale_table))
 
-    def _standardized_cumulative(self, inputs):
-        # type: (Tensor) -> Tensor
+    def _standardized_cumulative(self, inputs: Tensor) -> Tensor:
         half = float(0.5)
         const = float(-(2 ** -0.5))
         # Using the complementary error function maximizes numerical precision.
@@ -590,8 +601,9 @@ class GaussianConditional(EntropyModel):
         self._offset = -pmf_center
         self._cdf_length = pmf_length + 2
 
-    def _likelihood(self, inputs, scales, means=None):
-        # type: (Tensor, Tensor, Optional[Tensor]) -> Tensor
+    def _likelihood(
+        self, inputs: Tensor, scales: Tensor, means: Optional[Tensor] = None
+    ) -> Tensor:
         half = float(0.5)
 
         if means is not None:
@@ -623,7 +635,7 @@ class GaussianConditional(EntropyModel):
             likelihood = self.likelihood_lower_bound(likelihood)
         return outputs, likelihood
 
-    def build_indexes(self, scales):
+    def build_indexes(self, scales: Tensor) -> Tensor:
         scales = self.lower_bound_scale(scales)
         indexes = scales.new_full(scales.size(), len(self.scale_table) - 1).int()
         for s in self.scale_table[:-1]:
