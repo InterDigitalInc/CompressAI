@@ -67,7 +67,7 @@ black:
     - pip install compressai --find-links=dist/
     - pip install black
   script:
-    - black --check --diff compressai examples tests
+    - make check-black
   tags:
     - docker
 
@@ -79,7 +79,7 @@ isort:
     - pip install compressai --find-links=dist/
     - pip install isort
   script:
-    - isort --check-only -v compressai examples tests
+    - make check-isort
   tags:
     - docker
 
@@ -119,9 +119,8 @@ doc:
     - python --version
     - pip install -e .
     - cd docs
-  script:
     - pip install -r requirements.txt
+  script:
     - make html
   tags:
     - docker
-  # TODO: copy the generated doc to a public webserver
