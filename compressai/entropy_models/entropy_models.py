@@ -206,8 +206,8 @@ class EntropyModel(nn.Module):
         """
         symbols = self.quantize(inputs, "symbols", means)
 
-        if len(inputs.size()) != 4:
-            raise ValueError("Invalid `inputs` size. Expected a 4-D tensor.")
+        if len(inputs.size()) < 2:
+            raise ValueError("Invalid `inputs` size. Expected a tensor with at least 2 dimensions.")
 
         if inputs.size() != indexes.size():
             raise ValueError("`inputs` and `indexes` should have the same size.")
@@ -244,20 +244,20 @@ class EntropyModel(nn.Module):
         if not len(strings) == indexes.size(0):
             raise ValueError("Invalid strings or indexes parameters")
 
-        if len(indexes.size()) != 4:
-            raise ValueError("Invalid `indexes` size. Expected a 4-D tensor.")
+        if len(indexes.size()) < 2:
+            raise ValueError("Invalid `indexes` size. Expected a tensor with at least 2 dimensions.")
 
         self._check_cdf_size()
         self._check_cdf_length()
         self._check_offsets_size()
 
         if means is not None:
-            if means.size()[:-2] != indexes.size()[:-2]:
+            if means.size()[:2] != indexes.size()[:2]:
                 raise ValueError("Invalid means or indexes parameters")
-            if means.size() != indexes.size() and (
-                means.size(2) != 1 or means.size(3) != 1
-            ):
-                raise ValueError("Invalid means parameters")
+            if means.size() != indexes.size():
+                for i in range(2, len(indexes.size())):
+                    if means.size(i) != 1:
+                        raise ValueError("Invalid means parameters")
 
         cdf = self._quantized_cdf
         outputs = cdf.new(indexes.size())
@@ -461,20 +461,34 @@ class EntropyBottleneck(EntropyModel):
 
     @staticmethod
     def _build_indexes(size):
-        N, C, H, W = size
-        indexes = torch.arange(C).view(1, -1, 1, 1)
+        dims = len(size)
+        N = size[0]
+        C = size[1]
+        
+        view_dims = np.ones((dims,), dtype=np.int64)
+        view_dims[1] = -1
+        indexes = torch.arange(C).view(*view_dims)
         indexes = indexes.int()
-        return indexes.repeat(N, 1, H, W)
+
+        return indexes.repeat(N, 1, *size[2:])
+
+    @staticmethod
+    def _extend_ndims(tensor, n):
+        return tensor.reshape(-1, *([1] * n)) if n > 0 else tensor.reshape(-1)
 
     def compress(self, x):
         indexes = self._build_indexes(x.size())
-        medians = self._get_medians().detach().expand(x.size(0), -1, 1, 1)
+        medians = self._get_medians().detach()
+        spatial_dims = len(x.size()) - 2
+        medians = self._extend_ndims(medians, spatial_dims)
+        medians = medians.expand(x.size(0), *([-1] * (spatial_dims + 1)))
         return super().compress(x, indexes, medians)
 
     def decompress(self, strings, size):
-        output_size = (len(strings), self._quantized_cdf.size(0), size[0], size[1])
+        output_size = (len(strings), self._quantized_cdf.size(0), *size)
         indexes = self._build_indexes(output_size).to(self._quantized_cdf.device)
-        medians = self._get_medians().detach().expand(len(strings), -1, 1, 1)
+        medians = self._extend_ndims(self._get_medians().detach(), len(size))
+        medians = medians.expand(len(strings), *([-1] * (len(size) + 1)))
         return super().decompress(strings, indexes, medians)
 
 

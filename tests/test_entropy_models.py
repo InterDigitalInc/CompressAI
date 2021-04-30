@@ -186,6 +186,15 @@ class TestEntropyBottleneck:
         entropy_bottleneck = EntropyBottleneck(128)
         entropy_bottleneck.eval()
 
+        # Test 0D
+        x = torch.rand(1, 128)
+        y, y_likelihoods = entropy_bottleneck(x)
+
+        assert y.shape == x.shape
+        assert y_likelihoods.shape == x.shape
+
+        assert (y == torch.round(x)).all()
+
         # Test from 1 to 5 dimensions
         for i in range(1, 6):
             x = torch.rand(1, 128, *([4] * i))
@@ -231,6 +240,33 @@ class TestEntropyBottleneck:
         x = torch.rand(1, 32, 4, 4)
         x_q, likelihoods = eb(x)
         assert (likelihoods == torch.zeros_like(x_q)).all()
+    
+    def test_compression_2D(self):
+        x = torch.rand(1, 128, 32, 32)
+        eb = EntropyBottleneck(128)
+        eb.update()
+        s = eb.compress(x)
+        x2 = eb.decompress(s, x.size()[2:])
+
+        assert torch.allclose(torch.round(x), x2)
+
+    def test_compression_ND(self):
+        eb = EntropyBottleneck(128)
+        eb.update()
+        # Test 0D
+        x = torch.rand(1, 128)
+        s = eb.compress(x)
+        x2 = eb.decompress(s, [])
+
+        assert torch.allclose(torch.round(x), x2)
+
+        # Test from 1 to 5 dimensions
+        for i in range(1, 6):
+            x = torch.rand(1, 128, *([4] * i))
+            s = eb.compress(x)
+            x2 = eb.decompress(s, x.size()[2:])
+
+            assert torch.allclose(torch.round(x), x2)
 
 
 class TestGaussianConditional:
