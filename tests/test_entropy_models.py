@@ -240,7 +240,7 @@ class TestEntropyBottleneck:
         x = torch.rand(1, 32, 4, 4)
         x_q, likelihoods = eb(x)
         assert (likelihoods == torch.zeros_like(x_q)).all()
-    
+
     def test_compression_2D(self):
         x = torch.rand(1, 128, 32, 32)
         eb = EntropyBottleneck(128)

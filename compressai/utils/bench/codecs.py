@@ -52,7 +52,7 @@ def filesize(filepath: str) -> int:
 
 
 def read_image(filepath: str, mode: str = "RGB") -> np.array:
-    """Return PIL image in the specified `mode` format. """
+    """Return PIL image in the specified `mode` format."""
     if not os.path.isfile(filepath):
         raise ValueError(f'Invalid file "{filepath}".')
     return Image.open(filepath).convert(mode)
@@ -63,7 +63,7 @@ def compute_metrics(
     b: Union[np.array, Image.Image],
     max_val: float = 255.0,
 ) -> Tuple[float, float]:
-    """Returns PSNR and MS-SSIM between images `a` and `b`. """
+    """Returns PSNR and MS-SSIM between images `a` and `b`."""
     if isinstance(a, Image.Image):
         a = np.asarray(a)
     if isinstance(b, Image.Image):

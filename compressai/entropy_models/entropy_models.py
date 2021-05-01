@@ -207,7 +207,9 @@ class EntropyModel(nn.Module):
         symbols = self.quantize(inputs, "symbols", means)
 
         if len(inputs.size()) < 2:
-            raise ValueError("Invalid `inputs` size. Expected a tensor with at least 2 dimensions.")
+            raise ValueError(
+                "Invalid `inputs` size. Expected a tensor with at least 2 dimensions."
+            )
 
         if inputs.size() != indexes.size():
             raise ValueError("`inputs` and `indexes` should have the same size.")
@@ -245,7 +247,9 @@ class EntropyModel(nn.Module):
             raise ValueError("Invalid strings or indexes parameters")
 
         if len(indexes.size()) < 2:
-            raise ValueError("Invalid `indexes` size. Expected a tensor with at least 2 dimensions.")
+            raise ValueError(
+                "Invalid `indexes` size. Expected a tensor with at least 2 dimensions."
+            )
 
         self._check_cdf_size()
         self._check_cdf_length()
@@ -464,7 +468,7 @@ class EntropyBottleneck(EntropyModel):
         dims = len(size)
         N = size[0]
         C = size[1]
-        
+
         view_dims = np.ones((dims,), dtype=np.int64)
         view_dims[1] = -1
         indexes = torch.arange(C).view(*view_dims)
