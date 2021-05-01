@@ -47,7 +47,7 @@ style: ## Apply style formating
 
 tests:  ## Run tests
 	@echo "--> Running Python tests"
-	@pytest -sx -m "not slow" --cov compressai --cov-append --cov-report= ./tests/
+	@pytest -x -m "not slow" --cov compressai --cov-append --cov-report= ./tests/
 
 coverage: ## Run coverage
 	@echo "--> Running Python coverage"

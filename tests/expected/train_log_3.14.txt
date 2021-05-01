@@ -35,6 +35,6 @@ Train epoch 8: [0/1 (0%)]	Loss: 58.874 |	MSE loss: 0.084 |	Bpp loss: 4.05 |	Aux 
 Test epoch 8: Average losses:	Loss: 60.872 |	MSE loss: 0.087 |	Bpp loss: 4.05 |	Aux loss: 7914.45
 
 Learning rate: 0.0001
-Train epoch 9: [0/1 (0%)]	Loss: 60.795 |	MSE loss: 0.087 |	Bpp loss: 4.05 |	Aux loss: 7914.12
+Train epoch 9: [0/1 (0%)]	Loss: 60.794 |	MSE loss: 0.087 |	Bpp loss: 4.05 |	Aux loss: 7914.12
 Test epoch 9: Average losses:	Loss: 53.210 |	MSE loss: 0.076 |	Bpp loss: 4.05 |	Aux loss: 7914.06
 
