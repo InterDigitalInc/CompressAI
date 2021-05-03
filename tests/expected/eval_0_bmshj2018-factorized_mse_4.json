@@ -1,0 +1,1 @@
+{"name": "bmshj2018-factorized", "description": "Inference (ans)", "results": {"psnr": [29.85132455843225], "ms-ssim": [0.976097583770752], "bpp": [0.46142578125], "encoding_time": [0.8797280788421631], "decoding_time": [1.2694511413574219]}}

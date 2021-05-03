@@ -213,9 +213,7 @@ def setup_args():
     parser = argparse.ArgumentParser(
         description="Evaluate a model on an image dataset.", add_help=True
     )
-    subparsers = parser.add_subparsers(
-        help="model source", dest="source", required=True
-    )
+    subparsers = parser.add_subparsers(help="model source", dest="source")
 
     # Options for pretrained models
     pretrained_parser = subparsers.add_parser("pretrained", parents=[parent_parser])
@@ -251,11 +249,17 @@ def setup_args():
 
 
 def main(argv):
-    args = setup_args().parse_args(argv)
+    parser = setup_args()
+    args = parser.parse_args(argv)
+
+    if not args.source:
+        print("Error: missing 'checkpoint' or 'pretrained' source.", file=sys.stderr)
+        parser.print_help()
+        sys.exit(1)
 
     filepaths = collect_images(args.dataset)
     if len(filepaths) == 0:
-        print("No images found in directory.")
+        print("Error: no images found in directory.", file=sys.stderr)
         sys.exit(1)
 
     compressai.set_entropy_coder(args.entropy_coder)

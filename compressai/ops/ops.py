@@ -14,8 +14,10 @@
 
 import torch
 
+from torch import Tensor
 
-def ste_round(x):
+
+def ste_round(x: Tensor) -> Tensor:
     """
     Rounding with non-zero gradients. Gradients are approximated by replacing
     the derivative by the identity function.

@@ -8,12 +8,15 @@ end-to-end compression research.
 
 .. toctree::
    :maxdepth: 1
+
+   intro
+   installation
+
+.. toctree::
+   :maxdepth: 1
    :caption: Tutorials
 
-   tutorial_intro
-   tutorial_installation
-   tutorial_train
-
+   tutorials/tutorial_train
 
 .. toctree::
    :maxdepth: 1
@@ -39,3 +42,9 @@ end-to-end compression research.
   :caption: Utils
 
   cli_usage
+
+
+.. toctree::
+   :caption: Development
+
+   Github repository <https://github.com/InterDigitalInc/CompressAI/>

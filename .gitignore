@@ -2,6 +2,7 @@
 *.inc
 *.sh
 *.tar.gz
+.DS_Store
 builds
 compressai/version.py
 tags

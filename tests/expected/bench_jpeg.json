@@ -1,0 +1,1 @@
+{"name": "JPEG", "description": "JPEG. Pillow version 8.1.2", "results": {"bpp": [1.39178466796875], "encoding_time": [0.016268253326416016], "decoding_time": [0.007615804672241211], "psnr": [32.10869760031136], "ms-ssim": [0.9807608723640442]}}

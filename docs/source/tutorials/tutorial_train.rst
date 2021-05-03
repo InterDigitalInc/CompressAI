@@ -67,18 +67,18 @@ Loss functions
 
 1. Rate distortion loss
 
-   We are going to define a simple rate-distortion loss, which maximizes the
-   PSNR reconstruction (RGB) and minimizes the length (in bits) of the quantized
-   latent tensor (:code:`y_hat`).
+We are going to define a simple rate-distortion loss, which maximizes the
+PSNR reconstruction (RGB) and minimizes the length (in bits) of the quantized
+latent tensor (:code:`y_hat`).
 
-   A scalar is used to balance between the reconstruction quality and the
-   bit-rate (like the JPEG quality parameter, or the QP with HEVC):
+A scalar is used to balance between the reconstruction quality and the
+bit-rate (like the JPEG quality parameter, or the QP with HEVC):
 
-   .. math::
+.. math::
 
        \mathcal{L} = \mathcal{D} + \lambda * \mathcal{R}
 
-   .. code-block:: python
+.. code-block:: python
 
       import math
       import torch.nn as nn
@@ -100,7 +100,7 @@ Loss functions
       loss = mse_loss + lmbda * bpp_loss
 
 
-  .. note::
+.. note::
 
     It's possible to train architectures that can handle multiple bit-rate
     distortion points but that's outside the scope of this tutorial. See this
@@ -111,27 +111,27 @@ Loss functions
 
 2. Auxiliary loss
 
-  The entropy bottleneck parameters need to be trained to minimize the density
-  model evaluation of the latent elements. The auxiliary loss is accessible
-  through the :code:`entropy_bottleneck` layer:
+The entropy bottleneck parameters need to be trained to minimize the density
+model evaluation of the latent elements. The auxiliary loss is accessible
+through the :code:`entropy_bottleneck` layer:
 
-  .. code-block:: python
+.. code-block:: python
 
     aux_loss = net.entropy_bottleneck.loss()
 
-  The auxiliary loss must be minimized during or after the training of the
-  network.
+The auxiliary loss must be minimized during or after the training of the
+network.
 
 
 3. Optimizers
 
-   To train both the compression network and the entropy bottleneck densities
-   estimation, we will thus need two optimizers. To simplify the implementation,
-   CompressAI provides a :mod:`~compressai.models.CompressionModel` base class,
-   that includes an :mod:`~compressai.entropy_models.EntropyBottleneck` module
-   and some helper methods, let's rewrite our network:
+To train both the compression network and the entropy bottleneck densities
+estimation, we will thus need two optimizers. To simplify the implementation,
+CompressAI provides a :mod:`~compressai.models.CompressionModel` base class,
+that includes an :mod:`~compressai.entropy_models.EntropyBottleneck` module
+and some helper methods, let's rewrite our network:
 
-   .. code-block:: python
+.. code-block:: python
 
      from compressai.models import CompressionModel
      from compressai.models.utils import conv, deconv
@@ -162,9 +162,9 @@ Loss functions
             return x_hat, y_likelihoods
 
 
-  Now, we can simply access the two sets of trainable parameters:
+Now, we can simply access the two sets of trainable parameters:
 
-  .. code-block:: python
+.. code-block:: python
 
     import torch.optim as optim
 
@@ -173,9 +173,9 @@ Loss functions
     optimizer = optim.Adam(parameters, lr=1e-4)
     aux_optimizer = optim.Adam(aux_parameters, lr=1e-3)
 
-  And write a training loop:
+And write a training loop:
 
-  .. code-block:: python
+.. code-block:: python
 
     x = torch.rand(1, 3, 64, 64)
     for i in range(10):
@@ -230,7 +230,7 @@ of the implemented entropy coders and change the default entropy coder via
 
 1. Compress an image tensor to a bit-stream:
 
-  .. code-block:: python
+.. code-block:: python
 
     x = torch.rand(1, 3, 64, 64)
     y = net.encode(x)
@@ -239,7 +239,7 @@ of the implemented entropy coders and change the default entropy coder via
 
 2. Decompress a bit-stream to an image tensor:
 
-  .. code-block:: python
+.. code-block:: python
 
     shape = y.size()[2:]
     y_hat = net.entropy_bottleneck.decompress(strings, shape)

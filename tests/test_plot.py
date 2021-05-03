@@ -12,12 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import importlib
+import os
 
-def test_import_errors():
-    import compressai
+import matplotlib
+import pytest
+
+matplotlib.use("Agg")
+
+plot = importlib.import_module("compressai.utils.plot.__main__")
 
 
-def test_version():
-    from compressai.version import __version__
-
-    assert 5 <= len(__version__) <= 7
+@pytest.mark.parametrize("metric", ("psnr", "ms-ssim"))
+def test_plot(metric):
+    here = os.path.dirname(__file__)
+    filepath = os.path.join(here, "expected/eval_0_bmshj2018-factorized_mse_1.json")
+    cmd = ["-f", filepath, "--title", "myplot", "--metric", metric]
+    plot.main(cmd)
