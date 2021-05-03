@@ -13,4 +13,10 @@ push:
 	git commit -a -m "Update docs $(shell date)"
 	git push gitlab-ri gh-pages
 
-.PHONY: build push
+watch:
+	@find $(SOURCEDIR) ../compressai/compressai/ -type f \
+		-name "*.py" \
+		-o -name "*.md" -o -name "*.rst" \
+		| entr make build
+
+.PHONY: build push watch

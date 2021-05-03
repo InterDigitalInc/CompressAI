@@ -4,9 +4,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
+    <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta31"/>
         <title>compressai.entropy_models.entropy_models - CompressAI</title>
-      <link rel="stylesheet" href="../../../_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
+      <link rel="stylesheet" href="../../../_static/styles/furo.css?digest=978e1795dfe158b585dda6a8417f6411828bf3ed">
     <link rel="stylesheet" href="../../../_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../../../_static/pygments_dark.css">
     
@@ -113,11 +113,13 @@
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption"><span class="caption-text">Tutorials</span></p>
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorial_intro.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorial_installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorial_train.html">Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tutorial_train.html">Training</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Library API</span></p>
 <ul>
@@ -137,6 +139,10 @@
 <p class="caption"><span class="caption-text">Utils</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../cli_usage.html">Command line usage</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/InterDigitalInc/CompressAI/">Github repository</a></li>
 </ul>
 
 </div>
@@ -197,6 +203,7 @@
             <span class="n">encoder</span> <span class="o">=</span> <span class="n">range_coder</span><span class="o">.</span><span class="n">RangeEncoder</span><span class="p">()</span>
             <span class="n">decoder</span> <span class="o">=</span> <span class="n">range_coder</span><span class="o">.</span><span class="n">RangeDecoder</span><span class="p">()</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span> <span class="o">=</span> <span class="n">encoder</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_decoder</span> <span class="o">=</span> <span class="n">decoder</span>
 
@@ -248,6 +255,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">"_quantized_cdf"</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">"_cdf_length"</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">())</span>
 
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">attributes</span><span class="p">[</span><span class="s2">"entropy_coder"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_coder</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="n">attributes</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entropy_coder</span> <span class="o">=</span> <span class="n">_EntropyCoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"entropy_coder"</span><span class="p">))</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span>
@@ -263,16 +279,6 @@
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">unused</span>
-    <span class="k">def</span> <span class="nf">_get_noise_cached</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="c1"># use simple caching method to avoid creating a new tensor every call</span>
-        <span class="n">half</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_noise"</span><span class="p">):</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_noise"</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_noise</span><span class="o">.</span><span class="n">resize_</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_noise</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="o">-</span><span class="n">half</span><span class="p">,</span> <span class="n">half</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_noise</span>
-
     <span class="k">def</span> <span class="nf">quantize</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">means</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -280,11 +286,8 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid quantization mode: "</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">"'</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">"noise"</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
-                <span class="n">half</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
-                <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="o">-</span><span class="n">half</span><span class="p">,</span> <span class="n">half</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">noise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_noise_cached</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+            <span class="n">half</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="o">-</span><span class="n">half</span><span class="p">,</span> <span class="n">half</span><span class="p">)</span>
             <span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span> <span class="o">+</span> <span class="n">noise</span>
             <span class="k">return</span> <span class="n">inputs</span>
 
