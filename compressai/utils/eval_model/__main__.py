@@ -38,6 +38,8 @@ from compressai.zoo import load_state_dict
 from compressai.zoo import models as pretrained_models
 from compressai.zoo.image import model_architectures as architectures
 
+torch.backends.cudnn.deterministic = True
+
 # from torchvision.datasets.folder
 IMG_EXTENSIONS = (
     ".jpg",

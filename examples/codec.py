@@ -29,6 +29,8 @@ import compressai
 
 from compressai.zoo import models
 
+torch.backends.cudnn.deterministic = True
+
 model_ids = {k: i for i, k in enumerate(models.keys())}
 
 metric_ids = {

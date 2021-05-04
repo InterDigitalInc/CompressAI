@@ -273,7 +273,7 @@ class EntropyModel(nn.Module):
                         raise ValueError("Invalid means parameters")
 
         cdf = self._quantized_cdf
-        outputs = cdf.new(indexes.size())
+        outputs = cdf.new_empty(indexes.size())
 
         for i, s in enumerate(strings):
             values = self.entropy_coder.decode_with_indexes(
@@ -283,7 +283,9 @@ class EntropyModel(nn.Module):
                 self._cdf_length.reshape(-1).int().tolist(),
                 self._offset.reshape(-1).int().tolist(),
             )
-            outputs[i] = torch.Tensor(values).reshape(outputs[i].size())
+            outputs[i] = torch.tensor(
+                values, device=outputs.device, dtype=outputs.dtype
+            ).reshape(outputs[i].size())
         outputs = self.dequantize(outputs, means)
         return outputs
 
