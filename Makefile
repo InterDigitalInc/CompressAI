@@ -15,7 +15,7 @@ help: ## Show this message
 
 
 # Check style and linting
-.PHONY: check-black check-isort check-mypy static-analysis
+.PHONY: check-black check-isort check-flake8 check-mypy static-analysis
 
 check-black: ## Run black checks
 	@echo "--> Running black checks"
@@ -25,11 +25,15 @@ check-isort: ## Run isort checks
 	@echo "--> Running isort checks"
 	@isort --check-only $(src_dirs)
 
+check-flake8: ## Run flake8 checks
+	@echo "--> Running flake8 checks"
+	@flake8 $(src_dirs)
+
 check-mypy: ## Run mypy checks
 	@echo "--> Running mypy checks"
 	@mypy
 
-static-analysis: check-black check-isort check-mypy ## Run all static checks
+static-analysis: check-black check-isort check-flake8 check-mypy ## Run all static checks
 
 
 # Apply styling

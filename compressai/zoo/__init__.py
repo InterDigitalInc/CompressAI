@@ -12,7 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .image import *
+from .image import (
+    bmshj2018_factorized,
+    bmshj2018_hyperprior,
+    cheng2020_anchor,
+    cheng2020_attn,
+    mbt2018,
+    mbt2018_mean,
+)
 from .pretrained import load_pretrained as load_state_dict
 
 models = {

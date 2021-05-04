@@ -43,4 +43,4 @@ class TestScripting:
         conv = MaskedConv2d(3, 3, 3, padding=1)
 
         with pytest.raises(RuntimeError):
-            m = torch.jit.script(conv)
+            torch.jit.script(conv)

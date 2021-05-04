@@ -22,7 +22,6 @@ from compressai.entropy_models import (
     EntropyModel,
     GaussianConditional,
 )
-from compressai.models.priors import FactorizedPrior
 from compressai.zoo import bmshj2018_factorized, bmshj2018_hyperprior
 
 
@@ -90,10 +89,10 @@ class TestEntropyModel:
 
     def test_invalid_coder(self):
         with pytest.raises(ValueError):
-            entropy_model = EntropyModel(entropy_coder="huffman")
+            EntropyModel(entropy_coder="huffman")
 
         with pytest.raises(ValueError):
-            entropy_model = EntropyModel(entropy_coder=0xFF)
+            EntropyModel(entropy_coder=0xFF)
 
     def test_invalid_inputs(self, entropy_model):
         with pytest.raises(TypeError):

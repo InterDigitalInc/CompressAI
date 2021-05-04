@@ -61,7 +61,7 @@ def test_bench_codec(capsys, codec):
     assert expected["name"] == output["name"]
 
     for key in ("psnr", "ms-ssim", "bpp"):
-        if not key in expected["results"]:
+        if key not in expected["results"]:
             continue
         assert np.allclose(
             expected["results"][key], output["results"][key], rtol=1e-5, atol=1e-5

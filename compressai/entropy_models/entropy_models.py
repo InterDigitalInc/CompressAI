@@ -10,11 +10,8 @@ import torch.nn.functional as F
 
 from torch import Tensor
 
-# isort: off; pylint: disable=E0611,E0401
 from compressai._CXX import pmf_to_quantized_cdf as _pmf_to_quantized_cdf
 from compressai.ops import LowerBound
-
-# isort: on; pylint: enable=E0611,E0401
 
 
 class _EntropyCoder:
@@ -33,12 +30,12 @@ class _EntropyCoder:
             )
 
         if method == "ans":
-            from compressai import ans  # pylint: disable=E0611
+            from compressai import ans
 
             encoder = ans.RansEncoder()
             decoder = ans.RansDecoder()
         elif method == "rangecoder":
-            import range_coder  # pylint: disable=E0401
+            import range_coder
 
             encoder = range_coder.RangeEncoder()
             decoder = range_coder.RangeDecoder()
@@ -354,7 +351,7 @@ class EntropyBottleneck(EntropyModel):
     def update(self, force: bool = False) -> bool:
         # Check if we need to update the bottleneck parameters, the offsets are
         # only computed and stored when the conditonal model is update()'d.
-        if self._offset.numel() > 0 and not force:  # pylint: disable=E0203
+        if self._offset.numel() > 0 and not force:
             return False
 
         medians = self.quantiles[:, 0, 1]
@@ -580,7 +577,7 @@ class GaussianConditional(EntropyModel):
         # updated.
         if self._offset.numel() > 0 and not force:
             return False
-        device = self.scale_table.device  # pylint: disable=E0203
+        device = self.scale_table.device
         self.scale_table = self._prepare_scale_table(scale_table).to(device)
         self.update()
         return True

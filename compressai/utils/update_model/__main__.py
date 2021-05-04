@@ -63,7 +63,7 @@ def load_checkpoint(filepath: Path) -> Dict[str, torch.Tensor]:
 
 
 description = """
-Export a trained model to a new checkpoint with an updated CDFs parameters and a 
+Export a trained model to a new checkpoint with an updated CDFs parameters and a
 hash prefix, so that it can be loaded later via `load_state_dict_from_url`.
 """.strip()
 
