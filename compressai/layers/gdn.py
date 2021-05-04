@@ -20,6 +20,8 @@ from torch import Tensor
 
 from compressai.ops.parametrizers import NonNegativeParametrizer
 
+__all__ = ["GDN", "GDN1"]
+
 
 class GDN(nn.Module):
     r"""Generalized Divisive Normalization layer.

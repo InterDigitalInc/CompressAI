@@ -29,16 +29,6 @@ line_length = 88
 known_third_party = "PIL,pytorch_msssim,torchvision,torch"
 skip_gitignore = true
 
-[tool.pylint.messages_control]
-disable = "C0330,C0326,bad-continuation,C0103,C0304,W0221,R0902,R0914,C0114,W0511,C0116,W0201,C0415,R0401,R0201,R0913,R0903,R0801"
-
-[tool.pylint.format]
-max-line-length = "88"
-
-[tool.pylint.typecheck]
-ignored-modules = "torch"
-extension-pkg-whitelist = "compressai.ans,compressai._cxx,range_coder"
-
 [tool.pytest.ini_options]
 markers = [
     "pretrained: download and check pretrained models (slow, deselect with '-m \"not pretrained\"')",

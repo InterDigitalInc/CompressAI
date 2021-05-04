@@ -19,15 +19,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# pylint: disable=E0611,E0401
 from compressai.ans import BufferedRansEncoder, RansDecoder
 from compressai.entropy_models import EntropyBottleneck, GaussianConditional
 from compressai.layers import GDN, MaskedConv2d
 
 from .utils import conv, deconv, update_registered_buffers
-
-# pylint: enable=E0611,E0401
-
 
 __all__ = [
     "CompressionModel",
@@ -186,9 +182,7 @@ SCALES_MAX = 256
 SCALES_LEVELS = 64
 
 
-def get_scale_table(
-    min=SCALES_MIN, max=SCALES_MAX, levels=SCALES_LEVELS
-):  # pylint: disable=W0622
+def get_scale_table(min=SCALES_MIN, max=SCALES_MAX, levels=SCALES_LEVELS):
     return torch.exp(torch.linspace(math.log(min), math.log(max), levels))
 
 

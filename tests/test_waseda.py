@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
-import torch
-
 from compressai.models.waseda import Cheng2020Anchor
 from compressai.zoo import cheng2020_anchor
 

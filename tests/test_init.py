@@ -16,6 +16,8 @@
 def test_import_errors():
     import compressai
 
+    del compressai
+
 
 def test_version():
     from compressai.version import __version__

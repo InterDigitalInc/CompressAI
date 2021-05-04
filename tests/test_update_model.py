@@ -83,7 +83,7 @@ def test_valid_name(tmpdir):
     assert len(stdout) == 0
     assert len(stderr) == 0
 
-    files = sorted(list(Path(tmpdir).glob("*.pth.tar")))
+    files = sorted(Path(tmpdir).glob("*.pth.tar"))
     assert len(files) == 2
 
     assert files[0].name == "model.pth.tar"

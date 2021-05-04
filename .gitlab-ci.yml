@@ -47,15 +47,15 @@ wheel:3.6:
   extends: wheel:3.8
   image: python:3.6-buster
 
-pylint:
+flake8:
   stage: static-analysis
   image: pytorch/pytorch:1.8.1-cuda11.1-cudnn8-runtime
   before_script:
     - python --version
     - pip install compressai --find-links=dist/
-    - pip install pylint
+    - pip install flake8 flake8-bugbear flake8-comprehensions
   script:
-    - pylint compressai examples
+    - flake8 compressai tests examples docs
   tags:
     - docker
 

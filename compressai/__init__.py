@@ -39,7 +39,7 @@ def set_entropy_coder(entropy_coder):
     Args:
         entropy_coder (string): Name of the entropy coder
     """
-    global _entropy_coder  # pylint: disable=W0603
+    global _entropy_coder
     if entropy_coder not in _available_entropy_coders:
         raise ValueError(
             f'Invalid entropy coder "{entropy_coder}", choose from'
