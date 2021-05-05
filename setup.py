@@ -23,7 +23,7 @@ from setuptools import find_packages, setup
 cwd = Path(__file__).resolve().parent
 
 package_name = "compressai"
-version = "1.1.4"
+version = "1.1.5dev0"
 git_hash = "unknown"
 
 
