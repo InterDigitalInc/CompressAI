@@ -203,7 +203,7 @@ to update the internal parameters of the entropy bottlenecks:
 
 .. code-block:: bash
 
-   python -m compressai.utils.update_model -n final-model --arch ARCH model_checkpoint.pth.tar
+   python -m compressai.utils.update_model -n final-model --architecture ARCH model_checkpoint.pth.tar
 
 This will modify the buffers related to the learned cumulative distribution
 functions (CDFs) required to perform the actual entropy coding.
@@ -218,6 +218,18 @@ method of a :mod:`~compressai.models.CompressionModel` or
 :mod:`~compressai.entropy_models.EntropyBottleneck` instance at the end of your
 training script, before saving the model checkpoint.
 
+Evaluating the model
+--------------------
+
+Once a model has been updated, you can use :code:`eval_model` to get its performances on an image dataset:
+
+.. code-block:: bash
+
+   python -m compressai.utils.eval_model checkpoint /path/to/image/dataset \
+       -a ARCH -p path/to/checkpoint-xxxxxxxx.pth.tar
+
+You can run :code:`python -m compressai.utils.eval_model --help` to get the
+complete list of options.
 
 Entropy coding
 --------------

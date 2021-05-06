@@ -39,6 +39,7 @@ from compressai.zoo import models as pretrained_models
 from compressai.zoo.image import model_architectures as architectures
 
 torch.backends.cudnn.deterministic = True
+torch.set_num_threads(1)
 
 # from torchvision.datasets.folder
 IMG_EXTENSIONS = (
@@ -177,7 +178,7 @@ def setup_args():
     parent_parser.add_argument("dataset", type=str, help="dataset path")
     parent_parser.add_argument(
         "-a",
-        "--arch",
+        "--architecture",
         type=str,
         choices=pretrained_models.keys(),
         help="model architecture",
@@ -268,12 +269,12 @@ def main(argv):
 
     if args.source == "pretrained":
         runs = sorted(args.qualities)
-        opts = (args.arch, args.metric)
+        opts = (args.architecture, args.metric)
         load_func = load_pretrained
         log_fmt = "\rEvaluating {0} | {run:d}"
     elif args.source == "checkpoint":
         runs = args.paths
-        opts = (args.arch,)
+        opts = (args.architecture,)
         load_func = load_checkpoint
         log_fmt = "\rEvaluating {run:s}"
 
@@ -297,7 +298,7 @@ def main(argv):
         "entropy estimation" if args.entropy_estimation else args.entropy_coder
     )
     output = {
-        "name": args.arch,
+        "name": args.architecture,
         "description": f"Inference ({description})",
         "results": results,
     }

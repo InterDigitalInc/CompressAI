@@ -247,7 +247,9 @@ def parse_args(argv):
         help="Size of the patches to be cropped (default: %(default)s)",
     )
     parser.add_argument("--cuda", action="store_true", help="Use cuda")
-    parser.add_argument("--save", action="store_true", help="Save model to disk")
+    parser.add_argument(
+        "--save", action="store_true", default=True, help="Save model to disk"
+    )
     parser.add_argument(
         "--seed", type=float, help="Set random seed for reproducibility"
     )
