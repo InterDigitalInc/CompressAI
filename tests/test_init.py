@@ -13,6 +13,9 @@
 # limitations under the License.
 
 
+import re
+
+
 def test_import_errors():
     import compressai
 
@@ -22,4 +25,4 @@ def test_import_errors():
 def test_version():
     from compressai.version import __version__
 
-    assert 5 <= len(__version__) <= 7
+    assert re.match(r"([0-9]+)\.([0-9]+)\.([0-9]+)([a-z]+[0-9]+)?", __version__)
