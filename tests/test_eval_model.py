@@ -22,6 +22,7 @@ import pytest
 import torch
 
 eval_model = importlib.import_module("compressai.utils.eval_model.__main__")
+update_model = importlib.import_module("compressai.utils.update_model.__main__")
 
 # Example: GENERATE_EXPECTED=1 pytest -sx tests/test_eval_model.py
 GENERATE_EXPECTED = os.getenv("GENERATE_EXPECTED")
@@ -106,3 +107,55 @@ def test_eval_model_pretrained(capsys, model, quality, metric, entropy_estimatio
         assert np.allclose(
             expected["results"][key], output["results"][key], rtol=1e-5, atol=1e-5
         )
+
+
+@pytest.mark.parametrize("model_name", ("factorized-prior", "bmshj2018-factorized"))
+def test_eval_model_ckpt(tmp_path, model_name):
+    here = os.path.dirname(__file__)
+    parent = os.path.dirname(here)
+
+    # fake training
+    datapath = os.path.join(here, "assets/fakedata/imagefolder")
+    spec = importlib.util.spec_from_file_location(
+        "examples.train", os.path.join(parent, "examples/train.py")
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    argv = [
+        "-d",
+        datapath,
+        "-e",
+        "1",
+        "--batch-size",
+        "1",
+        "--patch-size",
+        "48",
+        "64",
+        "--seed",
+        "0",
+        "--save",
+    ]
+
+    os.chdir(tmp_path)
+    module.main(argv)
+
+    checkpoint = "checkpoint_best_loss.pth.tar"
+    assert os.path.isfile(checkpoint)
+
+    # update model
+    cmd = ["-a", model_name, "-n", "factorized", checkpoint]
+    update_model.main(cmd)
+
+    # ckpt evaluation
+    dirpath = os.path.join(here, "assets/dataset")
+    checkpoint = next(f for f in os.listdir(tmp_path) if f.startswith("factorized-"))
+    cmd = [
+        "checkpoint",
+        dirpath,
+        "-a",
+        "bmshj2018-factorized",
+        "-p",
+        checkpoint,
+    ]
+    eval_model.main(cmd)

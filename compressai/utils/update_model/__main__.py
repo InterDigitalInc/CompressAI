@@ -33,6 +33,7 @@ from compressai.models.priors import (
     MeanScaleHyperprior,
     ScaleHyperprior,
 )
+from compressai.zoo.image import model_architectures as zoo_models
 
 
 def sha256_file(filepath: Path, len_hash_prefix: int = 8) -> str:
@@ -73,6 +74,7 @@ models = {
     "mean-scale-hyperprior": MeanScaleHyperprior,
     "scale-hyperprior": ScaleHyperprior,
 }
+models.update(zoo_models)
 
 
 def setup_args():
@@ -89,6 +91,7 @@ def setup_args():
         help="Do not update the model CDFs parameters.",
     )
     parser.add_argument(
+        "-a",
         "--architecture",
         default="scale-hyperprior",
         choices=models.keys(),
@@ -106,7 +109,11 @@ def main(argv):
 
     state_dict = load_checkpoint(filepath)
 
-    model_cls = models[args.architecture]
+    model_cls_or_entrypoint = models[args.architecture]
+    if not isinstance(model_cls_or_entrypoint, type):
+        model_cls = model_cls_or_entrypoint()
+    else:
+        model_cls = model_cls_or_entrypoint
     net = model_cls.from_state_dict(state_dict)
 
     if not args.no_update:
@@ -123,12 +130,12 @@ def main(argv):
     ext = "".join(filepath.suffixes)
 
     if args.dir is not None:
-        output_dir = args.dir
+        output_dir = Path(args.dir)
         Path(output_dir).mkdir(exist_ok=True)
     else:
-        output_dir = Path.cwd().name
+        output_dir = Path.cwd()
 
-    filepath = Path(f"{output_dir}/{filename}{ext}")
+    filepath = output_dir / f"{filename}{ext}"
     torch.save(state_dict, filepath)
     hash_prefix = sha256_file(filepath)
 
