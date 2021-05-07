@@ -4,9 +4,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Image compression" href="zoo.html" />
 
-    <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta31"/>
+    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
         <title>Command line usage - CompressAI</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?digest=978e1795dfe158b585dda6a8417f6411828bf3ed">
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
     <link rel="stylesheet" href="_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
     
@@ -120,6 +120,7 @@
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tutorial_train.html">Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tutorial_custom.html">Custom model</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Library API</span></p>
 <ul>
@@ -242,7 +243,9 @@ optional arguments:
 <p>Update the CDFs parameters of a trained model.</p>
 <p>To be called on a model checkpoint after training. This will update the internal
 CDFs related buffers required for entropy coding.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.update_model [-h] [-n NAME] [-d DIR] [--no-update] [--architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior}] filepath
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.update_model [-h] [-n NAME] [-d DIR] [--no-update]
+                                               [-a {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,bmshj2018-factorized,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}]
+                                               filepath
 
 Export a trained model to a new checkpoint with an updated CDFs parameters and a hash prefix, so that it can be loaded later via `load_state_dict_from_url`.
 
@@ -254,7 +257,7 @@ optional arguments:
   -n NAME, --name NAME  Exported model name.
   -d DIR, --dir DIR     Exported model directory.
   --no-update           Do not update the model CDFs parameters.
-  --architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior}
+  -a {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,bmshj2018-factorized,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}, --architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,bmshj2018-factorized,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}
                         Set model architecture (default: scale-hyperprior).
 </pre></div>
 </div>

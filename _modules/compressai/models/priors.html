@@ -4,9 +4,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta31"/>
+    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
         <title>compressai.models.priors - CompressAI</title>
-      <link rel="stylesheet" href="../../../_static/styles/furo.css?digest=978e1795dfe158b585dda6a8417f6411828bf3ed">
+      <link rel="stylesheet" href="../../../_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
     <link rel="stylesheet" href="../../../_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../../../_static/pygments_dark.css">
     
@@ -120,6 +120,7 @@
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tutorial_train.html">Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tutorial_custom.html">Custom model</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Library API</span></p>
 <ul>
@@ -179,15 +180,11 @@
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 
-<span class="c1"># pylint: disable=E0611,E0401</span>
 <span class="kn">from</span> <span class="nn">compressai.ans</span> <span class="kn">import</span> <span class="n">BufferedRansEncoder</span><span class="p">,</span> <span class="n">RansDecoder</span>
 <span class="kn">from</span> <span class="nn">compressai.entropy_models</span> <span class="kn">import</span> <span class="n">EntropyBottleneck</span><span class="p">,</span> <span class="n">GaussianConditional</span>
 <span class="kn">from</span> <span class="nn">compressai.layers</span> <span class="kn">import</span> <span class="n">GDN</span><span class="p">,</span> <span class="n">MaskedConv2d</span>
 
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">conv</span><span class="p">,</span> <span class="n">deconv</span><span class="p">,</span> <span class="n">update_registered_buffers</span>
-
-<span class="c1"># pylint: enable=E0611,E0401</span>
-
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">"CompressionModel"</span><span class="p">,</span>
@@ -346,9 +343,7 @@
 <span class="n">SCALES_LEVELS</span> <span class="o">=</span> <span class="mi">64</span>
 
 
-<span class="k">def</span> <span class="nf">get_scale_table</span><span class="p">(</span>
-    <span class="nb">min</span><span class="o">=</span><span class="n">SCALES_MIN</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">SCALES_MAX</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="n">SCALES_LEVELS</span>
-<span class="p">):</span>  <span class="c1"># pylint: disable=W0622</span>
+<span class="k">def</span> <span class="nf">get_scale_table</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="n">SCALES_MIN</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">SCALES_MAX</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="n">SCALES_LEVELS</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">min</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">max</span><span class="p">),</span> <span class="n">levels</span><span class="p">))</span>
 
 

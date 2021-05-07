@@ -17,6 +17,7 @@ end-to-end compression research.
    :caption: Tutorials
 
    tutorials/tutorial_train
+   Custom model<tutorials/tutorial_custom>
 
 .. toctree::
    :maxdepth: 1

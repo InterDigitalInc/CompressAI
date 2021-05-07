@@ -4,9 +4,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="compressai.transforms" href="transforms.html" /><link rel="prev" title="compressai.models" href="models.html" />
 
-    <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta31"/>
+    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
         <title>compressai.ops - CompressAI</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?digest=978e1795dfe158b585dda6a8417f6411828bf3ed">
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
     <link rel="stylesheet" href="_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
     
@@ -120,6 +120,7 @@
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tutorial_train.html">Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tutorial_custom.html">Custom model</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Library API</span></p>
 <ul class="current">
@@ -163,7 +164,7 @@
 <h2>ste_round<a class="headerlink" href="#ste-round" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="compressai.ops.ste_round">
-<code class="sig-prename descclassname"><span class="pre">compressai.ops.</span></code><code class="sig-name descname"><span class="pre">ste_round</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/ops/ops.html#ste_round"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.ops.ste_round" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">compressai.ops.</span></code><code class="sig-name descname"><span class="pre">ste_round</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> → <span class="pre">torch.Tensor</span><a class="reference internal" href="_modules/compressai/ops/ops.html#ste_round"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.ops.ste_round" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rounding with non-zero gradients. Gradients are approximated by replacing
 the derivative by the identity function.</p>
 <p>Used in <a class="reference external" href="https://arxiv.org/abs/1703.00395">“Lossy Image Compression with Compressive Autoencoders”</a></p>
@@ -178,7 +179,7 @@ the derivative by the identity function.</p>
 <h2>LowerBound<a class="headerlink" href="#lowerbound" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compressai.ops.LowerBound">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.ops.</span></code><code class="sig-name descname"><span class="pre">LowerBound</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bound</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/ops/bound_ops.html#LowerBound"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.ops.LowerBound" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.ops.</span></code><code class="sig-name descname"><span class="pre">LowerBound</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bound</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/ops/bound_ops.html#LowerBound"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.ops.LowerBound" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lower bound operator, computes <cite>torch.max(x, bound)</cite> with a custom
 gradient.</p>
 <p>The derivative is replaced by the identity function when <cite>x</cite> is moved
@@ -189,7 +190,7 @@ towards the <cite>bound</cite>, otherwise the gradient is kept to zero.</p>
 <h2>NonNegativeParametrizer<a class="headerlink" href="#nonnegativeparametrizer" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compressai.ops.NonNegativeParametrizer">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.ops.</span></code><code class="sig-name descname"><span class="pre">NonNegativeParametrizer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minimum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reparam_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.814697265625e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/ops/parametrizers.html#NonNegativeParametrizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.ops.NonNegativeParametrizer" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.ops.</span></code><code class="sig-name descname"><span class="pre">NonNegativeParametrizer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minimum</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reparam_offset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">3.814697265625e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/ops/parametrizers.html#NonNegativeParametrizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.ops.NonNegativeParametrizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Non negative reparametrization.</p>
 <p>Used for stability during training.</p>
 </dd></dl>
