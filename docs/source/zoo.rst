@@ -30,6 +30,7 @@ documentation for more information on
 `train <https://pytorch.org/docs/stable/nn.html?highlight=train#torch.nn.Module.train>`_
 and `eval <https://pytorch.org/docs/stable/nn.html?highlight=eval#torch.nn.Module.eval>`_.
 
+.. _zoo-training:
 
 Training
 ~~~~~~~~
