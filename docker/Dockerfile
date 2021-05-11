@@ -3,6 +3,7 @@ FROM ${PYTORCH_IMAGE}-devel as builder
 
 WORKDIR /tmp/compressai
 COPY compressai.tar.gz .
+RUN pip install pybind11
 RUN tar xzf compressai.tar.gz && \
 		python3 setup.py bdist_wheel
 
