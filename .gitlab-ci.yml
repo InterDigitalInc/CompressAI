@@ -89,7 +89,7 @@ test:pytorch-1.5.1:
   before_script:
     - python --version
     - pip install -e .
-    - pip install click pytest codecov pytest-cov
+    - pip install click pytest pytest-cov
   script:
     - >
       if [ "$CI_COMMIT_BRANCH" == "master" ]; then
