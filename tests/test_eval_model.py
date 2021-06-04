@@ -105,7 +105,7 @@ def test_eval_model_pretrained(capsys, model, quality, metric, entropy_estimatio
         if key not in expected["results"]:
             continue
         assert np.allclose(
-            expected["results"][key], output["results"][key], rtol=1e-5, atol=1e-5
+            expected["results"][key], output["results"][key], rtol=1e-4, atol=1e-4
         )
 
 
