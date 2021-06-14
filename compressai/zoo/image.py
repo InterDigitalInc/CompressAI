@@ -225,7 +225,7 @@ def bmshj2018_factorized(
 
     Args:
         quality (int): Quality levels (1: lowest, highest: 8)
-        metric (str): Optimized metric, choose from ('mse')
+        metric (str): Optimized metric, choose from ('mse', 'ms-ssim')
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
@@ -250,7 +250,7 @@ def bmshj2018_hyperprior(
 
     Args:
         quality (int): Quality levels (1: lowest, highest: 8)
-        metric (str): Optimized metric, choose from ('mse')
+        metric (str): Optimized metric, choose from ('mse', 'ms-ssim')
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
