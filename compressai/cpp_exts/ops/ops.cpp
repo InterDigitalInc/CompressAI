@@ -3,9 +3,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numeric>
+#include <string>
 #include <vector>
 
 std::vector<uint32_t> pmf_to_quantized_cdf(const std::vector<float> &pmf,
@@ -27,6 +28,14 @@ std::vector<uint32_t> pmf_to_quantized_cdf(const std::vector<float> &pmf,
    * although it's only run once per model after training. See TF/compression
    * implementation for an optimized version. */
 
+  for (float p : pmf) {
+    if (p < 0 || !std::isfinite(p)) {
+      throw std::domain_error(
+          std::string("Invalid `pmf`, non-finite or negative element found: ") +
+          std::to_string(p));
+    }
+  }
+
   std::vector<uint32_t> cdf(pmf.size() + 1);
   cdf[0] = 0; /* freq 0 */
 
@@ -34,6 +43,10 @@ std::vector<uint32_t> pmf_to_quantized_cdf(const std::vector<float> &pmf,
                  [=](float p) { return std::round(p * (1 << precision)); });
 
   const uint32_t total = std::accumulate(cdf.begin(), cdf.end(), 0);
+  if (total == 0) {
+    throw std::domain_error("Invalid `pmf`: at least one element must have a "
+                            "non-zero probability.");
+  }
 
   std::transform(cdf.begin(), cdf.end(), cdf.begin(),
                  [precision, total](uint32_t p) {
