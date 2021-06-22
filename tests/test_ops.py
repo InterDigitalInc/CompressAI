@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 import torch
 
+from compressai._CXX import pmf_to_quantized_cdf
 from compressai.ops import LowerBound, NonNegativeParametrizer, ste_round
 
 
@@ -81,3 +83,21 @@ class TestNonNegativeParametrizer:
 
             assert x_reparam.shape == x.shape
             assert torch.allclose(x_reparam.min(), minimum)
+
+
+class TestPmfToQuantizedCDF:
+    def test_ok(self):
+        out = pmf_to_quantized_cdf([0.1, 0.2, 0, 0], 16)
+        assert out == [0, 21845, 65534, 65535, 65536]
+
+    def test_negative_prob(self):
+        with pytest.raises(ValueError):
+            pmf_to_quantized_cdf([1, 0, -1], 16)
+
+    @pytest.mark.parametrize("v", ("inf", "-inf", "nan"))
+    def test_non_finite_prob(self, v):
+        with pytest.raises(ValueError):
+            pmf_to_quantized_cdf([1, 0, float(v)], 16)
+
+        with pytest.raises(ValueError):
+            pmf_to_quantized_cdf([1, 0, float(v), 2, 3, 4], 16)

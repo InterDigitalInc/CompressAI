@@ -11,7 +11,7 @@ exclude = '''
 		\.eggs
 		| \.git
 		| \.mypy_cache
-		| \venv*
+		| venv*
 		| _build
 		| build
 		| dist

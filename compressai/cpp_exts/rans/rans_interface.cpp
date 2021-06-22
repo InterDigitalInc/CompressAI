@@ -368,5 +368,5 @@ PYBIND11_MODULE(ans, m) {
       .def("set_stream", &RansDecoder::set_stream)
       .def("decode_stream", &RansDecoder::decode_stream)
       .def("decode_with_indexes", &RansDecoder::decode_with_indexes,
-              "Decode a string to a list of symbols");
+           "Decode a string to a list of symbols");
 }
