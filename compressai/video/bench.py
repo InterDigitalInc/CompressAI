@@ -1,31 +1,34 @@
-import abc
 import argparse
 import json
-import re
 import subprocess
 import sys
 import tempfile
 
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
 
-from pytorch_msssim import ms_ssim
+from pytorch_msssim import ms_ssim  # type: ignore
+from torch import Tensor
 from torch.utils.model_zoo import tqdm
 
 from compressai.transforms.functional import ycbcr2rgb, yuv_420_to_444
 
 from .codecs import H264, H265
-from .rawvideo import RawVideoSequence, VideoFormat, get_raw_video_file_info
+from .rawvideo import RawVideoSequence, VideoFormat
 
-Numeric = Union[int, float]
 codec_classes = [H264, H265]
 
 
-def frame_to_tensor(frame, max_value: int):
+Frame = Tuple[Tensor, Tensor, Tensor]
+
+
+def to_tensors(
+    frame: Tuple[np.ndarray, np.ndarray, np.ndarray], max_value: int
+) -> Frame:
     return (
         torch.from_numpy(np.true_divide(frame[0], max_value, dtype="float32")),
         torch.from_numpy(np.true_divide(frame[1], max_value, dtype="float32")),
@@ -58,25 +61,26 @@ def run_cmdline(
             print(out)
         return
 
+    p = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     with logpath.open("w") as f:
-        p = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        for line in p.stdout:
-            line = line.decode()
-            sys.stdout.write(line)
-            f.write(line)
+        if p.stdout is not None:
+            for bline in p.stdout:
+                line = bline.decode()
+                sys.stdout.write(line)
+                f.write(line)
     p.wait()
 
 
 def compute_metrics_for_frame(
-    org_frame,
-    dec_frame,
+    org_frame: Frame,
+    dec_frame: Frame,
     max_val: float = 1.0,
-) -> Dict[str, Numeric]:
-    org_frame = tuple(plane.unsqueeze(0).unsqueeze(0) for plane in org_frame)
-    dec_frame = tuple(plane.unsqueeze(0).unsqueeze(0) for plane in dec_frame)
+) -> Dict[str, Any]:
+    org_frame = tuple(p.unsqueeze(0).unsqueeze(0) for p in org_frame)  # type: ignore
+    dec_frame = tuple(p.unsqueeze(0).unsqueeze(0) for p in dec_frame)  # type:ignore
 
-    org = ycbcr2rgb(yuv_420_to_444(org_frame))
-    dec = ycbcr2rgb(yuv_420_to_444(dec_frame))
+    org = ycbcr2rgb(yuv_420_to_444(org_frame))  # type: ignore
+    dec = ycbcr2rgb(yuv_420_to_444(dec_frame))  # type: ignore
 
     mse = (org - dec).pow(2).mean().item()
     psnr_val = 20 * np.log10(max_val) - 10 * np.log10(mse)
@@ -89,11 +93,11 @@ def get_filesize(filepath: Union[Path, str]) -> int:
 
 
 def evaluate(
-    org_seq_path: str, dec_seq_path: str, bitstream_path: str
-) -> Dict[str, Numeric]:
+    org_seq_path: Path, dec_seq_path: Path, bitstream_path: Path
+) -> Dict[str, Any]:
     filesize = get_filesize(bitstream_path)
-    org_seq = RawVideoSequence.from_file(org_seq_path)
-    dec_seq = RawVideoSequence.new_like(org_seq, dec_seq_path)
+    org_seq = RawVideoSequence.from_file(str(org_seq_path))
+    dec_seq = RawVideoSequence.new_like(org_seq, str(dec_seq_path))
     n = len(org_seq)
     if len(dec_seq) != n:
         raise RuntimeError(
@@ -107,20 +111,20 @@ def evaluate(
     results = defaultdict(list)
     with tqdm(total=n) as pbar:
         for i in range(n):
-            org_frame = frame_to_tensor(org_seq[i], max_value)
-            dec_frame = frame_to_tensor(dec_seq[i], max_value)
+            org_frame = to_tensors(org_seq[i], max_value)
+            dec_frame = to_tensors(dec_seq[i], max_value)
             metrics = compute_metrics_for_frame(org_frame, dec_frame)
             pbar.update(1)
     for k, v in metrics.items():
         results[k].append(v)
 
-    results = {k: np.mean(v) for k, v in results.items()}
-    results["filesize"] = filesize
-    results["bpp"] = filesize / (n * org_seq.width * org_seq.height)
-    return results
+    seq_results: Dict[str, Any] = {k: np.mean(v) for k, v in results.items()}
+    seq_results["filesize"] = filesize
+    seq_results["bpp"] = filesize / (n * org_seq.width * org_seq.height)
+    return seq_results
 
 
-def aggregate_results(filepaths: List[Path]) -> Dict[str, Numeric]:
+def aggregate_results(filepaths: List[Path]) -> Dict[str, Any]:
     metrics = defaultdict(list)
 
     # sum
@@ -131,12 +135,11 @@ def aggregate_results(filepaths: List[Path]) -> Dict[str, Numeric]:
             metrics[k].append(v)
 
     # normalize
-    for k, v in metrics.items():
-        metrics[k] = np.mean(v)
-    return dict(metrics)
+    agg = {k: np.mean(v) for k, v in metrics.items()}
+    return agg
 
 
-def create_parser():
+def create_parser() -> Tuple[argparse.ArgumentParser, argparse._SubParsersAction]:
     parser = argparse.ArgumentParser(
         description="HBD", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
@@ -148,7 +151,7 @@ def create_parser():
     return parser, subparsers
 
 
-def main(args=None):
+def main(args: Any = None) -> None:
     if args is None:
         args = sys.argv[1:]
     parser, subparsers = create_parser()
@@ -190,9 +193,9 @@ def main(args=None):
             run_cmdline(cmd)
 
             # compute metrics
-            metrics = evaluate(str(filepath), f.name, outputpath)
-            with sequence_metrics_path.open("w") as f:
-                json.dump(metrics, f, indent=2)
+            metrics = evaluate(filepath, Path(f.name), outputpath)
+            with sequence_metrics_path.open("wb") as f:
+                f.write(json.dumps(metrics, indent=2).encode())
 
     results = aggregate_results(results_paths)
     print(results)

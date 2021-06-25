@@ -1,13 +1,15 @@
 import abc
 import argparse
+
 from pathlib import Path
+from typing import Any, List
 
 from .rawvideo import get_raw_video_file_info
 
 
 class Codec(abc.ABC):
-    name = None
-    help = None
+    name = ""
+    help = ""
 
     def add_parser_args(self, parser: argparse.ArgumentParser) -> None:
         # """Overridable. Add options for this sub-command to the
@@ -19,7 +21,7 @@ class Codec(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_encode_cmd(self, filepath: str, options) -> str:
+    def get_encode_cmd(self, filepath: Path, args) -> List[Any]:
         raise NotImplementedError
 
 
@@ -30,12 +32,12 @@ class H264(Codec):
         parser.add_argument("-p", "--preset", default="medium", help="Preset")
         parser.add_argument("-q", "--qp", default=32, help="Quality")
 
-    def get_outputpath(self, filepath: Path, args) -> str:
+    def get_outputpath(self, filepath: Path, args) -> Path:
         return Path(args.output) / (
             f"{filepath.stem}_{self.name}_{args.preset}_qp{args.qp}.mp4"
         )
 
-    def get_encode_cmd(self, filepath: Path, args) -> str:
+    def get_encode_cmd(self, filepath: Path, args) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
         outputpath = self.get_outputpath(filepath, args)
         cmd = [
@@ -66,7 +68,7 @@ class H264(Codec):
 class H265(H264):
     name = "h265"
 
-    def get_encode_cmd(self, filepath: Path, args) -> str:
+    def get_encode_cmd(self, filepath: Path, args) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
         outputpath = self.get_outputpath(filepath, args)
         cmd = [
