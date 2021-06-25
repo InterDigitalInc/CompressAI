@@ -29,8 +29,8 @@ class H264(Codec):
     name = "h264"
 
     def add_parser_args(self, parser: argparse.ArgumentParser) -> None:
-        parser.add_argument("-p", "--preset", default="medium", help="Preset")
-        parser.add_argument("-q", "--qp", default=32, help="Quality")
+        parser.add_argument("-p", "--preset", default="medium", help="preset")
+        parser.add_argument("-q", "--qp", default=32, help="quality")
 
     def get_outputpath(self, filepath: Path, args) -> Path:
         return Path(args.output) / (
@@ -59,7 +59,7 @@ class H264(Codec):
             "-pix_fmt",
             "yuv420p",
             "-threads",
-            "1",
+            "4",
             outputpath,
         ]
         return cmd
@@ -92,7 +92,7 @@ class H265(H264):
             "-pix_fmt",
             "yuv420p",
             "-threads",
-            "1",
+            "4",
             outputpath,
         ]
         return cmd

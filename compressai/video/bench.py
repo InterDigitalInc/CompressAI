@@ -82,10 +82,12 @@ def compute_metrics_for_frame(
     org = ycbcr2rgb(yuv_420_to_444(org_frame))  # type: ignore
     dec = ycbcr2rgb(yuv_420_to_444(dec_frame))  # type: ignore
 
+    org = (org * max_val).clamp(0, max_val).round()
+    dec = (dec * max_val).clamp(0, max_val).round()
+
     mse = (org - dec).pow(2).mean().item()
-    psnr_val = 20 * np.log10(max_val) - 10 * np.log10(mse)
     ms_ssim_val = ms_ssim(org, dec, data_range=max_val).item()
-    return {"ms-ssim": ms_ssim_val, "psnr": psnr_val}
+    return {"ms-ssim": ms_ssim_val, "mse": mse}
 
 
 def get_filesize(filepath: Union[Path, str]) -> int:
@@ -95,32 +97,38 @@ def get_filesize(filepath: Union[Path, str]) -> int:
 def evaluate(
     org_seq_path: Path, dec_seq_path: Path, bitstream_path: Path
 ) -> Dict[str, Any]:
-    filesize = get_filesize(bitstream_path)
+    # load original and decoded sequences
     org_seq = RawVideoSequence.from_file(str(org_seq_path))
     dec_seq = RawVideoSequence.new_like(org_seq, str(dec_seq_path))
-    n = len(org_seq)
-    if len(dec_seq) != n:
+
+    max_val = 2 ** org_seq.bitdepth - 1
+    num_frames = len(org_seq)
+
+    if len(dec_seq) != num_frames:
         raise RuntimeError(
-            "Invalid number of frames in decoded sequence " f"({n}!={len(dec_seq)})"
+            "Invalid number of frames in decoded sequence "
+            f"({num_frames}!={len(dec_seq)})"
         )
 
     if org_seq.format != VideoFormat.YUV420:
         raise NotImplementedError(f"Unsupported video format: {org_seq.format}")
 
-    max_value = 2 ** org_seq.bitdepth - 1
+    # compute metrics for each frame
     results = defaultdict(list)
-    with tqdm(total=n) as pbar:
-        for i in range(n):
-            org_frame = to_tensors(org_seq[i], max_value)
-            dec_frame = to_tensors(dec_seq[i], max_value)
-            metrics = compute_metrics_for_frame(org_frame, dec_frame)
+    with tqdm(total=num_frames) as pbar:
+        for i in range(num_frames):
+            org_frame = to_tensors(org_seq[i], max_val)
+            dec_frame = to_tensors(dec_seq[i], max_val)
+            metrics = compute_metrics_for_frame(org_frame, dec_frame, max_val)
+            for k, v in metrics.items():
+                results[k].append(v)
             pbar.update(1)
-    for k, v in metrics.items():
-        results[k].append(v)
 
+    # compute average metrics for sequence
     seq_results: Dict[str, Any] = {k: np.mean(v) for k, v in results.items()}
-    seq_results["filesize"] = filesize
-    seq_results["bpp"] = filesize / (n * org_seq.width * org_seq.height)
+    filesize = get_filesize(bitstream_path)
+    seq_results["bpp"] = 8.0 * filesize / (num_frames * org_seq.width * org_seq.height)
+    seq_results["psnr"] = 20 * np.log10(max_val) - 10 * np.log10(seq_results["mse"])
     return seq_results
 
 
@@ -139,29 +147,38 @@ def aggregate_results(filepaths: List[Path]) -> Dict[str, Any]:
     return agg
 
 
-def create_parser() -> Tuple[argparse.ArgumentParser, argparse._SubParsersAction]:
+def create_parser() -> Tuple[
+    argparse.ArgumentParser, argparse.ArgumentParser, argparse._SubParsersAction
+]:
     parser = argparse.ArgumentParser(
-        description="HBD", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        description="Video codec baselines.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument("dataset", type=str, help="Sequences directory.")
-    parser.add_argument("output", type=str, help="Output directory.")
-    parser.add_argument("-n", "--dry-run", action="store_true", help="Dry run.")
-    subparsers = parser.add_subparsers(dest="codec", help="Codec to use.")
+    parent_parser = argparse.ArgumentParser(add_help=False)
+    parent_parser.add_argument("dataset", type=str, help="sequences directory")
+    parent_parser.add_argument("output", type=str, help="output directory")
+    parent_parser.add_argument("-n", "--dry-run", action="store_true", help="dry run")
+    parent_parser.add_argument(
+        "-f", "--force", action="store_true", help="overwrite previous runs"
+    )
+    subparsers = parser.add_subparsers(dest="codec", help="video codec")
     subparsers.required = True
-    return parser, subparsers
+    return parser, parent_parser, subparsers
 
 
 def main(args: Any = None) -> None:
     if args is None:
         args = sys.argv[1:]
-    parser, subparsers = create_parser()
+    parser, parent_parser, subparsers = create_parser()
 
     codec_lookup = {}
     for cls in codec_classes:
         codec = cls()
         codec_lookup[codec.name] = codec
         codec_parser = subparsers.add_parser(
-            codec.name, formatter_class=argparse.ArgumentDefaultsHelpFormatter
+            codec.name,
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+            parents=[parent_parser],
         )
         codec.add_parser_args(codec_parser)
 
@@ -177,6 +194,8 @@ def main(args: Any = None) -> None:
         outputpath = codec.get_outputpath(filepath, args)
 
         # encode sequence if not already encoded
+        # if args.force:
+        #     outputpath.unlink(missing_ok=True)
         if not outputpath.is_file():
             logpath = outputpath.with_suffix(".log")
             run_cmdline(encode_cmd, logpath=logpath, dry_run=args.dry_run)
@@ -184,6 +203,9 @@ def main(args: Any = None) -> None:
         # compute metrics if not already performed
         sequence_metrics_path = outputpath.with_suffix(".json")
         results_paths.append(sequence_metrics_path)
+
+        if args.force:
+            sequence_metrics_path.unlink(missing_ok=True)
         if sequence_metrics_path.is_file():
             continue
 
@@ -196,9 +218,10 @@ def main(args: Any = None) -> None:
             metrics = evaluate(filepath, Path(f.name), outputpath)
             with sequence_metrics_path.open("wb") as f:
                 f.write(json.dumps(metrics, indent=2).encode())
+        break
 
     results = aggregate_results(results_paths)
-    print(results)
+    print(json.dumps(results, indent=2))
 
 
 if __name__ == "__main__":
