@@ -1,0 +1,202 @@
+import abc
+import argparse
+import json
+import re
+import subprocess
+import sys
+import tempfile
+
+from collections import defaultdict
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+
+import numpy as np
+import torch
+
+from pytorch_msssim import ms_ssim
+from torch.utils.model_zoo import tqdm
+
+from compressai.transforms.functional import ycbcr2rgb, yuv_420_to_444
+
+from .codecs import H264, H265
+from .rawvideo import RawVideoSequence, VideoFormat, get_raw_video_file_info
+
+Numeric = Union[int, float]
+codec_classes = [H264, H265]
+
+
+def frame_to_tensor(frame, max_value: int):
+    return (
+        torch.from_numpy(np.true_divide(frame[0], max_value, dtype="float32")),
+        torch.from_numpy(np.true_divide(frame[1], max_value, dtype="float32")),
+        torch.from_numpy(np.true_divide(frame[2], max_value, dtype="float32")),
+    )
+
+
+# def sequence_to_tensor(sequence):
+#     max_value = 2 ** sequence.bitdepth - 1
+#     return tuple(frame_to_tensor(frame, max_value) for frame in sequence)
+
+
+# class SequenceToTensor:
+#     def __call__(self, sequence):
+#         return sequence_to_tensor(sequence)
+
+
+def run_cmdline(
+    cmdline: List[Any], logpath: Optional[Path] = None, dry_run: bool = False
+) -> None:
+    cmdline = list(map(str, cmdline))
+    print(f"--> Running: {' '.join(cmdline)}", file=sys.stderr)
+
+    if dry_run:
+        return
+
+    if logpath is None:
+        out = subprocess.check_output(cmdline).decode()
+        if out:
+            print(out)
+        return
+
+    with logpath.open("w") as f:
+        p = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in p.stdout:
+            line = line.decode()
+            sys.stdout.write(line)
+            f.write(line)
+    p.wait()
+
+
+def compute_metrics_for_frame(
+    org_frame,
+    dec_frame,
+    max_val: float = 1.0,
+) -> Dict[str, Numeric]:
+    org_frame = tuple(plane.unsqueeze(0).unsqueeze(0) for plane in org_frame)
+    dec_frame = tuple(plane.unsqueeze(0).unsqueeze(0) for plane in dec_frame)
+
+    org = ycbcr2rgb(yuv_420_to_444(org_frame))
+    dec = ycbcr2rgb(yuv_420_to_444(dec_frame))
+
+    mse = (org - dec).pow(2).mean().item()
+    psnr_val = 20 * np.log10(max_val) - 10 * np.log10(mse)
+    ms_ssim_val = ms_ssim(org, dec, data_range=max_val).item()
+    return {"ms-ssim": ms_ssim_val, "psnr": psnr_val}
+
+
+def get_filesize(filepath: Union[Path, str]) -> int:
+    return Path(filepath).stat().st_size
+
+
+def evaluate(
+    org_seq_path: str, dec_seq_path: str, bitstream_path: str
+) -> Dict[str, Numeric]:
+    filesize = get_filesize(bitstream_path)
+    org_seq = RawVideoSequence.from_file(org_seq_path)
+    dec_seq = RawVideoSequence.new_like(org_seq, dec_seq_path)
+    n = len(org_seq)
+    if len(dec_seq) != n:
+        raise RuntimeError(
+            "Invalid number of frames in decoded sequence " f"({n}!={len(dec_seq)})"
+        )
+
+    if org_seq.format != VideoFormat.YUV420:
+        raise NotImplementedError(f"Unsupported video format: {org_seq.format}")
+
+    max_value = 2 ** org_seq.bitdepth - 1
+    results = defaultdict(list)
+    with tqdm(total=n) as pbar:
+        for i in range(n):
+            org_frame = frame_to_tensor(org_seq[i], max_value)
+            dec_frame = frame_to_tensor(dec_seq[i], max_value)
+            metrics = compute_metrics_for_frame(org_frame, dec_frame)
+            pbar.update(1)
+    for k, v in metrics.items():
+        results[k].append(v)
+
+    results = {k: np.mean(v) for k, v in results.items()}
+    results["filesize"] = filesize
+    results["bpp"] = filesize / (n * org_seq.width * org_seq.height)
+    return results
+
+
+def aggregate_results(filepaths: List[Path]) -> Dict[str, Numeric]:
+    metrics = defaultdict(list)
+
+    # sum
+    for f in filepaths:
+        with f.open("r") as fd:
+            data = json.load(fd)
+        for k, v in data.items():
+            metrics[k].append(v)
+
+    # normalize
+    for k, v in metrics.items():
+        metrics[k] = np.mean(v)
+    return dict(metrics)
+
+
+def create_parser():
+    parser = argparse.ArgumentParser(
+        description="HBD", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument("dataset", type=str, help="Sequences directory.")
+    parser.add_argument("output", type=str, help="Output directory.")
+    parser.add_argument("-n", "--dry-run", action="store_true", help="Dry run.")
+    subparsers = parser.add_subparsers(dest="codec", help="Codec to use.")
+    subparsers.required = True
+    return parser, subparsers
+
+
+def main(args=None):
+    if args is None:
+        args = sys.argv[1:]
+    parser, subparsers = create_parser()
+
+    codec_lookup = {}
+    for cls in codec_classes:
+        codec = cls()
+        codec_lookup[codec.name] = codec
+        codec_parser = subparsers.add_parser(
+            codec.name, formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        )
+        codec.add_parser_args(codec_parser)
+
+    args, extra = parser.parse_known_args(args)
+
+    # create output directory
+    Path(args.output).mkdir(parents=True, exist_ok=True)
+
+    codec = codec_lookup[args.codec]
+    results_paths = []
+    for filepath in sorted(Path(args.dataset).glob("*.yuv")):
+        encode_cmd = codec.get_encode_cmd(filepath, args)
+        outputpath = codec.get_outputpath(filepath, args)
+
+        # encode sequence if not already encoded
+        if not outputpath.is_file():
+            logpath = outputpath.with_suffix(".log")
+            run_cmdline(encode_cmd, logpath=logpath, dry_run=args.dry_run)
+
+        # compute metrics if not already performed
+        sequence_metrics_path = outputpath.with_suffix(".json")
+        results_paths.append(sequence_metrics_path)
+        if sequence_metrics_path.is_file():
+            continue
+
+        with tempfile.NamedTemporaryFile(suffix=".yuv", delete=True) as f:
+            # decode sequence
+            cmd = ["ffmpeg", "-y", "-i", outputpath, "-pix_fmt", "yuv420p", f.name]
+            run_cmdline(cmd)
+
+            # compute metrics
+            metrics = evaluate(str(filepath), f.name, outputpath)
+            with sequence_metrics_path.open("w") as f:
+                json.dump(metrics, f, indent=2)
+
+    results = aggregate_results(results_paths)
+    print(results)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
