@@ -108,7 +108,7 @@ def yuv_420_to_444(
         yuv (torch.Tensor, torch.Tensor, torch.Tensor): 420 input frames in
             (Nx1xHxW) format
         mode (str): algorithm used for upsampling: ``'bilinear'`` |
-            ``'nearest'`` Default ``'bilinear'``
+            | ``'bilinear'`` | ``'nearest'`` Default ``'bilinear'``
         return_tuple (bool): return input as tuple of tensors instead of a
             concatenated tensor, 3 (Nx1xHxW) tensors instead of one (Nx3xHxW)
             tensor (default: False)
@@ -120,13 +120,15 @@ def yuv_420_to_444(
     if len(yuv) != 3 or any(not isinstance(c, torch.Tensor) for c in yuv):
         raise ValueError("Expected a tuple of 3 torch tensors")
 
-    if mode not in ("bilinear", "nearest"):
+    if mode not in ("bilinear", "bicubic", "nearest"):
         raise ValueError(f'Invalid upsampling mode "{mode}".')
 
-    if mode in ("bilinear", "nearest"):
+    kwargs = {}
+    if mode != "nearest":
+        kwargs = {"align_corners": False}
 
-        def _upsample(tensor):
-            return F.interpolate(tensor, scale_factor=2, mode=mode, align_corners=False)
+    def _upsample(tensor):
+        return F.interpolate(tensor, scale_factor=2, mode=mode, **kwargs)
 
     y, u, v = yuv
     u, v = _upsample(u), _upsample(v)

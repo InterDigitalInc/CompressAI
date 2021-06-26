@@ -23,27 +23,18 @@ from .rawvideo import RawVideoSequence, VideoFormat
 codec_classes = [H264, H265]
 
 
-Frame = Tuple[Tensor, Tensor, Tensor]
+Frame = Union[Tuple[Tensor, Tensor, Tensor], Tuple[Tensor, ...]]
 
 
 def to_tensors(
-    frame: Tuple[np.ndarray, np.ndarray, np.ndarray], max_value: int = 1
+    frame: Tuple[np.ndarray, np.ndarray, np.ndarray],
+    max_value: int = 1,
+    device: str = "cpu",
 ) -> Frame:
-    return (
-        torch.from_numpy(np.true_divide(frame[0], max_value, dtype="float32")),
-        torch.from_numpy(np.true_divide(frame[1], max_value, dtype="float32")),
-        torch.from_numpy(np.true_divide(frame[2], max_value, dtype="float32")),
+    return tuple(
+        torch.from_numpy(np.true_divide(c, max_value, dtype=np.float32)).to(device)
+        for c in frame
     )
-
-
-# def sequence_to_tensor(sequence):
-#     max_value = 2 ** sequence.bitdepth - 1
-#     return tuple(frame_to_tensor(frame, max_value) for frame in sequence)
-
-
-# class SequenceToTensor:
-#     def __call__(self, sequence):
-#         return sequence_to_tensor(sequence)
 
 
 def run_cmdline(
@@ -78,24 +69,27 @@ def compute_metrics_for_frame(
 ) -> Dict[str, Any]:
     org_frame = tuple(p.unsqueeze(0).unsqueeze(0) for p in org_frame)  # type: ignore
     dec_frame = tuple(p.unsqueeze(0).unsqueeze(0) for p in dec_frame)  # type:ignore
-    out = {}
+    out: Dict[str, Any] = {}
 
     # YCbCr metrics
     for i, component in enumerate("yuv"):
-        mse = (org_frame[i] - dec_frame[i]).pow(2).mean().item()
-        out[f"{component}_mse"] = mse
+        out[f"{component}_mse"] = (org_frame[i] - dec_frame[i]).pow(2).mean()
 
     # RGB metrics
-    # org = ycbcr2rgb(yuv_420_to_444(org_frame, mode="bicubic"))  # type: ignore
-    # dec = ycbcr2rgb(yuv_420_to_444(dec_frame, mode="bicubic"))  # type: ignore
+    def conv(x):
+        # return x.div(max_val)
+        return (x - 16) / (235.0 - 16.0)
 
-    # org = (org * max_val).clamp(0, max_val).round()
-    # dec = (dec * max_val).clamp(0, max_val).round()
+    org_frame = tuple(conv(c) for c in org_frame)
+    dec_frame = tuple(conv(c) for c in dec_frame)
+    org = ycbcr2rgb(yuv_420_to_444(org_frame, mode="bicubic"))  # type: ignore
+    dec = ycbcr2rgb(yuv_420_to_444(dec_frame, mode="bicubic"))  # type: ignore
 
-    # mse = (org - dec).pow(2).mean().item()
-    # ms_ssim_val = ms_ssim(org, dec, data_range=max_val).item()
-    mse = 100.0
-    ms_ssim_val = 100.0
+    org = (org * max_val).clamp(0, max_val).round()
+    dec = (dec * max_val).clamp(0, max_val).round()
+    mse = (org - dec).pow(2).mean()
+
+    ms_ssim_val = ms_ssim(org, dec, data_range=max_val)
     out.update({"ms-ssim": ms_ssim_val, "mse": mse})
     return out
 
@@ -105,7 +99,7 @@ def get_filesize(filepath: Union[Path, str]) -> int:
 
 
 def evaluate(
-    org_seq_path: Path, dec_seq_path: Path, bitstream_path: Path
+    org_seq_path: Path, dec_seq_path: Path, bitstream_path: Path, cuda: bool = False
 ) -> Dict[str, Any]:
     # load original and decoded sequences
     org_seq = RawVideoSequence.from_file(str(org_seq_path))
@@ -125,24 +119,33 @@ def evaluate(
 
     # compute metrics for each frame
     results = defaultdict(list)
+    device = "cuda" if cuda else "cpu"
     with tqdm(total=num_frames) as pbar:
         for i in range(num_frames):
-            org_frame = to_tensors(org_seq[i])
-            dec_frame = to_tensors(dec_seq[i])
+            org_frame = to_tensors(org_seq[i], device=device)
+            dec_frame = to_tensors(dec_seq[i], device=device)
             metrics = compute_metrics_for_frame(org_frame, dec_frame, max_val)
             for k, v in metrics.items():
                 results[k].append(v)
             pbar.update(1)
 
     # compute average metrics for sequence
-    seq_results: Dict[str, Any] = {k: np.mean(v) for k, v in results.items()}
+    seq_results: Dict[str, Any] = {
+        k: torch.mean(torch.stack(v)) for k, v in results.items()
+    }
     filesize = get_filesize(bitstream_path)
     seq_results["bpp"] = 8.0 * filesize / (num_frames * org_seq.width * org_seq.height)
-    seq_results["rgb_psnr"] = 20 * np.log10(max_val) - 10 * np.log10(seq_results["mse"])
+    seq_results["rgb_psnr"] = (
+        20 * np.log10(max_val) - 10 * torch.log10(seq_results.pop("mse")).item()
+    )
     for component in "yuv":
-        seq_results[f"{component}_psnr"] = 20 * np.log10(max_val) - 10 * np.log10(
-            seq_results[f"{component}_mse"]
+        seq_results[f"{component}_psnr"] = (
+            20 * np.log10(max_val)
+            - 10 * torch.log10(seq_results.pop(f"{component}_mse")).item()
         )
+    for k, v in seq_results.items():
+        if isinstance(v, torch.Tensor):
+            seq_results[k] = v.item()
     return seq_results
 
 
@@ -175,6 +178,7 @@ def create_parser() -> Tuple[
     parent_parser.add_argument(
         "-f", "--force", action="store_true", help="overwrite previous runs"
     )
+    parent_parser.add_argument("--cuda", action="store_true", help="use cuda")
     subparsers = parser.add_subparsers(dest="codec", help="video codec")
     subparsers.required = True
     return parser, parent_parser, subparsers
@@ -229,7 +233,7 @@ def main(args: Any = None) -> None:
             run_cmdline(cmd)
 
             # compute metrics
-            metrics = evaluate(filepath, Path(f.name), outputpath)
+            metrics = evaluate(filepath, Path(f.name), outputpath, args.cuda)
             with sequence_metrics_path.open("wb") as f:
                 f.write(json.dumps(metrics, indent=2).encode())
 
