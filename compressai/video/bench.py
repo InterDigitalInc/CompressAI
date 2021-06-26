@@ -27,7 +27,7 @@ Frame = Tuple[Tensor, Tensor, Tensor]
 
 
 def to_tensors(
-    frame: Tuple[np.ndarray, np.ndarray, np.ndarray], max_value: int
+    frame: Tuple[np.ndarray, np.ndarray, np.ndarray], max_value: int = 1
 ) -> Frame:
     return (
         torch.from_numpy(np.true_divide(frame[0], max_value, dtype="float32")),
@@ -78,16 +78,26 @@ def compute_metrics_for_frame(
 ) -> Dict[str, Any]:
     org_frame = tuple(p.unsqueeze(0).unsqueeze(0) for p in org_frame)  # type: ignore
     dec_frame = tuple(p.unsqueeze(0).unsqueeze(0) for p in dec_frame)  # type:ignore
+    out = {}
 
-    org = ycbcr2rgb(yuv_420_to_444(org_frame))  # type: ignore
-    dec = ycbcr2rgb(yuv_420_to_444(dec_frame))  # type: ignore
+    # YCbCr metrics
+    for i, component in enumerate("yuv"):
+        mse = (org_frame[i] - dec_frame[i]).pow(2).mean().item()
+        out[f"{component}_mse"] = mse
 
-    org = (org * max_val).clamp(0, max_val).round()
-    dec = (dec * max_val).clamp(0, max_val).round()
+    # RGB metrics
+    # org = ycbcr2rgb(yuv_420_to_444(org_frame, mode="bicubic"))  # type: ignore
+    # dec = ycbcr2rgb(yuv_420_to_444(dec_frame, mode="bicubic"))  # type: ignore
 
-    mse = (org - dec).pow(2).mean().item()
-    ms_ssim_val = ms_ssim(org, dec, data_range=max_val).item()
-    return {"ms-ssim": ms_ssim_val, "mse": mse}
+    # org = (org * max_val).clamp(0, max_val).round()
+    # dec = (dec * max_val).clamp(0, max_val).round()
+
+    # mse = (org - dec).pow(2).mean().item()
+    # ms_ssim_val = ms_ssim(org, dec, data_range=max_val).item()
+    mse = 100.0
+    ms_ssim_val = 100.0
+    out.update({"ms-ssim": ms_ssim_val, "mse": mse})
+    return out
 
 
 def get_filesize(filepath: Union[Path, str]) -> int:
@@ -117,8 +127,8 @@ def evaluate(
     results = defaultdict(list)
     with tqdm(total=num_frames) as pbar:
         for i in range(num_frames):
-            org_frame = to_tensors(org_seq[i], max_val)
-            dec_frame = to_tensors(dec_seq[i], max_val)
+            org_frame = to_tensors(org_seq[i])
+            dec_frame = to_tensors(dec_seq[i])
             metrics = compute_metrics_for_frame(org_frame, dec_frame, max_val)
             for k, v in metrics.items():
                 results[k].append(v)
@@ -128,7 +138,11 @@ def evaluate(
     seq_results: Dict[str, Any] = {k: np.mean(v) for k, v in results.items()}
     filesize = get_filesize(bitstream_path)
     seq_results["bpp"] = 8.0 * filesize / (num_frames * org_seq.width * org_seq.height)
-    seq_results["psnr"] = 20 * np.log10(max_val) - 10 * np.log10(seq_results["mse"])
+    seq_results["rgb_psnr"] = 20 * np.log10(max_val) - 10 * np.log10(seq_results["mse"])
+    for component in "yuv":
+        seq_results[f"{component}_psnr"] = 20 * np.log10(max_val) - 10 * np.log10(
+            seq_results[f"{component}_mse"]
+        )
     return seq_results
 
 
@@ -194,8 +208,8 @@ def main(args: Any = None) -> None:
         outputpath = codec.get_outputpath(filepath, args)
 
         # encode sequence if not already encoded
-        # if args.force:
-        #     outputpath.unlink(missing_ok=True)
+        if args.force:
+            outputpath.unlink(missing_ok=True)
         if not outputpath.is_file():
             logpath = outputpath.with_suffix(".log")
             run_cmdline(encode_cmd, logpath=logpath, dry_run=args.dry_run)
@@ -218,7 +232,6 @@ def main(args: Any = None) -> None:
             metrics = evaluate(filepath, Path(f.name), outputpath)
             with sequence_metrics_path.open("wb") as f:
                 f.write(json.dumps(metrics, indent=2).encode())
-        break
 
     results = aggregate_results(results_paths)
     print(json.dumps(results, indent=2))
