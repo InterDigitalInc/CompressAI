@@ -17,7 +17,7 @@ from torch.utils.model_zoo import tqdm
 
 from compressai.transforms.functional import ycbcr2rgb, yuv_420_to_444
 
-from .codecs import H264, H265
+from .codecs import H264, H265, Codec
 from .rawvideo import RawVideoSequence, VideoFormat
 
 codec_classes = [H264, H265]
@@ -62,26 +62,36 @@ def run_cmdline(
     p.wait()
 
 
+def convert_legal_to_full_range(frame: Frame, bitdepth: int = 8) -> Frame:
+    ranges = torch.tensor([16, 235, 16, 240], device=frame[0].device)
+    ranges *= 2 ** (bitdepth - 8)
+    ymin, ymax, cmin, cmax = ranges
+    y, cb, cr = frame
+
+    y = (y - ymin) / (ymax - ymin)
+    cb = (cb - cmin) / (cmax - cmin)
+    cr = (cr - cmin) / (cmax - cmin)
+
+    return y, cb, cr
+
+
 def compute_metrics_for_frame(
     org_frame: Frame,
     dec_frame: Frame,
-    max_val: float = 1.0,
+    bitdepth: int = 8,
 ) -> Dict[str, Any]:
     org_frame = tuple(p.unsqueeze(0).unsqueeze(0) for p in org_frame)  # type: ignore
     dec_frame = tuple(p.unsqueeze(0).unsqueeze(0) for p in dec_frame)  # type:ignore
     out: Dict[str, Any] = {}
 
+    max_val = 2 ** bitdepth - 1
+
     # YCbCr metrics
     for i, component in enumerate("yuv"):
         out[f"{component}_mse"] = (org_frame[i] - dec_frame[i]).pow(2).mean()
 
-    # RGB metrics
-    def conv(x):
-        # return x.div(max_val)
-        return (x - 16) / (235.0 - 16.0)
-
-    org_frame = tuple(conv(c) for c in org_frame)
-    dec_frame = tuple(conv(c) for c in dec_frame)
+    org_frame = convert_legal_to_full_range(org_frame, bitdepth)
+    dec_frame = convert_legal_to_full_range(dec_frame, bitdepth)
     org = ycbcr2rgb(yuv_420_to_444(org_frame, mode="bicubic"))  # type: ignore
     dec = ycbcr2rgb(yuv_420_to_444(dec_frame, mode="bicubic"))  # type: ignore
 
@@ -124,7 +134,7 @@ def evaluate(
         for i in range(num_frames):
             org_frame = to_tensors(org_seq[i], device=device)
             dec_frame = to_tensors(dec_seq[i], device=device)
-            metrics = compute_metrics_for_frame(org_frame, dec_frame, max_val)
+            metrics = compute_metrics_for_frame(org_frame, dec_frame, org_seq.bitdepth)
             for k, v in metrics.items():
                 results[k].append(v)
             pbar.update(1)
@@ -164,6 +174,53 @@ def aggregate_results(filepaths: List[Path]) -> Dict[str, Any]:
     return agg
 
 
+def bench(
+    dataset: Path,
+    codec: Codec,
+    outputdir: Path,
+    force: bool = False,
+    cuda: bool = False,
+    dry_run: bool = False,
+    **args: Any,
+) -> Dict[str, Any]:
+    # create output directory
+    Path(outputdir).mkdir(parents=True, exist_ok=True)
+
+    results_paths = []
+    for filepath in sorted(Path(dataset).glob("*.yuv")):
+        encode_cmd = codec.get_encode_cmd(filepath, **args)
+        outputpath = codec.get_output_path(filepath, **args)
+
+        # encode sequence if not already encoded
+        if force:
+            outputpath.unlink(missing_ok=True)
+        if not outputpath.is_file():
+            logpath = outputpath.with_suffix(".log")
+            run_cmdline(encode_cmd, logpath=logpath, dry_run=dry_run)
+
+        # compute metrics if not already performed
+        sequence_metrics_path = outputpath.with_suffix(".json")
+        results_paths.append(sequence_metrics_path)
+
+        if force:
+            sequence_metrics_path.unlink(missing_ok=True)
+        if sequence_metrics_path.is_file():
+            continue
+
+        with tempfile.NamedTemporaryFile(suffix=".yuv", delete=True) as f:
+            # decode sequence
+            cmd = ["ffmpeg", "-y", "-i", outputpath, "-pix_fmt", "yuv420p", f.name]
+            run_cmdline(cmd)
+
+            # compute metrics
+            metrics = evaluate(filepath, Path(f.name), outputpath, cuda)
+            with sequence_metrics_path.open("wb") as f:
+                f.write(json.dumps(metrics, indent=2).encode())
+
+    results = aggregate_results(results_paths)
+    return results
+
+
 def create_parser() -> Tuple[
     argparse.ArgumentParser, argparse.ArgumentParser, argparse._SubParsersAction
 ]:
@@ -200,44 +257,10 @@ def main(args: Any = None) -> None:
         )
         codec.add_parser_args(codec_parser)
 
-    args, extra = parser.parse_known_args(args)
+    args = vars(parser.parse_args(args))
+    codec = codec_lookup[args.pop("codec")]
+    results = bench(args.pop("dataset"), codec, args["output"], **args)
 
-    # create output directory
-    Path(args.output).mkdir(parents=True, exist_ok=True)
-
-    codec = codec_lookup[args.codec]
-    results_paths = []
-    for filepath in sorted(Path(args.dataset).glob("*.yuv")):
-        encode_cmd = codec.get_encode_cmd(filepath, args)
-        outputpath = codec.get_outputpath(filepath, args)
-
-        # encode sequence if not already encoded
-        if args.force:
-            outputpath.unlink(missing_ok=True)
-        if not outputpath.is_file():
-            logpath = outputpath.with_suffix(".log")
-            run_cmdline(encode_cmd, logpath=logpath, dry_run=args.dry_run)
-
-        # compute metrics if not already performed
-        sequence_metrics_path = outputpath.with_suffix(".json")
-        results_paths.append(sequence_metrics_path)
-
-        if args.force:
-            sequence_metrics_path.unlink(missing_ok=True)
-        if sequence_metrics_path.is_file():
-            continue
-
-        with tempfile.NamedTemporaryFile(suffix=".yuv", delete=True) as f:
-            # decode sequence
-            cmd = ["ffmpeg", "-y", "-i", outputpath, "-pix_fmt", "yuv420p", f.name]
-            run_cmdline(cmd)
-
-            # compute metrics
-            metrics = evaluate(filepath, Path(f.name), outputpath, args.cuda)
-            with sequence_metrics_path.open("wb") as f:
-                f.write(json.dumps(metrics, indent=2).encode())
-
-    results = aggregate_results(results_paths)
     print(json.dumps(results, indent=2))
 
 

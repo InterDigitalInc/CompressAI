@@ -12,16 +12,14 @@ class Codec(abc.ABC):
     help = ""
 
     def add_parser_args(self, parser: argparse.ArgumentParser) -> None:
-        # """Overridable. Add options for this sub-command to the
-        # given `parser` instance.
-
-        # Args:
-        #     parser (argparse.ArgumentParser): Instance to add arguments to.
-        # """
         pass
 
     @abc.abstractmethod
-    def get_encode_cmd(self, filepath: Path, args) -> List[Any]:
+    def get_output_path(self, filepath: Path, **args: Any) -> Path:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def get_encode_cmd(self, filepath: Path, **args: Any) -> List[Any]:
         raise NotImplementedError
 
 
@@ -32,14 +30,14 @@ class H264(Codec):
         parser.add_argument("-p", "--preset", default="medium", help="preset")
         parser.add_argument("-q", "--qp", default=32, help="quality")
 
-    def get_outputpath(self, filepath: Path, args) -> Path:
-        return Path(args.output) / (
-            f"{filepath.stem}_{self.name}_{args.preset}_qp{args.qp}.mp4"
+    def get_output_path(self, filepath: Path, **args: Any) -> Path:
+        return Path(args["output"]) / (
+            f"{filepath.stem}_{self.name}_{args['preset']}_qp{args['qp']}.mp4"
         )
 
-    def get_encode_cmd(self, filepath: Path, args) -> List[Any]:
+    def get_encode_cmd(self, filepath: Path, **args: Any) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
-        outputpath = self.get_outputpath(filepath, args)
+        outputpath = self.get_output_path(filepath, **args)
         cmd = [
             "ffmpeg",
             "-s:v",
@@ -49,9 +47,9 @@ class H264(Codec):
             "-c:v",
             "h264",
             "-crf",
-            args.qp,
+            args["qp"],
             "-preset",
-            args.preset,
+            args["preset"],
             "-bf",
             0,
             "-tune",
@@ -68,9 +66,9 @@ class H264(Codec):
 class H265(H264):
     name = "h265"
 
-    def get_encode_cmd(self, filepath: Path, args) -> List[Any]:
+    def get_encode_cmd(self, filepath: Path, **args: Any) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
-        outputpath = self.get_outputpath(filepath, args)
+        outputpath = self.get_output_path(filepath, **args)
         cmd = [
             "ffmpeg",
             "-s:v",
@@ -80,9 +78,9 @@ class H265(H264):
             "-c:v",
             "hevc",
             "-crf",
-            args.qp,
+            args["qp"],
             "-preset",
-            args.preset,
+            args["preset"],
             "-x265-params",
             "bframes=0",
             "-tune",
