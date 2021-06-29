@@ -78,8 +78,6 @@ class H265(H264):
             "-i",
             filepath,
             "-c:v",
-            "-tune",
-            "ssim",
             "hevc",
             "-crf",
             args.qp,
