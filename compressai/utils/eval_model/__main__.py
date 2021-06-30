@@ -258,12 +258,12 @@ def main(argv):
     if not args.source:
         print("Error: missing 'checkpoint' or 'pretrained' source.", file=sys.stderr)
         parser.print_help()
-        sys.exit(1)
+        raise SystemExit(1)
 
     filepaths = collect_images(args.dataset)
     if len(filepaths) == 0:
         print("Error: no images found in directory.", file=sys.stderr)
-        sys.exit(1)
+        raise SystemExit(1)
 
     compressai.set_entropy_coder(args.entropy_coder)
 
