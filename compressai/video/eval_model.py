@@ -19,7 +19,12 @@ from torch import Tensor
 from torch.cuda import amp
 from torch.utils.model_zoo import tqdm
 
-from compressai.transforms.functional import ycbcr2rgb, yuv_420_to_444
+from compressai.transforms.functional import (
+    rgb2ycbcr,
+    ycbcr2rgb,
+    yuv_420_to_444,
+    yuv_444_to_420,
+)
 
 from .eval_codec import aggregate_results, convert_legal_to_full_range, to_tensors
 from .rawvideo import RawVideoSequence, VideoFormat
@@ -67,7 +72,10 @@ def compute_metrics_for_frame(
     org = (org * max_val).clamp(0, max_val).round()
     rec = (rec * max_val).clamp(0, max_val).round()
     mse = (org - rec).pow(2).mean()
-    return {"mse": mse}
+    return {
+        "mse": mse,
+        "rgb_psnr_frame": 20 * np.log10(2 ** bitdepth - 1) - 10 * torch.log10(mse),
+    }
 
 
 def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
@@ -81,6 +89,7 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
     num_pixels = org_seq.height * org_seq.width
     results = defaultdict(list)
 
+    # output = Path(sequence.name).open("wb")
     with tqdm(total=num_frames) as pbar:
         for i in range(num_frames):
             cur_frame = convert_frame(org_seq[i], device, org_seq.bitdepth)
@@ -102,6 +111,10 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
                 for lkl in likelihoods.values()
                 for k in ("y", "z")
             )
+
+            # out = yuv_444_to_420(rgb2ycbcr(crop(rec_frame, padding).clamp(0, 1)))
+            # for c in out:
+            #     output.write(c.cpu().squeeze().mul(255.0).byte().numpy().tobytes())
 
             for k, v in metrics.items():
                 results[k].append(v)
