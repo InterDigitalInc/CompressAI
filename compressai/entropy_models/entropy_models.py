@@ -157,12 +157,14 @@ class EntropyModel(nn.Module):
         return self.quantize(inputs, mode, means)
 
     @staticmethod
-    def dequantize(inputs: Tensor, means: Optional[Tensor] = None) -> Tensor:
+    def dequantize(
+        inputs: Tensor, means: Optional[Tensor] = None, dtype: torch.dtype = torch.float
+    ) -> Tensor:
         if means is not None:
             outputs = inputs.type_as(means)
             outputs += means
         else:
-            outputs = inputs.float()
+            outputs = inputs.type(dtype)
         return outputs
 
     @classmethod
@@ -236,13 +238,20 @@ class EntropyModel(nn.Module):
             strings.append(rv)
         return strings
 
-    def decompress(self, strings, indexes, means=None):
+    def decompress(
+        self,
+        strings: str,
+        indexes: torch.IntTensor,
+        dtype: torch.dtype = torch.float,
+        means: torch.Tensor = None,
+    ):
         """
         Decompress char strings to tensors.
 
         Args:
             strings (str): compressed tensors
             indexes (torch.IntTensor): tensors CDF indexes
+            dtype (torch.dtype): type of dequantized output
             means (torch.Tensor, optional): optional tensor means
         """
 
@@ -283,7 +292,7 @@ class EntropyModel(nn.Module):
             outputs[i] = torch.tensor(
                 values, device=outputs.device, dtype=outputs.dtype
             ).reshape(outputs[i].size())
-        outputs = self.dequantize(outputs, means)
+        outputs = self.dequantize(outputs, means, dtype)
         return outputs
 
 
@@ -505,7 +514,7 @@ class EntropyBottleneck(EntropyModel):
         indexes = self._build_indexes(output_size).to(self._quantized_cdf.device)
         medians = self._extend_ndims(self._get_medians().detach(), len(size))
         medians = medians.expand(len(strings), *([-1] * (len(size) + 1)))
-        return super().decompress(strings, indexes, medians)
+        return super().decompress(strings, indexes, medians.dtype, medians)
 
 
 class GaussianConditional(EntropyModel):
