@@ -139,7 +139,7 @@ class Codec:
 
 
 class PillowCodec(Codec):
-    """Abastract codec based on Pillow bindings."""
+    """Abstract codec based on Pillow bindings."""
 
     fmt = None
 
@@ -204,9 +204,13 @@ class WebP(PillowCodec):
 
 
 class BinaryCodec(Codec):
-    """Call a external binary."""
+    """Call an external binary."""
 
     fmt = None
+
+    @property
+    def name(self):
+        raise NotImplementedError()
 
     def _run(self, img, quality, return_rec=False, return_metrics=True):
         fd0, png_filepath = mkstemp(suffix=".png")
