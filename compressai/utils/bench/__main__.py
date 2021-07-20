@@ -50,9 +50,13 @@ def func(codec, i, *args):
 
 
 def collect(codec: Codec, dataset: str, qualities: List[int], num_jobs: int = 1):
+    if not os.path.isdir(dataset):
+        raise OSError(f"No such directory: {dataset}")
+
     filepaths = [
-        os.path.join(dataset, f)
-        for f in os.listdir(dataset)
+        os.path.join(dirpath, f)
+        for dirpath, dirnames, filenames in os.walk(dataset)
+        for f in filenames
         if os.path.splitext(f)[-1].lower() in IMG_EXTENSIONS
     ]
 
