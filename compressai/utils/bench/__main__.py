@@ -49,7 +49,14 @@ def func(codec, i, *args):
     return i, rv
 
 
-def collect(codec: Codec, dataset: str, qualities: List[int], num_jobs: int = 1):
+def collect(
+        codec: Codec,
+        dataset: str,
+        qualities: List[int],
+        return_rec: bool,
+        return_metrics: bool,
+        num_jobs: int = 1
+):
     if not os.path.isdir(dataset):
         raise OSError(f"No such directory: {dataset}")
 
@@ -66,7 +73,7 @@ def collect(codec: Codec, dataset: str, qualities: List[int], num_jobs: int = 1)
         print("No images found in the dataset directory")
         sys.exit(1)
 
-    args = [(codec, i, f, q) for i, q in enumerate(qualities) for f in filepaths]
+    args = [(codec, i, f, q, return_rec, return_metrics) for i, q in enumerate(qualities) for f in filepaths]
 
     if pool:
         rv = pool.starmap(func, args)
@@ -105,7 +112,7 @@ def setup_common_args(parser):
         type=int,
         metavar="N",
         default=1,
-        help="Number of parallel jobs (default: %(default)s)",
+        help="number of parallel jobs (default: %(default)s)",
     )
     parser.add_argument(
         "-q",
@@ -116,6 +123,17 @@ def setup_common_args(parser):
         nargs="*",
         type=int,
         help="quality parameter (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--return-rec",
+        action="store_true",
+        help="return the recovered image as well (default: false)",
+    )
+    parser.add_argument(
+        "--no-msssim-metrics",
+        action="store_false",
+        dest="return_metrics",
+        help="do not return PSNR and MS-SSIM metrics (use for very small images)",
     )
 
 
@@ -129,7 +147,7 @@ def main(argv):
 
     codec_cls = next(c for c in codecs if c.__name__.lower() == args.codec)
     codec = codec_cls(args)
-    results = collect(codec, args.dataset, args.qualities, args.num_jobs)
+    results = collect(codec, args.dataset, args.qualities, args.return_rec, args.return_metrics, args.num_jobs)
 
     output = {
         "name": codec.name,
