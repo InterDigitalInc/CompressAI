@@ -74,7 +74,7 @@ def compute_metrics_for_frame(
     mse = (org - rec).pow(2).mean()
     return {
         "mse": mse,
-        "rgb_psnr_frame": 20 * np.log10(2 ** bitdepth - 1) - 10 * torch.log10(mse),
+        "rgb_psnr": 20 * np.log10(max_val) - 10 * torch.log10(mse),
     }
 
 
@@ -126,10 +126,6 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
     }
     # filesize = get_filesize(bitstream_path)
     # seq_results["bpp"] = 8.0 * filesize / (num_frames * org_seq.width * org_seq.height)
-    max_val = 2 ** org_seq.bitdepth - 1
-    seq_results["rgb_psnr"] = (
-        20 * np.log10(max_val) - 10 * torch.log10(seq_results.pop("mse")).item()
-    )
     # for component in "yuv":
     #     seq_results[f"{component}_psnr"] = (
     #         20 * np.log10(max_val)
