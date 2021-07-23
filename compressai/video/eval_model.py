@@ -12,7 +12,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from lvc.models.networks.video.ssf import google2020_ssf  # type: ignore
+from lvc.models.networks.video.ssf import (  # type: ignore
+    google2020_flow,
+    google2020_ssf,
+)
 
 # from pytorch_msssim import ms_ssim  # type: ignore
 from torch import Tensor
@@ -29,7 +32,7 @@ from compressai.transforms.functional import (
 from .eval_codec import aggregate_results, convert_legal_to_full_range, to_tensors
 from .rawvideo import RawVideoSequence, VideoFormat
 
-models = {"google2020_ssf": google2020_ssf}
+models = {"google2020_ssf": google2020_ssf, "google2020_flow": google2020_flow}
 
 Frame = Union[Tuple[Tensor, Tensor, Tensor], Tuple[Tensor, ...]]
 
@@ -78,6 +81,15 @@ def compute_metrics_for_frame(
     }
 
 
+def compute_bpp(likelihoods, num_pixels: int) -> float:
+    bpp = sum(
+        (torch.log(getattr(lkl, k)).sum() / (-math.log(2) * num_pixels))
+        for lkl in likelihoods.values()
+        for k in ("y", "z")
+    )
+    return bpp
+
+
 def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
     org_seq = RawVideoSequence.from_file(str(sequence))
 
@@ -88,9 +100,11 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
     num_frames = len(org_seq)
     num_pixels = org_seq.height * org_seq.width
     results = defaultdict(list)
+    max_val = 2 ** org_seq.bitdepth - 1
 
     # output = Path(sequence.name).open("wb")
     with tqdm(total=num_frames) as pbar:
+        # rec_frame_ai = None
         for i in range(num_frames):
             cur_frame = convert_frame(org_seq[i], device, org_seq.bitdepth)
             cur_frame, padding = pad(cur_frame)
@@ -101,21 +115,55 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
                 rec_frame, likelihoods = net.forward_inter(
                     cur_frame, rec_frame
                 )  # type:ignore
+
+                # rec_frame_ai, likelihoods_ai = net.forward_keyframe(
+                #     cur_frame
+                # )  # type:ignore
+                # rec_frame_ai = rec_frame_ai.clamp(0, 1)
+                # metrics_ai = compute_metrics_for_frame(
+                #     crop(cur_frame, padding),
+                #     crop(rec_frame_ai, padding),
+                #     org_seq.bitdepth,
+                # )
+                # metrics_ai["bpp"] = compute_bpp(likelihoods_ai, num_pixels)
+
             rec_frame = rec_frame.clamp(0, 1)
 
             metrics = compute_metrics_for_frame(
                 crop(cur_frame, padding), crop(rec_frame, padding), org_seq.bitdepth
             )
-            metrics["bpp"] = sum(
-                (torch.log(getattr(lkl, k)).sum() / (-math.log(2) * num_pixels))
-                for lkl in likelihoods.values()
-                for k in ("y", "z")
-            )
+            metrics["bpp"] = compute_bpp(likelihoods, num_pixels)
 
+            # if (
+            #     rec_frame_ai is not None
+            #     and metrics_ai["rgb_psnr"] > metrics["rgb_psnr"]
+            #     and metrics_ai["bpp"] <= metrics["bpp"]
+            # ):
+            #     print(f"INTRASWITCH frame_id={i} | "
+            #           f"{metrics_ai['rgb_psnr']:.2f} {metrics_ai['bpp']:.3f} | "
+            #           f"{metrics['rgb_psnr']:.2f} {metrics['bpp']:.3f}"
+            #           )
+            #     metrics = metrics_ai
+            #     rec_frame = rec_frame_ai
+
+            # TODO: per component metrics
             # out = yuv_444_to_420(rgb2ycbcr(crop(rec_frame, padding).clamp(0, 1)))
+            # org_frame_fr = convert_legal_to_full_range(
+            #     to_tensors(org_seq[i], device=str(device)), org_seq.bitdepth
+            # )
+            # for c, n in enumerate("yuv"):
+            #     metrics[f"{n}_mse"] = (
+            #         (
+            #             org_frame_fr[c].mul(max_val).clamp(0, max_val).round()
+            #             - out[c].mul(max_val).clamp(0, max_val).round()
+            #         )
+            #         .pow(2)
+            #         .mean()
+            #     )
+
+            # TODO: option to save rec YUV
             # for c in out:
             #     output.write(c.cpu().squeeze().mul(255.0).byte().numpy().tobytes())
-
             for k, v in metrics.items():
                 results[k].append(v)
             pbar.update(1)
@@ -126,6 +174,7 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
     }
     # filesize = get_filesize(bitstream_path)
     # seq_results["bpp"] = 8.0 * filesize / (num_frames * org_seq.width * org_seq.height)
+    # TODO: per component metrics
     # for component in "yuv":
     #     seq_results[f"{component}_psnr"] = (
     #         20 * np.log10(max_val)
