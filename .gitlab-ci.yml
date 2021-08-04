@@ -112,6 +112,10 @@ test:pytorch-1.8.1:
   extends: test:pytorch-1.5.1
   image: pytorch/pytorch:1.8.1-cuda11.1-cudnn8-devel
 
+test:pytorch-1.9.0:
+  extends: test:pytorch-1.5.1
+  image: pytorch/pytorch:1.9.0-cuda11.1-cudnn8-devel
+
 doc:
   stage: doc
   image: pytorch/pytorch:1.8.1-cuda11.1-cudnn8-devel
