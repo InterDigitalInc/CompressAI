@@ -11,8 +11,8 @@ stages:
   - test
   - doc
 
-wheel:3.8:
-  image: python:3.8-buster
+wheel:
+  image: python:$PYTHON_VERSION-buster
   stage: build
   before_script:
     - pip install build
@@ -22,11 +22,14 @@ wheel:3.8:
     paths:
       - dist/
     expire_in: 1 day
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ['3.6', '3.7', '3.8', '3.9']
   tags:
     - docker
 
 sdist:
-  image: python:3.8-buster
+  image: python:3-buster
   stage: build
   before_script:
     - pip install build
@@ -34,18 +37,6 @@ sdist:
     - python -m build --sdist .
   tags:
     - docker
-
-wheel:3.9:
-  extends: wheel:3.8
-  image: python:3.9-buster
-
-wheel:3.7:
-  extends: wheel:3.8
-  image: python:3.7-buster
-
-wheel:3.6:
-  extends: wheel:3.8
-  image: python:3.6-buster
 
 flake8:
   stage: static-analysis
