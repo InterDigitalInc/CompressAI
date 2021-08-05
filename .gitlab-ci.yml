@@ -74,9 +74,9 @@ isort:
   tags:
     - docker
 
-test:pytorch-1.5.1:
+test:
   stage: test
-  image: pytorch/pytorch:1.5.1-cuda10.1-cudnn7-devel
+  image: pytorch/pytorch:$PYTORCH_IMAGE
   before_script:
     - python --version
     - pip install -e .
@@ -88,24 +88,16 @@ test:pytorch-1.5.1:
       else
         pytest --cov=compressai -m "not pretrained" -s tests
       fi
+  parallel:
+    matrix:
+      - PYTORCH_IMAGE:
+          - "1.9.0-cuda11.1-cudnn8-devel"
+          - "1.8.1-cuda11.1-cudnn8-devel"
+          - "1.7.1-cuda11.0-cudnn8-devel"
+          - "1.6.0-cuda10.1-cudnn7-devel"
+          - "1.5.1-cuda10.1-cudnn7-devel"
   tags:
     - docker
-
-test:pytorch-1.6.0:
-  extends: test:pytorch-1.5.1
-  image: pytorch/pytorch:1.6.0-cuda10.1-cudnn7-devel
-
-test:pytorch-1.7.1:
-  extends: test:pytorch-1.5.1
-  image: pytorch/pytorch:1.7.1-cuda11.0-cudnn8-devel
-
-test:pytorch-1.8.1:
-  extends: test:pytorch-1.5.1
-  image: pytorch/pytorch:1.8.1-cuda11.1-cudnn8-devel
-
-test:pytorch-1.9.0:
-  extends: test:pytorch-1.5.1
-  image: pytorch/pytorch:1.9.0-cuda11.1-cudnn8-devel
 
 doc:
   stage: doc
