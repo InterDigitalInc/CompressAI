@@ -54,7 +54,6 @@ def collect(
     dataset: str,
     qualities: List[int],
     metrics: List[str],
-    return_rec: bool,
     num_jobs: int = 1,
 ):
     if not os.path.isdir(dataset):
@@ -74,9 +73,7 @@ def collect(
         sys.exit(1)
 
     args = [
-        (codec, i, f, q, metrics, return_rec)
-        for i, q in enumerate(qualities)
-        for f in filepaths
+        (codec, i, f, q, metrics) for i, q in enumerate(qualities) for f in filepaths
     ]
 
     if pool:
@@ -85,9 +82,12 @@ def collect(
         rv = list(starmap(func, args))
 
     results = [defaultdict(float) for _ in range(len(qualities))]
+
     for i, metrics in rv:
         for k, v in metrics.items():
             results[i][k] += v
+
+    # aggregate results for all images
     for i, _ in enumerate(results):
         for k, v in results[i].items():
             results[i][k] = v / len(filepaths)
@@ -129,11 +129,6 @@ def setup_common_args(parser):
         help="quality parameter (default: %(default)s)",
     )
     parser.add_argument(
-        "--return-rec",
-        action="store_true",
-        help="return the recovered image as well (default: false)",
-    )
-    parser.add_argument(
         "--metrics",
         dest="metrics",
         default=["psnr", "ms-ssim"],
@@ -157,7 +152,6 @@ def main(argv):
         args.dataset,
         args.qualities,
         args.metrics,
-        args.return_rec,
         args.num_jobs,
     )
 
