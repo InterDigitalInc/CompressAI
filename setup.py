@@ -100,7 +100,7 @@ def get_extra_requirements():
         "doc": ["sphinx", "furo"],
         "tutorials": ["jupyter", "ipywidgets"],
     }
-    extras_require["all"] = set(req for reqs in extras_require.values() for req in reqs)
+    extras_require["all"] = {req for reqs in extras_require.values() for req in reqs}
     return extras_require
 
 
