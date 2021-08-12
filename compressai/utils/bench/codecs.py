@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import abc
 import io
 import os
 import platform
@@ -125,7 +127,7 @@ def _get_bpg_version(encoder_path):
     return rv.split()[4]
 
 
-class Codec:
+class Codec(abc.ABC):
     """Abstract base class"""
 
     _description = None
@@ -145,12 +147,14 @@ class Codec:
         return self._description
 
     @property
+    @abc.abstractmethod
     def name(self):
         raise NotImplementedError()
 
     def _load_img(self, img):
         return read_image(os.path.abspath(img))
 
+    @abc.abstractmethod
     def _run_impl(self, img, quality, *args, **kwargs):
         raise NotImplementedError()
 
