@@ -49,10 +49,20 @@ def func(codec, i, *args):
     return i, rv
 
 
-def collect(codec: Codec, dataset: str, qualities: List[int], num_jobs: int = 1):
+def collect(
+    codec: Codec,
+    dataset: str,
+    qualities: List[int],
+    metrics: List[str],
+    num_jobs: int = 1,
+):
+    if not os.path.isdir(dataset):
+        raise OSError(f"No such directory: {dataset}")
+
     filepaths = [
-        os.path.join(dataset, f)
-        for f in os.listdir(dataset)
+        os.path.join(dirpath, f)
+        for dirpath, _, filenames in os.walk(dataset)
+        for f in filenames
         if os.path.splitext(f)[-1].lower() in IMG_EXTENSIONS
     ]
 
@@ -62,7 +72,9 @@ def collect(codec: Codec, dataset: str, qualities: List[int], num_jobs: int = 1)
         print("No images found in the dataset directory")
         sys.exit(1)
 
-    args = [(codec, i, f, q) for i, q in enumerate(qualities) for f in filepaths]
+    args = [
+        (codec, i, f, q, metrics) for i, q in enumerate(qualities) for f in filepaths
+    ]
 
     if pool:
         rv = pool.starmap(func, args)
@@ -70,9 +82,12 @@ def collect(codec: Codec, dataset: str, qualities: List[int], num_jobs: int = 1)
         rv = list(starmap(func, args))
 
     results = [defaultdict(float) for _ in range(len(qualities))]
+
     for i, metrics in rv:
         for k, v in metrics.items():
             results[i][k] += v
+
+    # aggregate results for all images
     for i, _ in enumerate(results):
         for k, v in results[i].items():
             results[i][k] = v / len(filepaths)
@@ -101,7 +116,7 @@ def setup_common_args(parser):
         type=int,
         metavar="N",
         default=1,
-        help="Number of parallel jobs (default: %(default)s)",
+        help="number of parallel jobs (default: %(default)s)",
     )
     parser.add_argument(
         "-q",
@@ -109,9 +124,16 @@ def setup_common_args(parser):
         dest="qualities",
         metavar="Q",
         default=[75],
-        nargs="*",
+        nargs="+",
         type=int,
         help="quality parameter (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--metrics",
+        dest="metrics",
+        default=["psnr", "ms-ssim"],
+        nargs="+",
+        help="do not return PSNR and MS-SSIM metrics (use for very small images)",
     )
 
 
@@ -125,7 +147,13 @@ def main(argv):
 
     codec_cls = next(c for c in codecs if c.__name__.lower() == args.codec)
     codec = codec_cls(args)
-    results = collect(codec, args.dataset, args.qualities, args.num_jobs)
+    results = collect(
+        codec,
+        args.dataset,
+        args.qualities,
+        args.metrics,
+        args.num_jobs,
+    )
 
     output = {
         "name": codec.name,
