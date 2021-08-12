@@ -50,19 +50,19 @@ def func(codec, i, *args):
 
 
 def collect(
-        codec: Codec,
-        dataset: str,
-        qualities: List[int],
-        return_rec: bool,
-        return_metrics: bool,
-        num_jobs: int = 1
+    codec: Codec,
+    dataset: str,
+    qualities: List[int],
+    metrics: List[str],
+    return_rec: bool,
+    num_jobs: int = 1,
 ):
     if not os.path.isdir(dataset):
         raise OSError(f"No such directory: {dataset}")
 
     filepaths = [
         os.path.join(dirpath, f)
-        for dirpath, dirnames, filenames in os.walk(dataset)
+        for dirpath, _, filenames in os.walk(dataset)
         for f in filenames
         if os.path.splitext(f)[-1].lower() in IMG_EXTENSIONS
     ]
@@ -73,7 +73,11 @@ def collect(
         print("No images found in the dataset directory")
         sys.exit(1)
 
-    args = [(codec, i, f, q, return_rec, return_metrics) for i, q in enumerate(qualities) for f in filepaths]
+    args = [
+        (codec, i, f, q, metrics, return_rec)
+        for i, q in enumerate(qualities)
+        for f in filepaths
+    ]
 
     if pool:
         rv = pool.starmap(func, args)
@@ -120,7 +124,7 @@ def setup_common_args(parser):
         dest="qualities",
         metavar="Q",
         default=[75],
-        nargs="*",
+        nargs="+",
         type=int,
         help="quality parameter (default: %(default)s)",
     )
@@ -130,9 +134,10 @@ def setup_common_args(parser):
         help="return the recovered image as well (default: false)",
     )
     parser.add_argument(
-        "--no-msssim-metrics",
-        action="store_false",
-        dest="return_metrics",
+        "--metrics",
+        dest="metrics",
+        default=["psnr", "ms-ssim"],
+        nargs="+",
         help="do not return PSNR and MS-SSIM metrics (use for very small images)",
     )
 
@@ -147,7 +152,14 @@ def main(argv):
 
     codec_cls = next(c for c in codecs if c.__name__.lower() == args.codec)
     codec = codec_cls(args)
-    results = collect(codec, args.dataset, args.qualities, args.return_rec, args.return_metrics, args.num_jobs)
+    results = collect(
+        codec,
+        args.dataset,
+        args.qualities,
+        args.metrics,
+        args.return_rec,
+        args.num_jobs,
+    )
 
     output = {
         "name": codec.name,

@@ -19,7 +19,7 @@ import sys
 import time
 
 from tempfile import mkstemp
-from typing import Tuple, Union
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 import PIL
@@ -58,28 +58,49 @@ def read_image(filepath: str, mode: str = "RGB") -> np.array:
     return Image.open(filepath).convert(mode)
 
 
+def _compute_psnr(a, b, max_val: float = 255.0) -> float:
+    mse = torch.mean((a - b) ** 2).item()
+    psnr = 20 * np.log10(max_val) - 10 * np.log10(mse)
+    return psnr
+
+
+def _compute_ms_ssim(a, b, max_val: float = 255.0) -> float:
+    return ms_ssim(a, b, data_range=max_val).item()
+
+
+_metric_functions = {
+    "psnr": _compute_psnr,
+    "ms-ssim": _compute_ms_ssim,
+}
+
+
 def compute_metrics(
     a: Union[np.array, Image.Image],
     b: Union[np.array, Image.Image],
+    metrics: Optional[List[str]] = None,
     max_val: float = 255.0,
-) -> Tuple[float, float]:
+) -> Dict[str, float]:
     """Returns PSNR and MS-SSIM between images `a` and `b`."""
-    if isinstance(a, Image.Image):
-        a = np.asarray(a)
-    if isinstance(b, Image.Image):
-        b = np.asarray(b)
 
-    a = torch.from_numpy(a.copy()).float().unsqueeze(0)
-    if a.size(3) == 3:
-        a = a.permute(0, 3, 1, 2)
-    b = torch.from_numpy(b.copy()).float().unsqueeze(0)
-    if b.size(3) == 3:
-        b = b.permute(0, 3, 1, 2)
+    if metrics is None:
+        metrics = ["psnr"]
 
-    mse = torch.mean((a - b) ** 2).item()
-    p = 20 * np.log10(max_val) - 10 * np.log10(mse)
-    m = ms_ssim(a, b, data_range=max_val).item()
-    return p, m
+    def _convert(x):
+        if isinstance(x, Image.Image):
+            x = np.asarray(x)
+        x = torch.from_numpy(x.copy()).float().unsqueeze(0)
+        if x.size(3) == 3:
+            # (1, H, W, 3) -> (1, 3, H, W)
+            x = x.permute(0, 3, 1, 2)
+        return x
+
+    a = _convert(a)
+    b = _convert(b)
+
+    out = {}
+    for metric_name in metrics:
+        out[metric_name] = _metric_functions[metric_name](a, b, max_val)
+    return out
 
 
 def run_command(cmd, ignore_returncodes=None):
@@ -128,14 +149,24 @@ class Codec:
         raise NotImplementedError()
 
     def _load_img(self, img):
-        return os.path.abspath(img)
+        return read_image(os.path.abspath(img))
 
-    def _run(self, img, quality, *args, **kwargs):
+    def _run_impl(self, img, quality, *args, **kwargs):
         raise NotImplementedError()
 
-    def run(self, img, quality, *args, **kwargs):
+    def run(
+        self,
+        img,
+        quality: int,
+        metrics: Optional[List[str]] = None,
+        return_rec: bool = False,
+    ):
         img = self._load_img(img)
-        return self._run(img, quality, *args, **kwargs)
+        info, rec = self._run_impl(img, quality)
+        info.update(compute_metrics(rec, img, metrics))
+        if return_rec:
+            return info, rec
+        return info
 
 
 class PillowCodec(Codec):
@@ -147,10 +178,7 @@ class PillowCodec(Codec):
     def name(self):
         raise NotImplementedError()
 
-    def _load_img(self, img):
-        return read_image(img)
-
-    def _run(self, img, quality, return_rec=False, return_metrics=True):
+    def _run_impl(self, img, quality):
         start = time.time()
         tmp = io.BytesIO()
         img.save(tmp, format=self.fmt, quality=int(quality))
@@ -171,14 +199,7 @@ class PillowCodec(Codec):
             "decoding_time": dec_time,
         }
 
-        if return_metrics:
-            psnr_val, msssim_val = compute_metrics(rec, img)
-            out["psnr"] = psnr_val
-            out["ms-ssim"] = msssim_val
-
-        if return_rec:
-            return out, rec
-        return out
+        return out, rec
 
 
 class JPEG(PillowCodec):
@@ -212,7 +233,7 @@ class BinaryCodec(Codec):
     def name(self):
         raise NotImplementedError()
 
-    def _run(self, img, quality, return_rec=False, return_metrics=True):
+    def _run_impl(self, img, quality):
         fd0, png_filepath = mkstemp(suffix=".png")
         fd1, out_filepath = mkstemp(suffix=self.fmt)
 
@@ -228,7 +249,6 @@ class BinaryCodec(Codec):
         dec_time = time.time() - start
 
         # Read image
-        img = read_image(img)
         rec = read_image(png_filepath)
         os.close(fd0)
         os.remove(png_filepath)
@@ -243,14 +263,7 @@ class BinaryCodec(Codec):
             "decoding_time": dec_time,
         }
 
-        if return_metrics:
-            psnr_val, msssim_val = compute_metrics(rec, img)
-            out["psnr"] = psnr_val
-            out["ms-ssim"] = msssim_val
-
-        if return_rec:
-            return out, rec
-        return out
+        return out, rec
 
     def _get_encode_cmd(self, img, quality, out_filepath):
         raise NotImplementedError()
@@ -500,7 +513,7 @@ class VTM(Codec):
         self.rgb = args.rgb
         return args
 
-    def _run(self, img, quality, return_rec=False, return_metrics=True):
+    def _run_impl(self, img, quality):
         if not 0 <= quality <= 63:
             raise ValueError(f"Invalid quality value: {quality} (0,63)")
 
@@ -595,17 +608,10 @@ class VTM(Codec):
             "decoding_time": dec_time,
         }
 
-        if return_metrics:
-            psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.0)
-            out["psnr"] = psnr_val
-            out["ms-ssim"] = msssim_val
-
-        if return_rec:
-            rec = Image.fromarray(
-                (rec_arr.clip(0, 1).transpose(1, 2, 0) * 255.0).astype(np.uint8)
-            )
-            return out, rec
-        return out
+        rec = Image.fromarray(
+            (rec_arr.clip(0, 1).transpose(1, 2, 0) * 255.0).astype(np.uint8)
+        )
+        return out, rec
 
 
 class HM(Codec):
@@ -646,12 +652,12 @@ class HM(Codec):
         self.rgb = args.rgb
         return args
 
-    def _run(self, img, quality, return_rec=False, return_metrics=True):
+    def _run_impl(self, img, quality):
         if not 0 <= quality <= 51:
             raise ValueError(f"Invalid quality value: {quality} (0,51)")
 
         # Convert input image to yuv 444 file
-        arr = np.asarray(read_image(img))
+        arr = np.asarray(img)
         fd, yuv_path = mkstemp(suffix=".yuv")
         out_filepath = os.path.splitext(yuv_path)[0] + ".bin"
         bitdepth = 8
@@ -742,17 +748,10 @@ class HM(Codec):
             "decoding_time": dec_time,
         }
 
-        if return_metrics:
-            psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.0)
-            out["psnr"] = psnr_val
-            out["ms-ssim"] = msssim_val
-
-        if return_rec:
-            rec = Image.fromarray(
-                (rec_arr.clip(0, 1).transpose(1, 2, 0) * 255.0).astype(np.uint8)
-            )
-            return out, rec
-        return out
+        rec = Image.fromarray(
+            (rec_arr.clip(0, 1).transpose(1, 2, 0) * 255.0).astype(np.uint8)
+        )
+        return out, rec
 
 
 class AV1(Codec):
@@ -785,12 +784,12 @@ class AV1(Codec):
         self.decoder_path = os.path.join(args.build_dir, "aomdec")
         return args
 
-    def _run(self, img, quality, return_rec=False, return_metrics=True):
+    def _run_impl(self, img, quality):
         if not 0 <= quality <= 63:
             raise ValueError(f"Invalid quality value: {quality} (0,63)")
 
         # Convert input image to yuv 444 file
-        arr = np.asarray(read_image(img))
+        arr = np.asarray(img)
         fd, yuv_path = mkstemp(suffix=".yuv")
         out_filepath = os.path.splitext(yuv_path)[0] + ".webm"
         bitdepth = 8
@@ -875,14 +874,7 @@ class AV1(Codec):
             "decoding_time": dec_time,
         }
 
-        if return_metrics:
-            psnr_val, msssim_val = compute_metrics(arr, rec_arr, max_val=1.0)
-            out["psnr"] = psnr_val
-            out["ms-ssim"] = msssim_val
-
-        if return_rec:
-            rec = Image.fromarray(
-                (rec_arr.clip(0, 1).transpose(1, 2, 0) * 255.0).astype(np.uint8)
-            )
-            return out, rec
-        return out
+        rec = Image.fromarray(
+            (rec_arr.clip(0, 1).transpose(1, 2, 0) * 255.0).astype(np.uint8)
+        )
+        return out, rec
