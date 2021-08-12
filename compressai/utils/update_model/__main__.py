@@ -33,6 +33,7 @@ from compressai.models.priors import (
     MeanScaleHyperprior,
     ScaleHyperprior,
 )
+from compressai.zoo import load_state_dict
 from compressai.zoo.image import model_architectures as zoo_models
 
 
@@ -60,6 +61,7 @@ def load_checkpoint(filepath: Path) -> Dict[str, torch.Tensor]:
     else:
         state_dict = checkpoint
 
+    state_dict = load_state_dict(state_dict)
     return state_dict
 
 
