@@ -40,7 +40,7 @@ sdist:
 
 flake8:
   stage: static-analysis
-  image: pytorch/pytorch:1.8.1-cuda11.1-cudnn8-runtime
+  image: pytorch/pytorch:1.8.1-cuda11.1-cudnn8-devel
   before_script:
     - python --version
     - pip install compressai --find-links=dist/
