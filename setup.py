@@ -118,7 +118,7 @@ setup(
         "numpy",
         "scipy",
         "matplotlib",
-        "torch",
+        "torch>=1.7.1",
         "torchvision",
         "pytorch-msssim",
     ],
