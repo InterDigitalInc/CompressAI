@@ -70,11 +70,8 @@ class TestBmshj2018Factorized:
 
     @pytest.mark.slow
     @pytest.mark.pretrained
-    @pytest.mark.parametrize(
-        "metric", [("mse",), ("ms-ssim",)]
-    )  # bypass weird pytest bug
+    @pytest.mark.parametrize("metric", ("mse", "ms-ssim"))
     def test_pretrained(self, metric):
-        metric = metric[0]
         for i in range(1, 6):
             net = bmshj2018_factorized(i, metric=metric, pretrained=True)
             assert net.state_dict()["g_a.0.weight"].size(0) == 128
@@ -115,15 +112,16 @@ class TestBmshj2018Hyperprior:
 
     @pytest.mark.slow
     @pytest.mark.pretrained
-    def test_pretrained(self):
+    @pytest.mark.parametrize("metric", ("mse", "ms-ssim"))
+    def test_pretrained(self, metric):
         # test we can load the correct models from the urls
         for i in range(1, 6):
-            net = bmshj2018_factorized(i, metric="mse", pretrained=True)
+            net = bmshj2018_factorized(i, metric=metric, pretrained=True)
             assert net.state_dict()["g_a.0.weight"].size(0) == 128
             assert net.state_dict()["g_a.6.weight"].size(0) == 192
 
         for i in range(6, 9):
-            net = bmshj2018_factorized(i, metric="mse", pretrained=True)
+            net = bmshj2018_factorized(i, metric=metric, pretrained=True)
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
             assert net.state_dict()["g_a.6.weight"].size(0) == 320
 
@@ -157,15 +155,16 @@ class TestMbt2018Mean:
 
     @pytest.mark.slow
     @pytest.mark.pretrained
-    def test_pretrained(self):
+    @pytest.mark.parametrize("metric", ("mse", "ms-ssim"))
+    def test_pretrained(self, metric):
         # test we can load the correct models from the urls
         for i in range(1, 5):
-            net = mbt2018_mean(i, metric="mse", pretrained=True)
+            net = mbt2018_mean(i, metric=metric, pretrained=True)
             assert net.state_dict()["g_a.0.weight"].size(0) == 128
             assert net.state_dict()["g_a.6.weight"].size(0) == 192
 
         for i in range(5, 9):
-            net = mbt2018_mean(i, metric="mse", pretrained=True)
+            net = mbt2018_mean(i, metric=metric, pretrained=True)
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
             assert net.state_dict()["g_a.6.weight"].size(0) == 320
 
@@ -199,15 +198,16 @@ class TestMbt2018:
 
     @pytest.mark.slow
     @pytest.mark.pretrained
-    def test_pretrained(self):
+    @pytest.mark.parametrize("metric", ("mse", "ms-ssim"))
+    def test_pretrained(self, metric):
         # test we can load the correct models from the urls
         for i in range(1, 5):
-            net = mbt2018(i, metric="mse", pretrained=True)
+            net = mbt2018(i, metric=metric, pretrained=True)
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
             assert net.state_dict()["g_a.6.weight"].size(0) == 192
 
         for i in range(5, 9):
-            net = mbt2018(i, metric="mse", pretrained=True)
+            net = mbt2018(i, metric=metric, pretrained=True)
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
             assert net.state_dict()["g_a.6.weight"].size(0) == 320
 
@@ -233,11 +233,13 @@ class TestCheng2020:
 
     @pytest.mark.slow
     @pytest.mark.pretrained
-    def test_pretrained(self):
+    @pytest.mark.parametrize("model_entrypoint", (cheng2020_anchor, cheng2020_attn))
+    @pytest.mark.parametrize("metric", ("mse", "ms-ssim"))
+    def test_pretrained(self, model_entrypoint, metric):
         for i in range(1, 4):
-            net = cheng2020_anchor(i, metric="mse", pretrained=True)
+            net = model_entrypoint(i, metric=metric, pretrained=True)
             assert net.state_dict()["g_a.0.conv1.weight"].size(0) == 128
 
         for i in range(4, 7):
-            net = cheng2020_anchor(i, metric="mse", pretrained=True)
-            assert net.state_dict()["g_a.0.conv1.weight"].size(0) == 192
+            net = model_entrypoint(i, metric=metric, pretrained=True)
+            assert net.state_dict()["g_a.0.conv1.weight"].size(0) in (128, 192)

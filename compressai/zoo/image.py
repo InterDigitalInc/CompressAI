@@ -100,6 +100,16 @@ model_urls = {
             7: f"{root_url}/mbt2018-mean-7-d5d441d1.pth.tar",
             8: f"{root_url}/mbt2018-mean-8-8089ae3e.pth.tar",
         },
+        "ms-ssim": {
+            1: f"{root_url}/mbt2018-mean-ms-ssim-1-5bf9c0b6.pth.tar",
+            2: f"{root_url}/mbt2018-mean-ms-ssim-2-e2a1bf3f.pth.tar",
+            3: f"{root_url}/mbt2018-mean-ms-ssim-3-640ce819.pth.tar",
+            4: f"{root_url}/mbt2018-mean-ms-ssim-4-12626c13.pth.tar",
+            5: f"{root_url}/mbt2018-mean-ms-ssim-5-1be7f059.pth.tar",
+            6: f"{root_url}/mbt2018-mean-ms-ssim-6-b83bf379.pth.tar",
+            7: f"{root_url}/mbt2018-mean-ms-ssim-7-ddf9644c.pth.tar",
+            8: f"{root_url}/mbt2018-mean-ms-ssim-8-0cc7b94f.pth.tar",
+        },
     },
     "mbt2018": {
         "mse": {
@@ -112,6 +122,16 @@ model_urls = {
             7: f"{root_url}/mbt2018-7-8ba2bf82.pth.tar",
             8: f"{root_url}/mbt2018-8-dd0097aa.pth.tar",
         },
+        "ms-ssim": {
+            1: f"{root_url}/mbt2018-ms-ssim-1-2878436b.pth.tar",
+            2: f"{root_url}/mbt2018-ms-ssim-2-c41cb208.pth.tar",
+            3: f"{root_url}/mbt2018-ms-ssim-3-d0dd64e8.pth.tar",
+            4: f"{root_url}/mbt2018-ms-ssim-4-a120e037.pth.tar",
+            5: f"{root_url}/mbt2018-ms-ssim-5-9b30e3b7.pth.tar",
+            6: f"{root_url}/mbt2018-ms-ssim-6-f8b3626f.pth.tar",
+            7: f"{root_url}/mbt2018-ms-ssim-7-16e6ff50.pth.tar",
+            8: f"{root_url}/mbt2018-ms-ssim-8-0cb49d43.pth.tar",
+        },
     },
     "cheng2020-anchor": {
         "mse": {
@@ -122,9 +142,32 @@ model_urls = {
             5: f"{root_url}/cheng2020-anchor-5-23852949.pth.tar",
             6: f"{root_url}/cheng2020-anchor-6-4c052b1a.pth.tar",
         },
+        "ms-ssim": {
+            1: f"{root_url}/cheng2020_anchor-ms-ssim-1-20f521db.pth.tar",
+            2: f"{root_url}/cheng2020_anchor-ms-ssim-2-c7ff5812.pth.tar",
+            3: f"{root_url}/cheng2020_anchor-ms-ssim-3-c23e22d5.pth.tar",
+            4: f"{root_url}/cheng2020_anchor-ms-ssim-4-0e658304.pth.tar",
+            5: f"{root_url}/cheng2020_anchor-ms-ssim-5-c0a95e77.pth.tar",
+            6: f"{root_url}/cheng2020_anchor-ms-ssim-6-f2dc1913.pth.tar",
+        },
     },
     "cheng2020-attn": {
-        "mse": {},
+        "mse": {
+            1: f"{root_url}/cheng2020_attn-mse-1-465f2b64.pth.tar",
+            2: f"{root_url}/cheng2020_attn-mse-2-e0805385.pth.tar",
+            3: f"{root_url}/cheng2020_attn-mse-3-2d07bbdf.pth.tar",
+            4: f"{root_url}/cheng2020_attn-mse-4-f7b0ccf2.pth.tar",
+            5: f"{root_url}/cheng2020_attn-mse-5-26c8920e.pth.tar",
+            6: f"{root_url}/cheng2020_attn-mse-6-730501f2.pth.tar",
+        },
+        "ms-ssim": {
+            1: f"{root_url}/cheng2020_attn-ms-ssim-1-c5381d91.pth.tar",
+            2: f"{root_url}/cheng2020_attn-ms-ssim-2-5dad201d.pth.tar",
+            3: f"{root_url}/cheng2020_attn-ms-ssim-3-5c9be841.pth.tar",
+            4: f"{root_url}/cheng2020_attn-ms-ssim-4-8b2f647e.pth.tar",
+            5: f"{root_url}/cheng2020_attn-ms-ssim-5-5ca1f34c.pth.tar",
+            6: f"{root_url}/cheng2020_attn-ms-ssim-6-216423ec.pth.tar",
+        },
     },
 }
 
@@ -277,7 +320,7 @@ def mbt2018_mean(quality, metric="mse", pretrained=False, progress=True, **kwarg
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    if metric not in ("mse",):
+    if metric not in ("mse", "ms-ssim"):
         raise ValueError(f'Invalid metric "{metric}"')
 
     if quality < 1 or quality > 8:
@@ -298,7 +341,7 @@ def mbt2018(quality, metric="mse", pretrained=False, progress=True, **kwargs):
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    if metric not in ("mse",):
+    if metric not in ("mse", "ms-ssim"):
         raise ValueError(f'Invalid metric "{metric}"')
 
     if quality < 1 or quality > 8:
@@ -319,7 +362,7 @@ def cheng2020_anchor(quality, metric="mse", pretrained=False, progress=True, **k
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    if metric not in ("mse",):
+    if metric not in ("mse", "ms-ssim"):
         raise ValueError(f'Invalid metric "{metric}"')
 
     if quality < 1 or quality > 6:
@@ -342,7 +385,7 @@ def cheng2020_attn(quality, metric="mse", pretrained=False, progress=True, **kwa
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    if metric not in ("mse",):
+    if metric not in ("mse", "ms-ssim"):
         raise ValueError(f'Invalid metric "{metric}"')
 
     if quality < 1 or quality > 6:
