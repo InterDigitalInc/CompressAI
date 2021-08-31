@@ -316,7 +316,7 @@ def mbt2018_mean(quality, metric="mse", pretrained=False, progress=True, **kwarg
 
     Args:
         quality (int): Quality levels (1: lowest, highest: 8)
-        metric (str): Optimized metric, choose from ('mse')
+        metric (str): Optimized metric, choose from ('mse', 'ms-ssim')
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
@@ -337,7 +337,7 @@ def mbt2018(quality, metric="mse", pretrained=False, progress=True, **kwargs):
 
     Args:
         quality (int): Quality levels (1: lowest, highest: 8)
-        metric (str): Optimized metric, choose from ('mse')
+        metric (str): Optimized metric, choose from ('mse', 'ms-ssim')
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
@@ -358,7 +358,7 @@ def cheng2020_anchor(quality, metric="mse", pretrained=False, progress=True, **k
 
     Args:
         quality (int): Quality levels (1: lowest, highest: 6)
-        metric (str): Optimized metric, choose from ('mse')
+        metric (str): Optimized metric, choose from ('mse', 'ms-ssim')
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
@@ -381,7 +381,7 @@ def cheng2020_attn(quality, metric="mse", pretrained=False, progress=True, **kwa
 
     Args:
         quality (int): Quality levels (1: lowest, highest: 6)
-        metric (str): Optimized metric, choose from ('mse')
+        metric (str): Optimized metric, choose from ('mse', 'ms-ssim')
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
