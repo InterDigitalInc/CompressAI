@@ -150,8 +150,8 @@ def setup_args():
         metavar="",
         type=float,
         nargs=4,
-        default=(0, 2, 28, 43),
-        help="Axes limit (xmin, xmax, ymin, ymax), default: %(default)s",
+        default=None,
+        help="Axes limit (xmin, xmax, ymin, ymax), default: autorange",
     )
     parser.add_argument(
         "--backend",
