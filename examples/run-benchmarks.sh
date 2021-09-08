@@ -47,6 +47,12 @@ fi
 dataset="$1"
 shift
 
+dataset_name=$(basename "${dataset}")
+if [[ ${dataset_name} == "val"* ]] || [[ ${dataset_name} == "train" ]] || [[ ${dataset_name} == "test" ]]; then
+  dataset_name=$(basename $(dirname "${dataset}"))
+fi
+
+
 # libpng
 BPGENC="$(which bpgenc)"
 BPGDEC="$(which bpgdec)"
@@ -80,59 +86,59 @@ AV1_BIN_DIR="${HOME}/av1/aom/build_gcc"
 
 jpeg() {
     python3 -m compressai.utils.bench jpeg "$dataset"            \
-        -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/jpeg.json
+        -q $(seq 5 5 95) -j "$NJOBS" > "results/${dataset_name}/jpeg.json"
 }
 
 jpeg2000() {
     python3 -m compressai.utils.bench jpeg2000 "$dataset"        \
-        -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/jpeg2000.json
+        -q $(seq 5 5 95) -j "$NJOBS" > "results/${dataset_name}/jpeg2000.json"
 }
 
 webp() {
     python3 -m compressai.utils.bench webp "$dataset"            \
-        -q $(seq 5 5 95) -j "$NJOBS" > benchmarks/webp.json
+        -q $(seq 5 5 95) -j "$NJOBS" > "results/${dataset_name}/webp.json"
 }
 
 bpg() {
     if [ -z ${BPGENC+x} ] || [ -z ${BPGDEC+x} ]; then echo "install libBPG"; exit 1; fi
     python3 -m compressai.utils.bench bpg "$dataset"             \
-        -q $(seq 47 -5 2) -m "$1" -e "$2" -c "$3"               \
+        -q $(seq 47 -5 12) -m "$1" -e "$2" -c "$3"               \
         --encoder-path "$BPGENC"                                \
         --decoder-path "$BPGDEC"                                \
-        -j "$NJOBS" > "benchmarks/$4"
+        -j "$NJOBS" > "results/${dataset_name}/$4"
 }
 
 hm() {
     if [ -z ${HM_BIN_DIR+x} ]; then echo "set HM bin directory HM_BIN_DIR"; exit 1; fi
     echo "using HM version $HM_VERSION"
     python3 -m compressai.utils.bench hm "$dataset"             \
-        -q $(seq 47 -5 2) -b "$HM_BIN_DIR" -c "$HM_CFG"         \
-        -j "$NJOBS" > "benchmarks/hm.json"
+        -q $(seq 47 -5 12) -b "$HM_BIN_DIR" -c "$HM_CFG"         \
+        -j "$NJOBS" > "results/${dataset_name}/hm.json"
 }
 
 vtm() {
     if [ -z ${VTM_BIN_DIR+x} ]; then echo "set VTM bin directory VTM_BIN_DIR"; exit 1; fi
     echo "using VTM version $VTM_VERSION"
     python3 -m compressai.utils.bench vtm "$dataset"            \
-        -q $(seq 47 -5 2) -b "$VTM_BIN_DIR" -c "$VTM_CFG"       \
-        -j "$NJOBS" > "benchmarks/vtm.json"
+        -q $(seq 47 -5 12) -b "$VTM_BIN_DIR" -c "$VTM_CFG"       \
+        -j "$NJOBS" > "results/${dataset_name}/vtm.json"
 }
 
 av1() {
     if [ -z ${AV1_BIN_DIR+x} ]; then echo "set AV1 bin directory AV1_BIN_DIR"; exit 1; fi
     python3 -m compressai.utils.bench av1 "$dataset"            \
-        -q $(seq 62 -5 2) -b "${AV1_BIN_DIR}"       \
-        -j "$NJOBS" > "benchmarks/av1.json"
+        -q $(seq 62 -5 7) -b "${AV1_BIN_DIR}"       \
+        -j "$NJOBS" > "results/${dataset_name}/av1.json"
 }
 
 tfci() {
     if [ -z ${TFCI_SCRIPT+x} ]; then echo "set TFCI_SCRIPT bin path"; exit 1; fi
     python3 -m compressai.utils.bench tfci "$dataset"           \
         --path "$TFCI_SCRIPT" --model "$1"                      \
-        -q $(seq 1 8) -j "$NJOBS" > "benchmarks/$1.json"
+        -q $(seq 1 8) -j "$NJOBS" > "results/${dataset_name}/official-$1.json"
 }
 
-mkdir -p "benchmarks"
+mkdir -p "results/${dataset_name}"
 
 for i in "$@"; do
     case $i in
