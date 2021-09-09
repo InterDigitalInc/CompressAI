@@ -69,7 +69,14 @@ def matplotlib_plt(
     for sc in scatters:
         if any(x in sc["name"] for x in hybrid_matches):
             linestyle = "--"
-        ax.plot(sc["xs"], sc["ys"], marker=".", linestyle=linestyle, label=sc["name"])
+        ax.plot(
+            sc["xs"],
+            sc["ys"],
+            marker=".",
+            linestyle=linestyle,
+            linewidth=0.7,
+            label=sc["name"],
+        )
 
     ax.set_xlabel("Bit-rate [bpp]")
     ax.set_ylabel(ylabel)
