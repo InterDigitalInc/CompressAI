@@ -93,8 +93,8 @@ def plotly_plt(
 ):
     del figsize
     try:
-        import plotly.io as pio
         import plotly.graph_objs as go
+        import plotly.io as pio
     except ImportError:
         print("plotly requires pandas: pip install -U pandas plotly")
         sys.exit(1)
