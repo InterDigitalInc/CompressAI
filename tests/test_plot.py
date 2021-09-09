@@ -24,8 +24,18 @@ plot = importlib.import_module("compressai.utils.plot.__main__")
 
 
 @pytest.mark.parametrize("metric", ("psnr", "ms-ssim"))
-def test_plot(metric):
+@pytest.mark.parametrize("backend", ("matplotlib", "plotly"))
+def test_plot(metric, backend):
     here = os.path.dirname(__file__)
     filepath = os.path.join(here, "expected/eval_0_bmshj2018-factorized_mse_1.json")
-    cmd = ["-f", filepath, "--title", "myplot", "--metric", metric]
+    cmd = [
+        "-f",
+        filepath,
+        "--title",
+        "myplot",
+        "--metric",
+        metric,
+        "--backend",
+        backend,
+    ]
     plot.main(cmd)
