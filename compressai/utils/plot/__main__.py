@@ -24,15 +24,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-_backends = ["matplotlib"]
-
-try:
-    import plotly.graph_objs as go
-    import plotly.offline
-
-    _backends.append("plotly")
-except ImportError:
-    pass
+_backends = ["matplotlib", "plotly"]
 
 
 def parse_json_file(filepath, metric):
@@ -69,11 +61,15 @@ def parse_json_file(filepath, metric):
 def matplotlib_plt(
     scatters, title, ylabel, output_file, limits=None, show=False, figsize=None
 ):
+    linestyle = "-"
+    hybrid_matches = ["HM", "VTM", "JPEG", "JPEG2000", "WebP", "BPG", "AV1"]
     if figsize is None:
         figsize = (9, 6)
     fig, ax = plt.subplots(figsize=figsize)
     for sc in scatters:
-        ax.plot(sc["xs"], sc["ys"], ".-", label=sc["name"])
+        if any(x in sc["name"] for x in hybrid_matches):
+            linestyle = "--"
+        ax.plot(sc["xs"], sc["ys"], marker=".", linestyle=linestyle, label=sc["name"])
 
     ax.set_xlabel("Bit-rate [bpp]")
     ax.set_ylabel(ylabel)
@@ -96,24 +92,25 @@ def plotly_plt(
     scatters, title, ylabel, output_file, limits=None, show=False, figsize=None
 ):
     del figsize
-    scatters = [go.Scatter(x=sc["xs"], y=sc["ys"], name=sc["name"]) for sc in scatters]
-    plotly.offline.plot(
-        {
-            "data": scatters,
-            "layout": go.Layout(
-                title=title,
-                legend={
-                    "font": {
-                        "size": 14,
-                    },
-                },
-                xaxis={"title": "Bit-rate [bpp]", "range": [limits[0], limits[1]]},
-                yaxis={"title": ylabel, "range": [limits[2], limits[3]]},
-            ),
-        },
-        auto_open=show,
-        filename=output_file or "plot.html",
-    )
+    try:
+        import plotly.io as pio
+        import plotly.graph_objs as go
+    except ImportError:
+        print("plotly requires pandas: pip install -U pandas plotly")
+        sys.exit(1)
+
+    fig = go.Figure()
+    for sc in scatters:
+        fig.add_traces(go.Scatter(x=sc["xs"], y=sc["ys"], name=sc["name"]))
+
+    fig.update_xaxes(title_text="Bit-rate [bpp]")
+    fig.update_yaxes(title_text=ylabel)
+    if limits is not None:
+        fig.update_xaxes(range=[limits[0], limits[1]])
+        fig.update_yaxes(range=[limits[2], limits[3]])
+
+    filename = output_file or "plot.html"
+    pio.write_html(fig, file=filename, auto_open=True)
 
 
 def setup_args():
@@ -180,6 +177,7 @@ def main(argv):
         "matplotlib": matplotlib_plt,
         "plotly": plotly_plt,
     }
+
     func_map[args.backend](
         scatters,
         args.title,
