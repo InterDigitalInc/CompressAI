@@ -177,9 +177,7 @@ def main(argv):
         rv = parse_json_file(f, args.metric)
         scatters.append(rv)
 
-    ylabel = args.metric
-    if ylabel == "psnr":
-        ylabel = "PSNR [dB]"
+    ylabel = f"{args.metric} [dB]"
     func_map = {
         "matplotlib": matplotlib_plt,
         "plotly": plotly_plt,
