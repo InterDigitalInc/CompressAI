@@ -525,7 +525,7 @@ class VTM(Codec):
         bitdepth = 8
 
         # Convert input image to yuv 444 file
-        arr = np.asarray(read_image(img))
+        arr = np.asarray(img)
         fd, yuv_path = mkstemp(suffix=".yuv")
         out_filepath = os.path.splitext(yuv_path)[0] + ".bin"
 
