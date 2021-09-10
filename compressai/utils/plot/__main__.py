@@ -103,8 +103,9 @@ def plotly_plt(
         import plotly.graph_objs as go
         import plotly.io as pio
     except ImportError:
-        print("plotly requires pandas: pip install -U pandas plotly")
-        sys.exit(1)
+        raise SystemExit(
+            "Unable to import plotly, install with: pip install pandas plotly"
+        )
 
     fig = go.Figure()
     for sc in scatters:
