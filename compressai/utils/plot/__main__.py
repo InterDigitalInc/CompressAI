@@ -37,25 +37,30 @@ def parse_json_file(filepath, metric):
             print(f'Error reading file "{filepath}"')
             raise err
 
-    if "results" not in data or "bpp" not in data["results"]:
-        raise ValueError(f'Invalid file "{filepath}"')
+    if "results" in data:
+        results = data["results"]
+    else:
+        results = data
 
-    if metric not in data["results"]:
+    if metric not in results:
         raise ValueError(
             f'Error: metric "{metric}" not available.'
-            f' Available metrics: {", ".join(data["results"].keys())}'
+            f' Available metrics: {", ".join(results.keys())}'
         )
 
-    if metric == "ms-ssim":
-        # Convert to db
-        values = np.array(data["results"][metric])
-        data["results"][metric] = -10 * np.log10(1 - values)
+    try:
+        if metric == "ms-ssim":
+            # Convert to db
+            values = np.array(results[metric])
+            results[metric] = -10 * np.log10(1 - values)
 
-    return {
-        "name": data.get("name", name),
-        "xs": data["results"]["bpp"],
-        "ys": data["results"][metric],
-    }
+        return {
+            "name": data.get("name", name),
+            "xs": results["bpp"],
+            "ys": results[metric],
+        }
+    except KeyError:
+        raise ValueError(f'Invalid file "{filepath}"')
 
 
 def matplotlib_plt(
