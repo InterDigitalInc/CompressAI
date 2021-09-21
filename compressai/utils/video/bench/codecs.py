@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 from typing import Any, List
 
-from .rawvideo import get_raw_video_file_info
+from compressai.datasets.rawvideo import get_raw_video_file_info
 
 
 class Codec(abc.ABC):

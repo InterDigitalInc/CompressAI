@@ -5,7 +5,7 @@ import sys
 
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 import numpy as np
 import torch
@@ -22,19 +22,54 @@ from torch import Tensor
 from torch.cuda import amp
 from torch.utils.model_zoo import tqdm
 
-from compressai.transforms.functional import (
-    rgb2ycbcr,
-    ycbcr2rgb,
-    yuv_420_to_444,
-    yuv_444_to_420,
-)
-
-from .eval_codec import aggregate_results, convert_legal_to_full_range, to_tensors
-from .rawvideo import RawVideoSequence, VideoFormat
+from compressai.datasets import RawVideoSequence, VideoFormat
+from compressai.transforms.functional import ycbcr2rgb, yuv_420_to_444
 
 models = {"google2020_ssf": google2020_ssf, "google2020_flow": google2020_flow}
 
 Frame = Union[Tuple[Tensor, Tensor, Tensor], Tuple[Tensor, ...]]
+
+
+# TODO (racapef) duplicate from bench
+def to_tensors(
+    frame: Tuple[np.ndarray, np.ndarray, np.ndarray],
+    max_value: int = 1,
+    device: str = "cpu",
+) -> Frame:
+    return tuple(
+        torch.from_numpy(np.true_divide(c, max_value, dtype=np.float32)).to(device)
+        for c in frame
+    )
+
+
+# TODO (racapef) duplicate from bench
+def aggregate_results(filepaths: List[Path]) -> Dict[str, Any]:
+    metrics = defaultdict(list)
+
+    # sum
+    for f in filepaths:
+        with f.open("r") as fd:
+            data = json.load(fd)
+        for k, v in data.items():
+            metrics[k].append(v)
+
+    # normalize
+    agg = {k: np.mean(v) for k, v in metrics.items()}
+    return agg
+
+
+# TODO (racapef) duplicate from bench
+def convert_legal_to_full_range(frame: Frame, bitdepth: int = 8) -> Frame:
+    ranges = torch.tensor([16, 235, 16, 240], device=frame[0].device)
+    ranges *= 2 ** (bitdepth - 8)
+    ymin, ymax, cmin, cmax = ranges
+    y, cb, cr = frame
+
+    y = (y - ymin) / (ymax - ymin)
+    cb = (cb - cmin) / (cmax - cmin)
+    cr = (cr - cmin) / (cmax - cmin)
+
+    return y, cb, cr
 
 
 def convert_frame(
@@ -100,7 +135,7 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
     num_frames = len(org_seq)
     num_pixels = org_seq.height * org_seq.width
     results = defaultdict(list)
-    max_val = 2 ** org_seq.bitdepth - 1
+    # max_val = 2 ** org_seq.bitdepth - 1
 
     # output = Path(sequence.name).open("wb")
     with tqdm(total=num_frames) as pbar:

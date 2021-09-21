@@ -15,10 +15,10 @@ from pytorch_msssim import ms_ssim  # type: ignore
 from torch import Tensor
 from torch.utils.model_zoo import tqdm
 
+from compressai.datasets.rawvideo import RawVideoSequence, VideoFormat
 from compressai.transforms.functional import ycbcr2rgb, yuv_420_to_444
 
 from .codecs import H264, H265, Codec
-from .rawvideo import RawVideoSequence, VideoFormat
 
 codec_classes = [H264, H265]
 
