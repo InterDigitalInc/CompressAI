@@ -13,5 +13,6 @@
 # limitations under the License.
 
 from .image import ImageFolder
+from .rawvideo import *
 
 __all__ = ["ImageFolder"]
