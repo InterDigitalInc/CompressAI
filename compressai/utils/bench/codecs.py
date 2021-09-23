@@ -564,7 +564,7 @@ class VTM(Codec):
             "1",
             "--InputChromaFormat=444",
             "--InputBitDepth=8",
-            "--ConformanceMode=1",
+            "--ConformanceWindowMode=1",
         ]
 
         if self.rgb:
