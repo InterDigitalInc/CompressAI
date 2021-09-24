@@ -33,9 +33,7 @@ torch.backends.cudnn.deterministic = True
 
 model_ids = {k: i for i, k in enumerate(models.keys())}
 
-metric_ids = {
-    "mse": 0,
-}
+metric_ids = {"mse": 0, "ms-ssim": 1}
 
 
 def inverse_dict(d):
@@ -244,7 +242,7 @@ def encode(argv):
     parser.add_argument(
         "-m",
         "--metric",
-        choices=["mse"],
+        choices=["mse", "ms-ssim"],
         default="mse",
         help="metric trained against (default: %(default)s",
     )
