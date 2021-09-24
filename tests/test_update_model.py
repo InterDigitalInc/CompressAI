@@ -21,7 +21,7 @@ from pathlib import Path
 import pytest
 import torch
 
-from compressai.models.priors import FactorizedPrior
+from compressai.models.google import FactorizedPrior
 
 update_model_module = importlib.import_module("compressai.utils.update_model.__main__")
 

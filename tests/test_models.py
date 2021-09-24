@@ -16,7 +16,7 @@ import pytest
 import torch
 import torch.nn as nn
 
-from compressai.models.priors import (
+from compressai.models.google import (
     SCALES_LEVELS,
     SCALES_MAX,
     SCALES_MIN,

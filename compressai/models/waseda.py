@@ -23,7 +23,7 @@ from compressai.layers import (
     subpel_conv3x3,
 )
 
-from .priors import JointAutoregressiveHierarchicalPriors
+from .google import JointAutoregressiveHierarchicalPriors
 
 
 class Cheng2020Anchor(JointAutoregressiveHierarchicalPriors):

@@ -27,7 +27,7 @@ from typing import Dict
 
 import torch
 
-from compressai.models.priors import (
+from compressai.models.google import (
     FactorizedPrior,
     JointAutoregressiveHierarchicalPriors,
     MeanScaleHyperprior,
