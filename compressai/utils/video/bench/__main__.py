@@ -18,9 +18,9 @@ from torch.utils.model_zoo import tqdm
 from compressai.datasets.rawvideo import RawVideoSequence, VideoFormat
 from compressai.transforms.functional import ycbcr2rgb, yuv_420_to_444
 
-from .codecs import H264, H265, Codec
+from .codecs import x264, x265, Codec
 
-codec_classes = [H264, H265]
+codec_classes = [x264, x265]
 
 
 Frame = Union[Tuple[Tensor, Tensor, Tensor], Tuple[Tensor, ...]]
