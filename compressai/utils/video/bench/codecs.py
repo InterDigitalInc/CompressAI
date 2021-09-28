@@ -23,8 +23,8 @@ class Codec(abc.ABC):
         raise NotImplementedError
 
 
-class H264(Codec):
-    name = "h264"
+class x264(Codec):
+    name = "x264"
 
     def add_parser_args(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("-p", "--preset", default="medium", help="preset")
@@ -45,7 +45,7 @@ class H264(Codec):
             "-i",
             filepath,
             "-c:v",
-            "h264",
+            "x264",
             "-crf",
             args["qp"],
             "-preset",
@@ -63,8 +63,8 @@ class H264(Codec):
         return cmd
 
 
-class H265(H264):
-    name = "h265"
+class x265(x264):
+    name = "x265"
 
     def get_encode_cmd(self, filepath: Path, **args: Any) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
