@@ -259,13 +259,14 @@ def main(args: Any = None) -> None:
         codec.add_parser_args(codec_parser)
 
     args = vars(parser.parse_args(args))
-    codec = codec_lookup[args.pop("codec")]
 
     dataset = args["dataset"]
-    if not Path(dataset).is_dir():
+    if not Path(args["dataset"]).is_dir():
         raise OSError(f"No such directory: {dataset}")
 
-    results = bench(dataset, codec, args["output"], **args)
+    codec = codec_lookup[args.pop("codec")]
+
+    results = bench(args.pop("dataset"), codec, args["output"], **args)
 
     print(json.dumps(results, indent=2))
 
