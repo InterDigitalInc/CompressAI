@@ -181,10 +181,17 @@ class RawVideoSequence(Sequence[np.ndarray]):
         height: Video height, if not given it may be deduced from the filename.
         bitdepth: Video bitdepth, if not given it may be deduced from the filename.
         format: Video format, if not given it may be deduced from the filename.
+        framerate: Video framerate, if not given it may be deduced from the filename.
     """
 
     def __init__(
-        self, data, width: int, height: int, bitdepth: int, format: VideoFormat, framerate: int
+        self,
+        data,
+        width: int,
+        height: int,
+        bitdepth: int,
+        format: VideoFormat,
+        framerate: int,
     ):
         self.width = width
         self.height = height
