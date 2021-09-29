@@ -52,7 +52,7 @@ def func(codec, i, *args):
 def collect(
     codec: Codec,
     dataset: str,
-    qualities: List[int],
+    qps: List[int],
     metrics: List[str],
     num_jobs: int = 1,
 ):
@@ -70,7 +70,7 @@ def collect(
         sys.exit(1)
 
     args = [
-        (codec, i, f, q, metrics) for i, q in enumerate(qualities) for f in filepaths
+        (codec, i, f, q, metrics) for i, q in enumerate(qps) for f in filepaths
     ]
 
     if pool:
@@ -78,7 +78,7 @@ def collect(
     else:
         rv = list(starmap(func, args))
 
-    results = [defaultdict(float) for _ in range(len(qualities))]
+    results = [defaultdict(float) for _ in range(len(qps))]
 
     for i, metrics in rv:
         for k, v in metrics.items():
@@ -117,13 +117,13 @@ def setup_common_args(parser):
     )
     parser.add_argument(
         "-q",
-        "--quality",
-        dest="qualities",
+        "--qps",
+        dest="qps",
         metavar="Q",
         default=[75],
         nargs="+",
         type=int,
-        help="quality parameter (default: %(default)s)",
+        help="list of quality/quantization parameter (default: %(default)s)",
     )
     parser.add_argument(
         "--metrics",
@@ -147,7 +147,7 @@ def main(argv):
     results = collect(
         codec,
         args.dataset,
-        args.qualities,
+        args.qps,
         args.metrics,
         args.num_jobs,
     )
