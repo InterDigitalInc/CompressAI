@@ -18,11 +18,11 @@ codecs.
 import argparse
 import json
 import multiprocessing as mp
-from pathlib import Path
 import sys
 
 from collections import defaultdict
 from itertools import starmap
+from pathlib import Path
 from typing import List
 
 from .codecs import AV1, BPG, HM, JPEG, JPEG2000, TFCI, VTM, Codec, WebP
@@ -69,9 +69,7 @@ def collect(
         print("No images found in the dataset directory")
         sys.exit(1)
 
-    args = [
-        (codec, i, f, q, metrics) for i, q in enumerate(qps) for f in filepaths
-    ]
+    args = [(codec, i, f, q, metrics) for i, q in enumerate(qps) for f in filepaths]
 
     if pool:
         rv = pool.starmap(func, args)

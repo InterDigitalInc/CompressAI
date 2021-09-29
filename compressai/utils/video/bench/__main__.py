@@ -18,7 +18,7 @@ from torch.utils.model_zoo import tqdm
 from compressai.datasets.rawvideo import RawVideoSequence, VideoFormat
 from compressai.transforms.functional import ycbcr2rgb, yuv_420_to_444
 
-from .codecs import x264, x265, Codec
+from .codecs import Codec, x264, x265
 
 codec_classes = [x264, x265]
 
@@ -259,7 +259,12 @@ def main(args: Any = None) -> None:
 
     args = vars(parser.parse_args(args))
     codec = codec_lookup[args.pop("codec")]
-    results = bench(args.pop("dataset"), codec, args["output"], **args)
+
+    dataset = args["dataset"]
+    if not Path(dataset).is_dir():
+        raise OSError(f"No such directory: {dataset}")
+
+    results = bench(dataset, codec, args["output"], **args)
 
     print(json.dumps(results, indent=2))
 

@@ -1,7 +1,7 @@
 import abc
 import argparse
-import platform
 import os
+import platform
 import subprocess
 import sys
 import time
