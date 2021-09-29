@@ -4,7 +4,6 @@ import os
 import platform
 import subprocess
 import sys
-import time
 
 from pathlib import Path
 from typing import Any, List
@@ -62,44 +61,13 @@ class x264(Codec):
             "-i",
             filepath,
             "-c:v",
-            "x264",
+            "h264",
             "-crf",
             args["qp"],
             "-preset",
             args["preset"],
             "-bf",
             0,
-            "-tune",
-            "ssim",
-            "-pix_fmt",
-            "yuv420p",
-            "-threads",
-            "4",
-            outputpath,
-        ]
-        return cmd
-
-
-class x265(x264):
-    name = "x265"
-
-    def get_encode_cmd(self, filepath: Path, **args: Any) -> List[Any]:
-        info = get_raw_video_file_info(filepath.stem)
-        outputpath = self.get_output_path(filepath, **args)
-        cmd = [
-            "ffmpeg",
-            "-s:v",
-            f"{info['width']}x{info['height']}",
-            "-i",
-            filepath,
-            "-c:v",
-            "hevc",
-            "-crf",
-            args["qp"],
-            "-preset",
-            args["preset"],
-            "-x265-params",
-            "bframes=0",
             "-tune",
             "ssim",
             "-pix_fmt",
