@@ -18,7 +18,7 @@ codecs.
 import argparse
 import json
 import multiprocessing as mp
-import os
+from pathlib import Path
 import sys
 
 from collections import defaultdict
@@ -56,15 +56,12 @@ def collect(
     metrics: List[str],
     num_jobs: int = 1,
 ):
-    if not os.path.isdir(dataset):
+    if not Path(dataset).is_dir():
         raise OSError(f"No such directory: {dataset}")
 
-    filepaths = [
-        os.path.join(dirpath, f)
-        for dirpath, _, filenames in os.walk(dataset)
-        for f in filenames
-        if os.path.splitext(f)[-1].lower() in IMG_EXTENSIONS
-    ]
+    filepaths = []
+    for ext in IMG_EXTENSIONS:
+        filepaths.extend(Path(dataset).rglob(f"*{ext}"))
 
     pool = mp.Pool(num_jobs) if num_jobs > 1 else None
 
