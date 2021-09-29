@@ -184,11 +184,12 @@ class RawVideoSequence(Sequence[np.ndarray]):
     """
 
     def __init__(
-        self, data, width: int, height: int, bitdepth: int, format: VideoFormat
+        self, data, width: int, height: int, bitdepth: int, format: VideoFormat, framerate: int
     ):
         self.width = width
         self.height = height
         self.bitdepth = bitdepth
+        self.framerate = framerate
 
         if isinstance(format, str):
             self.format = video_formats[format.lower()]
@@ -212,6 +213,7 @@ class RawVideoSequence(Sequence[np.ndarray]):
             height=sequence.height,
             bitdepth=sequence.bitdepth,
             format=sequence.format,
+            framerate=sequence.framerate,
         )
 
     @classmethod
@@ -222,6 +224,7 @@ class RawVideoSequence(Sequence[np.ndarray]):
         height: int = None,
         bitdepth: int = None,
         format: VideoFormat = None,
+        framerate: int = None,
     ) -> "RawVideoSequence":
         """
         Loads a raw video file from the given filename.
@@ -243,13 +246,21 @@ class RawVideoSequence(Sequence[np.ndarray]):
         format = format if format else info.get("format", None)
         height = height if height else info.get("height", None)
         width = width if width else info.get("width", None)
+        framerate = framerate if framerate else info.get("framerate", None)
 
         if width is None or height is None or bitdepth is None or format is None:
             raise RuntimeError(f"Could not get sequence information {filename}")
 
         data = np.memmap(filename, dtype=bitdepth_to_dtype[bitdepth], mode="r")
 
-        return cls(data, width=width, height=height, bitdepth=bitdepth, format=format)
+        return cls(
+            data,
+            width=width,
+            height=height,
+            bitdepth=bitdepth,
+            format=format,
+            framerate=framerate,
+        )
 
     def __getitem__(self, index: Union[int, slice]) -> Any:
         return self.data[index]
