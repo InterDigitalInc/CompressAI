@@ -144,7 +144,7 @@ def evaluate(
         k: torch.mean(torch.stack(v)) for k, v in results.items()
     }
     filesize = get_filesize(bitstream_path)
-    seq_results["bitrate"] = filesize * org_seq.framerate / ((num_frames) * 1000)
+    seq_results["bitrate"] = float(filesize * org_seq.framerate / (num_frames * 1000))
 
     seq_results["rgb_psnr"] = (
         20 * np.log10(max_val) - 10 * torch.log10(seq_results.pop("mse")).item()

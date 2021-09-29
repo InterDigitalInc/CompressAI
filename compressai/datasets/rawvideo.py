@@ -12,7 +12,8 @@ class VideoFormat(enum.Enum):
     YUV420 = "yuv420"  # planar 4:2:0 YUV
     YUV422 = "yuv422"  # planar 4:2:2 YUV
     YUV444 = "yuv444"  # planar 4:4:4 YUV
-    RGB = "rgb" # planar 4:4:4 RGB
+    RGB = "rgb"  # planar 4:4:4 RGB
+
 
 # Table of "fourcc" formats from Vooya, GStreamer, and ffmpeg mapped to a normalized enum value.
 video_formats = {
