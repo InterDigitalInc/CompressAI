@@ -62,17 +62,17 @@ def run_cmdline(
     p.wait()
 
 
-def convert_legal_to_full_range(frame: Frame, bitdepth: int = 8) -> Frame:
-    ranges = torch.tensor([16, 235, 16, 240], device=frame[0].device)
-    ranges *= 2 ** (bitdepth - 8)
-    ymin, ymax, cmin, cmax = ranges
-    y, cb, cr = frame
+# def convert_legal_to_full_range(frame: Frame, bitdepth: int = 8) -> Frame:
+#     ranges = torch.tensor([16, 235, 16, 240], device=frame[0].device)
+#     ranges *= 2 ** (bitdepth - 8)
+#     ymin, ymax, cmin, cmax = ranges
+#     y, cb, cr = frame
 
-    y = (y - ymin) / (ymax - ymin)
-    cb = (cb - cmin) / (cmax - cmin)
-    cr = (cr - cmin) / (cmax - cmin)
+#     y = (y - ymin) / (ymax - ymin)
+#     cb = (cb - cmin) / (cmax - cmin)
+#     cr = (cr - cmin) / (cmax - cmin)
 
-    return y, cb, cr
+#     return y, cb, cr
 
 
 def compute_metrics_for_frame(
@@ -90,8 +90,8 @@ def compute_metrics_for_frame(
     for i, component in enumerate("yuv"):
         out[f"{component}_mse"] = (org_frame[i] - dec_frame[i]).pow(2).mean()
 
-    org_frame = convert_legal_to_full_range(org_frame, bitdepth)
-    dec_frame = convert_legal_to_full_range(dec_frame, bitdepth)
+    # org_frame = convert_legal_to_full_range(org_frame, bitdepth)
+    # dec_frame = convert_legal_to_full_range(dec_frame, bitdepth)
     org = ycbcr2rgb(yuv_420_to_444(org_frame, mode="bicubic"))  # type: ignore
     dec = ycbcr2rgb(yuv_420_to_444(dec_frame, mode="bicubic"))  # type: ignore
 
