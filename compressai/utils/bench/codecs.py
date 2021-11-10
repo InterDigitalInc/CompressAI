@@ -160,14 +160,13 @@ class Codec(abc.ABC):
 
     def run(
         self,
-        img,
+        in_filepath,
         quality: int,
         metrics: Optional[List[str]] = None,
         return_rec: bool = False,
     ):
-        img = self._load_img(img)
-        info, rec = self._run_impl(img, quality)
-        info.update(compute_metrics(rec, img, metrics))
+        info, rec = self._run_impl(in_filepath, quality)
+        info.update(compute_metrics(rec, self._load_img(in_filepath), metrics))
         if return_rec:
             return info, rec
         return info
@@ -182,7 +181,8 @@ class PillowCodec(Codec):
     def name(self):
         raise NotImplementedError()
 
-    def _run_impl(self, img, quality):
+    def _run_impl(self, in_filepath, quality):
+        img = self._load_img(in_filepath)
         start = time.time()
         tmp = io.BytesIO()
         img.save(tmp, format=self.fmt, quality=int(quality))
@@ -237,13 +237,13 @@ class BinaryCodec(Codec):
     def name(self):
         raise NotImplementedError()
 
-    def _run_impl(self, img, quality):
+    def _run_impl(self, in_filepath, quality):
         fd0, png_filepath = mkstemp(suffix=".png")
         fd1, out_filepath = mkstemp(suffix=self.fmt)
 
         # Encode
         start = time.time()
-        run_command(self._get_encode_cmd(img, quality, out_filepath))
+        run_command(self._get_encode_cmd(in_filepath, quality, out_filepath))
         enc_time = time.time() - start
         size = filesize(out_filepath)
 
@@ -259,6 +259,7 @@ class BinaryCodec(Codec):
         os.close(fd1)
         os.remove(out_filepath)
 
+        img = self._load_img(in_filepath)
         bpp_val = float(size) * 8 / (img.size[0] * img.size[1])
 
         out = {
@@ -269,7 +270,7 @@ class BinaryCodec(Codec):
 
         return out, rec
 
-    def _get_encode_cmd(self, img, quality, out_filepath):
+    def _get_encode_cmd(self, in_filepath, quality, out_filepath):
         raise NotImplementedError()
 
     def _get_decode_cmd(self, out_filepath, rec_filepath):
@@ -291,14 +292,14 @@ class JPEG2000(BinaryCodec):
     def description(self):
         return f"JPEG2000. ffmpeg version {_get_ffmpeg_version()}"
 
-    def _get_encode_cmd(self, img, quality, out_filepath):
+    def _get_encode_cmd(self, in_filepath, quality, out_filepath):
         cmd = [
             "ffmpeg",
             "-loglevel",
             "panic",
             "-y",
             "-i",
-            img,
+            in_filepath,
             "-vcodec",
             "jpeg2000",
             "-pix_fmt",
@@ -372,7 +373,7 @@ class BPG(BinaryCodec):
         self.decoder_path = args.decoder_path
         return args
 
-    def _get_encode_cmd(self, img, quality, out_filepath):
+    def _get_encode_cmd(self, in_filepath, quality, out_filepath):
         if not 0 <= quality <= 51:
             raise ValueError(f"Invalid quality value: {quality} (0,51)")
         cmd = [
@@ -389,7 +390,7 @@ class BPG(BinaryCodec):
             self.color_mode,
             "-b",
             self.bitdepth,
-            img,
+            in_filepath,
         ]
         return cmd
 
@@ -439,7 +440,7 @@ class TFCI(BinaryCodec):
         self.tfci_path = args.path
         return args
 
-    def _get_encode_cmd(self, img, quality, out_filepath):
+    def _get_encode_cmd(self, in_filepath, quality, out_filepath):
         if not 1 <= quality <= 8:
             raise ValueError(f"Invalid quality value: {quality} (1, 8)")
         cmd = [
@@ -447,7 +448,7 @@ class TFCI(BinaryCodec):
             self.tfci_path,
             "compress",
             f"{self.model}-{quality:d}",
-            img,
+            in_filepath,
             out_filepath,
         ]
         return cmd
@@ -517,7 +518,7 @@ class VTM(Codec):
         self.rgb = args.rgb
         return args
 
-    def _run_impl(self, img, quality):
+    def _run_impl(self, in_filepath, quality):
         if not 0 <= quality <= 63:
             raise ValueError(f"Invalid quality value: {quality} (0,63)")
 
@@ -525,7 +526,7 @@ class VTM(Codec):
         bitdepth = 8
 
         # Convert input image to yuv 444 file
-        arr = np.asarray(img)
+        arr = np.asarray(self._load_img(in_filepath))
         fd, yuv_path = mkstemp(suffix=".yuv")
         out_filepath = os.path.splitext(yuv_path)[0] + ".bin"
 
@@ -656,12 +657,12 @@ class HM(Codec):
         self.rgb = args.rgb
         return args
 
-    def _run_impl(self, img, quality):
+    def _run_impl(self, in_filepath, quality):
         if not 0 <= quality <= 51:
             raise ValueError(f"Invalid quality value: {quality} (0,51)")
 
         # Convert input image to yuv 444 file
-        arr = np.asarray(img)
+        arr = np.asarray(self._load_img(in_filepath))
         fd, yuv_path = mkstemp(suffix=".yuv")
         out_filepath = os.path.splitext(yuv_path)[0] + ".bin"
         bitdepth = 8
