@@ -29,7 +29,7 @@ wheel:
     - docker
 
 sdist:
-  image: python:3-buster
+  image: python:3.6-buster
   stage: build
   before_script:
     - pip install build
@@ -52,7 +52,7 @@ flake8:
 
 black:
   stage: static-analysis
-  image: python:3-buster
+  image: python:3.6-buster
   before_script:
     - python --version
     - pip install compressai --find-links=dist/
@@ -64,7 +64,7 @@ black:
 
 isort:
   stage: static-analysis
-  image: python:3-buster
+  image: python:3.6-buster
   before_script:
     - python --version
     - pip install compressai --find-links=dist/
