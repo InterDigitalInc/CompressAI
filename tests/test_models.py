@@ -50,17 +50,12 @@ class TestCompressionModel:
                 self.original_conv = self.conv.weight
                 self.original_deconv = self.deconv.weight
 
-                self._initialize_weights()
-
         model = Model()
         nn.init.kaiming_normal_(model.original_conv)
         nn.init.kaiming_normal_(model.original_deconv)
 
         assert torch.allclose(model.original_conv, model.conv.weight)
         assert torch.allclose(model.original_deconv, model.deconv.weight)
-
-        assert model.conv.bias.abs().sum() == 0
-        assert model.deconv.bias.abs().sum() == 0
 
 
 class TestModels:

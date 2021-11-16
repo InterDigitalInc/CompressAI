@@ -43,12 +43,15 @@ class CompressionModel(nn.Module):
             bottleneck
     """
 
-    def __init__(self, entropy_bottleneck_channels, init_weights=True):
+    def __init__(self, entropy_bottleneck_channels, init_weights=None):
         super().__init__()
         self.entropy_bottleneck = EntropyBottleneck(entropy_bottleneck_channels)
 
-        if init_weights:
-            self._initialize_weights()
+        if init_weights is not None:
+            warnings.warn(
+                "init_weights was removed as it was never functional",
+                DeprecationWarning,
+            )
 
     def aux_loss(self):
         """Return the aggregated loss over the auxiliary entropy bottleneck
@@ -58,13 +61,6 @@ class CompressionModel(nn.Module):
             m.loss() for m in self.modules() if isinstance(m, EntropyBottleneck)
         )
         return aux_loss
-
-    def _initialize_weights(self):
-        for m in self.modules():
-            if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
-                nn.init.kaiming_normal_(m.weight)
-                if m.bias is not None:
-                    nn.init.zeros_(m.bias)
 
     def forward(self, *args):
         raise NotImplementedError()
