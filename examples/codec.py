@@ -242,7 +242,7 @@ def encode(argv):
     parser.add_argument(
         "-m",
         "--metric",
-        choices=["mse", "ms-ssim"],
+        choices=metric_ids.keys(),
         default="mse",
         help="metric trained against (default: %(default)s",
     )
