@@ -227,4 +227,3 @@ static inline void RansSimdDecRenorm(RansSimdDec* r, uint16_t** pptr)
 }
 
 #endif // RANS_WORD_SSE41_HEADER
-

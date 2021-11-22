@@ -14,7 +14,7 @@
 
 import torch
 import torch.nn as nn
-
+import torch.nn.functional as F
 
 def find_named_module(module, query):
     """Helper function to find a named module. Returns a `nn.Module` or `None`
@@ -128,3 +128,44 @@ def deconv(in_channels, out_channels, kernel_size=5, stride=2):
         output_padding=stride - 1,
         padding=kernel_size // 2,
     )
+
+def quantize_ste(x):
+    """Differentiable quantization via the Straight-Through-Estimator."""
+    # STE (straight-through estimator) trick: x_hard - x_soft.detach() + x_soft
+    return (torch.round(x) - x).detach() + x
+
+def gaussian_kernel1d(kernel_size: int, sigma: float, device: torch.device, dtype: torch.dtype):
+    """1D Gaussian kernel."""
+    khalf = (kernel_size - 1) / 2.0
+    x = torch.linspace(-khalf, khalf, steps=kernel_size, dtype=dtype, device=device)
+    pdf = torch.exp(-0.5 * (x / sigma).pow(2))
+    return pdf / pdf.sum()
+
+def gaussian_kernel2d(kernel_size: int, sigma: float, device: torch.device, dtype: torch.dtype):
+    """2D Gaussian kernel."""
+    kernel = gaussian_kernel1d(kernel_size, sigma, device, dtype)
+    return torch.mm(kernel[:, None], kernel[None, :])
+
+def gaussian_blur(x, kernel = None, kernel_size = None, sigma = None):
+    """Apply a 2D gaussian blur on a given image tensor."""
+    if kernel is None:
+        if kernel_size is None or sigma is None:
+            raise RuntimeError("Missing kernel_size or sigma parameters")
+        dtype = x.dtype if torch.is_floating_point(x) else torch.float32
+        device = x.device
+        kernel = gaussian_kernel2d(kernel_size, sigma, device, dtype)
+
+    padding = kernel.size(0) // 2
+    x = F.pad(x, (padding, padding, padding, padding), mode="replicate")
+    x = torch.nn.functional.conv2d(
+        x,
+        kernel.expand(x.size(1), 1, kernel.size(0), kernel.size(1)),
+        groups=x.size(1),
+    )
+    return x
+
+
+def meshgrid2d(N: int, C: int, H: int, W: int, device: torch.device):
+    """Create a 2D meshgrid for interpolation."""
+    theta = torch.eye(2, 3, device=device).unsqueeze(0).expand(N, 2, 3)
+    return F.affine_grid(theta, (N, C, H, W), align_corners=False)

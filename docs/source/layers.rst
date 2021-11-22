@@ -36,4 +36,4 @@ ResidualBlockUpsample
 
 AttentionBlock
 --------------
-.. autoclass:: AttentionBlock 
+.. autoclass:: AttentionBlock

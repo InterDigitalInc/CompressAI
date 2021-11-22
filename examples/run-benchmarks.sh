@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Do not forget to 
+# Do not forget to
 # - set paths to codec bins and sources below
 # - activate the virtual environment containing CompressAI
 

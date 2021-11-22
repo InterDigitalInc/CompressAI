@@ -7,7 +7,7 @@
 // The only caveat is that this version requires 64-bit arithmetic; in
 // particular, the encoder approximation in the bottom half requires a
 // fast way to obtain the top 64 bits of an unsigned 64*64 bit product.
-// 
+//
 // In short, as written, this code works on 64-bit targets only!
 
 #ifndef RANS64_HEADER

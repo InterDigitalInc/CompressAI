@@ -11,7 +11,7 @@ per-file-ignores =
 
 max-line-length = 88
 
-# maximum McCabe complexity 
+# maximum McCabe complexity
 max-complexity = 12
 
 exclude =

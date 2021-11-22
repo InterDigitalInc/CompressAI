@@ -18,6 +18,7 @@ import torch
 import torch.nn as nn
 
 from torch import Tensor
+from torch.autograd import Function
 
 from .gdn import GDN
 
@@ -29,6 +30,7 @@ __all__ = [
     "ResidualBlockWithStride",
     "conv3x3",
     "subpel_conv3x3",
+    "qrelu"
 ]
 
 
@@ -225,3 +227,50 @@ class AttentionBlock(nn.Module):
         out = a * torch.sigmoid(b)
         out += identity
         return out
+
+class qrelu(Function):
+    """QReLU
+
+    Clamping input with given bit-depth range. 
+    Suppose that input data presents integer through the integer networks
+    otherwise fraction values of input bypass without rounding operation for floating point networks.
+
+    Pre-computed scale with gamma function is used for backward computation.
+    
+    More details can be found `"Integer networks for data compression with latent-variable models"
+    
+    #_______`_, Balle et al. in 2019
+
+    Args:
+        input : a tensor data
+        bit_depth : bit-depth for clamping input
+        beta : 
+    """
+
+    @staticmethod
+    def forward(ctx, input, bit_depth, beta):
+        ctx.alpha = 0.9943258522851727
+        ctx.beta = beta
+        ctx.max_value = 2 ** bit_depth - 1
+        ctx.save_for_backward(input)
+
+        return input.clamp(min=0, max=ctx.max_value)
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        grad_input = None
+        (input,) = ctx.saved_tensors
+
+        grad_input = grad_output.clone()
+        grad_sub = (
+            torch.exp(
+                (-ctx.alpha ** ctx.beta)
+                * torch.abs(2.0 * input / ctx.max_value - 1) ** ctx.beta
+            )
+            * grad_output.clone()
+        )
+
+        grad_input[input < 0] = grad_sub[input < 0]
+        grad_input[input > ctx.max_value] = grad_sub[input > ctx.max_value]
+
+        return grad_input, None, None
