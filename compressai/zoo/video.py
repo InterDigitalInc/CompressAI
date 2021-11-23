@@ -1,4 +1,4 @@
-# Copyright 2020 InterDigital Communications, Inc.
+# Copyright 2021 InterDigital Communications, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .utils import ImageFolder, VideoFolder
-from .rawvideo import *
+# from torch.hub import load_state_dict_from_url
 
-__all__ = ["ImageFolder", "VideoFolder"]
+# from compressai.models import ScaleSpaceFlow
+
+# from .pretrained import load_pretrained
+
+# __all__ = [
+#    "scalespaceflow2020",
+# ]
+
+# model_architectures = {
+#    "scalespaceflow2020": ScaleSpaceFlow,
+# }

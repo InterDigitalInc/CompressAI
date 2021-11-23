@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import math
-from typing import List
 import warnings
+
+from typing import List
 
 import torch
 import torch.nn as nn
@@ -26,8 +27,15 @@ from compressai.ans import BufferedRansEncoder, RansDecoder
 from compressai.entropy_models import EntropyBottleneck, GaussianConditional
 from compressai.layers import GDN, MaskedConv2d, qrelu
 
-
-from .utils import conv, deconv, update_registered_buffers, quantize_ste, gaussian_kernel2d, gaussian_blur, meshgrid2d
+from .utils import (
+    conv,
+    deconv,
+    gaussian_blur,
+    gaussian_kernel2d,
+    meshgrid2d,
+    quantize_ste,
+    update_registered_buffers,
+)
 
 __all__ = [
     "CompressionModel",
@@ -655,7 +663,7 @@ class ScaleSpaceFlow(nn.Module):
 
     Args:
         num_levels (int): Number of Scale-space
-        sigma0 (float): standard deviation for gaussian kernel of the first space scale. 
+        sigma0 (float): standard deviation for gaussian kernel of the first space scale.
         scale_field_shift (float):
     """
 
@@ -668,7 +676,9 @@ class ScaleSpaceFlow(nn.Module):
         super().__init__()
 
         class Encoder(nn.Sequential):
-            def __init__(self, in_planes: int, mid_planes: int = 128, out_planes: int = 192):
+            def __init__(
+                self, in_planes: int, mid_planes: int = 128, out_planes: int = 192
+            ):
                 super().__init__(
                     conv(in_planes, mid_planes, kernel_size=5, stride=2),
                     nn.ReLU(inplace=True),
@@ -680,7 +690,9 @@ class ScaleSpaceFlow(nn.Module):
                 )
 
         class Decoder(nn.Sequential):
-            def __init__(self, out_planes: int, in_planes: int = 192, mid_planes: int = 128):
+            def __init__(
+                self, out_planes: int, in_planes: int = 192, mid_planes: int = 128
+            ):
                 super().__init__(
                     deconv(in_planes, mid_planes, kernel_size=5, stride=2),
                     nn.ReLU(inplace=True),
@@ -738,25 +750,25 @@ class ScaleSpaceFlow(nn.Module):
 
                 return x
 
-
         class Hyperprior(CompressionModel):
             def __init__(self, planes: int = 192, mid_planes: int = 192):
                 super().__init__(entropy_bottleneck_channels=mid_planes)
                 self.hyper_encoder = HyperEncoder(planes, mid_planes, planes)
                 self.hyper_decoder_mean = HyperDecoder(planes, mid_planes, planes)
-                self.hyper_decoder_scale = HyperDecoderWithQReLU(planes, mid_planes, planes)
+                self.hyper_decoder_scale = HyperDecoderWithQReLU(
+                    planes, mid_planes, planes
+                )
                 self.gaussian_conditional = GaussianConditional(None)
 
             def forward(self, y):
                 z = self.hyper_encoder(y)
                 z_hat, z_likelihoods = self.entropy_bottleneck(z)
-        
+
                 scales = self.hyper_decoder_scale(z_hat)
                 means = self.hyper_decoder_mean(z_hat)
                 _, y_likelihoods = self.gaussian_conditional(y, scales, means)
                 y_hat = quantize_ste(y - means) + means
                 return y_hat, (y_likelihoods, z_likelihoods)
-
 
         self.img_encoder = Encoder(3)
         self.img_decoder = Decoder(3)
@@ -852,9 +864,9 @@ class ScaleSpaceFlow(nn.Module):
                 )
             volume.append(interp.unsqueeze(2))
         return torch.cat(volume, dim=2)
-    
+
     @amp.autocast(enabled=False)
-    def warp_volume(volume, flow, scale_field, padding_mode: str = "border"):
+    def warp_volume(self, volume, flow, scale_field, padding_mode: str = "border"):
         """3D volume warping."""
         if volume.ndimension() != 5:
             raise ValueError(
@@ -873,14 +885,12 @@ class ScaleSpaceFlow(nn.Module):
         )
         return out.squeeze(2)
 
-
     def forward_prediction(self, x_ref, motion_info):
         flow, scale_field = motion_info.chunk(2, dim=1)
 
         volume = self.gaussian_volume(x_ref, self.sigma0, self.num_levels)
         x_pred = self.warp_volume(volume, flow, scale_field)
         return x_pred
-
 
     def aux_loss(self):
         """Return the aggregated loss over the auxiliary entropy bottleneck
