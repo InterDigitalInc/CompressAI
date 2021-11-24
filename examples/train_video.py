@@ -18,6 +18,8 @@ import random
 import shutil
 import sys
 
+from collections import defaultdict
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -32,13 +34,36 @@ from compressai.models.google import ScaleSpaceFlow
 from compressai.zoo import models
 
 
+def collect_likelihoods_list(likelihoods_list, num_pixels: int):
+    bpp_info_dict = defaultdict(int)
+    bpp_loss = 0
+
+    for i, frame_likelihoods in enumerate(likelihoods_list):
+        frame_bpp = 0
+        for label, likelihoods in frame_likelihoods.items():
+            label_bpp = 0
+            for field, v in likelihoods.items():
+                bpp = torch.log(v).sum(dim=(1, 2, 3)) / (-math.log(2) * num_pixels)
+
+                bpp_loss += bpp
+                frame_bpp += bpp
+                label_bpp += bpp
+
+                bpp_info_dict[f"bpp_loss.{label}"] += bpp.sum()
+                bpp_info_dict[f"bpp_loss.{label}.{i}.{field}"] = bpp.sum()
+            bpp_info_dict[f"bpp_loss.{label}.{i}"] = label_bpp.sum()
+        bpp_info_dict[f"bpp_loss.{i}"] = frame_bpp.sum()
+    return bpp_loss, bpp_info_dict
+
+
 class RateDistortionLoss(nn.Module):
     """Custom rate distortion loss with a Lagrangian parameter."""
 
-    def __init__(self, lmbda=1e-2, return_details: bool = False):
+    def __init__(self, lmbda=1e-2, return_details: bool = False, bitdepth: int = 8):
         super().__init__()
-        self.mse = nn.MSELoss()
+        self.mse = nn.MSELoss(reduction="none")
         self.lmbda = lmbda
+        self._scaling_functions = lambda x: (2 ** bitdepth - 1) ** 2 * x
         self.return_details = bool(return_details)
 
     @staticmethod
@@ -52,10 +77,25 @@ class RateDistortionLoss(nn.Module):
     def _get_scaled_distortion(self, x, target):
         if not len(x) == len(target):
             raise RuntimeError(f"len(x)={len(x)} != len(target)={len(target)})")
-        assert len(x) == 1
 
-        metric_value = self.mse(x, target)
-        scaled_metric = self.lmbda * metric_value
+        if isinstance(x, torch.Tensor):
+            x = x.chunk(x.size(1), dim=1)
+
+        if isinstance(target, torch.Tensor):
+            target = target.chunk(target.size(1), dim=1)
+
+        # compute metric over each component (eg: y, u and v)
+        metric_values = []
+        for (x0, x1) in zip(x, target):
+            v = self.mse(x0.float(), x1.float())
+            if v.ndimension() == 4:
+                v = v.mean(dim=(1, 2, 3))
+            metric_values.append(v)
+        metric_values = torch.stack(metric_values)
+
+        # sum value over the components dimension
+        metric_value = torch.sum(metric_values.transpose(1, 0), dim=1)
+        scaled_metric = self._scaling_functions(metric_value)
 
         return scaled_metric, metric_value
 
@@ -83,20 +123,22 @@ class RateDistortionLoss(nn.Module):
         self._check_tensors_list(target)
         self._check_tensors_list(output["x_hat"])
 
-        N, _, H, W = target[0][0].size()  # 3x 1ch tensors tuples
-        out = {}
+        _, _, H, W = target[0].size()
         num_frames = len(target)
-        #        num_pixels = N * H * W * num_frames
+        out = {}
+        num_pixels = H * W * num_frames
 
         # Get scaled and raw loss distortions for each frame
         scaled_distortions = []
         distortions = []
         for i, (x_hat, x) in enumerate(zip(output["x_hat"], target)):
             scaled_distortion, distortion = self._get_scaled_distortion(x_hat, x)
-            scaled_distortions.append(scaled_distortion)
+
             distortions.append(distortion)
+            scaled_distortions.append(scaled_distortion)
+
             if self.return_details:
-                out[f"frame{i}.mse_loss"] = distortion.mean()
+                out[f"frame{i}.mse_loss"] = distortion
         # aggregate (over batch and frame dimensions).
         out["mse_loss"] = torch.stack(distortions).mean()
 
@@ -104,9 +146,8 @@ class RateDistortionLoss(nn.Module):
         scaled_distortions = sum(scaled_distortions) / num_frames
 
         assert isinstance(output["likelihoods"], list)
-        #        likelihoods_list = output.pop("likelihoods")
+        likelihoods_list = output.pop("likelihoods")
 
-        """
         # collect bpp info on noisy tensors (estimated differentiable entropy)
         bpp_loss, bpp_info_dict = collect_likelihoods_list(likelihoods_list, num_pixels)
         if self.return_details:
@@ -114,41 +155,13 @@ class RateDistortionLoss(nn.Module):
 
         # now we either use a fixed lambda or try to balance between 2 lambdas
         # based on a target bpp.
-        if self.target_bpp is None:
-            lambdas = torch.full_like(bpp_loss, self.lmbda)
-        else:
-            lambda_lbr = self.lmbda
-            lambda_hbr = self.lmbda * self.lambda_scale
-            # carefull here, we need the estimated bpp over quantized latents,
-            # which is closer to the actual bpp (but not differentiable for
-            # backpropagating the loss)
+        lambdas = torch.full_like(bpp_loss, self.lmbda)
 
-            # collect bpp info on quantized tensors (estimated discrete entropy)
-            bpp_loss_quantized, _ = collect_likelihoods_list(
-                likelihoods_list, num_pixels, fields=["yq", "zq"]
-            )
-
-            lambdas = torch.where(
-                bpp_loss_quantized * N > self.target_bpp, lambda_lbr, lambda_hbr
-            )
-
-            out["bpp_loss_quantized"] = bpp_loss_quantized.sum()
-
-        bpp_loss = bpp_loss.sum()
+        bpp_loss = bpp_loss.mean()
         out["loss"] = (lambdas * scaled_distortions).mean() + bpp_loss
 
         out["distortion"] = scaled_distortions.mean()
         out["bpp_loss"] = bpp_loss
-        return out
-
-
-        out["bpp_loss"] = sum(
-            (torch.log(likelihoods).sum() / (-math.log(2) * num_pixels))
-            for likelihoods in output["likelihoods"].values()
-        )
-        out["mse_loss"] = self.mse(output["x_hat"], target)
-        out["loss"] = self.lmbda * 255 ** 2 * out["mse_loss"] + out["bpp_loss"]
-        """
         return out
 
 
@@ -258,8 +271,8 @@ def test_epoch(epoch, test_dataloader, model, criterion):
     aux_loss = AverageMeter()
 
     with torch.no_grad():
-        for d in test_dataloader:
-            d = d.to(device)
+        for batch in test_dataloader:
+            d = [frames.to(device) for frames in batch]
             out_net = model(d)
             out_criterion = criterion(out_net, d)
 
@@ -423,7 +436,7 @@ def main(argv):
 
     optimizer, aux_optimizer = configure_optimizers(net, args)
     lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min")
-    criterion = RateDistortionLoss(lmbda=args.lmbda)
+    criterion = RateDistortionLoss(lmbda=args.lmbda, return_details=True)
 
     last_epoch = 0
     if args.checkpoint:  # load from previous checkpoint

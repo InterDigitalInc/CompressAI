@@ -768,7 +768,7 @@ class ScaleSpaceFlow(nn.Module):
                 means = self.hyper_decoder_mean(z_hat)
                 _, y_likelihoods = self.gaussian_conditional(y, scales, means)
                 y_hat = quantize_ste(y - means) + means
-                return y_hat, (y_likelihoods, z_likelihoods)
+                return y_hat, {"y": y_likelihoods, "z": z_likelihoods}
 
         self.img_encoder = Encoder(3)
         self.img_decoder = Decoder(3)
