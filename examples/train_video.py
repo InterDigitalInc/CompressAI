@@ -1,4 +1,4 @@
-# Copyright 2020 InterDigital Communications, Inc.
+# Copyright 2021 InterDigital Communications, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 import argparse
 import math
+import os
 import random
 import shutil
 import sys
@@ -179,16 +180,6 @@ class AverageMeter:
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
-
-
-class CustomDataParallel(nn.DataParallel):
-    """Custom DataParallel to access the module methods."""
-
-    def __getattr__(self, key):
-        try:
-            return super().__getattr__(key)
-        except AttributeError:
-            return getattr(self.module, key)
 
 
 def configure_optimizers(net, args):
