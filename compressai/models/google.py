@@ -770,6 +770,34 @@ class ScaleSpaceFlow(nn.Module):
                 y_hat = quantize_ste(y - means) + means
                 return y_hat, {"y": y_likelihoods, "z": z_likelihoods}
 
+            def compress(self, y):
+                z = self.hyper_encoder(y)
+
+                z_string = self.entropy_bottleneck.compress(z)
+                z_hat = self.entropy_bottleneck.decompress(z_string, z.size()[-2:])
+
+                scales = self.hyper_decoder_scale(z_hat)
+                means = self.hyper_decoder_mean(z_hat)
+
+                indexes = self.gaussian_conditional.build_indexes(scales)
+                y_string = self.gaussian_conditional.compress(y, indexes, means)
+                y_hat = self.gaussian_conditional.quantize(y, "symbols", means)
+
+                return y_hat, {"strings": [y_string, z_string], "shape": z.size()[-2:]}
+
+            def decompress(self, strings, shape):
+                assert isinstance(strings, list) and len(strings) == 2
+                z_hat = self.entropy_bottleneck.decompress(strings[1], shape)
+
+                scales = self.hyper_decoder_scale(z_hat)
+                means = self.hyper_decoder_mean(z_hat)
+                indexes = self.gaussian_conditional.build_indexes(scales)
+                y_hat = self.gaussian_conditional.decompress(
+                    strings[0], indexes, z_hat.dtype, means
+                )
+
+                return y_hat
+
         self.img_encoder = Encoder(3)
         self.img_decoder = Decoder(3)
         self.img_hyperprior = Hyperprior()
@@ -815,6 +843,19 @@ class ScaleSpaceFlow(nn.Module):
         x_hat = self.img_decoder(y_hat)
         return x_hat, {"keyframe": likelihoods}
 
+    def encode_keyframe(self, x):
+        y = self.img_encoder(x)
+        y_hat, out_keyframe = self.img_hyperprior.compress(y)
+        x_hat = self.img_decoder(y_hat)
+
+        return x_hat, out_keyframe
+
+    def decode_keyframe(self, strings, shape):
+        y_hat = self.img_hyperprior.decompress(strings, shape)
+        x_hat = self.img_decoder(y_hat)
+
+        return x_hat
+
     def forward_inter(self, x_cur, x_ref):
         # encode the motion information
         x = torch.cat((x_cur, x_ref), dim=1)
@@ -838,6 +879,57 @@ class ScaleSpaceFlow(nn.Module):
         x_rec = x_pred + x_res_hat
 
         return x_rec, {"motion": motion_likelihoods, "residual": res_likelihoods}
+
+    def encode_inter(self, x_cur, x_ref):
+        # encode the motion information
+        x = torch.cat((x_cur, x_ref), dim=1)
+        y_motion = self.motion_encoder(x)
+        y_motion_hat, out_motion = self.motion_hyperprior.compress(y_motion)
+
+        # decode the space-scale flow information
+        motion_info = self.motion_decoder(y_motion_hat)
+        x_pred = self.forward_prediction(x_ref, motion_info)
+
+        # residual
+        x_res = x_cur - x_pred
+        y_res = self.res_encoder(x_res)
+        y_res_hat, out_res = self.res_hyperprior.compress(y_res)
+
+        # y_combine
+        y_combine = torch.cat((y_res_hat, y_motion_hat), dim=1)
+        x_res_hat = self.res_decoder(y_combine)
+
+        # final reconstruction: prediction + residual
+        x_rec = x_pred + x_res_hat
+
+        return x_rec, {
+            "strings": {
+                "motion": out_motion["strings"],
+                "residual": out_res["strings"],
+            },
+            "shapes": {"motion": out_motion["shape"], "residual": out_res["shape"]},
+        }
+
+    def decoder_inter(self, x_ref, strings, shapes):
+        key = "motion"
+        y_motion_hat = self.motion_hyperprior.decompress(strings[key], shapes[key])
+
+        # decode the space-scale flow information
+        motion_info = self.motion_decoder(y_motion_hat)
+        x_pred = self.forward_prediction(x_ref, motion_info)
+
+        # residual
+        key = "residual"
+        y_res_hat = self.res_hyperprior.decompress(strings[key], shapes[key])
+
+        # y_combine
+        y_combine = torch.cat((y_res_hat, y_motion_hat), dim=1)
+        x_res_hat = self.res_decoder(y_combine)
+
+        # final reconstruction: prediction + residual
+        x_rec = x_pred + x_res_hat
+
+        return x_rec
 
     @staticmethod
     def gaussian_volume(x, sigma: float, num_levels: int):
@@ -900,3 +992,46 @@ class ScaleSpaceFlow(nn.Module):
             m.loss() for m in self.modules() if isinstance(m, EntropyBottleneck)
         )
         return aux_loss
+
+    def compress(self, frames):
+        if not isinstance(frames, List):
+            raise RuntimeError(f"Invalid number of frames: {len(frames)}.")
+
+        frame_strings = []
+        shape_infos = []
+
+        x_ref, out_keyframe = self.encode_keyframe(frames[0])
+
+        frame_strings.append(out_keyframe["strings"])
+        shape_infos.append(out_keyframe["shape"])
+
+        for i in range(1, len(frames)):
+            x = frames[i]
+            x_ref, out_interframe = self.encode_inter(x, x_ref)
+
+            frame_strings.append(out_interframe["strings"])
+            shape_infos.append(out_interframe["shape"])
+
+        return frame_strings, shape_infos
+
+    def decompress(self, strings, shapes):
+
+        if not isinstance(strings, List) or not isinstance(shapes, List):
+            raise RuntimeError(f"Invalid number of frames: {len(strings)}.")
+
+        assert len(strings) == len(
+            shapes
+        ), f"Number of information should match {len(strings)} != {len(shapes)}."
+
+        dec_frames = []
+
+        x_ref = self.decode_keyframe(strings[0], shapes[0])
+        dec_frames.append(x_ref)
+
+        for i in range(1, len(strings)):
+            string = strings[i]
+            shape = shapes[i]
+            x_ref, out_interframe = self.decoder_inter(x_ref, string, shape)
+            dec_frames.append(x_ref)
+
+        return dec_frames
