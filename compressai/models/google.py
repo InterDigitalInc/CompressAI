@@ -781,7 +781,7 @@ class ScaleSpaceFlow(nn.Module):
 
                 indexes = self.gaussian_conditional.build_indexes(scales)
                 y_string = self.gaussian_conditional.compress(y, indexes, means)
-                y_hat = self.gaussian_conditional.quantize(y, "symbols", means)
+                y_hat = self.gaussian_conditional.quantize(y, "dequantize", means)
 
                 return y_hat, {"strings": [y_string, z_string], "shape": z.size()[-2:]}
 
@@ -907,10 +907,10 @@ class ScaleSpaceFlow(nn.Module):
                 "motion": out_motion["strings"],
                 "residual": out_res["strings"],
             },
-            "shapes": {"motion": out_motion["shape"], "residual": out_res["shape"]},
+            "shape": {"motion": out_motion["shape"], "residual": out_res["shape"]},
         }
 
-    def decoder_inter(self, x_ref, strings, shapes):
+    def decode_inter(self, x_ref, strings, shapes):
         key = "motion"
         y_motion_hat = self.motion_hyperprior.decompress(strings[key], shapes[key])
 
@@ -1035,3 +1035,73 @@ class ScaleSpaceFlow(nn.Module):
             dec_frames.append(x_ref)
 
         return dec_frames
+
+    def load_state_dict(self, state_dict):
+        super().load_state_dict(state_dict)
+
+        # Dynamically update the entropy bottleneck buffers related to the CDFs
+        update_registered_buffers(
+            self.img_hyperprior.entropy_bottleneck,
+            "img_hyperprior.entropy_bottleneck",
+            ["_quantized_cdf", "_offset", "_cdf_length"],
+            state_dict,
+        )
+        update_registered_buffers(
+            self.img_hyperprior.gaussian_conditional,
+            "img_hyperprior.gaussian_conditional",
+            ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
+            state_dict,
+        )
+        self.img_hyperprior.entropy_bottleneck.update()
+        # self.img_hyperprior.gaussian_conditional.update()
+
+        update_registered_buffers(
+            self.res_hyperprior.entropy_bottleneck,
+            "res_hyperprior.entropy_bottleneck",
+            ["_quantized_cdf", "_offset", "_cdf_length"],
+            state_dict,
+        )
+        update_registered_buffers(
+            self.res_hyperprior.gaussian_conditional,
+            "res_hyperprior.gaussian_conditional",
+            ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
+            state_dict,
+        )
+        self.res_hyperprior.entropy_bottleneck.update()
+        # self.res_hyperprior.gaussian_conditional.update()
+
+        update_registered_buffers(
+            self.motion_hyperprior.entropy_bottleneck,
+            "motion_hyperprior.entropy_bottleneck",
+            ["_quantized_cdf", "_offset", "_cdf_length"],
+            state_dict,
+        )
+        update_registered_buffers(
+            self.res_hyperprior.gaussian_conditional,
+            "motion_hyperprior.gaussian_conditional",
+            ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
+            state_dict,
+        )
+        self.motion_hyperprior.entropy_bottleneck.update()
+        # self.motion_hyperprior.gaussian_conditional.update()
+
+    def update(self, scale_table=None, force=False):
+        if scale_table is None:
+            scale_table = get_scale_table()
+
+        updated = self.img_hyperprior.gaussian_conditional.update_scale_table(
+            scale_table, force=force
+        )
+        # updated |= super().update(force=force)
+
+        updated = self.res_hyperprior.gaussian_conditional.update_scale_table(
+            scale_table, force=force
+        )
+        # updated |= super().update(force=force)
+
+        updated = self.motion_hyperprior.gaussian_conditional.update_scale_table(
+            scale_table, force=force
+        )
+        # updated |= super().update(force=force)
+
+        return updated

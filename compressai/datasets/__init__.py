@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .utils import ImageFolder, VideoFolder
+from .utils import ImageFolder, VideoFolder, VideoSequenceInYUV420
 from .rawvideo import *
 
-__all__ = ["ImageFolder", "VideoFolder"]
+__all__ = ["ImageFolder", "VideoFolder", "VideoSequenceInYUV420"]
