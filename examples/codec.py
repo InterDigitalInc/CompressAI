@@ -13,9 +13,6 @@
 # limitations under the License.
 
 import argparse
-import glob
-import math
-import os
 import struct
 import sys
 import time
@@ -43,6 +40,11 @@ torch.backends.cudnn.deterministic = True
 model_ids = {k: i for i, k in enumerate(models.keys())}
 
 metric_ids = {"mse": 0, "ms-ssim": 1}
+
+
+def BoolConvert(a):
+    b = [False, True]
+    return b[int(a)]
 
 
 def Average(lst):
@@ -75,10 +77,12 @@ def torch2img(x: torch.Tensor) -> Image.Image:
 
 def write_uints(fd, values, fmt=">{:d}I"):
     fd.write(struct.pack(fmt.format(len(values)), *values))
+    return len(values) * 4
 
 
 def write_uchars(fd, values, fmt=">{:d}B"):
     fd.write(struct.pack(fmt.format(len(values)), *values))
+    return len(values) * 1
 
 
 def read_uints(fd, n, fmt=">{:d}I"):
@@ -95,6 +99,7 @@ def write_bytes(fd, values, fmt=">{:d}s"):
     if len(values) == 0:
         return
     fd.write(struct.pack(fmt.format(len(values)), values))
+    return len(values) * 1
 
 
 def read_bytes(fd, n, fmt=">{:d}s"):
@@ -127,6 +132,26 @@ def parse_header(header):
         inverse_dict(metric_ids)[metric],
         quality,
     )
+
+
+def read_body(fd):
+    lstrings = []
+    shape = read_uints(fd, 2)
+    n_strings = read_uints(fd, 1)[0]
+    for _ in range(n_strings):
+        s = read_bytes(fd, read_uints(fd, 1)[0])
+        lstrings.append([s])
+
+    return lstrings, shape
+
+
+def write_body(fd, shape, out_strings):
+    bytes_cnt = 0
+    bytes_cnt = write_uints(fd, (shape[0], shape[1], len(out_strings)))
+    for s in out_strings:
+        bytes_cnt += write_uints(fd, (len(s[0]),))
+        bytes_cnt += write_bytes(fd, s[0])
+    return bytes_cnt
 
 
 def pad(x, p=2 ** 6):
@@ -185,10 +210,7 @@ def _encode(image, model, metric, quality, coder, output):
         # write original image size
         write_uints(f, (h, w))
         # write shape and number of encoded latents
-        write_uints(f, (shape[0], shape[1], len(out["strings"])))
-        for s in out["strings"]:
-            write_uints(f, (len(s[0]),))
-            write_bytes(f, s[0])
+        write_body(f, shape, out["strings"])
 
     enc_time = time.time() - enc_start
     size = filesize(output)
@@ -215,7 +237,6 @@ def _encode_video(video, model, coder, output, device):
         resolution=video["resolution"],
         num_frms=video["num_frms"],
     )
-    lzs = int(math.log10(len(video_sequence)) + 1)
 
     frames_enc_time = []
     frames_coded_size = []
@@ -225,54 +246,59 @@ def _encode_video(video, model, coder, output, device):
     frmH, frmW = video_sequence.height, video_sequence.width
 
     p = 128
-    for i in tqdm(range(len(video_sequence))):
-        poc = str(i).zfill(lzs)
-        frame_enc_start = time.time()
+    with Path(output).open("wb") as fout:
+        is_first_frm = False
 
-        frm = video_sequence[i]
-
-        x = pad(frm.to(device), p)
-
-        with torch.no_grad():
-            if i == 0:
-                x_out, out_info = net.encode_keyframe(x)
-            else:
-                x_out, out_info = net.encode_inter(x, x_ref)
-
-        x_ref = x_out
-
-        out_bin_file = f"{output}_poc{poc}.bin"
-
-        shape = out_info["shape"]
         # header = get_header(model, metric, quality)
+        # write_uchars(f, header)
+        # write original image size
+        write_uints(fout, (frmH, frmW))
 
-        with Path(out_bin_file).open("wb") as f:
-            # write_uchars(f, header)
-            # write original image size
-            write_uints(f, (frmH, frmW))
-            # write shape and number of encoded latents
+        for i in tqdm(range(len(video_sequence))):
+            is_first_frm = True if i == 0 else False
+            is_last_frm = True if (i + 1) == len(video_sequence) else False
+            frm_bytes = 0
+            frm_enc_start = time.time()
 
-            def write_body(f, shape, out_strings):
-                write_uints(f, (shape[0], shape[1], len(out_strings)))
-                for s in out_strings:
-                    write_uints(f, (len(s[0]),))
-                    write_bytes(f, s[0])
+            frm = video_sequence[i]
 
-            if isinstance(shape, Dict):
-                for shape, out in zip(
-                    out_info["shape"].items(), out_info["strings"].items()
-                ):
-                    write_body(f, shape[1], out[1])
-            else:
-                write_body(f, shape, out_info["strings"])
+            x = pad(frm.to(device), p)
 
-        frame_enc_time = time.time() - frame_enc_start
-        size = filesize(out_bin_file)
-        bpp = float(size) * 8 / (frmH * frmW)
+            with torch.no_grad():
+                if is_first_frm:
+                    x_out, out_info = net.encode_keyframe(x)
+                    shape = out_info["shape"]
 
-        frames_coded_bpp.append(bpp)
-        frames_enc_time.append(frame_enc_time)
-        frames_coded_size.append(size)
+                    # write a frame number
+                    frm_bytes = write_uints(fout, (i,))
+                    # write shape and number of encoded latents
+                    frm_bytes += write_body(fout, shape, out_info["strings"])
+                else:
+                    x_out, out_info = net.encode_inter(x, x_ref)
+                    shape = out_info["shape"]
+
+                    assert isinstance(shape, Dict) is True
+
+                    # write a frame number
+                    frm_bytes = write_uints(fout, (i,))
+                    # write shape and number of encoded latents for motion and residuals
+                    for shape, out in zip(
+                        out_info["shape"].items(), out_info["strings"].items()
+                    ):
+                        frm_bytes += write_body(fout, shape[1], out[1])
+
+                frm_bytes += write_uchars(fout, (is_last_frm,))
+
+            x_ref = x_out
+
+            frm_enc_time = time.time() - frm_enc_start
+            bpp = float(frm_bytes) * 8 / (frmH * frmW)
+
+            frames_coded_bpp.append(bpp)
+            frames_enc_time.append(frm_enc_time)
+            frames_coded_size.append(frm_bytes)
+
+        video_sequence.close()
 
     enc_time = time.time() - enc_start
 
@@ -294,12 +320,7 @@ def _decode(inputpath, coder, show, output=None):
     with Path(inputpath).open("rb") as f:
         model, metric, quality = parse_header(read_uchars(f, 2))
         original_size = read_uints(f, 2)
-        shape = read_uints(f, 2)
-        strings = []
-        n_strings = read_uints(f, 1)[0]
-        for _ in range(n_strings):
-            s = read_bytes(f, read_uints(f, 1)[0])
-            strings.append([s])
+        strings, shape = read_body(f)
 
     print(f"Model: {model:s}, metric: {metric:s}, quality: {quality:d}")
     start = time.time()
@@ -326,19 +347,6 @@ def _decode_video(model, device, inputpath, coder, show, output=None):
 
     dec_start = time.time()
 
-    all_coded_stream = glob.glob(f"{inputpath}/*.bin")
-    all_coded_stream.sort(key=lambda x: int(x.split(".bin")[0].split("poc")[-1]))
-
-    def read_body(f):
-        lstrings = []
-        shape = read_uints(f, 2)
-        n_strings = read_uints(f, 1)[0]
-        for _ in range(n_strings):
-            s = read_bytes(f, read_uints(f, 1)[0])
-            lstrings.append([s])
-
-        return lstrings, shape
-
     frames_dec_time = []
 
     start = time.time()
@@ -347,28 +355,43 @@ def _decode_video(model, device, inputpath, coder, show, output=None):
     load_time = time.time() - start
 
     x_ref = None
-    for poc, bin_file in enumerate(tqdm(all_coded_stream)):
-        frame_dec_start = time.time()
 
-        with Path(bin_file).open("rb") as f:
-            # model, metric, quality = parse_header(read_uchars(f, 2))
-            original_size = read_uints(f, 2)
+    with Path(inputpath).open("rb") as fin:
+        first_frm_done = False
+        is_last_frm = False
 
-            if poc == 0:
-                # print(f"Model: {model:s}, metric: {metric:s}, quality: {quality:d}")
-                print("Model information will be printed out")
+        # model, metric, quality = parse_header(read_uchars(f, 2))
+        original_size = read_uints(fin, 2)
+
+        # print(f"Model: {model:s}, metric: {metric:s}, quality: {quality:d}")
+        print("Model information will be printed out")
+
+        while not is_last_frm:
+            # for poc, bin_file in enumerate(tqdm(all_coded_stream)):
+            frame_dec_start = time.time()
 
             with torch.no_grad():
-                if poc == 0:
-                    lstrings, shape = read_body(f)
+                if not first_frm_done:
+                    # write a frame number
+                    poc = read_uints(fin, 1)[0]
+
+                    assert poc == 0
+                    lstrings, shape = read_body(fin)
                     out = net.decode_keyframe(lstrings, shape)
+                    first_frm_done = True
                 else:
-                    mstrings, mshape = read_body(f)
-                    rstrings, rshape = read_body(f)
+                    # write a frame number
+                    poc = read_uints(fin, 1)[0]
+                    assert poc > 0
+
+                    mstrings, mshape = read_body(fin)
+                    rstrings, rshape = read_body(fin)
                     inter_strings = {"motion": mstrings, "residual": rstrings}
                     inter_shapes = {"motion": mshape, "residual": rshape}
 
                     out = net.decode_inter(x_ref, inter_strings, inter_shapes)
+
+                is_last_frm = BoolConvert(read_uchars(fin, 1)[0])
 
                 x_ref = out
 
@@ -494,14 +517,10 @@ def video_encode(argv):
         default=compressai.available_entropy_coders()[0],
         help="Entropy coder (default: %(default)s)",
     )
-    parser.add_argument("-o", "--output", required=True, help="Output directory path")
+    parser.add_argument("-o", "--output", help="Output path")
     args = parser.parse_args(argv)
-
-    if not os.path.exists(args.output):
-        os.mkdir(args.output)
-
-    file_name = Path(Path(args.video).resolve().name).stem
-    output_prefix = f"{args.output}/coded_{file_name}"
+    if not args.output:
+        args.output = Path(Path(args.image).resolve().name).with_suffix(".bin")
 
     # temp code
     device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
@@ -527,7 +546,7 @@ def video_encode(argv):
         },
         model,
         args.coder,
-        output_prefix,
+        args.output,
         device,
     )
 
@@ -550,9 +569,7 @@ def decode(argv):
 
 def video_decode(argv):
     parser = argparse.ArgumentParser(description="Decode bit-stream to video sequence")
-    parser.add_argument(
-        "input", type=str, help="A directory includes coded bitstream per frame"
-    )
+    parser.add_argument("input", type=str)
     parser.add_argument(
         "-c",
         "--coder",
