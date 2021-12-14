@@ -65,10 +65,7 @@ bitdepth_to_dtype = {
 
 def make_dtype(format, value_type, width, height):
     # Use float division with rounding to account for oddly sized Y planes
-    # and even sized U and V planes to match ffmpeg. This was found with
-    # CLIC datasets "Lecture_1080P-4991" sequence which is 1438x1080 scaled to
-    # 959x720 in the Y plane and 480x360 in the U and V planes:
-    # /data/datasets/clic2021/orig-video-png/
+    # and even sized U and V planes to match ffmpeg.
 
     w_sub, h_sub = subsampling[format]
     if h_sub > 1:
