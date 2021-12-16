@@ -65,7 +65,7 @@ def test_eval_model():
 @pytest.mark.parametrize("entropy_estimation", (False, True))
 def test_eval_model_pretrained(capsys, model, quality, metric, entropy_estimation):
     here = os.path.dirname(__file__)
-    dirpath = os.path.join(here, "assets/dataset")
+    dirpath = os.path.join(here, "assets/dataset/image")
 
     cmd = [
         "pretrained",
@@ -148,7 +148,7 @@ def test_eval_model_ckpt(tmp_path, model_name):
     update_model.main(cmd)
 
     # ckpt evaluation
-    dirpath = os.path.join(here, "assets/dataset")
+    dirpath = os.path.join(here, "assets/dataset/image")
     checkpoint = next(f for f in os.listdir(tmp_path) if f.startswith("factorized-"))
     cmd = [
         "checkpoint",

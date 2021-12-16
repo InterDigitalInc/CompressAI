@@ -34,7 +34,7 @@ GENERATE_EXPECTED = os.getenv("GENERATE_EXPECTED")
 )
 def test_find_close(capsys, codec, metric, target):
     here = os.path.dirname(__file__)
-    dirpath = os.path.join(here, "assets/dataset")
+    dirpath = os.path.join(here, "assets/dataset/image")
 
     cmd = [
         codec,

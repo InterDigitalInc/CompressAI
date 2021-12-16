@@ -36,7 +36,7 @@ def test_eval_model_cmd():
 @pytest.mark.parametrize("codec", ("jpeg",))
 def test_bench_codec(capsys, codec):
     here = os.path.dirname(__file__)
-    dirpath = os.path.join(here, "assets/dataset")
+    dirpath = os.path.join(here, "assets/dataset/image")
 
     cmd = [
         codec,
