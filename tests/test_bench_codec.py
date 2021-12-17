@@ -46,6 +46,7 @@ def test_bench_codec(capsys, codec):
     bench_codec.main(cmd)
 
     output = capsys.readouterr().out
+    print(output)
     output = json.loads(output)
     expected = os.path.join(here, "expected", f"bench_{codec}.json")
 

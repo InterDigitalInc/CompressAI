@@ -16,6 +16,8 @@ import importlib
 import json
 import os
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -35,21 +37,20 @@ def test_eval_model_cmd():
 
 @pytest.mark.parametrize("codec", ("x264",))
 def test_bench_codec_video(capsys, codec):
-    here = os.path.dirname(__file__)
-    dirpath = os.path.join(here, "assets/dataset/video")
+    here = Path(__file__).parent
+    input_dir_path = here / "assets/dataset/video"
+    output_dir_path = here / "assets/dataset/video"
 
-    cmd = [
-        codec,
-        dirpath,
-    ]
+    cmd = [codec, input_dir_path.as_posix(), output_dir_path.as_posix()]
 
     bench_codec.main(cmd)
 
     output = capsys.readouterr().out
+    print(output)
     output = json.loads(output)
-    expected = os.path.join(here, "expected", f"bench_{codec}.json")
+    expected = here / f"expected/bench_{codec}.json"
 
-    if not os.path.isfile(expected):
+    if not expected.is_file():
         if not GENERATE_EXPECTED:
             raise RuntimeError(f"Missing expected file {expected}")
         with open(expected, "w") as f:
