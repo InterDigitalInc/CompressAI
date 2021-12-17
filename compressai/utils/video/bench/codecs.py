@@ -23,6 +23,11 @@ def run_command(cmd, ignore_returncodes=None):
         sys.exit(1)
 
 
+def _get_ffmpeg_version():
+    rv = run_command(["ffmpeg", "-version"])
+    return rv.split()[2]
+
+
 class Codec(abc.ABC):
     name = ""
     help = ""
@@ -41,6 +46,9 @@ class Codec(abc.ABC):
 
 class x264(Codec):
     name = "x264"
+
+    def description(self, **args):
+        return f'libx264 {args["preset"]}, ffmpeg version {_get_ffmpeg_version()}'
 
     def add_parser_args(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("-p", "--preset", default="medium", help="preset")
@@ -81,6 +89,10 @@ class x264(Codec):
 
 class x265(x264):
     name = "x265"
+
+    @property
+    def description(self):
+        return f"libx265, ffmpeg version {_get_ffmpeg_version()}"
 
     def get_encode_cmd(self, filepath: Path, **args: Any) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)

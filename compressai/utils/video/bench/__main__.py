@@ -255,7 +255,7 @@ def main(args: Any = None) -> None:
 
     output = {
         "name": codec.name,
-        "description": codec.description,
+        "description": codec.description(**args),
         "results": results,
     }
 
