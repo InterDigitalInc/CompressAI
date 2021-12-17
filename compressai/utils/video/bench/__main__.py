@@ -253,7 +253,13 @@ def main(args: Any = None) -> None:
 
     results = bench(args.pop("dataset"), codec, args["output"], **args)
 
-    print(json.dumps(results, indent=2))
+    output = {
+        "name": codec.name,
+        "description": codec.description,
+        "results": results,
+    }
+
+    print(json.dumps(output, indent=2))
 
 
 if __name__ == "__main__":
