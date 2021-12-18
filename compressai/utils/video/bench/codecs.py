@@ -90,9 +90,8 @@ class x264(Codec):
 class x265(x264):
     name = "x265"
 
-    @property
-    def description(self):
-        return f"libx265, ffmpeg version {_get_ffmpeg_version()}"
+    def description(self, **args):
+        return f'libx265 {args["preset"]}, ffmpeg version {_get_ffmpeg_version()}'
 
     def get_encode_cmd(self, filepath: Path, **args: Any) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
