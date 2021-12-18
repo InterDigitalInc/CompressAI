@@ -36,17 +36,15 @@ def test_eval_model_cmd():
 
 
 @pytest.mark.parametrize("codec", ("x264",))
-def test_bench_codec_video(capsys, codec):
+def test_bench_codec_video(capsys, codec, tmp_path):
     here = Path(__file__).parent
     input_dir_path = here / "assets/dataset/video"
-    output_dir_path = here / "assets/dataset/video"
 
-    cmd = [codec, input_dir_path.as_posix(), output_dir_path.as_posix()]
+    cmd = [codec, input_dir_path.as_posix(), tmp_path.as_posix()]
 
     bench_codec.main(cmd)
 
     output = capsys.readouterr().out
-    print(output)
     output = json.loads(output)
     expected = here / f"expected/bench_{codec}.json"
 
