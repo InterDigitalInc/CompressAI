@@ -57,7 +57,6 @@ def run_cmdline(
         if p.stdout is not None:
             for bline in p.stdout:
                 line = bline.decode()
-                sys.stdout.write(line)
                 f.write(line)
     p.wait()
 
