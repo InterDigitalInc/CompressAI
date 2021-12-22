@@ -30,10 +30,6 @@ from compressai.layers import GDN, MaskedConv2d
 from .utils import (
     conv,
     deconv,
-    gaussian_blur,
-    gaussian_kernel2d,
-    meshgrid2d,
-    quantize_ste,
     update_registered_buffers,
 )
 
@@ -43,7 +39,6 @@ __all__ = [
     "ScaleHyperprior",
     "MeanScaleHyperprior",
     "JointAutoregressiveHierarchicalPriors",
-    "ScaleSpaceFlow",
 ]
 
 
