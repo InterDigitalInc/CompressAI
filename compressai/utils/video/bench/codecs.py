@@ -52,7 +52,6 @@ class x264(Codec):
 
     def add_parser_args(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("-p", "--preset", default="medium", help="preset")
-        parser.add_argument("-q", "--qp", default=32, help="quality")
 
     def get_output_path(self, filepath: Path, **args: Any) -> Path:
         return Path(args["output"]) / (
