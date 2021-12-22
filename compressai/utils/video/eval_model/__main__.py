@@ -49,6 +49,7 @@ from torch.utils.model_zoo import tqdm
 from compressai.datasets import RawVideoSequence, VideoFormat
 from compressai.models.video.google import ScaleSpaceFlow
 from compressai.transforms.functional import ycbcr2rgb, yuv_420_to_444
+from compressai.zoo import models as pretrained_models
 
 models = {"ssf2020": ScaleSpaceFlow}
 
@@ -290,6 +291,12 @@ def load_checkpoint(arch: str, checkpoint_path: str) -> nn.Module:
     return net
 
 
+def load_pretrained(model: str, metric: str, quality: int) -> nn.Module:
+    return pretrained_models[model](
+        quality=quality, metric=metric, pretrained=True
+    ).eval()
+
+
 def create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Video compression network evaluation.",
@@ -321,23 +328,23 @@ def create_parser() -> argparse.ArgumentParser:
     subparsers.required = True
 
     # Options for pretrained models
-    # pretrained_parser = subparsers.add_parser("pretrained", parents=[parent_parser])
-    # pretrained_parser.add_argument(
-    #     "-m",
-    #     "--metric",
-    #     type=str,
-    #     choices=["mse", "ms-ssim"],
-    #     default="mse",
-    #     help="metric trained against (default: %(default)s)",
-    # )
-    # pretrained_parser.add_argument(
-    #     "-q",
-    #     "--quality",
-    #     dest="qualities",
-    #     nargs="+",
-    #     type=int,
-    #     default=(1,),
-    # )
+    pretrained_parser = subparsers.add_parser("pretrained", parents=[parent_parser])
+    pretrained_parser.add_argument(
+        "-m",
+        "--metric",
+        type=str,
+        choices=["mse", "ms-ssim"],
+        default="mse",
+        help="metric trained against (default: %(default)s)",
+    )
+    pretrained_parser.add_argument(
+        "-q",
+        "--quality",
+        dest="qualities",
+        nargs="+",
+        type=int,
+        default=(1,),
+    )
 
     checkpoint_parser = subparsers.add_parser("checkpoint", parents=[parent_parser])
     checkpoint_parser.add_argument(
@@ -357,10 +364,19 @@ def main(args: Any = None) -> None:
     parser = create_parser()
     args = parser.parse_args(args)
 
-    if args.source != "checkpoint":
-        raise NotImplementedError()
+    if args.source == "pretrained":
+        model = load_pretrained(args.architecture, args.metric, args.qualities[0])
+        # runs = sorted(args.qualities)
+        # opts = (args.architecture, args.metric)
+        # load_func = load_pretrained
+        # log_fmt = "\rEvaluating {0} | {run:d}"
+    elif args.source == "checkpoint":
+        model = load_checkpoint(args.architecture, args.path)
+        # runs = args.paths
+        # opts = (args.architecture,)
+        # load_func = load_checkpoint
+        # log_fmt = "\rEvaluating {run:s}"
 
-    model = load_checkpoint(args.architecture, args.path)
     if args.cuda and torch.cuda.is_available():
         model = model.to("cuda")
         if args.half:

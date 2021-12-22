@@ -85,7 +85,7 @@ def ssf2020(quality, metric="mse", pretrained=False, progress=True, **kwargs):
     IEEE Conference on Computer Vision and Pattern Recognition (CVPR 2020).
 
     Args:
-        quality (int): Quality levels (1: lowest, highest: 8)
+        quality (int): Quality levels (1: lowest, highest: 9)
         metric (str): Optimized metric, choose from ('mse', 'ms-ssim')
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
@@ -94,6 +94,6 @@ def ssf2020(quality, metric="mse", pretrained=False, progress=True, **kwargs):
         raise ValueError(f'Invalid metric "{metric}"')
 
     if quality < 1 or quality > 9:
-        raise ValueError(f'Invalid quality "{quality}", should be between (1, 8)')
+        raise ValueError(f'Invalid quality "{quality}", should be between (1, 9)')
 
-    return _load_model("mbt2018", metric, quality, pretrained, progress, **kwargs)
+    return _load_model("ssf2020", metric, quality, pretrained, progress, **kwargs)

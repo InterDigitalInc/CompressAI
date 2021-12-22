@@ -252,9 +252,9 @@ class qrelu(Function):
 
     Pre-computed scale with gamma function is used for backward computation.
 
-    More details can be found in 
+    More details can be found in
     `"Integer networks for data compression with latent-variable models"
-    <https://openreview.net/pdf?id=S1zz2i0cY7>`_, 
+    <https://openreview.net/pdf?id=S1zz2i0cY7>`_,
     by Johannes Ballé, Nick Johnston and David Minnen, ICLR in 2019
 
     Args:
@@ -265,7 +265,7 @@ class qrelu(Function):
 
     @staticmethod
     def forward(ctx, input, bit_depth, beta):
-        #TODO(choih): allow to use adaptive scale instead of 
+        # TODO(choih): allow to use adaptive scale instead of
         # pre-computed scale with gamma function
         ctx.alpha = 0.9943258522851727
         ctx.beta = beta

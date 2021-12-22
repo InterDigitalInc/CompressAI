@@ -95,7 +95,9 @@ class RateDistortionLoss(nn.Module):
 
         nC = x.size(1)
         if not nC == target.size(1):
-            raise RuntimeError("number of channels mismatches while computing distortion")
+            raise RuntimeError(
+                "number of channels mismatches while computing distortion"
+            )
 
         if isinstance(x, torch.Tensor):
             x = x.chunk(x.size(1), dim=1)
@@ -113,7 +115,7 @@ class RateDistortionLoss(nn.Module):
         metric_values = torch.stack(metric_values)
 
         # sum value over the components dimension
-        metric_value = torch.sum(metric_values.transpose(1, 0), dim=1)/nC
+        metric_value = torch.sum(metric_values.transpose(1, 0), dim=1) / nC
         scaled_metric = self._scaling_functions(metric_value)
 
         return scaled_metric, metric_value
