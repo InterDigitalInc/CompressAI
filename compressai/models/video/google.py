@@ -458,7 +458,7 @@ class ScaleSpaceFlow(nn.Module):
             state_dict,
         )
         update_registered_buffers(
-            self.res_hyperprior.gaussian_conditional,
+            self.motion_hyperprior.gaussian_conditional,
             "motion_hyperprior.gaussian_conditional",
             ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
             state_dict,
