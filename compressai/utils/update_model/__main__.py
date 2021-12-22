@@ -76,7 +76,7 @@ models = {
     "jarhp": JointAutoregressiveHierarchicalPriors,
     "mean-scale-hyperprior": MeanScaleHyperprior,
     "scale-hyperprior": ScaleHyperprior,
-    "scalespaceflow2020": ScaleSpaceFlow,
+    "ssf2020": ScaleSpaceFlow,
 }
 models.update(zoo_models)
 

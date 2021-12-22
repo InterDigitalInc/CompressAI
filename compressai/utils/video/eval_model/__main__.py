@@ -12,9 +12,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from compressai.models.video.google import ScaleSpaceFlow  # type: ignore
+from compressai.models.video.google import ScaleSpaceFlow
 
-# from pytorch_msssim import ms_ssim  # type: ignore
+# from pytorch_msssim import ms_ssim
 from torch import Tensor
 from torch.cuda import amp
 from torch.utils.model_zoo import tqdm
@@ -115,7 +115,7 @@ def compute_metrics_for_frame(
 
 def compute_bpp(likelihoods, num_pixels: int) -> float:
     bpp = sum(
-        (torch.log(getattr(lkl, k)).sum() / (-math.log(2) * num_pixels))
+        (torch.log(lkl[k]).sum() / (-math.log(2) * num_pixels))
         for lkl in likelihoods.values()
         for k in ("y", "z")
     )
