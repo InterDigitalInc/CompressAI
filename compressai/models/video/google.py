@@ -24,7 +24,7 @@ from torch.cuda import amp
 
 from compressai.ans import BufferedRansEncoder, RansDecoder
 from compressai.entropy_models import EntropyBottleneck, GaussianConditional
-from .utils import (
+from ..utils import (
     conv,
     deconv,
     gaussian_blur,
@@ -33,6 +33,7 @@ from .utils import (
     quantize_ste,
     update_registered_buffers,
 )
+from ..google import get_scale_table
 from compressai.layers import qrelu
 
 
@@ -465,6 +466,16 @@ class ScaleSpaceFlow(nn.Module):
         )
         self.motion_hyperprior.entropy_bottleneck.update()
         # self.motion_hyperprior.gaussian_conditional.update()
+
+    @classmethod
+    def from_state_dict(cls, state_dict):
+        """Return a new model instance from `state_dict`."""
+        print(state_dict.keys)
+        N = state_dict["res_encoder.0.weight"].size(0)
+        M = state_dict["res_encoder.6.weight"].size(0)
+        net = cls(N, M)
+        net.load_state_dict(state_dict)
+        return net
 
     def update(self, scale_table=None, force=False):
         if scale_table is None:
