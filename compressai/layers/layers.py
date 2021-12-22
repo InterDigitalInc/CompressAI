@@ -246,25 +246,27 @@ class AttentionBlock(nn.Module):
 
 class qrelu(Function):
     """QReLU
-
     Clamping input with given bit-depth range.
-    Suppose that input data presents integer through the integer networks
-    otherwise fraction values of input bypass without rounding operation for floating point networks.
+    Suppose that input data presents integer through an integer network
+    otherwise any precision of input will simply clamp without rounding operation.
 
     Pre-computed scale with gamma function is used for backward computation.
 
-    More details can be found `"Integer networks for data compression with latent-variable models"
-
-    #_______`_, Balle et al. in 2019
+    More details can be found in 
+    `"Integer networks for data compression with latent-variable models"
+    <https://openreview.net/pdf?id=S1zz2i0cY7>`_, 
+    by Johannes Ballé, Nick Johnston and David Minnen, ICLR in 2019
 
     Args:
         input : a tensor data
         bit_depth : bit-depth for clamping input
-        beta :
+        beta : a parameter for modeling gradient for backward computation
     """
 
     @staticmethod
     def forward(ctx, input, bit_depth, beta):
+        #TODO(choih): allow to use adaptive scale instead of 
+        # pre-computed scale with gamma function
         ctx.alpha = 0.9943258522851727
         ctx.beta = beta
         ctx.max_value = 2 ** bit_depth - 1
