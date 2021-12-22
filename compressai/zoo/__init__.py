@@ -20,6 +20,7 @@ from .image import (
     mbt2018,
     mbt2018_mean,
 )
+from .video import ssf2020
 from .pretrained import load_pretrained as load_state_dict
 
 models = {
@@ -29,4 +30,5 @@ models = {
     "mbt2018": mbt2018,
     "cheng2020-anchor": cheng2020_anchor,
     "cheng2020-attn": cheng2020_attn,
+    "ssf2020": ssf2020,
 }

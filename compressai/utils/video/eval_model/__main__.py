@@ -12,10 +12,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from lvc.models.networks.video.ssf import (  # type: ignore
-    google2020_flow,
-    google2020_ssf,
-)
+from compressai.models.video.google import ScaleSpaceFlow  # type: ignore
 
 # from pytorch_msssim import ms_ssim  # type: ignore
 from torch import Tensor
@@ -25,7 +22,7 @@ from torch.utils.model_zoo import tqdm
 from compressai.datasets import RawVideoSequence, VideoFormat
 from compressai.transforms.functional import ycbcr2rgb, yuv_420_to_444
 
-models = {"google2020_ssf": google2020_ssf, "google2020_flow": google2020_flow}
+models = {"ssf2020": ScaleSpaceFlow}
 
 Frame = Union[Tuple[Tensor, Tensor, Tensor], Tuple[Tensor, ...]]
 

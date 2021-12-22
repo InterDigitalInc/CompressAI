@@ -33,6 +33,7 @@ from compressai.models.google import (
     MeanScaleHyperprior,
     ScaleHyperprior,
 )
+from compressai.models.video.google import ScaleSpaceFlow
 from compressai.zoo import load_state_dict
 from compressai.zoo.image import model_architectures as zoo_models
 
@@ -75,6 +76,7 @@ models = {
     "jarhp": JointAutoregressiveHierarchicalPriors,
     "mean-scale-hyperprior": MeanScaleHyperprior,
     "scale-hyperprior": ScaleHyperprior,
+    "scalespaceflow2020": ScaleSpaceFlow,
 }
 models.update(zoo_models)
 
