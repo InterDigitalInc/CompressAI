@@ -236,98 +236,6 @@ def _encode(image, model, metric, quality, coder, output):
     )
 
 
-# def _encode_video(image, model, metric, quality, coder, output):
-def _encode_video(video, model, coder, output, device):
-    compressai.set_entropy_coder(coder)
-    enc_start = time.time()
-
-    start = time.time()
-    #    net = models[model](quality=quality, metric=metric, pretrained=True).eval()
-    net = model.to(device).eval()
-    load_time = time.time() - start
-
-    video_sequence = VideoSequenceInYUV420(
-        interval=1,
-        src_addr=video["addr"],
-        resolution=video["resolution"],
-        num_frms=video["num_frms"],
-    )
-
-    frames_enc_time = []
-    frames_coded_size = []
-    frames_coded_bpp = []
-    x_ref = None
-
-    frmH, frmW = video_sequence.height, video_sequence.width
-
-    p = 128
-    with Path(output).open("wb") as fout:
-        is_first_frm = False
-
-        # header = get_header(model, metric, quality)
-        # write_uchars(f, header)
-        # write original image size
-        write_uints(fout, (frmH, frmW))
-
-        for i in tqdm(range(len(video_sequence))):
-            is_first_frm = True if i == 0 else False
-            is_last_frm = True if (i + 1) == len(video_sequence) else False
-            frm_bytes = 0
-            frm_enc_start = time.time()
-
-            frm = video_sequence[i]
-
-            x = pad(frm.to(device), p)
-
-            with torch.no_grad():
-                if is_first_frm:
-                    x_out, out_info = net.encode_keyframe(x)
-                    shape = out_info["shape"]
-
-                    # write a frame number
-                    frm_bytes = write_uints(fout, (i,))
-                    # write shape and number of encoded latents
-                    frm_bytes += write_body(fout, shape, out_info["strings"])
-                else:
-                    x_out, out_info = net.encode_inter(x, x_ref)
-                    shape = out_info["shape"]
-
-                    assert isinstance(shape, Dict) is True
-
-                    # write a frame number
-                    frm_bytes = write_uints(fout, (i,))
-                    # write shape and number of encoded latents for motion and residuals
-                    for shape, out in zip(
-                        out_info["shape"].items(), out_info["strings"].items()
-                    ):
-                        frm_bytes += write_body(fout, shape[1], out[1])
-
-                frm_bytes += write_uchars(fout, (is_last_frm,))
-
-            x_ref = x_out
-
-            frm_enc_time = time.time() - frm_enc_start
-            bpp = float(frm_bytes) * 8 / (frmH * frmW)
-
-            frames_coded_bpp.append(bpp)
-            frames_enc_time.append(frm_enc_time)
-            frames_coded_size.append(frm_bytes)
-
-        video_sequence.close()
-
-    enc_time = time.time() - enc_start
-
-    print(
-        "=== Encoding Summary ===\n"
-        "------------------------\n"
-        f" Total {i+1} Frames\n"
-        f" Per frame encoding : {int(Average(frames_coded_size))} bytes (avg.) | "
-        f" {Average(frames_coded_bpp):.3f} bpp (avg.) | "
-        f" {Average(frames_enc_time):.3f}s (avg.) | "
-        f" Encoded in {enc_time:.2f}s (model loading: {load_time:.2f}s)"
-    )
-
-
 def _decode(inputpath, coder, show, output=None):
     compressai.set_entropy_coder(coder)
 
@@ -354,84 +262,6 @@ def _decode(inputpath, coder, show, output=None):
         show_image(img)
     if output is not None:
         img.save(output)
-
-
-# temp
-def _decode_video(model, device, inputpath, coder, show, output=None):
-    compressai.set_entropy_coder(coder)
-
-    dec_start = time.time()
-
-    frames_dec_time = []
-
-    start = time.time()
-    # net = models[model](quality=quality, metric=metric, pretrained=True).eval()
-    net = model.to(device).eval()
-    load_time = time.time() - start
-
-    x_ref = None
-
-    with Path(inputpath).open("rb") as fin:
-        first_frm_done = False
-        is_last_frm = False
-
-        # model, metric, quality = parse_header(read_uchars(f, 2))
-        original_size = read_uints(fin, 2)
-
-        # print(f"Model: {model:s}, metric: {metric:s}, quality: {quality:d}")
-        print("Model information will be printed out")
-
-        while not is_last_frm:
-            # for poc, bin_file in enumerate(tqdm(all_coded_stream)):
-            frame_dec_start = time.time()
-
-            with torch.no_grad():
-                if not first_frm_done:
-                    # write a frame number
-                    poc = read_uints(fin, 1)[0]
-
-                    assert poc == 0
-                    lstrings, shape = read_body(fin)
-                    out = net.decode_keyframe(lstrings, shape)
-                    first_frm_done = True
-                else:
-                    # write a frame number
-                    poc = read_uints(fin, 1)[0]
-                    assert poc > 0
-
-                    mstrings, mshape = read_body(fin)
-                    rstrings, rshape = read_body(fin)
-                    inter_strings = {"motion": mstrings, "residual": rstrings}
-                    inter_shapes = {"motion": mshape, "residual": rshape}
-
-                    out = net.decode_inter(x_ref, inter_strings, inter_shapes)
-
-                is_last_frm = BoolConvert(read_uchars(fin, 1)[0])
-
-                x_ref = out
-
-                x_hat = crop(out, original_size)
-                # yuv = yuv_444_to_420(rgb2ycbcr(x_hat))
-                img = torch2img(x_hat)
-
-                if output is not None:
-                    img.save(output)
-
-                frame_dec_time = time.time() - frame_dec_start
-                frames_dec_time.append(frame_dec_time)
-
-                if show:
-                    show_image(img)
-
-    dec_time = time.time() - dec_start
-
-    print(
-        "=== Decoding Summary ===\n"
-        "------------------------\n"
-        f" Total {poc+1} Frames\n"
-        f" Per frame decoding : {Average(frames_dec_time):.3f}s (avg.) | "
-        f" Decoded in {dec_time:.2f}s (model loading: {load_time:.2f}s)"
-    )
 
 
 def show_image(img: Image.Image):
@@ -484,88 +314,6 @@ def encode(argv):
     _encode(args.image, args.model, args.metric, args.quality, args.coder, args.output)
 
 
-def video_encode(argv):
-    print("Currently video encoder supports YUV input only")
-    parser = argparse.ArgumentParser(description="Encode a video sequence to bitstream")
-    parser.add_argument("video", type=str)
-    parser.add_argument(
-        "--video-resolution",
-        type=int,
-        nargs=2,
-        default=(1080, 1920),
-        help="resolution of the input video to code (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--num_frms",
-        type=int,
-        default=-1,
-        help="Number of frames to be coded (default: %(default)s encode all frames)",
-    )
-    # temp
-    parser.add_argument("--checkpoint", type=str, help="Path to a checkpoint")
-    parser.add_argument("--cuda", action="store_true", help="Use cuda")
-    # parser.add_argument(
-    #    "--model",
-    #    choices=models.keys(),
-    #    default=list(models.keys())[0],
-    #    help="NN model to use (default: %(default)s)",
-    # )
-    # parser.add_argument(
-    #    "-m",
-    #    "--metric",
-    #    choices=metric_ids.keys(),
-    #    default="mse",
-    #    help="metric trained against (default: %(default)s",
-    # )
-    # parser.add_argument(
-    #    "-q",
-    #    "--quality",
-    #    choices=list(range(1, 9)),
-    #    type=int,
-    #    default=3,
-    #    help="Quality setting (default: %(default)s)",
-    # )
-    parser.add_argument(
-        "-c",
-        "--coder",
-        choices=compressai.available_entropy_coders(),
-        default=compressai.available_entropy_coders()[0],
-        help="Entropy coder (default: %(default)s)",
-    )
-    parser.add_argument("-o", "--output", help="Output path")
-    args = parser.parse_args(argv)
-    if not args.output:
-        args.output = Path(Path(args.image).resolve().name).with_suffix(".bin")
-
-    # temp code
-    device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
-
-    from compressai.models.google import ScaleSpaceFlow
-
-    model = ScaleSpaceFlow()
-
-    if args.checkpoint:  # load from previous checkpoint
-        print("Loading", args.checkpoint)
-        checkpoint = torch.load(args.checkpoint, map_location=device)
-
-        # Not clear this part
-        model.load_state_dict(checkpoint["state_dict"])
-        model.update(force=True)
-
-    # _encode(args.video, args.model, args.metric, args.quality, args.coder, args.output)
-    _encode_video(
-        {
-            "addr": args.video,
-            "resolution": args.video_resolution,
-            "num_frms": args.num_frms,
-        },
-        model,
-        args.coder,
-        args.output,
-        device,
-    )
-
-
 def decode(argv):
     parser = argparse.ArgumentParser(description="Decode bit-stream to imager")
     parser.add_argument("input", type=str)
@@ -582,46 +330,9 @@ def decode(argv):
     _decode(args.input, args.coder, args.show, args.output)
 
 
-def video_decode(argv):
-    parser = argparse.ArgumentParser(description="Decode bit-stream to video sequence")
-    parser.add_argument("input", type=str)
-    parser.add_argument(
-        "-c",
-        "--coder",
-        choices=compressai.available_entropy_coders(),
-        default=compressai.available_entropy_coders()[0],
-        help="Entropy coder (default: %(default)s)",
-    )
-    parser.add_argument("--show", action="store_true")
-    parser.add_argument("-o", "--output", required=True, help="Output path")
-    # temp
-    parser.add_argument("--checkpoint", type=str, help="Path to a checkpoint")
-    parser.add_argument("--cuda", action="store_true", help="Use cuda")
-    args = parser.parse_args(argv)
-
-    # temp codes
-    device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
-
-    from compressai.models.google import ScaleSpaceFlow
-
-    model = ScaleSpaceFlow()
-
-    if args.checkpoint:  # load from previous checkpoint
-        print("Loading", args.checkpoint)
-        checkpoint = torch.load(args.checkpoint, map_location=device)
-
-        # Not clear this part
-        model.load_state_dict(checkpoint["state_dict"])
-        model.update(force=True)
-
-    _decode_video(model, device, args.input, args.coder, args.show, args.output)
-
-
 def parse_args(argv):
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument(
-        "command", choices=["encode", "video_encode", "decode", "video_decode"]
-    )
+    parser.add_argument("command", choices=["encode", "decode"])
     args = parser.parse_args(argv)
     return args
 
@@ -632,12 +343,8 @@ def main(argv):
     torch.set_num_threads(1)  # just to be sure
     if args.command == "img_encode":
         encode(argv)
-    elif args.command == "video_encode":
-        video_encode(argv)
     elif args.command == "img_decode":
         decode(argv)
-    elif args.command == "video_decode":
-        video_decode(argv)
 
 
 if __name__ == "__main__":
