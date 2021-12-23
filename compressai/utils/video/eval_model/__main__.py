@@ -55,6 +55,15 @@ models = {"ssf2020": ScaleSpaceFlow}
 
 Frame = Union[Tuple[Tensor, Tensor, Tensor], Tuple[Tensor, ...]]
 
+RAWVIDEO_EXTENSIONS = (".yuv",)  # read raw yuv videos for now
+
+
+def collect_videos(rootpath: str) -> List[str]:
+    video_files = []
+    for ext in RAWVIDEO_EXTENSIONS:
+        video_files.extend(Path(rootpath).glob(f"*{ext}"))
+    return video_files
+
 
 # TODO (racapef) duplicate from bench
 def to_tensors(
@@ -177,17 +186,6 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
                     cur_frame, rec_frame
                 )  # type:ignore
 
-                # rec_frame_ai, likelihoods_ai = net.forward_keyframe(
-                #     cur_frame
-                # )  # type:ignore
-                # rec_frame_ai = rec_frame_ai.clamp(0, 1)
-                # metrics_ai = compute_metrics_for_frame(
-                #     crop(cur_frame, padding),
-                #     crop(rec_frame_ai, padding),
-                #     org_seq.bitdepth,
-                # )
-                # metrics_ai["bpp"] = compute_bpp(likelihoods_ai, num_pixels)
-
             rec_frame = rec_frame.clamp(0, 1)
 
             metrics = compute_metrics_for_frame(
@@ -195,36 +193,9 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
             )
             metrics["bpp"] = compute_bpp(likelihoods, num_pixels)
 
-            # if (
-            #     rec_frame_ai is not None
-            #     and metrics_ai["rgb_psnr"] > metrics["rgb_psnr"]
-            #     and metrics_ai["bpp"] <= metrics["bpp"]
-            # ):
-            #     print(f"INTRASWITCH frame_id={i} | "
-            #           f"{metrics_ai['rgb_psnr']:.2f} {metrics_ai['bpp']:.3f} | "
-            #           f"{metrics['rgb_psnr']:.2f} {metrics['bpp']:.3f}"
-            #           )
-            #     metrics = metrics_ai
-            #     rec_frame = rec_frame_ai
-
-            # TODO: per component metrics
-            # out = yuv_444_to_420(rgb2ycbcr(crop(rec_frame, padding).clamp(0, 1)))
-            # org_frame_fr = convert_legal_to_full_range(
-            #     to_tensors(org_seq[i], device=str(device)), org_seq.bitdepth
-            # )
-            # for c, n in enumerate("yuv"):
-            #     metrics[f"{n}_mse"] = (
-            #         (
-            #             org_frame_fr[c].mul(max_val).clamp(0, max_val).round()
-            #             - out[c].mul(max_val).clamp(0, max_val).round()
-            #         )
-            #         .pow(2)
-            #         .mean()
-            #     )
-
-            # TODO: option to save rec YUV
+            # TODO(racapef): option to save rec YUV
             # for c in out:
-            #     output.write(c.cpu().squeeze().mul(255.0).byte().numpy().tobytes())
+            #     output.write(c.cpu().squeeze().mul(max_val).byte().numpy().tobytes())
             for k, v in metrics.items():
                 results[k].append(v)
             pbar.update(1)
@@ -235,7 +206,7 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
     }
     # filesize = get_filesize(bitstream_path)
     # seq_results["bpp"] = 8.0 * filesize / (num_frames * org_seq.width * org_seq.height)
-    # TODO: per component metrics
+    # TODO (racapef): per component metrics
     # for component in "yuv":
     #     seq_results[f"{component}_psnr"] = (
     #         20 * np.log10(max_val)
@@ -248,7 +219,7 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
 
 
 def run_inference(
-    dataset: Path,
+    filepaths,
     net: nn.Module,
     outputdir: Path,
     force: bool = False,
@@ -260,7 +231,7 @@ def run_inference(
     Path(outputdir).mkdir(parents=True, exist_ok=True)
     results_paths = []
 
-    for filepath in sorted(Path(dataset).glob("*.yuv")):
+    for filepath in filepaths:
         outputpath = Path(outputdir) / filepath.with_suffix(".bin").name
         sequence_metrics_path = outputpath.with_suffix(".json")
         results_paths.append(sequence_metrics_path)
@@ -324,6 +295,13 @@ def create_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="use evaluated entropy estimation (no entropy coding)",
     )
+    parent_parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="verbose mode",
+    )
+
     subparsers = parser.add_subparsers(help="model source", dest="source")
     subparsers.required = True
 
@@ -350,8 +328,9 @@ def create_parser() -> argparse.ArgumentParser:
     checkpoint_parser.add_argument(
         "-p",
         "--path",
-        dest="path",
+        dest="paths",
         type=str,
+        nargs="*",
         required=True,
         help="checkpoint path",
     )
@@ -364,26 +343,44 @@ def main(args: Any = None) -> None:
     parser = create_parser()
     args = parser.parse_args(args)
 
+    if not args.source:
+        print("Error: missing 'checkpoint' or 'pretrained' source.", file=sys.stderr)
+        parser.print_help()
+        raise SystemExit(1)
+
+    filepaths = collect_videos(args.dataset)
+    if len(filepaths) == 0:
+        print("Error: no video found in directory.", file=sys.stderr)
+        raise SystemExit(1)
+
     if args.source == "pretrained":
-        model = load_pretrained(args.architecture, args.metric, args.qualities[0])
-        # runs = sorted(args.qualities)
-        # opts = (args.architecture, args.metric)
-        # load_func = load_pretrained
-        # log_fmt = "\rEvaluating {0} | {run:d}"
+        # model = load_pretrained(args.architecture, args.metric, args.qualities[0])
+        runs = sorted(args.qualities)
+        opts = (args.architecture, args.metric)
+        load_func = load_pretrained
+        log_fmt = "\rEvaluating {0} | {run:d}"
     elif args.source == "checkpoint":
-        model = load_checkpoint(args.architecture, args.path)
-        # runs = args.paths
-        # opts = (args.architecture,)
-        # load_func = load_checkpoint
-        # log_fmt = "\rEvaluating {run:s}"
+        # model = load_checkpoint(args.architecture, args.path)
+        runs = args.paths
+        opts = (args.architecture,)
+        load_func = load_checkpoint
+        log_fmt = "\rEvaluating {run:s}"
 
-    if args.cuda and torch.cuda.is_available():
-        model = model.to("cuda")
-        if args.half:
-            model = model.half()
+    results = defaultdict(list)
+    for run in runs:
+        if args.verbose:
+            sys.stderr.write(log_fmt.format(*opts, run=run))
+            sys.stderr.flush()
+        model = load_func(*opts, run)
+        if args.cuda and torch.cuda.is_available():
+            model = model.to("cuda")
+            if args.half:
+                model = model.half()
+        args = vars(args)
+        metrics = run_inference(filepaths, model, args.pop("output"), **args)
+        for k, v in metrics.items():
+            results[k].append(v)
 
-    args = vars(args)
-    results = run_inference(args.pop("dataset"), model, args.pop("output"), **args)
     print(json.dumps(results, indent=2))
 
 
