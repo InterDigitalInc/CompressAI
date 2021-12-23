@@ -57,9 +57,9 @@ codec_classes = [x264, x265]
 Frame = Union[Tuple[Tensor, Tensor, Tensor], Tuple[Tensor, ...]]
 
 
-def func(codec, i, filepath, qp, preset, outputdir, cuda, force, dry_run):
-    encode_cmd = codec.get_encode_cmd(filepath, qp, preset, outputdir)
-    outputpath = codec.get_output_path(filepath, qp, preset, outputdir)
+def func(codec, i, filepath, qp, preset, tune, outputdir, cuda, force, dry_run):
+    encode_cmd = codec.get_encode_cmd(filepath, qp, preset, tune, outputdir)
+    outputpath = codec.get_output_path(filepath, qp, preset, tune, outputdir)
 
     # encode sequence if not already encoded
     if force:
@@ -230,6 +230,7 @@ def bench(
     qps: List[int] = [32],
     num_jobs: int = 1,
     preset: str = "medium",
+    tune: str = "psnr",
     **args: Any,
 ) -> Dict[str, Any]:
     # create output directory
@@ -245,6 +246,7 @@ def bench(
             f,
             q,
             preset,
+            tune,
             outputdir,
             args["cuda"],
             args["force"],

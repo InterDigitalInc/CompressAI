@@ -75,17 +75,26 @@ class x264(Codec):
     name = "x264"
 
     def description(self, **args):
-        return f'libx264 {args["preset"]}, ffmpeg version {_get_ffmpeg_version()}'
+        return f'libx264 {args["preset"]}, tuned for {args["tune"]}, ffmpeg version {_get_ffmpeg_version()}'
 
     def add_parser_args(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("-p", "--preset", default="medium", help="preset")
+        parser.add_argument(
+            "--tune",
+            default="psnr",
+            help="tune encoder for psnr or ssim (default: %(default)s)",
+        )
 
-    def get_output_path(self, filepath: Path, qp, preset: str, output: str) -> Path:
-        return Path(output) / (f"{filepath.stem}_{self.name}_{preset}_qp{qp}.mp4")
+    def get_output_path(
+        self, filepath: Path, qp, preset: str, tune: str, output: str
+    ) -> Path:
+        return Path(output) / (
+            f"{filepath.stem}_{self.name}_{preset}_tune-{tune}_qp{qp}.mp4"
+        )
 
-    def get_encode_cmd(self, filepath: Path, qp, preset, outputdir) -> List[Any]:
+    def get_encode_cmd(self, filepath: Path, qp, preset, tune, outputdir) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
-        outputpath = self.get_output_path(filepath, qp, preset, outputdir)
+        outputpath = self.get_output_path(filepath, qp, preset, tune, outputdir)
         cmd = [
             "ffmpeg",
             "-s:v",
@@ -100,8 +109,8 @@ class x264(Codec):
             preset,
             "-bf",
             0,
-            # "-tune",
-            # "ssim",
+            "-tune",
+            tune,
             "-pix_fmt",
             "yuv420p",
             "-threads",
@@ -115,9 +124,11 @@ class x265(x264):
     name = "x265"
 
     def description(self, **args):
-        return f'libx265 {args["preset"]}, ffmpeg version {_get_ffmpeg_version()}'
+        return f'libx265 {args["preset"]}, tuned for {args["tune"]}, ffmpeg version {_get_ffmpeg_version()}'
 
-    def get_encode_cmd(self, filepath: Path, qp, preset, outputdir) -> List[Any]:
+    def get_encode_cmd(
+        self, filepath: Path, qp, preset, metric, outputdir
+    ) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
         outputpath = self.get_output_path(filepath, qp, preset, outputdir)
         cmd = [
@@ -134,8 +145,8 @@ class x265(x264):
             preset,
             "-x265-params",
             "bframes=0",
-            # "-tune",
-            # "ssim",
+            "-tune",
+            metric,
             "-pix_fmt",
             "yuv420p",
             "-threads",
