@@ -41,7 +41,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# from pytorch_msssim import ms_ssim
+from pytorch_msssim import ms_ssim
 from torch import Tensor
 from torch.cuda import amp
 from torch.utils.model_zoo import tqdm
@@ -94,15 +94,14 @@ def aggregate_results(filepaths: List[Path]) -> Dict[str, Any]:
 
 
 def convert_frame(
-    frame: Tuple[np.ndarray, np.ndarray, np.ndarray],
-    device: torch.device,
+    frame: Tuple[np.ndarray, np.ndarray, np.ndarray], device: torch.device, max_val: int
 ) -> Tensor:
     # yuv420 [0, 2**bitdepth-1] to rgb 444 [0, 1] only for now
-    out = to_tensors(frame, device=str(device))
+    out = to_tensors(frame, device=str(device), max_value=max_val)
     out = yuv_420_to_444(
         tuple(c.unsqueeze(0).unsqueeze(0) for c in out), mode="bicubic"  # type: ignore
     )
-    return ycbcr2rgb(out).clamp(0, 1)  # type: ignore
+    return ycbcr2rgb(out)  # type: ignore
 
 
 def pad(x: Tensor, p: int = 2 ** (4 + 3)) -> Tuple[Tensor, Tuple[int, ...]]:
@@ -122,16 +121,28 @@ def crop(x: Tensor, padding: Tuple[int, ...]) -> Tensor:
     return F.pad(x, tuple(-p for p in padding))
 
 
-def compute_metrics_for_frame(
-    org: Tensor, rec: Tensor, bitdepth: int
-) -> Dict[str, Any]:
-    max_val = 2 ** bitdepth - 1
-    org = (org * max_val).clamp(0, max_val).round()
-    rec = (rec * max_val).clamp(0, max_val).round()
-    mse = (org - rec).pow(2).mean()
+def compute_metrics(tst, ref, max_val: float = 1.0):
+    """Returns PSNR and MS-SSIM between images `a` and `b`."""
+    # input tensor should be in a form of (N, C, H, W)
+    a = tst.detach()
+    b = ref.detach()
+
+    mse = torch.mean((a - b) ** 2).item()
+    p = -10 * np.log10(mse)
+    m = ms_ssim(a, b, data_range=max_val).item()
+    return p, m
+
+
+def compute_metrics_for_frame(org: Tensor, rec: Tensor, max_val: int) -> Dict[str, Any]:
+    rec = torch.clamp(rec, 0.0, 1.0)
+    mse = torch.mean((org - rec) ** 2)
+    p = -10 * torch.log10(mse)
+    m = ms_ssim(org, rec, data_range=1.0)
+
     return {
-        "mse": mse,
-        "rgb_psnr": 20 * np.log10(max_val) - 10 * torch.log10(mse),
+        "mse": mse * (max_val * max_val),
+        "rgb_psnr": p,
+        "msssim": m,
     }
 
 
@@ -153,11 +164,12 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
     device = next(net.parameters()).device
     num_frames = len(org_seq)
     num_pixels = org_seq.height * org_seq.width
+    max_val = 2 ** org_seq.bitdepth - 1
     results = defaultdict(list)
 
     with tqdm(total=num_frames) as pbar:
         for i in range(num_frames):
-            cur_frame = convert_frame(org_seq[i], device)
+            cur_frame = convert_frame(org_seq[i], device, max_val)
             cur_frame, padding = pad(cur_frame)
 
             if i == 0:
@@ -170,7 +182,7 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
             rec_frame = rec_frame.clamp(0, 1)
 
             metrics = compute_metrics_for_frame(
-                crop(cur_frame, padding), crop(rec_frame, padding), org_seq.bitdepth
+                crop(cur_frame, padding), crop(rec_frame, padding), max_val
             )
             metrics["bpp"] = compute_bpp(likelihoods, num_pixels)
 
