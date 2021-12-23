@@ -117,9 +117,9 @@ class x265(x264):
     def description(self, **args):
         return f'libx265 {args["preset"]}, ffmpeg version {_get_ffmpeg_version()}'
 
-    def get_encode_cmd(self, filepath: Path, qp, preset) -> List[Any]:
+    def get_encode_cmd(self, filepath: Path, qp, preset, outputdir) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
-        outputpath = self.get_output_path(filepath, qp, preset)
+        outputpath = self.get_output_path(filepath, qp, preset, outputdir)
         cmd = [
             "ffmpeg",
             "-s:v",
