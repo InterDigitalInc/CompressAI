@@ -37,7 +37,6 @@ import torch.nn.functional as F
 
 from torch.cuda import amp
 
-from compressai.ans import BufferedRansEncoder, RansDecoder
 from compressai.entropy_models import EntropyBottleneck, GaussianConditional
 from compressai.layers import qrelu
 
@@ -449,7 +448,8 @@ class ScaleSpaceFlow(nn.Module):
             ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
             state_dict,
         )
-        self.img_hyperprior.update()
+        self.img_hyperprior.entropy_bottleneck.update()
+        # self.img_hyperprior.gaussian_conditional.update()
 
         update_registered_buffers(
             self.res_hyperprior.entropy_bottleneck,
@@ -463,7 +463,8 @@ class ScaleSpaceFlow(nn.Module):
             ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
             state_dict,
         )
-        self.res_hyperprior.update()
+        self.res_hyperprior.entropy_bottleneck.update()
+        # self.res_hyperprior.gaussian_conditional.update()
 
         update_registered_buffers(
             self.motion_hyperprior.entropy_bottleneck,
@@ -477,8 +478,8 @@ class ScaleSpaceFlow(nn.Module):
             ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
             state_dict,
         )
-        self.motion_hyperprior.update()
-
+        self.motion_hyperprior.entropy_bottleneck.update()
+        # self.motion_hyperprior.gaussian_conditional.update()
         super().load_state_dict(state_dict)
 
     @classmethod

@@ -57,9 +57,37 @@ codec_classes = [x264, x265]
 Frame = Union[Tuple[Tensor, Tensor, Tensor], Tuple[Tensor, ...]]
 
 
-def func(codec, i, *args):
-    rv = codec.run(*args)
-    return i, rv
+def func(codec, i, filepath, qp, preset, outputdir, cuda, force, dry_run):
+    encode_cmd = codec.get_encode_cmd(filepath, qp, preset, outputdir)
+    outputpath = codec.get_output_path(filepath, qp, preset, outputdir)
+
+    # encode sequence if not already encoded
+    if force:
+        outputpath.unlink(missing_ok=True)
+    if not outputpath.is_file():
+        logpath = outputpath.with_suffix(".log")
+        run_cmdline(encode_cmd, logpath=logpath, dry_run=dry_run)
+
+    # compute metrics if not already performed
+    sequence_metrics_path = outputpath.with_suffix(".json")
+    # results_paths.append(sequence_metrics_path)
+
+    if force:
+        sequence_metrics_path.unlink(missing_ok=True)
+    if sequence_metrics_path.is_file():
+        return
+
+    with tempfile.NamedTemporaryFile(suffix=".yuv", delete=True) as f:
+        # decode sequence
+        cmd = ["ffmpeg", "-y", "-i", outputpath, "-pix_fmt", "yuv420p", f.name]
+        run_cmdline(cmd)
+
+        # compute metrics
+        metrics = evaluate(filepath, Path(f.name), outputpath, cuda)
+        with sequence_metrics_path.open("wb") as f:
+            f.write(json.dumps(metrics, indent=2).encode())
+
+    return i, metrics
 
 
 def to_tensors(
@@ -199,10 +227,9 @@ def bench(
     dataset: Path,
     codec: Codec,
     outputdir: Path,
-    qps: List[int],
+    qps: List[int] = [32],
     num_jobs: int = 1,
-    cuda: bool = False,
-    dry_run: bool = False,
+    preset: str = "medium",
     **args: Any,
 ) -> Dict[str, Any]:
     # create output directory
@@ -211,7 +238,21 @@ def bench(
     pool = mp.Pool(num_jobs) if num_jobs > 1 else None
 
     filepaths = sorted(Path(dataset).glob("*.yuv"))
-    args = [(codec, i, f, q) for i, q in enumerate(qps) for f in filepaths]
+    args = [
+        (
+            codec,
+            i,
+            f,
+            q,
+            preset,
+            outputdir,
+            args["cuda"],
+            args["force"],
+            args["dry_run"],
+        )
+        for i, q in enumerate(qps)
+        for f in filepaths
+    ]
 
     if pool:
         rv = pool.starmap(func, args)
@@ -224,7 +265,7 @@ def bench(
         for k, v in metrics.items():
             results[i][k] += v
 
-    # aggregate results for all images
+    # aggregate results for all videos
     for i, _ in enumerate(results):
         for k, v in results[i].items():
             results[i][k] = v / len(filepaths)
@@ -235,85 +276,6 @@ def bench(
         for k, v in r.items():
             out[k].append(v)
     return out
-
-    # results_paths = []
-    # for filepath in sorted(Path(dataset).glob("*.yuv")):
-    #     encode_cmd = codec.get_encode_cmd(filepath, **args)
-    #     outputpath = codec.get_output_path(filepath, **args)
-
-    #     # encode sequence if not already encoded
-    #     if force:
-    #         outputpath.unlink(missing_ok=True)
-    #     if not outputpath.is_file():
-    #         logpath = outputpath.with_suffix(".log")
-    #         run_cmdline(encode_cmd, logpath=logpath, dry_run=dry_run)
-
-    #     # compute metrics if not already performed
-    #     sequence_metrics_path = outputpath.with_suffix(".json")
-    #     results_paths.append(sequence_metrics_path)
-
-    #     if force:
-    #         sequence_metrics_path.unlink(missing_ok=True)
-    #     if sequence_metrics_path.is_file():
-    #         continue
-
-    #     with tempfile.NamedTemporaryFile(suffix=".yuv", delete=True) as f:
-    #         # decode sequence
-    #         cmd = ["ffmpeg", "-y", "-i", outputpath, "-pix_fmt", "yuv420p", f.name]
-    #         run_cmdline(cmd)
-
-    #         # compute metrics
-    #         metrics = evaluate(filepath, Path(f.name), outputpath, cuda)
-    #         with sequence_metrics_path.open("wb") as f:
-    #             f.write(json.dumps(metrics, indent=2).encode())
-
-    # results = aggregate_results(results_paths)
-    # return results
-
-
-# def collect(
-#     codec: Codec,
-#     dataset: str,
-#     qps: List[int],
-#     num_jobs: int = 1,
-# ):
-#     if not Path(dataset).is_dir():
-#         raise OSError(f"No such directory: {dataset}")
-
-#     filepaths = []
-#     for ext in IMG_EXTENSIONS:
-#         filepaths.extend(Path(dataset).rglob(f"*{ext}"))
-
-#     pool = mp.Pool(num_jobs) if num_jobs > 1 else None
-
-#     if len(filepaths) == 0:
-#         print("No images found in the dataset directory")
-#         sys.exit(1)
-
-#     args = [(codec, i, f, q, metrics) for i, q in enumerate(qps) for f in filepaths]
-
-#     if pool:
-#         rv = pool.starmap(func, args)
-#     else:
-#         rv = list(starmap(func, args))
-
-#     results = [defaultdict(float) for _ in range(len(qps))]
-
-#     for i, metrics in rv:
-#         for k, v in metrics.items():
-#             results[i][k] += v
-
-#     # aggregate results for all images
-#     for i, _ in enumerate(results):
-#         for k, v in results[i].items():
-#             results[i][k] = v / len(filepaths)
-
-#     # list of dict -> dict of list
-#     out = defaultdict(list)
-#     for r in results:
-#         for k, v in r.items():
-#             out[k].append(v)
-#     return out
 
 
 def create_parser() -> Tuple[
@@ -372,16 +334,15 @@ def main(args: Any = None) -> None:
 
     args = vars(parser.parse_args(args))
 
-    # results = collect(
-    #     codec,
-    #     args.dataset,
-    #     args.qps,
-    #     args.num_jobs,
-    # )
-
     codec = codec_lookup[args.pop("codec")]
 
-    results = bench(args.pop("dataset"), codec, args["output"], args.pop("qps"), **args)
+    results = bench(
+        args.pop("dataset"),
+        codec,
+        args["output"],
+        args.pop("qps"),
+        **args,
+    )
 
     output = {
         "name": codec.name,

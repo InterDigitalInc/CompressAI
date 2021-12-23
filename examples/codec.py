@@ -33,22 +33,16 @@ import sys
 import time
 
 from pathlib import Path
-from typing import Dict
 
 import torch
 import torch.nn.functional as F
 
 from PIL import Image
 from torchvision.transforms import ToPILImage, ToTensor
-from tqdm import tqdm
 
 import compressai
 
-from compressai.datasets import VideoSequenceInYUV420
 from compressai.zoo import models
-
-# from compressai.transforms.functional import rgb2ycbcr, yuv_444_to_420
-
 
 torch.backends.cudnn.deterministic = True
 

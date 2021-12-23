@@ -30,13 +30,9 @@
 import math
 import warnings
 
-from typing import List
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-from torch.cuda import amp
 
 from compressai.ans import BufferedRansEncoder, RansDecoder
 from compressai.entropy_models import EntropyBottleneck, GaussianConditional

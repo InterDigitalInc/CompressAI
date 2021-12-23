@@ -29,8 +29,6 @@
 
 import abc
 import argparse
-import os
-import platform
 import subprocess
 import sys
 
@@ -82,14 +80,12 @@ class x264(Codec):
     def add_parser_args(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("-p", "--preset", default="medium", help="preset")
 
-    def get_output_path(self, filepath: Path, **args: Any) -> Path:
-        return Path(args["output"]) / (
-            f"{filepath.stem}_{self.name}_{args['preset']}_qp{args['qp']}.mp4"
-        )
+    def get_output_path(self, filepath: Path, qp, preset: str, output: str) -> Path:
+        return Path(output) / (f"{filepath.stem}_{self.name}_{preset}_qp{qp}.mp4")
 
-    def get_encode_cmd(self, filepath: Path, **args: Any) -> List[Any]:
+    def get_encode_cmd(self, filepath: Path, qp, preset, outputdir) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
-        outputpath = self.get_output_path(filepath, **args)
+        outputpath = self.get_output_path(filepath, qp, preset, outputdir)
         cmd = [
             "ffmpeg",
             "-s:v",
@@ -99,9 +95,9 @@ class x264(Codec):
             "-c:v",
             "h264",
             "-crf",
-            args["qp"],
+            qp,
             "-preset",
-            args["preset"],
+            preset,
             "-bf",
             0,
             # "-tune",
@@ -121,9 +117,9 @@ class x265(x264):
     def description(self, **args):
         return f'libx265 {args["preset"]}, ffmpeg version {_get_ffmpeg_version()}'
 
-    def get_encode_cmd(self, filepath: Path, **args: Any) -> List[Any]:
+    def get_encode_cmd(self, filepath: Path, qp, preset) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
-        outputpath = self.get_output_path(filepath, **args)
+        outputpath = self.get_output_path(filepath, qp, preset)
         cmd = [
             "ffmpeg",
             "-s:v",
@@ -133,9 +129,9 @@ class x265(x264):
             "-c:v",
             "hevc",
             "-crf",
-            args["qp"],
+            qp,
             "-preset",
-            args["preset"],
+            preset,
             "-x265-params",
             "bframes=0",
             # "-tune",
@@ -147,21 +143,3 @@ class x265(x264):
             outputpath,
         ]
         return cmd
-
-
-def get_vtm_encoder_path(build_dir):
-    system = platform.system()
-    try:
-        elfnames = {"Darwin": "EncoderApp", "Linux": "EncoderAppStatic"}
-        return os.path.join(build_dir, elfnames[system])
-    except KeyError as err:
-        raise RuntimeError(f'Unsupported platform "{system}"') from err
-
-
-def get_vtm_decoder_path(build_dir):
-    system = platform.system()
-    try:
-        elfnames = {"Darwin": "DecoderApp", "Linux": "DecoderAppStatic"}
-        return os.path.join(build_dir, elfnames[system])
-    except KeyError as err:
-        raise RuntimeError(f'Unsupported platform "{system}"') from err
