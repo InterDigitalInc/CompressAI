@@ -37,7 +37,7 @@ import torch.nn.functional as F
 
 from torch.cuda import amp
 
-from compressai.entropy_models import EntropyBottleneck, GaussianConditional
+from compressai.entropy_models import GaussianConditional
 from compressai.layers import qrelu
 
 from ..google import CompressionModel, get_scale_table

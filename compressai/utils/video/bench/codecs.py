@@ -56,11 +56,28 @@ def _get_ffmpeg_version():
 
 
 class Codec(abc.ABC):
-    name = ""
+    # name = ""
+    description = ""
     help = ""
+
+    @classmethod
+    def setup_args(cls, parser):
+        pass
+
+    @property
+    @abc.abstractmethod
+    def name(self):
+        raise NotImplementedError()
+
+    @property
+    def description(self):
+        return self._description
 
     def add_parser_args(self, parser: argparse.ArgumentParser) -> None:
         pass
+
+    def _set_args(self, args):
+        return args
 
     @abc.abstractmethod
     def get_output_path(self, filepath: Path, **args: Any) -> Path:
@@ -72,10 +89,18 @@ class Codec(abc.ABC):
 
 
 class x264(Codec):
-    name = "x264"
+    preset = ""
+    tune = ""
 
-    def description(self, **args):
-        return f'libx264 {args["preset"]}, tuned for {args["tune"]}, ffmpeg version {_get_ffmpeg_version()}'
+    @property
+    def name(self):
+        return "x264"
+
+    def description(self):
+        return f"{self.name} {self.preset}, tuned for {self.tune}, ffmpeg version {_get_ffmpeg_version()}"
+
+    def name_config(self):
+        return f"{self.name}-{self.preset}-tune-{self.tune}"
 
     def add_parser_args(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument("-p", "--preset", default="medium", help="preset")
@@ -85,16 +110,20 @@ class x264(Codec):
             help="tune encoder for psnr or ssim (default: %(default)s)",
         )
 
-    def get_output_path(
-        self, filepath: Path, qp, preset: str, tune: str, output: str
-    ) -> Path:
+    def set_args(self, args):
+        args = super()._set_args(args)
+        self.preset = args.preset
+        self.tune = args.tune
+        return args
+
+    def get_output_path(self, filepath: Path, qp, output: str) -> Path:
         return Path(output) / (
-            f"{filepath.stem}_{self.name}_{preset}_tune-{tune}_qp{qp}.mp4"
+            f"{filepath.stem}_{self.name}_{self.preset}_tune-{self.tune}_qp{qp}.mp4"
         )
 
-    def get_encode_cmd(self, filepath: Path, qp, preset, tune, outputdir) -> List[Any]:
+    def get_encode_cmd(self, filepath: Path, qp, outputdir) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
-        outputpath = self.get_output_path(filepath, qp, preset, tune, outputdir)
+        outputpath = self.get_output_path(filepath, qp, outputdir)
         cmd = [
             "ffmpeg",
             "-s:v",
@@ -106,11 +135,11 @@ class x264(Codec):
             "-crf",
             qp,
             "-preset",
-            preset,
+            self.preset,
             "-bf",
             0,
             "-tune",
-            tune,
+            self.tune,
             "-pix_fmt",
             "yuv420p",
             "-threads",
@@ -121,16 +150,13 @@ class x264(Codec):
 
 
 class x265(x264):
-    name = "x265"
+    @property
+    def name(self):
+        return "x265"
 
-    def description(self, **args):
-        return f'libx265 {args["preset"]}, tuned for {args["tune"]}, ffmpeg version {_get_ffmpeg_version()}'
-
-    def get_encode_cmd(
-        self, filepath: Path, qp, preset, metric, outputdir
-    ) -> List[Any]:
+    def get_encode_cmd(self, filepath: Path, qp, outputdir) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
-        outputpath = self.get_output_path(filepath, qp, preset, outputdir)
+        outputpath = self.get_output_path(filepath, qp, outputdir)
         cmd = [
             "ffmpeg",
             "-s:v",
@@ -142,11 +168,11 @@ class x265(x264):
             "-crf",
             qp,
             "-preset",
-            preset,
+            self.preset,
             "-x265-params",
             "bframes=0",
             "-tune",
-            metric,
+            self.tune,
             "-pix_fmt",
             "yuv420p",
             "-threads",

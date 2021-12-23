@@ -57,9 +57,9 @@ codec_classes = [x264, x265]
 Frame = Union[Tuple[Tensor, Tensor, Tensor], Tuple[Tensor, ...]]
 
 
-def func(codec, i, filepath, qp, preset, tune, outputdir, cuda, force, dry_run):
-    encode_cmd = codec.get_encode_cmd(filepath, qp, preset, tune, outputdir)
-    outputpath = codec.get_output_path(filepath, qp, preset, tune, outputdir)
+def func(codec, i, filepath, qp, outputdir, cuda, force, dry_run):
+    encode_cmd = codec.get_encode_cmd(filepath, qp, outputdir)
+    outputpath = codec.get_output_path(filepath, qp, outputdir)
 
     # encode sequence if not already encoded
     if force:
@@ -140,8 +140,8 @@ def compute_metrics_for_frame(
     for i, component in enumerate("yuv"):
         out[f"{component}_mse"] = (org_frame[i] - dec_frame[i]).pow(2).mean()
 
-    org = ycbcr2rgb(yuv_420_to_444(org_frame, mode="bicubic"))  # type: ignore
-    dec = ycbcr2rgb(yuv_420_to_444(dec_frame, mode="bicubic"))  # type: ignore
+    org = ycbcr2rgb(yuv_420_to_444(org_frame, mode="bicubic").true_divide(max_val))  # type: ignore
+    dec = ycbcr2rgb(yuv_420_to_444(dec_frame, mode="bicubic").true_divide(max_val))  # type: ignore
 
     org = (org * max_val).clamp(0, max_val).round()
     dec = (dec * max_val).clamp(0, max_val).round()
@@ -223,14 +223,12 @@ def aggregate_results(filepaths: List[Path]) -> Dict[str, Any]:
     return agg
 
 
-def bench(
+def collect(
     dataset: Path,
-    codec: Codec,
+    codec_class: Codec,
     outputdir: Path,
-    qps: List[int] = [32],
+    qps: List[int],
     num_jobs: int = 1,
-    preset: str = "medium",
-    tune: str = "psnr",
     **args: Any,
 ) -> Dict[str, Any]:
     # create output directory
@@ -241,12 +239,10 @@ def bench(
     filepaths = sorted(Path(dataset).glob("*.yuv"))
     args = [
         (
-            codec,
+            codec_class,
             i,
             f,
             q,
-            preset,
-            tune,
             outputdir,
             args["cuda"],
             args["force"],
@@ -325,30 +321,32 @@ def main(args: Any = None) -> None:
 
     codec_lookup = {}
     for cls in codec_classes:
-        codec = cls()
-        codec_lookup[codec.name] = codec
+        codec_class = cls()
+        codec_lookup[codec_class.name] = codec_class
         codec_parser = subparsers.add_parser(
-            codec.name,
+            codec_class.name,
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
             parents=[parent_parser],
         )
-        codec.add_parser_args(codec_parser)
+        codec_class.add_parser_args(codec_parser)
 
-    args = vars(parser.parse_args(args))
+    args = parser.parse_args(args)
 
-    codec = codec_lookup[args.pop("codec")]
+    codec_class = codec_lookup[args.codec]
+    codec_class.set_args(args)
 
-    results = bench(
+    args = vars(args)
+    results = collect(
         args.pop("dataset"),
-        codec,
+        codec_class,
         args["output"],
         args.pop("qps"),
         **args,
     )
 
     output = {
-        "name": codec.name,
-        "description": codec.description(**args),
+        "name": codec_class.name_config(),
+        "description": codec_class.description(),
         "results": results,
     }
 
