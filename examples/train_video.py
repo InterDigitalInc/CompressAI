@@ -34,6 +34,7 @@ import shutil
 import sys
 
 from collections import defaultdict
+from typing import List
 
 import torch
 import torch.nn as nn
@@ -202,6 +203,17 @@ class AverageMeter:
         self.avg = self.sum / self.count
 
 
+def compute_aux_loss(aux_list: List, backward=False):
+    aux_loss_sum = 0
+    for aux_loss in aux_list:
+        aux_loss_sum += aux_loss
+
+        if backward is True:
+            aux_loss.backward()
+
+    return aux_loss_sum
+
+
 def configure_optimizers(net, args):
     """Separate parameters for the main optimizer and the auxiliary optimizer.
     Return two optimizers"""
@@ -256,8 +268,7 @@ def train_one_epoch(
             torch.nn.utils.clip_grad_norm_(model.parameters(), clip_max_norm)
         optimizer.step()
 
-        aux_loss = model.aux_loss()
-        aux_loss.backward()
+        aux_loss = compute_aux_loss(model.aux_loss(), backward=True)
         aux_optimizer.step()
 
         if i % 10 == 0:
@@ -287,7 +298,7 @@ def test_epoch(epoch, test_dataloader, model, criterion):
             out_net = model(d)
             out_criterion = criterion(out_net, d)
 
-            aux_loss.update(model.aux_loss())
+            aux_loss.update(compute_aux_loss(model.aux_loss()))
             bpp_loss.update(out_criterion["bpp_loss"])
             loss.update(out_criterion["loss"])
             mse_loss.update(out_criterion["mse_loss"])

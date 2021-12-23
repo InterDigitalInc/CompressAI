@@ -382,13 +382,14 @@ class ScaleSpaceFlow(nn.Module):
         return x_pred
 
     def aux_loss(self):
-        """Return the aggregated loss over the auxiliary entropy bottleneck
-        module(s).
-        """
-        aux_loss = sum(
-            m.loss() for m in self.modules() if isinstance(m, EntropyBottleneck)
-        )
-        return aux_loss
+        """Return a list of the auxiliary entropy bottleneck over module(s)."""
+
+        aux_loss_list = []
+        for m in self.modules():
+            if isinstance(m, CompressionModel):
+                aux_loss_list.append(m.aux_loss())
+
+        return aux_loss_list
 
     def compress(self, frames):
         if not isinstance(frames, List):
