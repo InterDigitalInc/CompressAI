@@ -93,28 +93,12 @@ def aggregate_results(filepaths: List[Path]) -> Dict[str, Any]:
     return agg
 
 
-# TODO (racapef) duplicate from bench
-def convert_legal_to_full_range(frame: Frame, bitdepth: int = 8) -> Frame:
-    ranges = torch.tensor([16, 235, 16, 240], device=frame[0].device)
-    ranges *= 2 ** (bitdepth - 8)
-    ymin, ymax, cmin, cmax = ranges
-    y, cb, cr = frame
-
-    y = (y - ymin) / (ymax - ymin)
-    cb = (cb - cmin) / (cmax - cmin)
-    cr = (cr - cmin) / (cmax - cmin)
-
-    return y, cb, cr
-
-
 def convert_frame(
     frame: Tuple[np.ndarray, np.ndarray, np.ndarray],
     device: torch.device,
-    bitdepth: int,
 ) -> Tensor:
-    # yuv420 [0, 2**bitdepth-1] (legal) to rgb 444 [0, 1] only for now
+    # yuv420 [0, 2**bitdepth-1] to rgb 444 [0, 1] only for now
     out = to_tensors(frame, device=str(device))
-    out = convert_legal_to_full_range(out, bitdepth)
     out = yuv_420_to_444(
         tuple(c.unsqueeze(0).unsqueeze(0) for c in out), mode="bicubic"  # type: ignore
     )
@@ -170,13 +154,10 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
     num_frames = len(org_seq)
     num_pixels = org_seq.height * org_seq.width
     results = defaultdict(list)
-    # max_val = 2 ** org_seq.bitdepth - 1
 
-    # output = Path(sequence.name).open("wb")
     with tqdm(total=num_frames) as pbar:
-        # rec_frame_ai = None
         for i in range(num_frames):
-            cur_frame = convert_frame(org_seq[i], device, org_seq.bitdepth)
+            cur_frame = convert_frame(org_seq[i], device)
             cur_frame, padding = pad(cur_frame)
 
             if i == 0:
@@ -193,25 +174,13 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
             )
             metrics["bpp"] = compute_bpp(likelihoods, num_pixels)
 
-            # TODO(racapef): option to save rec YUV
-            # for c in out:
-            #     output.write(c.cpu().squeeze().mul(max_val).byte().numpy().tobytes())
             for k, v in metrics.items():
                 results[k].append(v)
             pbar.update(1)
 
-    # compute average metrics for sequence
     seq_results: Dict[str, Any] = {
         k: torch.mean(torch.stack(v)) for k, v in results.items()
     }
-    # filesize = get_filesize(bitstream_path)
-    # seq_results["bpp"] = 8.0 * filesize / (num_frames * org_seq.width * org_seq.height)
-    # TODO (racapef): per component metrics
-    # for component in "yuv":
-    #     seq_results[f"{component}_psnr"] = (
-    #         20 * np.log10(max_val)
-    #         - 10 * torch.log10(seq_results.pop(f"{component}_mse")).item()
-    #     )
     for k, v in seq_results.items():
         if isinstance(v, torch.Tensor):
             seq_results[k] = v.item()
@@ -223,7 +192,6 @@ def run_inference(
     net: nn.Module,
     outputdir: Path,
     force: bool = False,
-    dry_run: bool = False,
     entropy_estimation: bool = False,
     **args: Any,
 ) -> Dict[str, Any]:
@@ -242,7 +210,9 @@ def run_inference(
             continue
 
         if not entropy_estimation:
+            print("please use --entropy-estimation for now.", file=sys.stderr)
             raise NotImplementedError()
+
         else:
             with amp.autocast(enabled=args["half"]):
                 with torch.no_grad():
@@ -284,7 +254,6 @@ def create_parser() -> argparse.ArgumentParser:
         help="model architecture",
         required=True,
     )
-    parent_parser.add_argument("-n", "--dry-run", action="store_true", help="dry run")
     parent_parser.add_argument(
         "-f", "--force", action="store_true", help="overwrite previous runs"
     )
@@ -354,13 +323,11 @@ def main(args: Any = None) -> None:
         raise SystemExit(1)
 
     if args.source == "pretrained":
-        # model = load_pretrained(args.architecture, args.metric, args.qualities[0])
         runs = sorted(args.qualities)
         opts = (args.architecture, args.metric)
         load_func = load_pretrained
         log_fmt = "\rEvaluating {0} | {run:d}"
     elif args.source == "checkpoint":
-        # model = load_checkpoint(args.architecture, args.path)
         runs = args.paths
         opts = (args.architecture,)
         load_func = load_checkpoint
