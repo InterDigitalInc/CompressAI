@@ -355,12 +355,20 @@ def main(args: Any = None) -> None:
             model = model.to("cuda")
             if args.half:
                 model = model.half()
-        args = vars(args)
-        metrics = run_inference(filepaths, model, args.pop("output"), **args)
+        args_dict = vars(args)
+        metrics = run_inference(filepaths, model, args_dict.pop("output"), **args_dict)
         for k, v in metrics.items():
             results[k].append(v)
 
-    print(json.dumps(results, indent=2))
+    description = (
+        "entropy estimation" if args.entropy_estimation else args.entropy_coder
+    )
+    output = {
+        "name": args.architecture,
+        "description": f"Inference ({description})",
+        "results": results,
+    }
+    print(json.dumps(output, indent=2))
 
 
 if __name__ == "__main__":
