@@ -42,3 +42,10 @@ Cheng2020Attention
 ------------------
 .. autoclass:: Cheng2020Attention
     :members:
+
+.. currentmodule:: compressai.models.video
+
+ScaleSpaceFlow
+------------------
+.. autoclass:: ScaleSpaceFlow
+    :members:

@@ -153,7 +153,7 @@ all models
 
 .. image:: media/images/compressai-clic2020-pro.png
 
-bmshj2018 factorized 
+bmshj2018 factorized
 --------------------
 
 From: [bmshj2018]_.
@@ -231,7 +231,7 @@ From: [mbt2018]_.
 
         @article{xue2019video,
             title={Video Enhancement with Task-Oriented Flow},
-            author={Xue, Tianfan and Chen, Baian and Wu, Jiajun and Wei, Donglai and 
+            author={Xue, Tianfan and Chen, Baian and Wu, Jiajun and Wei, Donglai and
             Freeman, William T},
             journal={International Journal of Computer Vision (IJCV)},
             volume={127},
@@ -246,11 +246,46 @@ From: [mbt2018]_.
    .. code-block:: bibtex
 
         @inproceedings{cheng2020image,
-            title={Learned Image Compression with Discretized Gaussian Mixture 
+            title={Learned Image Compression with Discretized Gaussian Mixture
             Likelihoods and Attention Modules},
-            author={Cheng, Zhengxue and Sun, Heming and Takeuchi, Masaru and Katto, 
+            author={Cheng, Zhengxue and Sun, Heming and Takeuchi, Masaru and Katto,
             Jiro},
-            booktitle= "Proceedings of the IEEE Conference on Computer Vision and 
+            booktitle= "Proceedings of the IEEE Conference on Computer Vision and
             Pattern Recognition (CVPR)",
             year={2020}
-        }]
+        }
+
+....
+
+Video compression
+=================
+
+Models
+~~~~~~
+
+ssf2020
+-------
+Original paper: [ssf2020]_
+
+.. autofunction:: ssf2020
+
+....
+
+.. rubric:: Citations
+
+.. [ssf2020]
+   .. code-block:: bibtex
+
+        @inproceedings{agustsson_scale-space_2020,
+            title={Scale-{Space} {Flow} for {End}-to-{End} {Optimized} {Video} 
+            {Compression}},
+            author={Agustsson, Eirikur and Minnen, David and Johnston, Nick and 
+            Balle, Johannes and Hwang, Sung Jin and Toderici, George},
+            booktitle={2020 {IEEE}/{CVF} {Conference} on {Computer} {Vision} and 
+            {Pattern} {Recognition} ({CVPR})},
+         	publisher= {IEEE},
+            year={2020},
+         	month= jun,
+	         year= {2020},
+	         pages= {8500--8509},
+        }

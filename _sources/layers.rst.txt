@@ -36,4 +36,9 @@ ResidualBlockUpsample
 
 AttentionBlock
 --------------
-.. autoclass:: AttentionBlock 
+.. autoclass:: AttentionBlock
+
+
+QReLU
+--------------
+.. autoclass:: QReLU

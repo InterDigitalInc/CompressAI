@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
     <meta name="generator" content="sphinx-4.3.0, furo 2021.10.09"/>
-        <title>compressai.layers.gdn - CompressAI</title>
+        <title>compressai.datasets.video - CompressAI</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
@@ -215,7 +215,7 @@
           </label>
         </div>
         <article role="main">
-          <h1>Source code for compressai.layers.gdn</h1><div class="highlight"><pre>
+          <h1>Source code for compressai.datasets.video</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2021-2022, InterDigital Communications, Inc</span>
 <span class="c1"># All rights reserved.</span>
 
@@ -245,98 +245,103 @@
 <span class="c1"># OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF</span>
 <span class="c1"># ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">import</span> <span class="nn">random</span>
 
-<span class="kn">from</span> <span class="nn">compressai.ops.parametrizers</span> <span class="kn">import</span> <span class="n">NonNegativeParametrizer</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"GDN"</span><span class="p">,</span> <span class="s2">"GDN1"</span><span class="p">]</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
 
-<div class="viewcode-block" id="GDN"><a class="viewcode-back" href="../../../layers.html#compressai.layers.GDN">[docs]</a><span class="k">class</span> <span class="nc">GDN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">"""Generalized Divisive Normalization layer.</span>
+<div class="viewcode-block" id="VideoFolder"><a class="viewcode-back" href="../../../datasets.html#compressai.datasets.VideoFolder">[docs]</a><span class="k">class</span> <span class="nc">VideoFolder</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="sd">"""Load a video folder database. Training and testing video clips</span>
+<span class="sd">    are stored in a directorie containing mnay sub-directorie like Vimeo90K Dataset:</span>
 
-<span class="sd">    Introduced in `"Density Modeling of Images Using a Generalized Normalization</span>
-<span class="sd">    Transformation" &lt;https://arxiv.org/abs/1511.06281&gt;`_,</span>
-<span class="sd">    by Balle Johannes, Valero Laparra, and Eero P. Simoncelli, (2016).</span>
+<span class="sd">    .. code-block::</span>
 
-<span class="sd">    .. math::</span>
+<span class="sd">        - rootdir/</span>
+<span class="sd">            train.list</span>
+<span class="sd">            test.list</span>
+<span class="sd">            - sequences/</span>
+<span class="sd">                - 00010/</span>
+<span class="sd">                    ...</span>
+<span class="sd">                    -0932/</span>
+<span class="sd">                    -0933/</span>
+<span class="sd">                    ...</span>
+<span class="sd">                - 00011/</span>
+<span class="sd">                    ...</span>
+<span class="sd">                - 00012/</span>
+<span class="sd">                    ...</span>
 
-<span class="sd">       y[i] = \frac{x[i]}{\sqrt{\beta[i] + \sum_j(\gamma[j, i] * x[j]^2)}}</span>
+<span class="sd">    training and testing (valid) clips are withdrew from sub-directory navigated by</span>
+<span class="sd">    corresponding input files listing relevant folders.</span>
 
+<span class="sd">    This class returns a set of three video frames in a tuple.</span>
+<span class="sd">    Random interval can be applied to if subfolders includes more than 6 frames.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        root (string): root directory of the dataset</span>
+<span class="sd">        rnd_interval (bool): enable random interval [1,2,3] when drawing sample frames</span>
+<span class="sd">        transform (callable, optional): a function or transform that takes in a</span>
+<span class="sd">            PIL image and returns a transformed version</span>
+<span class="sd">        split (string): split mode ('train' or 'test')</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">beta_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
-        <span class="n">gamma_init</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">root</span><span class="p">,</span>
+        <span class="n">rnd_interval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">rnd_temp_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">transform</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">split</span><span class="o">=</span><span class="s2">"train"</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Transform must be applied"</span><span class="p">)</span>
 
-        <span class="n">beta_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">beta_min</span><span class="p">)</span>
-        <span class="n">gamma_init</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">gamma_init</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">inverse</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">inverse</span><span class="p">)</span>
+        <span class="n">splitfile</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">.list"</span><span class="p">)</span>
+        <span class="n">splitdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">root</span><span class="si">}</span><span class="s2">/sequences"</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">beta_reparam</span> <span class="o">=</span> <span class="n">NonNegativeParametrizer</span><span class="p">(</span><span class="n">minimum</span><span class="o">=</span><span class="n">beta_min</span><span class="p">)</span>
-        <span class="n">beta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">in_channels</span><span class="p">)</span>
-        <span class="n">beta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta_reparam</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">splitfile</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid file "</span><span class="si">{</span><span class="n">root</span><span class="si">}</span><span class="s1">"'</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">gamma_reparam</span> <span class="o">=</span> <span class="n">NonNegativeParametrizer</span><span class="p">()</span>
-        <span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma_init</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">in_channels</span><span class="p">)</span>
-        <span class="n">gamma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma_reparam</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">splitdir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Invalid directory "</span><span class="si">{</span><span class="n">root</span><span class="si">}</span><span class="s1">"'</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">splitfile</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_in</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sample_folders</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">splitdir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">f_in</span><span class="p">]</span>
 
-        <span class="n">beta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta_reparam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">)</span>
-        <span class="n">gamma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma_reparam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma</span><span class="p">)</span>
-        <span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">norm</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_frames</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># hard coding for now</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rnd_interval</span> <span class="o">=</span> <span class="n">rnd_interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rnd_temp_order</span> <span class="o">=</span> <span class="n">rnd_temp_order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">transform</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inverse</span><span class="p">:</span>
-            <span class="n">norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">norm</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rsqrt</span><span class="p">(</span><span class="n">norm</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Args:</span>
+<span class="sd">            index (int): Index</span>
 
-        <span class="n">out</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">norm</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            img: `PIL.Image.Image` or transformed `PIL.Image.Image`.</span>
+<span class="sd">        """</span>
 
-        <span class="k">return</span> <span class="n">out</span></div>
+        <span class="n">sample_folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_folders</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">sample_folder</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_file</span><span class="p">())</span>
 
+        <span class="n">max_interval</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_frames</span>
+        <span class="n">interval</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_interval</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rnd_interval</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">frame_paths</span> <span class="o">=</span> <span class="p">(</span><span class="n">samples</span><span class="p">[::</span><span class="n">interval</span><span class="p">])[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_frames</span><span class="p">]</span>
 
-<div class="viewcode-block" id="GDN1"><a class="viewcode-back" href="../../../layers.html#compressai.layers.GDN1">[docs]</a><span class="k">class</span> <span class="nc">GDN1</span><span class="p">(</span><span class="n">GDN</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">"""Simplified GDN layer.</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">p</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">frame_paths</span><span class="p">]</span>
 
-<span class="sd">    Introduced in `"Computationally Efficient Neural Image Compression"</span>
-<span class="sd">    &lt;http://arxiv.org/abs/1912.08771&gt;`_, by Johnston Nick, Elad Eban, Ariel</span>
-<span class="sd">    Gordon, and Johannes Ballé, (2019).</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rnd_temp_order</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">frames</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-<span class="sd">    .. math::</span>
+        <span class="k">return</span> <span class="n">frames</span>
 
-<span class="sd">        y[i] = \frac{x[i]}{\beta[i] + \sum_j(\gamma[j, i] * |x[j]|}</span>
-
-<span class="sd">    """</span>
-
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-
-        <span class="n">beta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta_reparam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">)</span>
-        <span class="n">gamma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma_reparam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma</span><span class="p">)</span>
-        <span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">norm</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">inverse</span><span class="p">:</span>
-            <span class="n">norm</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">norm</span>
-
-        <span class="n">out</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">norm</span>
-
-        <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_folders</span><span class="p">)</span></div>
 </pre></div>
         </article>
       </div>

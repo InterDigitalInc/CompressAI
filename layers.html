@@ -2,54 +2,50 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="compressai.models" href="models.html" /><link rel="prev" title="compressai.entropy_models" href="entropy_models.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="compressai.models" href="models.html" /><link rel="prev" title="compressai.entropy_models" href="entropy_models.html" />
 
-    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
+    <meta name="generator" content="sphinx-4.3.0, furo 2021.10.09"/>
         <title>compressai.layers - CompressAI</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
-    <link rel="stylesheet" href="_static/pygments.css">
-    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
+    
     
 
 
 <style>
-  :root {
+  body {
     --color-code-background: #f8f8f8;
   --color-code-foreground: black;
   --color-brand-primary: #00aaee;
   --color-brand-content: #00aaee;
   
   }
+  body[data-theme="dark"] {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
   @media (prefers-color-scheme: dark) {
-    :root {
+    body:not([data-theme="light"]) {
       --color-code-background: #202020;
   --color-code-foreground: #d0d0d0;
   
     }
   }
-
-  /* For allowing end-user-specific overrides */
-  .override-light {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
-  --color-brand-primary: #00aaee;
-  --color-brand-content: #00aaee;
-  
-  }
-  .override-dark {
-    --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-  }
-</style><link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
-  <body dir="">
+</style></head>
+  <body>
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="svg-toc" viewBox="0 0 24 24">
     <title>Contents</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <path stroke="none" d="M0 0h24v24H0z"/>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" />
       <line x1="4" y1="6" x2="20" y2="6" />
       <line x1="10" y1="12" x2="20" y2="12" />
       <line x1="6" y1="18" x2="20" y2="18" />
@@ -57,9 +53,8 @@
   </symbol>
   <symbol id="svg-menu" viewBox="0 0 24 24">
     <title>Menu</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-      class="feather feather-menu">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
       <line x1="3" y1="12" x2="21" y2="12"></line>
       <line x1="3" y1="6" x2="21" y2="6"></line>
       <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -67,18 +62,57 @@
   </symbol>
   <symbol id="svg-arrow-right" viewBox="0 0 24 24">
     <title>Expand</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-      class="feather feather-chevron-right">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
       <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
     </svg>
   </symbol>
 </svg>
 
 <input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
 <input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
-<label class="overlay sidebar-overlay" for="__navigation"></label>
-<label class="overlay toc-overlay" for="__toc"></label>
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
 
 
 
@@ -86,6 +120,7 @@
   <header class="mobile-header">
     <div class="header-left">
       <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
         <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
       </label>
     </div>
@@ -93,7 +128,16 @@
       <a href="index.html"><div class="brand">CompressAI</div></a>
     </div>
     <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
       <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
     </div>
@@ -108,21 +152,22 @@
   </div>
   
   
-</a><form class="sidebar-search-container" method="get" action="search.html">
-  <input class="sidebar-search" placeholder=Search name="q">
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
-</form><div class="sidebar-scroll"><div class="sidebar-tree">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Tutorials</span></p>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tutorial_train.html">Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tutorial_custom.html">Custom model</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Library API</span></p>
+<p class="caption" role="heading"><span class="caption-text">Library API</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="compressai.html">compressai</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ans.html">compressai.ans</a></li>
@@ -133,15 +178,16 @@
 <li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">compressai.transforms</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Model Zoo</span></p>
+<p class="caption" role="heading"><span class="caption-text">Model Zoo</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="zoo.html">Image compression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zoo.html#video-compression">Video compression</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Utils</span></p>
+<p class="caption" role="heading"><span class="caption-text">Utils</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="cli_usage.html">Command line usage</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Development</span></p>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/InterDigitalInc/CompressAI/">Github repository</a></li>
 </ul>
@@ -152,19 +198,31 @@
       
     </div>
   </aside>
-  <main class="main">
+  <div class="main">
     <div class="content">
-      <article role="main">
-        <label class="toc-overlay-icon toc-content-icon" for="__toc">
-          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
-        </label>
-        <div class="section" id="compressai-layers">
+      <div class="article-container">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="compressai-layers">
 <h1>compressai.layers<a class="headerlink" href="#compressai-layers" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="maskedconv2d">
+<section id="maskedconv2d">
 <h2>MaskedConv2d<a class="headerlink" href="#maskedconv2d" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="compressai.layers.MaskedConv2d">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.layers.</span></code><code class="sig-name descname"><span class="pre">MaskedConv2d</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'A'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#MaskedConv2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.MaskedConv2d" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.layers.MaskedConv2d">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.layers.</span></span><span class="sig-name descname"><span class="pre">MaskedConv2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'A'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#MaskedConv2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.MaskedConv2d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Masked 2D convolution implementation, mask future “unseen” pixels.
 Useful for building auto-regressive network components.</p>
 <p>Introduced in <a class="reference external" href="https://arxiv.org/abs/1606.05328">“Conditional Image Generation with PixelCNN Decoders”</a>.</p>
@@ -172,12 +230,12 @@ Useful for building auto-regressive network components.</p>
 first layer (which also masks the “current pixel”), <cite>mask_type=’B’</cite> for the
 following layers.</p>
 </dd></dl>
-</div>
-<div class="section" id="gdn">
+</section>
+<section id="gdn">
 <h2>GDN<a class="headerlink" href="#gdn" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="compressai.layers.GDN">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.layers.</span></code><code class="sig-name descname"><span class="pre">GDN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_min</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_init</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/gdn.html#GDN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.GDN" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.layers.GDN">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.layers.</span></span><span class="sig-name descname"><span class="pre">GDN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_init</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/gdn.html#GDN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.GDN" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generalized Divisive Normalization layer.</p>
 <p>Introduced in <a class="reference external" href="https://arxiv.org/abs/1511.06281">“Density Modeling of Images Using a Generalized Normalization
 Transformation”</a>,
@@ -185,24 +243,24 @@ by Balle Johannes, Valero Laparra, and Eero P. Simoncelli, (2016).</p>
 <div class="math-wrapper"><div class="math notranslate nohighlight">
 \[y[i] = \frac{x[i]}{\sqrt{\beta[i] + \sum_j(\gamma[j, i] * x[j]^2)}}\]</div></div>
 </dd></dl>
-</div>
-<div class="section" id="gdn1">
+</section>
+<section id="gdn1">
 <h2>GDN1<a class="headerlink" href="#gdn1" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="compressai.layers.GDN1">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.layers.</span></code><code class="sig-name descname"><span class="pre">GDN1</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_min</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_init</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/gdn.html#GDN1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.GDN1" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.layers.GDN1">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.layers.</span></span><span class="sig-name descname"><span class="pre">GDN1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_init</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/gdn.html#GDN1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.GDN1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simplified GDN layer.</p>
 <p>Introduced in <a class="reference external" href="http://arxiv.org/abs/1912.08771">“Computationally Efficient Neural Image Compression”</a>, by Johnston Nick, Elad Eban, Ariel
 Gordon, and Johannes Ballé, (2019).</p>
 <div class="math-wrapper"><div class="math notranslate nohighlight">
 \[y[i] = \frac{x[i]}{\beta[i] + \sum_j(\gamma[j, i] * |x[j]|}\]</div></div>
 </dd></dl>
-</div>
-<div class="section" id="residualblock">
+</section>
+<section id="residualblock">
 <h2>ResidualBlock<a class="headerlink" href="#residualblock" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="compressai.layers.ResidualBlock">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.layers.</span></code><code class="sig-name descname"><span class="pre">ResidualBlock</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_ch</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_ch</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#ResidualBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.ResidualBlock" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.layers.ResidualBlock">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.layers.</span></span><span class="sig-name descname"><span class="pre">ResidualBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_ch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_ch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#ResidualBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.ResidualBlock" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple residual block with two 3x3 convolutions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -213,12 +271,12 @@ Gordon, and Johannes Ballé, (2019).</p>
 </dd>
 </dl>
 </dd></dl>
-</div>
-<div class="section" id="residualblockwithstride">
+</section>
+<section id="residualblockwithstride">
 <h2>ResidualBlockWithStride<a class="headerlink" href="#residualblockwithstride" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="compressai.layers.ResidualBlockWithStride">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.layers.</span></code><code class="sig-name descname"><span class="pre">ResidualBlockWithStride</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_ch</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_ch</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#ResidualBlockWithStride"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.ResidualBlockWithStride" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.layers.ResidualBlockWithStride">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.layers.</span></span><span class="sig-name descname"><span class="pre">ResidualBlockWithStride</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_ch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_ch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#ResidualBlockWithStride"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.ResidualBlockWithStride" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual block with a stride on the first convolution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -230,12 +288,12 @@ Gordon, and Johannes Ballé, (2019).</p>
 </dd>
 </dl>
 </dd></dl>
-</div>
-<div class="section" id="residualblockupsample">
+</section>
+<section id="residualblockupsample">
 <h2>ResidualBlockUpsample<a class="headerlink" href="#residualblockupsample" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="compressai.layers.ResidualBlockUpsample">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.layers.</span></code><code class="sig-name descname"><span class="pre">ResidualBlockUpsample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_ch</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_ch</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upsample</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#ResidualBlockUpsample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.ResidualBlockUpsample" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.layers.ResidualBlockUpsample">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.layers.</span></span><span class="sig-name descname"><span class="pre">ResidualBlockUpsample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_ch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_ch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upsample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#ResidualBlockUpsample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.ResidualBlockUpsample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual block with sub-pixel upsampling on the last convolution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -247,12 +305,12 @@ Gordon, and Johannes Ballé, (2019).</p>
 </dd>
 </dl>
 </dd></dl>
-</div>
-<div class="section" id="attentionblock">
+</section>
+<section id="attentionblock">
 <h2>AttentionBlock<a class="headerlink" href="#attentionblock" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="compressai.layers.AttentionBlock">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.layers.</span></code><code class="sig-name descname"><span class="pre">AttentionBlock</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#AttentionBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.AttentionBlock" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.layers.AttentionBlock">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.layers.</span></span><span class="sig-name descname"><span class="pre">AttentionBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#AttentionBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.AttentionBlock" title="Permalink to this definition">¶</a></dt>
 <dd><p>Self attention block.</p>
 <p>Simplified variant from <a class="reference external" href="https://arxiv.org/abs/2001.01568">“Learned Image Compression with
 Discretized Gaussian Mixture Likelihoods and Attention Modules”</a>, by Zhengxue Cheng, Heming Sun, Masaru
@@ -263,10 +321,35 @@ Takeuchi, Jiro Katto.</p>
 </dd>
 </dl>
 </dd></dl>
-</div>
-</div>
+</section>
+<section id="qrelu">
+<h2>QReLU<a class="headerlink" href="#qrelu" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.layers.QReLU">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.layers.</span></span><span class="sig-name descname"><span class="pre">QReLU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/layers/layers.html#QReLU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.layers.QReLU" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clamping input with given bit-depth range.
+Suppose that input data presents integer through an integer network
+otherwise any precision of input will simply clamp without rounding
+operation.</p>
+<p>Pre-computed scale with gamma function is used for backward computation.</p>
+<p>More details can be found in
+<a class="reference external" href="https://openreview.net/pdf?id=S1zz2i0cY7">“Integer networks for data compression with latent-variable models”</a>,
+by Johannes Ballé, Nick Johnston and David Minnen, ICLR in 2019</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> – a tensor data</p></li>
+<li><p><strong>bit_depth</strong> – source bit-depth (used for clamping)</p></li>
+<li><p><strong>beta</strong> – a parameter for modeling the gradient during backward computation</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+</section>
+</section>
 
-      </article>
+        </article>
+      </div>
       <footer>
         
         <div class="related-pages">
@@ -293,8 +376,7 @@ Takeuchi, Jiro Katto.</p>
         </div>
 
         <div class="related-information">
-              Copyright &#169; 2021, InterDigital Communications, Inc.
-            |
+              Copyright &#169; 2021, InterDigital Communications, Inc. |
             <a class="muted-link" href="_sources/layers.rst.txt"
                rel="nofollow">
               Show Source
@@ -323,6 +405,7 @@ Takeuchi, Jiro Katto.</p>
 <li><a class="reference internal" href="#residualblockwithstride">ResidualBlockWithStride</a></li>
 <li><a class="reference internal" href="#residualblockupsample">ResidualBlockUpsample</a></li>
 <li><a class="reference internal" href="#attentionblock">AttentionBlock</a></li>
+<li><a class="reference internal" href="#qrelu">QReLU</a></li>
 </ul>
 </li>
 </ul>
@@ -333,12 +416,12 @@ Takeuchi, Jiro Katto.</p>
       
       
     </aside>
-  </main>
-</div>
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+    <script src="_static/scripts/main.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
 </html>

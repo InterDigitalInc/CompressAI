@@ -8,3 +8,9 @@ ImageFolder
 -----------
 .. autoclass:: ImageFolder
     :members:
+
+
+VideoFolder
+-----------
+.. autoclass:: VideoFolder
+    :members:
