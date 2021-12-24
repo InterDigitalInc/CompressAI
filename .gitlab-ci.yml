@@ -67,7 +67,7 @@ isort:
   image: python:3.6-buster
   before_script:
     - python --version
-    - pip install compressai --find-links=dist/
+    - pip install .
     - pip install isort
   script:
     - make check-isort

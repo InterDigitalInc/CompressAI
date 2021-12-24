@@ -1,19 +1,35 @@
-# Copyright 2020 InterDigital Communications, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright (c) 2021-2022, InterDigital Communications, Inc
+# All rights reserved.
+
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the disclaimer
+# below) provided that the following conditions are met:
+
+# * Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+# * Neither the name of InterDigital Communications, Inc nor the names of its
+#   contributors may be used to endorse or promote products derived from this
+#   software without specific prior written permission.
+
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY
+# THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+# CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+# NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 def find_named_module(module, query):
@@ -128,3 +144,52 @@ def deconv(in_channels, out_channels, kernel_size=5, stride=2):
         output_padding=stride - 1,
         padding=kernel_size // 2,
     )
+
+
+def quantize_ste(x):
+    """Differentiable quantization via the Straight-Through-Estimator."""
+    # STE (straight-through estimator) trick: x_hard - x_soft.detach() + x_soft
+    return (torch.round(x) - x).detach() + x
+
+
+def gaussian_kernel1d(
+    kernel_size: int, sigma: float, device: torch.device, dtype: torch.dtype
+):
+    """1D Gaussian kernel."""
+    khalf = (kernel_size - 1) / 2.0
+    x = torch.linspace(-khalf, khalf, steps=kernel_size, dtype=dtype, device=device)
+    pdf = torch.exp(-0.5 * (x / sigma).pow(2))
+    return pdf / pdf.sum()
+
+
+def gaussian_kernel2d(
+    kernel_size: int, sigma: float, device: torch.device, dtype: torch.dtype
+):
+    """2D Gaussian kernel."""
+    kernel = gaussian_kernel1d(kernel_size, sigma, device, dtype)
+    return torch.mm(kernel[:, None], kernel[None, :])
+
+
+def gaussian_blur(x, kernel=None, kernel_size=None, sigma=None):
+    """Apply a 2D gaussian blur on a given image tensor."""
+    if kernel is None:
+        if kernel_size is None or sigma is None:
+            raise RuntimeError("Missing kernel_size or sigma parameters")
+        dtype = x.dtype if torch.is_floating_point(x) else torch.float32
+        device = x.device
+        kernel = gaussian_kernel2d(kernel_size, sigma, device, dtype)
+
+    padding = kernel.size(0) // 2
+    x = F.pad(x, (padding, padding, padding, padding), mode="replicate")
+    x = torch.nn.functional.conv2d(
+        x,
+        kernel.expand(x.size(1), 1, kernel.size(0), kernel.size(1)),
+        groups=x.size(1),
+    )
+    return x
+
+
+def meshgrid2d(N: int, C: int, H: int, W: int, device: torch.device):
+    """Create a 2D meshgrid for interpolation."""
+    theta = torch.eye(2, 3, device=device).unsqueeze(0).expand(N, 2, 3)
+    return F.affine_grid(theta, (N, C, H, W), align_corners=False)

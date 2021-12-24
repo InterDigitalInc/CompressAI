@@ -124,7 +124,7 @@ Slow tests can be skipped with the `-m "not slow"` option.
 
 ## License
 
-CompressAI is licensed under the Apache License, Version 2.0
+CompressAI is licensed under the BSD 3-Clause Clear License
 
 ## Contributing
 

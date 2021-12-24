@@ -19,7 +19,7 @@ help: ## Show this message
 
 check-black: ## Run black checks
 	@echo "--> Running black checks"
-	@black --check --diff $(src_dirs)
+	@black --check --verbose --diff $(src_dirs)
 
 check-isort: ## Run isort checks
 	@echo "--> Running isort checks"

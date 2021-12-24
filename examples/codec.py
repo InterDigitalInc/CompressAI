@@ -1,16 +1,31 @@
-# Copyright 2020 InterDigital Communications, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright (c) 2021-2022, InterDigital Communications, Inc
+# All rights reserved.
+
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the disclaimer
+# below) provided that the following conditions are met:
+
+# * Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+# * Neither the name of InterDigital Communications, Inc nor the names of its
+#   contributors may be used to endorse or promote products derived from this
+#   software without specific prior written permission.
+
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY
+# THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+# CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+# NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import argparse
 import struct
@@ -34,6 +49,15 @@ torch.backends.cudnn.deterministic = True
 model_ids = {k: i for i, k in enumerate(models.keys())}
 
 metric_ids = {"mse": 0, "ms-ssim": 1}
+
+
+def BoolConvert(a):
+    b = [False, True]
+    return b[int(a)]
+
+
+def Average(lst):
+    return sum(lst) / len(lst)
 
 
 def inverse_dict(d):
@@ -62,10 +86,12 @@ def torch2img(x: torch.Tensor) -> Image.Image:
 
 def write_uints(fd, values, fmt=">{:d}I"):
     fd.write(struct.pack(fmt.format(len(values)), *values))
+    return len(values) * 4
 
 
 def write_uchars(fd, values, fmt=">{:d}B"):
     fd.write(struct.pack(fmt.format(len(values)), *values))
+    return len(values) * 1
 
 
 def read_uints(fd, n, fmt=">{:d}I"):
@@ -82,6 +108,7 @@ def write_bytes(fd, values, fmt=">{:d}s"):
     if len(values) == 0:
         return
     fd.write(struct.pack(fmt.format(len(values)), values))
+    return len(values) * 1
 
 
 def read_bytes(fd, n, fmt=">{:d}s"):
@@ -114,6 +141,26 @@ def parse_header(header):
         inverse_dict(metric_ids)[metric],
         quality,
     )
+
+
+def read_body(fd):
+    lstrings = []
+    shape = read_uints(fd, 2)
+    n_strings = read_uints(fd, 1)[0]
+    for _ in range(n_strings):
+        s = read_bytes(fd, read_uints(fd, 1)[0])
+        lstrings.append([s])
+
+    return lstrings, shape
+
+
+def write_body(fd, shape, out_strings):
+    bytes_cnt = 0
+    bytes_cnt = write_uints(fd, (shape[0], shape[1], len(out_strings)))
+    for s in out_strings:
+        bytes_cnt += write_uints(fd, (len(s[0]),))
+        bytes_cnt += write_bytes(fd, s[0])
+    return bytes_cnt
 
 
 def pad(x, p=2 ** 6):
@@ -172,10 +219,7 @@ def _encode(image, model, metric, quality, coder, output):
         # write original image size
         write_uints(f, (h, w))
         # write shape and number of encoded latents
-        write_uints(f, (shape[0], shape[1], len(out["strings"])))
-        for s in out["strings"]:
-            write_uints(f, (len(s[0]),))
-            write_bytes(f, s[0])
+        write_body(f, shape, out["strings"])
 
     enc_time = time.time() - enc_start
     size = filesize(output)
@@ -193,12 +237,7 @@ def _decode(inputpath, coder, show, output=None):
     with Path(inputpath).open("rb") as f:
         model, metric, quality = parse_header(read_uchars(f, 2))
         original_size = read_uints(f, 2)
-        shape = read_uints(f, 2)
-        strings = []
-        n_strings = read_uints(f, 1)[0]
-        for _ in range(n_strings):
-            s = read_bytes(f, read_uints(f, 1)[0])
-            strings.append([s])
+        strings, shape = read_body(f)
 
     print(f"Model: {model:s}, metric: {metric:s}, quality: {quality:d}")
     start = time.time()
@@ -296,9 +335,9 @@ def main(argv):
     args = parse_args(argv[1:2])
     argv = argv[2:]
     torch.set_num_threads(1)  # just to be sure
-    if args.command == "encode":
+    if args.command == "img_encode":
         encode(argv)
-    elif args.command == "decode":
+    elif args.command == "img_decode":
         decode(argv)
 
 

@@ -1,16 +1,31 @@
-# Copyright 2020 InterDigital Communications, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright (c) 2021-2022, InterDigital Communications, Inc
+# All rights reserved.
+
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the disclaimer
+# below) provided that the following conditions are met:
+
+# * Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+# * Neither the name of InterDigital Communications, Inc nor the names of its
+#   contributors may be used to endorse or promote products derived from this
+#   software without specific prior written permission.
+
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY
+# THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+# CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+# NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from typing import Any
 
@@ -18,6 +33,7 @@ import torch
 import torch.nn as nn
 
 from torch import Tensor
+from torch.autograd import Function
 
 from .gdn import GDN
 
@@ -29,6 +45,7 @@ __all__ = [
     "ResidualBlockWithStride",
     "conv3x3",
     "subpel_conv3x3",
+    "QReLU",
 ]
 
 
@@ -225,3 +242,55 @@ class AttentionBlock(nn.Module):
         out = a * torch.sigmoid(b)
         out += identity
         return out
+
+
+class QReLU(Function):
+    """QReLU
+
+    Clamping input with given bit-depth range.
+    Suppose that input data presents integer through an integer network
+    otherwise any precision of input will simply clamp without rounding
+    operation.
+
+    Pre-computed scale with gamma function is used for backward computation.
+
+    More details can be found in
+    `"Integer networks for data compression with latent-variable models"
+    <https://openreview.net/pdf?id=S1zz2i0cY7>`_,
+    by Johannes Ballé, Nick Johnston and David Minnen, ICLR in 2019
+
+    Args:
+        input: a tensor data
+        bit_depth: source bit-depth (used for clamping)
+        beta: a parameter for modeling the gradient during backward computation
+    """
+
+    @staticmethod
+    def forward(ctx, input, bit_depth, beta):
+        # TODO(choih): allow to use adaptive scale instead of
+        # pre-computed scale with gamma function
+        ctx.alpha = 0.9943258522851727
+        ctx.beta = beta
+        ctx.max_value = 2 ** bit_depth - 1
+        ctx.save_for_backward(input)
+
+        return input.clamp(min=0, max=ctx.max_value)
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        grad_input = None
+        (input,) = ctx.saved_tensors
+
+        grad_input = grad_output.clone()
+        grad_sub = (
+            torch.exp(
+                (-ctx.alpha ** ctx.beta)
+                * torch.abs(2.0 * input / ctx.max_value - 1) ** ctx.beta
+            )
+            * grad_output.clone()
+        )
+
+        grad_input[input < 0] = grad_sub[input < 0]
+        grad_input[input > ctx.max_value] = grad_sub[input > ctx.max_value]
+
+        return grad_input, None, None

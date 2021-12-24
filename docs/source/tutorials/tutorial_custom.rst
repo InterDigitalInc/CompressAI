@@ -205,4 +205,3 @@ And write a training loop:
       aux_loss = net.aux_loss()
       aux_loss.backward()
       aux_optimizer.step()
-

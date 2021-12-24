@@ -75,7 +75,7 @@ You can also build your own pip package:
    pip install dist/compressai-*.whl
 
 .. note::
-   on MacOS you might want to use :code:`CC=clang CXX=clang++ pip install ...` to 
+   on MacOS you might want to use :code:`CC=clang CXX=clang++ pip install ...` to
    compile with clang instead of gcc.
 
 

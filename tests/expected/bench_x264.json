@@ -1,0 +1,1 @@
+{"name": "x264-medium-tune-psnr", "description": "x264 medium, tuned for psnr, ffmpeg version 4.4.1", "results": {"ms-ssim": [0.940115749835968], "bitrate": [363.24], "rgb_psnr": [29.12749459721975], "y_psnr": [31.039798760198877], "u_psnr": [36.007960343145655], "v_psnr": [37.084036373876856]}}

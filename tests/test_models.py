@@ -1,16 +1,31 @@
-# Copyright 2020 InterDigital Communications, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright (c) 2021-2022, InterDigital Communications, Inc
+# All rights reserved.
+
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the disclaimer
+# below) provided that the following conditions are met:
+
+# * Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+# * Neither the name of InterDigital Communications, Inc nor the names of its
+#   contributors may be used to endorse or promote products derived from this
+#   software without specific prior written permission.
+
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY
+# THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+# CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+# NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import pytest
 import torch
@@ -32,6 +47,7 @@ from compressai.models.utils import (
     find_named_module,
     update_registered_buffers,
 )
+from compressai.models.video.google import ScaleSpaceFlow
 
 
 class TestCompressionModel:
@@ -163,6 +179,64 @@ class TestModels:
                 torch.load(filepath)
             )
             assert model.N == loaded.N and model.M == loaded.M
+
+    def test_scale_space_flow(self):
+        model = ScaleSpaceFlow()
+        x = [torch.rand(1, 3, 128, 128), torch.rand(1, 3, 128, 128)]
+        out = model(x)
+
+        assert "x_hat" in out
+        assert "likelihoods" in out
+        assert "keyframe" in out["likelihoods"][0]
+        assert "y" in out["likelihoods"][0]["keyframe"]
+        assert "z" in out["likelihoods"][0]["keyframe"]
+
+        assert "motion" in out["likelihoods"][1]
+        assert "y" in out["likelihoods"][1]["motion"]
+        assert "z" in out["likelihoods"][1]["motion"]
+
+        assert "residual" in out["likelihoods"][1]
+        assert "y" in out["likelihoods"][1]["residual"]
+        assert "z" in out["likelihoods"][1]["residual"]
+
+        assert out["x_hat"][0].shape == x[0].shape
+        assert out["x_hat"][1].shape == x[1].shape
+
+        y_likelihoods_shape = out["likelihoods"][0]["keyframe"]["y"].shape
+        assert y_likelihoods_shape[0] == x[0].shape[0]
+        assert y_likelihoods_shape[1] == 192
+        assert y_likelihoods_shape[2] == x[0].shape[2] / 2 ** 4
+        assert y_likelihoods_shape[3] == x[0].shape[3] / 2 ** 4
+
+        z_likelihoods_shape = out["likelihoods"][0]["keyframe"]["z"].shape
+        assert z_likelihoods_shape[0] == x[0].shape[0]
+        assert z_likelihoods_shape[1] == 192
+        assert z_likelihoods_shape[2] == x[0].shape[2] / 2 ** 7  # (128x128 input)
+        assert z_likelihoods_shape[3] == x[0].shape[3] / 2 ** 7
+
+        y_likelihoods_shape = out["likelihoods"][1]["motion"]["y"].shape
+        assert y_likelihoods_shape[0] == x[1].shape[0]
+        assert y_likelihoods_shape[1] == 192
+        assert y_likelihoods_shape[2] == x[1].shape[2] / 2 ** 4
+        assert y_likelihoods_shape[3] == x[1].shape[3] / 2 ** 4
+
+        z_likelihoods_shape = out["likelihoods"][1]["motion"]["z"].shape
+        assert z_likelihoods_shape[0] == x[1].shape[0]
+        assert z_likelihoods_shape[1] == 192
+        assert z_likelihoods_shape[2] == x[1].shape[2] / 2 ** 7  # (128x128 input)
+        assert z_likelihoods_shape[3] == x[1].shape[3] / 2 ** 7
+
+        y_likelihoods_shape = out["likelihoods"][1]["residual"]["y"].shape
+        assert y_likelihoods_shape[0] == x[1].shape[0]
+        assert y_likelihoods_shape[1] == 192
+        assert y_likelihoods_shape[2] == x[1].shape[2] / 2 ** 4
+        assert y_likelihoods_shape[3] == x[1].shape[3] / 2 ** 4
+
+        z_likelihoods_shape = out["likelihoods"][1]["residual"]["z"].shape
+        assert z_likelihoods_shape[0] == x[1].shape[0]
+        assert z_likelihoods_shape[1] == 192
+        assert z_likelihoods_shape[2] == x[1].shape[2] / 2 ** 7  # (128x128 input)
+        assert z_likelihoods_shape[3] == x[1].shape[3] / 2 ** 7
 
 
 def test_scale_table_default():
