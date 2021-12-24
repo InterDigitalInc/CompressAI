@@ -38,6 +38,7 @@ from compressai.layers import (
     ResidualBlock,
     ResidualBlockUpsample,
     ResidualBlockWithStride,
+    QReLU,
 )
 
 
@@ -201,3 +202,21 @@ def test_ResidualBlock():
 def test_AttentionBlock():
     layer = AttentionBlock(8)
     layer(torch.rand(1, 8, 4, 4))
+
+
+class TestQReLU:
+    @staticmethod
+    def test_QReLU():
+        def qrelu(input, bit_depth=8, beta=100):
+            return QReLU.apply(input, bit_depth, beta)
+
+        x = torch.rand(1, 32, 16, 16, requires_grad=True)
+        y = qrelu(x)
+        y.backward(x)
+
+        assert y.shape == x.shape
+        assert x.grad is not None
+        assert x.grad.shape == x.shape
+
+        y_ref = x.clamp(min=0, max=2 ** 8 - 1)
+        assert torch.allclose(y_ref, y)
