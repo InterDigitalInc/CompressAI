@@ -246,9 +246,11 @@ class AttentionBlock(nn.Module):
 
 class QReLU(Function):
     """QReLU
+
     Clamping input with given bit-depth range.
     Suppose that input data presents integer through an integer network
-    otherwise any precision of input will simply clamp without rounding operation.
+    otherwise any precision of input will simply clamp without rounding
+    operation.
 
     Pre-computed scale with gamma function is used for backward computation.
 
@@ -258,9 +260,9 @@ class QReLU(Function):
     by Johannes Ballé, Nick Johnston and David Minnen, ICLR in 2019
 
     Args:
-        input : a tensor data
-        bit_depth : bit-depth for clamping input
-        beta : a parameter for modeling gradient for backward computation
+        input: a tensor data
+        bit_depth: source bit-depth (used for clamping)
+        beta: a parameter for modeling the gradient during backward computation
     """
 
     @staticmethod
