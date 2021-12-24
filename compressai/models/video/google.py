@@ -38,7 +38,7 @@ import torch.nn.functional as F
 from torch.cuda import amp
 
 from compressai.entropy_models import GaussianConditional
-from compressai.layers import qrelu
+from compressai.layers import QReLU
 
 from ..google import CompressionModel, get_scale_table
 from ..utils import (
@@ -130,15 +130,15 @@ class ScaleSpaceFlow(nn.Module):
             ):
                 super().__init__()
 
-                def QReLU(input, bit_depth=8, beta=100):
-                    return qrelu.apply(input, bit_depth, beta)
+                def qrelu(input, bit_depth=8, beta=100):
+                    return QReLU.apply(input, bit_depth, beta)
 
                 self.deconv1 = deconv(in_planes, mid_planes, kernel_size=5, stride=2)
-                self.qrelu1 = QReLU
+                self.qrelu1 = qrelu
                 self.deconv2 = deconv(mid_planes, mid_planes, kernel_size=5, stride=2)
-                self.qrelu2 = QReLU
+                self.qrelu2 = qrelu
                 self.deconv3 = deconv(mid_planes, out_planes, kernel_size=5, stride=2)
-                self.qrelu3 = QReLU
+                self.qrelu3 = qrelu
 
             def forward(self, x):
                 x = self.qrelu1(self.deconv1(x))

@@ -45,7 +45,7 @@ __all__ = [
     "ResidualBlockWithStride",
     "conv3x3",
     "subpel_conv3x3",
-    "qrelu",
+    "QReLU",
 ]
 
 
@@ -244,7 +244,7 @@ class AttentionBlock(nn.Module):
         return out
 
 
-class qrelu(Function):
+class QReLU(Function):
     """QReLU
     Clamping input with given bit-depth range.
     Suppose that input data presents integer through an integer network
