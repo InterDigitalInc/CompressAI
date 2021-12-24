@@ -45,5 +45,8 @@ models = {
     "mbt2018": mbt2018,
     "cheng2020-anchor": cheng2020_anchor,
     "cheng2020-attn": cheng2020_attn,
+}
+
+models_video = {
     "ssf2020": ssf2020,
 }

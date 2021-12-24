@@ -44,10 +44,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 from compressai.datasets import VideoFolder
-
-# temp
-from compressai.models.google import ScaleSpaceFlow
-from compressai.zoo import models
+from compressai.zoo import models_video
 
 
 def collect_likelihoods_list(likelihoods_list, num_pixels: int):
@@ -325,8 +322,8 @@ def parse_args(argv):
     parser.add_argument(
         "-m",
         "--model",
-        default="bmshj2018-factorized",
-        choices=models.keys(),
+        default="ssf2020",
+        choices=models_video.keys(),
         help="Model architecture (default: %(default)s)",
     )
     parser.add_argument(
@@ -447,14 +444,8 @@ def main(argv):
         pin_memory=(device == "cuda"),
     )
 
-    # temp
-    # net = models[args.model](quality=3)
-    net = ScaleSpaceFlow()
+    net = models_video[args.model](quality=3)
     net = net.to(device)
-
-    # Need to check ==> DDP support
-    # if args.cuda and torch.cuda.device_count() > 1:
-    #    net = CustomDataParallel(net)
 
     optimizer, aux_optimizer = configure_optimizers(net, args)
     lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min")
