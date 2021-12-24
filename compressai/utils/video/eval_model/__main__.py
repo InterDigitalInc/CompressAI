@@ -49,7 +49,7 @@ from torch.utils.model_zoo import tqdm
 from compressai.datasets import RawVideoSequence, VideoFormat
 from compressai.models.video.google import ScaleSpaceFlow
 from compressai.transforms.functional import ycbcr2rgb, yuv_420_to_444
-from compressai.zoo import models as pretrained_models
+from compressai.zoo import models_video as pretrained_models
 
 models = {"ssf2020": ScaleSpaceFlow}
 

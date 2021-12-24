@@ -45,7 +45,15 @@ root_url = "https://compressai.s3.amazonaws.com/models/v1"
 model_urls = {
     "ssf2020": {
         "mse": {
-            1: f"{root_url}/ssf2020-mse-1-86f7f998.pth.tar",
+            1: f"{root_url}/ssf2020-mse-1-46b536a2.pth.tar",
+            2: f"{root_url}/ssf2020-mse-2-026aaa94.pth.tar",
+            3: f"{root_url}/ssf2020-mse-3-e97377db.pth.tar",
+            4: f"{root_url}/ssf2020-mse-4-948386e6.pth.tar",
+            5: f"{root_url}/ssf2020-mse-5-bc25abf9.pth.tar",
+            6: f"{root_url}/ssf2020-mse-6-d08f1dcc.pth.tar",
+            7: f"{root_url}/ssf2020-mse-7-fdbf0c38.pth.tar",
+            8: f"{root_url}/ssf2020-mse-8-36699fba.pth.tar",
+            9: f"{root_url}/ssf2020-mse-9-d0e007f0.pth.tar",
         }
     }
 }
