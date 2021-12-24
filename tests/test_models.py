@@ -47,6 +47,7 @@ from compressai.models.utils import (
     find_named_module,
     update_registered_buffers,
 )
+from compressai.models.video.google import ScaleSpaceFlow
 
 
 class TestCompressionModel:
@@ -178,6 +179,64 @@ class TestModels:
                 torch.load(filepath)
             )
             assert model.N == loaded.N and model.M == loaded.M
+
+    def test_scale_space_flow(self):
+        model = ScaleSpaceFlow()
+        x = [torch.rand(1, 3, 128, 128), torch.rand(1, 3, 128, 128)]
+        out = model(x)
+
+        assert "x_hat" in out
+        assert "likelihoods" in out
+        assert "keyframe" in out["likelihoods"][0]
+        assert "y" in out["likelihoods"][0]["keyframe"]
+        assert "z" in out["likelihoods"][0]["keyframe"]
+
+        assert "motion" in out["likelihoods"][1]
+        assert "y" in out["likelihoods"][1]["motion"]
+        assert "z" in out["likelihoods"][1]["motion"]
+
+        assert "residual" in out["likelihoods"][1]
+        assert "y" in out["likelihoods"][1]["residual"]
+        assert "z" in out["likelihoods"][1]["residual"]
+
+        assert out["x_hat"][0].shape == x[0].shape
+        assert out["x_hat"][1].shape == x[1].shape
+
+        y_likelihoods_shape = out["likelihoods"][0]["keyframe"]["y"].shape
+        assert y_likelihoods_shape[0] == x[0].shape[0]
+        assert y_likelihoods_shape[1] == 192
+        assert y_likelihoods_shape[2] == x[0].shape[2] / 2 ** 4
+        assert y_likelihoods_shape[3] == x[0].shape[3] / 2 ** 4
+
+        z_likelihoods_shape = out["likelihoods"][0]["keyframe"]["z"].shape
+        assert z_likelihoods_shape[0] == x[0].shape[0]
+        assert z_likelihoods_shape[1] == 192
+        assert z_likelihoods_shape[2] == x[0].shape[2] / 2 ** 7  # (128x128 input)
+        assert z_likelihoods_shape[3] == x[0].shape[3] / 2 ** 7
+
+        y_likelihoods_shape = out["likelihoods"][1]["motion"]["y"].shape
+        assert y_likelihoods_shape[0] == x[1].shape[0]
+        assert y_likelihoods_shape[1] == 192
+        assert y_likelihoods_shape[2] == x[1].shape[2] / 2 ** 4
+        assert y_likelihoods_shape[3] == x[1].shape[3] / 2 ** 4
+
+        z_likelihoods_shape = out["likelihoods"][1]["motion"]["z"].shape
+        assert z_likelihoods_shape[0] == x[1].shape[0]
+        assert z_likelihoods_shape[1] == 192
+        assert z_likelihoods_shape[2] == x[1].shape[2] / 2 ** 7  # (128x128 input)
+        assert z_likelihoods_shape[3] == x[1].shape[3] / 2 ** 7
+
+        y_likelihoods_shape = out["likelihoods"][1]["residual"]["y"].shape
+        assert y_likelihoods_shape[0] == x[1].shape[0]
+        assert y_likelihoods_shape[1] == 192
+        assert y_likelihoods_shape[2] == x[1].shape[2] / 2 ** 4
+        assert y_likelihoods_shape[3] == x[1].shape[3] / 2 ** 4
+
+        z_likelihoods_shape = out["likelihoods"][1]["residual"]["z"].shape
+        assert z_likelihoods_shape[0] == x[1].shape[0]
+        assert z_likelihoods_shape[1] == 192
+        assert z_likelihoods_shape[2] == x[1].shape[2] / 2 ** 7  # (128x128 input)
+        assert z_likelihoods_shape[3] == x[1].shape[3] / 2 ** 7
 
 
 def test_scale_table_default():
