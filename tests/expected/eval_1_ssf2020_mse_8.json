@@ -1,0 +1,1 @@
+{"name": "ssf2020", "description": "Inference (entropy estimation)", "results": {"mse": [128.4179229736328], "rgb_psnr": [27.049896240234375], "msssim": [0.9069530963897705], "bpp": [0.14607176184654236]}}

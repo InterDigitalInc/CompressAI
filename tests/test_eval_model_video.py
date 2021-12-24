@@ -76,7 +76,7 @@ def test_eval_model_video():
 
 # mse and entropy_estimation tested for now
 @pytest.mark.parametrize("model", ("ssf2020",))
-@pytest.mark.parametrize("quality", ("1",))  #  "4", "8"))
+@pytest.mark.parametrize("quality", ("1", "4", "8"))
 @pytest.mark.parametrize("metric", ("mse",))
 @pytest.mark.parametrize("entropy_estimation", (True,))
 def test_eval_model_pretrained(capsys, model, quality, metric, entropy_estimation):

@@ -35,10 +35,10 @@ from compressai.layers import (
     GDN1,
     AttentionBlock,
     MaskedConv2d,
+    QReLU,
     ResidualBlock,
     ResidualBlockUpsample,
     ResidualBlockWithStride,
-    QReLU,
 )
 
 
