@@ -438,49 +438,44 @@ class ScaleSpaceFlow(nn.Module):
 
         # Dynamically update the entropy bottleneck buffers related to the CDFs
         update_registered_buffers(
-            self.img_hyperprior.entropy_bottleneck,
-            "img_hyperprior.entropy_bottleneck",
-            ["_quantized_cdf", "_offset", "_cdf_length"],
-            state_dict,
-        )
-        update_registered_buffers(
             self.img_hyperprior.gaussian_conditional,
             "img_hyperprior.gaussian_conditional",
             ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
             state_dict,
         )
-        self.img_hyperprior.entropy_bottleneck.update()
-        # self.img_hyperprior.gaussian_conditional.update()
-
         update_registered_buffers(
-            self.res_hyperprior.entropy_bottleneck,
-            "res_hyperprior.entropy_bottleneck",
+            self.img_hyperprior.entropy_bottleneck,
+            "img_hyperprior.entropy_bottleneck",
             ["_quantized_cdf", "_offset", "_cdf_length"],
             state_dict,
         )
+
         update_registered_buffers(
             self.res_hyperprior.gaussian_conditional,
             "res_hyperprior.gaussian_conditional",
             ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
             state_dict,
         )
-        self.res_hyperprior.entropy_bottleneck.update()
-        # self.res_hyperprior.gaussian_conditional.update()
-
         update_registered_buffers(
-            self.motion_hyperprior.entropy_bottleneck,
-            "motion_hyperprior.entropy_bottleneck",
+            self.res_hyperprior.entropy_bottleneck,
+            "res_hyperprior.entropy_bottleneck",
             ["_quantized_cdf", "_offset", "_cdf_length"],
             state_dict,
         )
+
         update_registered_buffers(
             self.motion_hyperprior.gaussian_conditional,
             "motion_hyperprior.gaussian_conditional",
             ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
             state_dict,
         )
-        self.motion_hyperprior.entropy_bottleneck.update()
-        # self.motion_hyperprior.gaussian_conditional.update()
+        update_registered_buffers(
+            self.motion_hyperprior.entropy_bottleneck,
+            "motion_hyperprior.entropy_bottleneck",
+            ["_quantized_cdf", "_offset", "_cdf_length"],
+            state_dict,
+        )
+
         super().load_state_dict(state_dict)
 
     @classmethod
