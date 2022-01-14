@@ -481,10 +481,11 @@ class EntropyBottleneck(EntropyModel):
             # Compute inverse permutation
             inv_perm = np.arange(len(x.shape))[np.argsort(perm)]
         else:
+            raise NotImplementedError()
             # TorchScript in 2D for static inference
             # Convert to (channels, ... , batch) format
-            perm = (1, 2, 3, 0)
-            inv_perm = (3, 0, 1, 2)
+            # perm = (1, 2, 3, 0)
+            # inv_perm = (3, 0, 1, 2)
 
         x = x.permute(*perm).contiguous()
         shape = x.size()
@@ -501,8 +502,9 @@ class EntropyBottleneck(EntropyModel):
             if self.use_likelihood_bound:
                 likelihood = self.likelihood_lower_bound(likelihood)
         else:
+            raise NotImplementedError()
             # TorchScript not yet supported
-            likelihood = torch.zeros_like(outputs)
+            # likelihood = torch.zeros_like(outputs)
 
         # Convert back to input tensor shape
         outputs = outputs.reshape(shape)
