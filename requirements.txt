@@ -28,7 +28,7 @@ idna==2.10
 imagesize==1.2.0
 iniconfig==1.1.1
 ipykernel==5.4.3
-ipython==7.20.0
+ipython==7.31.1
 ipython-genutils==0.2.0
 ipywidgets==7.6.3
 isort==5.8.0
