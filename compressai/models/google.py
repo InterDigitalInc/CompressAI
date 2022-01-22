@@ -46,6 +46,10 @@ __all__ = [
     "ScaleHyperprior",
     "MeanScaleHyperprior",
     "JointAutoregressiveHierarchicalPriors",
+    "get_scale_table",
+    "SCALES_MIN",
+    "SCALES_MAX",
+    "SCALES_LEVELS",
 ]
 
 
