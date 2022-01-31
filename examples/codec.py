@@ -335,9 +335,9 @@ def main(argv):
     args = parse_args(argv[1:2])
     argv = argv[2:]
     torch.set_num_threads(1)  # just to be sure
-    if args.command == "img_encode":
+    if args.command == "encode":
         encode(argv)
-    elif args.command == "img_decode":
+    elif args.command == "decode":
         decode(argv)
 
 
