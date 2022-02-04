@@ -197,6 +197,19 @@ def get_raw_video_file_info(filename: str) -> Dict[str, Any]:
     return outinfo
 
 
+def get_num_frms(file_size, width, height, video_format, dtype):
+    w_sub, h_sub = subsampling[video_format]
+    itemsize = np.array([0], dtype=dtype).itemsize
+
+    frame_size = (width * height) + 2 * (
+        round(width / w_sub) * round(height / h_sub)
+    ) * itemsize
+
+    total_num_frms = file_size // frame_size
+
+    return total_num_frms
+
+
 class RawVideoSequence(Sequence[np.ndarray]):
     """
     Generalized encapsulation of raw video buffer data that can hold RGB or
@@ -213,7 +226,7 @@ class RawVideoSequence(Sequence[np.ndarray]):
 
     def __init__(
         self,
-        data,
+        mmap: np.memmap,
         width: int,
         height: int,
         bitdepth: int,
@@ -234,15 +247,17 @@ class RawVideoSequence(Sequence[np.ndarray]):
         self.dtype = make_dtype(
             self.format, value_type=value_type, width=width, height=height
         )
-        self.data = data.view(self.dtype)
+        self.data = mmap.view(self.dtype)
+
+        self.total_frms = get_num_frms(mmap.size, width, height, format, value_type)
 
     @classmethod
     def new_like(
         cls, sequence: "RawVideoSequence", filename: str
     ) -> "RawVideoSequence":
-        data = np.memmap(filename, dtype=bitdepth_to_dtype[sequence.bitdepth], mode="r")
+        mmap = np.memmap(filename, dtype=bitdepth_to_dtype[sequence.bitdepth], mode="r")
         return cls(
-            data,
+            mmap,
             width=sequence.width,
             height=sequence.height,
             bitdepth=sequence.bitdepth,
@@ -285,10 +300,10 @@ class RawVideoSequence(Sequence[np.ndarray]):
         if width is None or height is None or bitdepth is None or format is None:
             raise RuntimeError(f"Could not get sequence information {filename}")
 
-        data = np.memmap(filename, dtype=bitdepth_to_dtype[bitdepth], mode="r")
+        mmap = np.memmap(filename, dtype=bitdepth_to_dtype[bitdepth], mode="r")
 
         return cls(
-            data,
+            mmap,
             width=width,
             height=height,
             bitdepth=bitdepth,
@@ -301,3 +316,6 @@ class RawVideoSequence(Sequence[np.ndarray]):
 
     def __len__(self) -> int:
         return len(self.data)
+
+    def close(self):
+        del self.data

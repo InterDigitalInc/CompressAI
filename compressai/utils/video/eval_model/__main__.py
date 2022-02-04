@@ -49,7 +49,7 @@ from torch.utils.model_zoo import tqdm
 from compressai.datasets import RawVideoSequence, VideoFormat
 from compressai.models.video.google import ScaleSpaceFlow
 from compressai.transforms.functional import ycbcr2rgb, yuv_420_to_444
-from compressai.zoo import models_video as pretrained_models
+from compressai.zoo import video_models as pretrained_models
 
 models = {"ssf2020": ScaleSpaceFlow}
 
@@ -164,7 +164,7 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
     device = next(net.parameters()).device
     num_frames = len(org_seq)
     num_pixels = org_seq.height * org_seq.width
-    max_val = 2 ** org_seq.bitdepth - 1
+    max_val = 2**org_seq.bitdepth - 1
     results = defaultdict(list)
 
     with tqdm(total=num_frames) as pbar:

@@ -80,7 +80,7 @@ class GDN(nn.Module):
         beta = self.beta_reparam(self.beta)
         gamma = self.gamma_reparam(self.gamma)
         gamma = gamma.reshape(C, C, 1, 1)
-        norm = F.conv2d(x ** 2, gamma, beta)
+        norm = F.conv2d(x**2, gamma, beta)
 
         if self.inverse:
             norm = torch.sqrt(norm)

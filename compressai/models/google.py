@@ -156,7 +156,7 @@ class FactorizedPrior(CompressionModel):
 
     @property
     def downsampling_factor(self) -> int:
-        return 2 ** 4
+        return 2**4
 
     def forward(self, x):
         y = self.g_a(x)

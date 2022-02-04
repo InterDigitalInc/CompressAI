@@ -23,7 +23,6 @@ entrypoints==0.3
 flake8==3.9.2
 flake8-bugbear==21.4.3
 flake8-comprehensions==3.5.0
-furo==2021.4.11b34
 idna==2.10
 imagesize==1.2.0
 iniconfig==1.1.1

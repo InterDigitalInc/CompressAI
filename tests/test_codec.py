@@ -32,7 +32,7 @@ import itertools
 import pytest
 import torch
 
-from compressai.zoo import models
+from compressai.zoo import image_models
 
 archs = [
     "bmshj2018-factorized",
@@ -44,12 +44,12 @@ archs = [
 
 class TestCompressDecompress:
     @pytest.mark.parametrize("arch,N", itertools.product(archs, [1, 2, 3]))
-    def test_codec(self, arch: str, N: int):
+    def test_image_codec(self, arch: str, N: int):
         x = torch.zeros(N, 3, 256, 256)
         h, w = x.size()[-2:]
         x[:, :, h // 4 : -h // 4, w // 4 : -w // 4].fill_(1)
 
-        model = models[arch]
+        model = image_models[arch]
         net = model(quality=1, metric="mse", pretrained=True).eval()
         with torch.no_grad():
             rv = net.compress(x)

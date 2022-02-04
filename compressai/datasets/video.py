@@ -32,6 +32,9 @@ import random
 
 from pathlib import Path
 
+import numpy as np
+import torch
+
 from PIL import Image
 from torch.utils.data import Dataset
 
@@ -114,7 +117,10 @@ class VideoFolder(Dataset):
         interval = random.randint(1, max_interval) if self.rnd_interval else 1
         frame_paths = (samples[::interval])[: self.max_frames]
 
-        frames = [self.transform(Image.open(p)) for p in frame_paths]
+        frames = np.concatenate(
+            [np.asarray(Image.open(p).convert("RGB")) for p in frame_paths], axis=-1
+        )
+        frames = torch.chunk(self.transform(frames), 3)
 
         if self.rnd_temp_order:
             if random.random() < 0.5:

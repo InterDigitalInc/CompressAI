@@ -41,7 +41,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 from compressai.datasets import ImageFolder
-from compressai.zoo import models
+from compressai.zoo import image_models
 
 
 class RateDistortionLoss(nn.Module):
@@ -62,7 +62,7 @@ class RateDistortionLoss(nn.Module):
             for likelihoods in output["likelihoods"].values()
         )
         out["mse_loss"] = self.mse(output["x_hat"], target)
-        out["loss"] = self.lmbda * 255 ** 2 * out["mse_loss"] + out["bpp_loss"]
+        out["loss"] = self.lmbda * 255**2 * out["mse_loss"] + out["bpp_loss"]
 
         return out
 
@@ -206,7 +206,7 @@ def parse_args(argv):
         "-m",
         "--model",
         default="bmshj2018-factorized",
-        choices=models.keys(),
+        choices=image_models.keys(),
         help="Model architecture (default: %(default)s)",
     )
     parser.add_argument(
@@ -315,7 +315,7 @@ def main(argv):
         pin_memory=(device == "cuda"),
     )
 
-    net = models[args.model](quality=3)
+    net = image_models[args.model](quality=3)
     net = net.to(device)
 
     if args.cuda and torch.cuda.device_count() > 1:

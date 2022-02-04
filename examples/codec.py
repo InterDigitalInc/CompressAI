@@ -32,23 +32,51 @@ import struct
 import sys
 import time
 
+from enum import Enum
 from pathlib import Path
+from typing import IO, Dict, NamedTuple, Tuple, Union
 
+import numpy as np
 import torch
 import torch.nn.functional as F
 
 from PIL import Image
+from torch import Tensor
+from torch.utils.model_zoo import tqdm
 from torchvision.transforms import ToPILImage, ToTensor
 
 import compressai
 
-from compressai.zoo import models
+from compressai.datasets import RawVideoSequence, VideoFormat
+from compressai.transforms.functional import (
+    rgb2ycbcr,
+    ycbcr2rgb,
+    yuv_420_to_444,
+    yuv_444_to_420,
+)
+from compressai.zoo import image_models, models
 
 torch.backends.cudnn.deterministic = True
 
 model_ids = {k: i for i, k in enumerate(models.keys())}
 
 metric_ids = {"mse": 0, "ms-ssim": 1}
+
+Frame = Union[Tuple[Tensor, Tensor, Tensor], Tuple[Tensor, ...]]
+
+
+class CodecType(Enum):
+    IMAGE_CODEC = 0
+    VIDEO_CODEC = 1
+    NUM_CODEC_TYPE = 2
+
+
+class CodecInfo(NamedTuple):
+    codec_header: Tuple
+    original_size: Tuple
+    original_bitdepth: int
+    net: Dict
+    device: str
 
 
 def BoolConvert(a):
@@ -116,14 +144,19 @@ def read_bytes(fd, n, fmt=">{:d}s"):
     return struct.unpack(fmt.format(n), fd.read(n * sz))[0]
 
 
-def get_header(model_name, metric, quality):
+def get_header(model_name, metric, quality, num_of_frames, codec_type: Enum):
     """Format header information:
     - 1 byte for model id
     - 4 bits for metric
     - 4 bits for quality param
+    - 4 bytes for number of frames to be coded (only applicable for video)
     """
     metric = metric_ids[metric]
     code = (metric << 4) | (quality - 1 & 0x0F)
+
+    if codec_type == CodecType.VIDEO_CODEC:
+        return model_ids[model_name], code, num_of_frames
+
     return model_ids[model_name], code
 
 
@@ -136,6 +169,7 @@ def parse_header(header):
     model_id, code = header
     quality = (code & 0x0F) + 1
     metric = code >> 4
+
     return (
         inverse_dict(model_ids)[model_id],
         inverse_dict(metric_ids)[metric],
@@ -163,7 +197,37 @@ def write_body(fd, shape, out_strings):
     return bytes_cnt
 
 
-def pad(x, p=2 ** 6):
+def to_tensors(
+    frame: Tuple[np.ndarray, np.ndarray, np.ndarray],
+    max_value: int = 1,
+    device: str = "cpu",
+) -> Frame:
+    return tuple(
+        torch.from_numpy(np.true_divide(c, max_value, dtype=np.float32)).to(device)
+        for c in frame
+    )
+
+
+def convert_yuv420_rgb(
+    frame: Tuple[np.ndarray, np.ndarray, np.ndarray], device: torch.device, max_val: int
+) -> Tensor:
+    # yuv420 [0, 2**bitdepth-1] to rgb 444 [0, 1] only for now
+    frame = to_tensors(frame, device=str(device), max_value=max_val)
+    frame = yuv_420_to_444(
+        tuple(c.unsqueeze(0).unsqueeze(0) for c in frame), mode="bicubic"  # type: ignore
+    )
+    return ycbcr2rgb(frame)  # type: ignore
+
+
+def convert_rgb_yuv420(frame: Tensor) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    # yuv420 [0, 2**bitdepth-1] to rgb 444 [0, 1] only for now
+    return yuv_444_to_420(rgb2ycbcr(frame), mode="avg_pool")
+    # frame = yuv_444_to_420(rgb2ycbcr(frame), mode="avg_pool")
+    # frame = tuple((c * max_val).clamp(0, max_val).round() for c in frame)
+    # return frame
+
+
+def pad(x, p=2**6):
     h, w = x.size(2), x.size(3)
     H = (h + p - 1) // p * p
     W = (w + p - 1) // p * p
@@ -194,68 +258,256 @@ def crop(x, size):
     )
 
 
-def _encode(image, model, metric, quality, coder, output):
-    compressai.set_entropy_coder(coder)
-    enc_start = time.time()
+def convert_output(t: Tensor, bitdepth: int = 8) -> np.array:
+    assert bitdepth in (8, 10)
+    # [0,1] fp ->  [0, 2**bitstream-1] uint
+    dtype = np.uint8 if bitdepth == 8 else np.uint16
+    t = (t.clamp(0, 1) * (2**bitdepth - 1)).cpu().squeeze()
+    arr = t.numpy().astype(dtype)
+    return arr
 
-    img = load_image(image)
-    start = time.time()
-    net = models[model](quality=quality, metric=metric, pretrained=True).eval()
-    load_time = time.time() - start
 
-    x = img2torch(img)
+def write_frame(fout: IO[bytes], frame: Frame, bitdepth: np.uint = 8):
+    for plane in frame:
+        convert_output(plane, bitdepth).tofile(fout)
+
+
+def encode_image(input, codec: CodecInfo, output):
+    if Path(input).suffix == ".yuv":
+        # encode first frame of YUV sequence only
+        org_seq = RawVideoSequence.from_file(input)
+        bitdepth = org_seq.bitdepth
+        max_val = 2**bitdepth - 1
+        if org_seq.format != VideoFormat.YUV420:
+            raise NotImplementedError(f"Unsupported video format: {org_seq.format}")
+        x = convert_yuv420_rgb(org_seq[0], codec.device, max_val)
+    else:
+        img = load_image(input)
+        x = img2torch(img)
+        bitdepth = 8
+
     h, w = x.size(2), x.size(3)
     p = 64  # maximum 6 strides of 2
     x = pad(x, p)
 
     with torch.no_grad():
-        out = net.compress(x)
+        out = codec.net.compress(x)
 
     shape = out["shape"]
-    header = get_header(model, metric, quality)
 
     with Path(output).open("wb") as f:
-        write_uchars(f, header)
+        write_uchars(f, codec.codec_header)
         # write original image size
         write_uints(f, (h, w))
+        # write original bitdepth
+        write_uchars(f, (bitdepth,))
         # write shape and number of encoded latents
         write_body(f, shape, out["strings"])
 
-    enc_time = time.time() - enc_start
     size = filesize(output)
-    bpp = float(size) * 8 / (img.size[0] * img.size[1])
+    bpp = float(size) * 8 / (h * w)
+
+    return {"bpp": bpp}
+
+
+def encode_video(input, codec: CodecInfo, output):
+    if Path(input).suffix != ".yuv":
+        raise NotImplementedError(
+            f"Unsupported video file extension: {Path(input).suffix}"
+        )
+
+    # encode frames of YUV sequence only
+    org_seq = RawVideoSequence.from_file(input)
+    bitdepth = org_seq.bitdepth
+    max_val = 2**bitdepth - 1
+    if org_seq.format != VideoFormat.YUV420:
+        raise NotImplementedError(f"Unsupported video format: {org_seq.format}")
+
+    num_frames = codec.codec_header[2]
+
+    avg_frame_enc_time = []
+
+    f = Path(output).open("wb")
+    with torch.no_grad():
+        # Write Video Header
+        write_uchars(f, codec.codec_header[0:2])
+        # write original image size
+        write_uints(f, (org_seq.height, org_seq.width))
+        # write original bitdepth
+        write_uchars(f, (bitdepth,))
+        # write number of coded frames
+        write_uints(f, (num_frames,))
+
+        x_ref = None
+        with tqdm(total=num_frames) as pbar:
+            for i in range(num_frames):
+                frm_enc_start = time.time()
+
+                x_cur = convert_yuv420_rgb(org_seq[0], codec.device, max_val)
+                h, w = x_cur.size(2), x_cur.size(3)
+                p = 128  # maximum 7 strides of 2
+                x_cur = pad(x_cur, p)
+
+                if i == 0:
+                    x_out, out_info = codec.net.encode_keyframe(x_cur)
+                    write_body(f, out_info["shape"], out_info["strings"])
+                else:
+                    x_out, out_info = codec.net.encode_inter(x_cur, x_ref)
+                    for shape, out in zip(
+                        out_info["shape"].items(), out_info["strings"].items()
+                    ):
+                        write_body(f, shape[1], out[1])
+
+                x_ref = x_out.clamp(0, 1)
+
+                avg_frame_enc_time.append((time.time() - frm_enc_start))
+
+                pbar.update(1)
+
+        org_seq.close()
+    f.close()
+
+    size = filesize(output)
+    bpp = float(size) * 8 / (h * w * num_frames)
+
+    return {"bpp": bpp, "avg_frm_enc_time": np.mean(avg_frame_enc_time)}
+
+
+def _encode(input, num_of_frames, model, metric, quality, coder, device, output):
+    encode_func = {
+        CodecType.IMAGE_CODEC: encode_image,
+        CodecType.VIDEO_CODEC: encode_video,
+    }
+
+    compressai.set_entropy_coder(coder)
+    enc_start = time.time()
+
+    start = time.time()
+    model_info = models[model]
+    net = model_info(quality=quality, metric=metric, pretrained=True).to(device).eval()
+    codec_type = (
+        CodecType.IMAGE_CODEC if model in image_models else CodecType.VIDEO_CODEC
+    )
+
+    codec_header_info = get_header(model, metric, quality, num_of_frames, codec_type)
+    load_time = time.time() - start
+
+    if not Path(input).is_file():
+        raise FileNotFoundError(f"{input} does not exist")
+
+    codec_info = CodecInfo(codec_header_info, None, None, net, device)
+    out = encode_func[codec_type](input, codec_info, output)
+
+    enc_time = time.time() - enc_start
+
     print(
-        f"{bpp:.3f} bpp |"
+        f"{out['bpp']:.3f} bpp |"
         f" Encoded in {enc_time:.2f}s (model loading: {load_time:.2f}s)"
     )
 
 
-def _decode(inputpath, coder, show, output=None):
+def decode_image(f, codec: CodecInfo, output):
+    strings, shape = read_body(f)
+    with torch.no_grad():
+        out = codec.net.decompress(strings, shape)
+
+    x_hat = crop(out["x_hat"], codec.original_size)
+
+    img = torch2img(x_hat)
+
+    if output is not None:
+        if Path(output).suffix == ".yuv":
+            rec = convert_rgb_yuv420(x_hat)
+            with Path(output).open("wb") as fout:
+                write_frame(fout, rec, codec.original_bitdepth)
+        else:
+            img.save(output)
+
+    return {"img": img}
+
+
+def decode_video(f, codec: CodecInfo, output):
+    # read number of coded frames
+    num_frames = read_uints(f, 1)[0]
+
+    avg_frame_dec_time = []
+
+    with torch.no_grad():
+        x_ref = None
+        with tqdm(total=num_frames) as pbar:
+            for i in range(num_frames):
+                frm_dec_start = time.time()
+
+                if i == 0:
+                    strings, shape = read_body(f)
+                    x_out = codec.net.decode_keyframe(strings, shape)
+                else:
+                    mstrings, mshape = read_body(f)
+                    rstrings, rshape = read_body(f)
+                    inter_strings = {"motion": mstrings, "residual": rstrings}
+                    inter_shapes = {"motion": mshape, "residual": rshape}
+
+                    x_out = codec.net.decode_inter(x_ref, inter_strings, inter_shapes)
+
+                x_ref = x_out.clamp(0, 1)
+
+                avg_frame_dec_time.append((time.time() - frm_dec_start))
+
+                x_hat = crop(x_out, codec.original_size)
+                img = torch2img(x_hat)
+
+                if output is not None:
+                    if Path(output).suffix == ".yuv":
+                        rec = convert_rgb_yuv420(x_hat)
+                        wopt = "wb" if i == 0 else "ab"
+                        with Path(output).open(wopt) as fout:
+                            write_frame(fout, rec, codec.original_bitdepth)
+                    else:
+                        img.save(output)
+
+                pbar.update(1)
+
+    return {"img": img, "avg_frm_dec_time": np.mean(avg_frame_dec_time)}
+
+
+def _decode(inputpath, coder, show, device, output=None):
+    decode_func = {
+        CodecType.IMAGE_CODEC: decode_image,
+        CodecType.VIDEO_CODEC: decode_video,
+    }
+
     compressai.set_entropy_coder(coder)
 
     dec_start = time.time()
     with Path(inputpath).open("rb") as f:
         model, metric, quality = parse_header(read_uchars(f, 2))
+
         original_size = read_uints(f, 2)
-        strings, shape = read_body(f)
+        original_bitdepth = read_uchars(f, 1)[0]
 
-    print(f"Model: {model:s}, metric: {metric:s}, quality: {quality:d}")
-    start = time.time()
-    net = models[model](quality=quality, metric=metric, pretrained=True).eval()
-    load_time = time.time() - start
+        start = time.time()
+        model_info = models[model]
+        net = (
+            model_info[0](quality=quality, metric=metric, pretrained=True)
+            .to(device)
+            .eval()
+        )
+        codec_type = (
+            CodecType.IMAGE_CODEC if model in image_models else CodecType.VIDEO_CODEC
+        )
 
-    with torch.no_grad():
-        out = net.decompress(strings, shape)
+        load_time = time.time() - start
+        print(f"Model: {model:s}, metric: {metric:s}, quality: {quality:d}")
 
-    x_hat = crop(out["x_hat"], original_size)
-    img = torch2img(x_hat)
+        stream_info = CodecInfo(None, original_size, original_bitdepth, net, device)
+        out = decode_func[codec_type](f, stream_info, output)
+
     dec_time = time.time() - dec_start
     print(f"Decoded in {dec_time:.2f}s (model loading: {load_time:.2f}s)")
 
     if show:
-        show_image(img)
-    if output is not None:
-        img.save(output)
+        # For video, only the last frame is shown
+        show_image(out["img"])
 
 
 def show_image(img: Image.Image):
@@ -270,8 +522,19 @@ def show_image(img: Image.Image):
 
 
 def encode(argv):
-    parser = argparse.ArgumentParser(description="Encode image to bit-stream")
-    parser.add_argument("image", type=str)
+    parser = argparse.ArgumentParser(description="Encode image/video to bit-stream")
+    parser.add_argument(
+        "input",
+        type=str,
+        help="Input path, the first frame will be encoded with a NN image codec if the input is a raw yuv sequence",
+    )
+    parser.add_argument(
+        "-f",
+        "--num_of_frames",
+        default=-1,
+        type=int,
+        help="Number of frames to be coded. -1 will encode all frames of input (default: %(default)s)",
+    )
     parser.add_argument(
         "--model",
         choices=models.keys(),
@@ -283,7 +546,7 @@ def encode(argv):
         "--metric",
         choices=metric_ids.keys(),
         default="mse",
-        help="metric trained against (default: %(default)s",
+        help="metric trained against (default: %(default)s)",
     )
     parser.add_argument(
         "-q",
@@ -301,15 +564,26 @@ def encode(argv):
         help="Entropy coder (default: %(default)s)",
     )
     parser.add_argument("-o", "--output", help="Output path")
+    parser.add_argument("--cuda", action="store_true", help="Use cuda")
     args = parser.parse_args(argv)
     if not args.output:
-        args.output = Path(Path(args.image).resolve().name).with_suffix(".bin")
+        args.output = Path(Path(args.input).resolve().name).with_suffix(".bin")
 
-    _encode(args.image, args.model, args.metric, args.quality, args.coder, args.output)
+    device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
+    _encode(
+        args.input,
+        args.num_of_frames,
+        args.model,
+        args.metric,
+        args.quality,
+        args.coder,
+        device,
+        args.output,
+    )
 
 
 def decode(argv):
-    parser = argparse.ArgumentParser(description="Decode bit-stream to imager")
+    parser = argparse.ArgumentParser(description="Decode bit-stream to image/video")
     parser.add_argument("input", type=str)
     parser.add_argument(
         "-c",
@@ -320,8 +594,10 @@ def decode(argv):
     )
     parser.add_argument("--show", action="store_true")
     parser.add_argument("-o", "--output", help="Output path")
+    parser.add_argument("--cuda", action="store_true", help="Use cuda")
     args = parser.parse_args(argv)
-    _decode(args.input, args.coder, args.show, args.output)
+    device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
+    _decode(args.input, args.coder, args.show, device, args.output)
 
 
 def parse_args(argv):
@@ -335,9 +611,9 @@ def main(argv):
     args = parse_args(argv[1:2])
     argv = argv[2:]
     torch.set_num_threads(1)  # just to be sure
-    if args.command == "img_encode":
+    if args.command == "encode":
         encode(argv)
-    elif args.command == "img_decode":
+    elif args.command == "decode":
         decode(argv)
 
 

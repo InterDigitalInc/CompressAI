@@ -142,7 +142,7 @@ class TestGDN:
         assert x.grad is not None
         assert x.grad.shape == x.shape
 
-        y_ref = x / torch.sqrt(1 + 0.1 * (x ** 2))
+        y_ref = x / torch.sqrt(1 + 0.1 * (x**2))
         assert torch.allclose(y_ref, y)
 
     def test_igdn(self):
@@ -155,7 +155,7 @@ class TestGDN:
         assert x.grad is not None
         assert x.grad.shape == x.shape
 
-        y_ref = x * torch.sqrt(1 + 0.1 * (x ** 2))
+        y_ref = x * torch.sqrt(1 + 0.1 * (x**2))
         assert torch.allclose(y_ref, y)
 
     def test_gdn1(self):
@@ -218,5 +218,5 @@ class TestQReLU:
         assert x.grad is not None
         assert x.grad.shape == x.shape
 
-        y_ref = x.clamp(min=0, max=2 ** 8 - 1)
+        y_ref = x.clamp(min=0, max=2**8 - 1)
         assert torch.allclose(y_ref, y)

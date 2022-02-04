@@ -89,8 +89,8 @@ class TestModels:
         y_likelihoods_shape = out["likelihoods"]["y"].shape
         assert y_likelihoods_shape[0] == x.shape[0]
         assert y_likelihoods_shape[1] == 192
-        assert y_likelihoods_shape[2] == x.shape[2] / 2 ** 4
-        assert y_likelihoods_shape[3] == x.shape[3] / 2 ** 4
+        assert y_likelihoods_shape[2] == x.shape[2] / 2**4
+        assert y_likelihoods_shape[3] == x.shape[3] / 2**4
 
     def test_scale_hyperprior(self, tmpdir):
         model = ScaleHyperprior(128, 192)
@@ -107,14 +107,14 @@ class TestModels:
         y_likelihoods_shape = out["likelihoods"]["y"].shape
         assert y_likelihoods_shape[0] == x.shape[0]
         assert y_likelihoods_shape[1] == 192
-        assert y_likelihoods_shape[2] == x.shape[2] / 2 ** 4
-        assert y_likelihoods_shape[3] == x.shape[3] / 2 ** 4
+        assert y_likelihoods_shape[2] == x.shape[2] / 2**4
+        assert y_likelihoods_shape[3] == x.shape[3] / 2**4
 
         z_likelihoods_shape = out["likelihoods"]["z"].shape
         assert z_likelihoods_shape[0] == x.shape[0]
         assert z_likelihoods_shape[1] == 128
-        assert z_likelihoods_shape[2] == x.shape[2] / 2 ** 6
-        assert z_likelihoods_shape[3] == x.shape[3] / 2 ** 6
+        assert z_likelihoods_shape[2] == x.shape[2] / 2**6
+        assert z_likelihoods_shape[3] == x.shape[3] / 2**6
 
         for sz in [(128, 128), (128, 192), (192, 128)]:
             model = ScaleHyperprior(*sz)
@@ -138,14 +138,14 @@ class TestModels:
         y_likelihoods_shape = out["likelihoods"]["y"].shape
         assert y_likelihoods_shape[0] == x.shape[0]
         assert y_likelihoods_shape[1] == 192
-        assert y_likelihoods_shape[2] == x.shape[2] / 2 ** 4
-        assert y_likelihoods_shape[3] == x.shape[3] / 2 ** 4
+        assert y_likelihoods_shape[2] == x.shape[2] / 2**4
+        assert y_likelihoods_shape[3] == x.shape[3] / 2**4
 
         z_likelihoods_shape = out["likelihoods"]["z"].shape
         assert z_likelihoods_shape[0] == x.shape[0]
         assert z_likelihoods_shape[1] == 128
-        assert z_likelihoods_shape[2] == x.shape[2] / 2 ** 6
-        assert z_likelihoods_shape[3] == x.shape[3] / 2 ** 6
+        assert z_likelihoods_shape[2] == x.shape[2] / 2**6
+        assert z_likelihoods_shape[3] == x.shape[3] / 2**6
 
     def test_jarhp(self, tmpdir):
         model = JointAutoregressiveHierarchicalPriors(128, 192)
@@ -162,14 +162,14 @@ class TestModels:
         y_likelihoods_shape = out["likelihoods"]["y"].shape
         assert y_likelihoods_shape[0] == x.shape[0]
         assert y_likelihoods_shape[1] == 192
-        assert y_likelihoods_shape[2] == x.shape[2] / 2 ** 4
-        assert y_likelihoods_shape[3] == x.shape[3] / 2 ** 4
+        assert y_likelihoods_shape[2] == x.shape[2] / 2**4
+        assert y_likelihoods_shape[3] == x.shape[3] / 2**4
 
         z_likelihoods_shape = out["likelihoods"]["z"].shape
         assert z_likelihoods_shape[0] == x.shape[0]
         assert z_likelihoods_shape[1] == 128
-        assert z_likelihoods_shape[2] == x.shape[2] / 2 ** 6
-        assert z_likelihoods_shape[3] == x.shape[3] / 2 ** 6
+        assert z_likelihoods_shape[2] == x.shape[2] / 2**6
+        assert z_likelihoods_shape[3] == x.shape[3] / 2**6
 
         for sz in [(128, 128), (128, 192), (192, 128)]:
             model = JointAutoregressiveHierarchicalPriors(*sz)
@@ -205,38 +205,38 @@ class TestModels:
         y_likelihoods_shape = out["likelihoods"][0]["keyframe"]["y"].shape
         assert y_likelihoods_shape[0] == x[0].shape[0]
         assert y_likelihoods_shape[1] == 192
-        assert y_likelihoods_shape[2] == x[0].shape[2] / 2 ** 4
-        assert y_likelihoods_shape[3] == x[0].shape[3] / 2 ** 4
+        assert y_likelihoods_shape[2] == x[0].shape[2] / 2**4
+        assert y_likelihoods_shape[3] == x[0].shape[3] / 2**4
 
         z_likelihoods_shape = out["likelihoods"][0]["keyframe"]["z"].shape
         assert z_likelihoods_shape[0] == x[0].shape[0]
         assert z_likelihoods_shape[1] == 192
-        assert z_likelihoods_shape[2] == x[0].shape[2] / 2 ** 7  # (128x128 input)
-        assert z_likelihoods_shape[3] == x[0].shape[3] / 2 ** 7
+        assert z_likelihoods_shape[2] == x[0].shape[2] / 2**7  # (128x128 input)
+        assert z_likelihoods_shape[3] == x[0].shape[3] / 2**7
 
         y_likelihoods_shape = out["likelihoods"][1]["motion"]["y"].shape
         assert y_likelihoods_shape[0] == x[1].shape[0]
         assert y_likelihoods_shape[1] == 192
-        assert y_likelihoods_shape[2] == x[1].shape[2] / 2 ** 4
-        assert y_likelihoods_shape[3] == x[1].shape[3] / 2 ** 4
+        assert y_likelihoods_shape[2] == x[1].shape[2] / 2**4
+        assert y_likelihoods_shape[3] == x[1].shape[3] / 2**4
 
         z_likelihoods_shape = out["likelihoods"][1]["motion"]["z"].shape
         assert z_likelihoods_shape[0] == x[1].shape[0]
         assert z_likelihoods_shape[1] == 192
-        assert z_likelihoods_shape[2] == x[1].shape[2] / 2 ** 7  # (128x128 input)
-        assert z_likelihoods_shape[3] == x[1].shape[3] / 2 ** 7
+        assert z_likelihoods_shape[2] == x[1].shape[2] / 2**7  # (128x128 input)
+        assert z_likelihoods_shape[3] == x[1].shape[3] / 2**7
 
         y_likelihoods_shape = out["likelihoods"][1]["residual"]["y"].shape
         assert y_likelihoods_shape[0] == x[1].shape[0]
         assert y_likelihoods_shape[1] == 192
-        assert y_likelihoods_shape[2] == x[1].shape[2] / 2 ** 4
-        assert y_likelihoods_shape[3] == x[1].shape[3] / 2 ** 4
+        assert y_likelihoods_shape[2] == x[1].shape[2] / 2**4
+        assert y_likelihoods_shape[3] == x[1].shape[3] / 2**4
 
         z_likelihoods_shape = out["likelihoods"][1]["residual"]["z"].shape
         assert z_likelihoods_shape[0] == x[1].shape[0]
         assert z_likelihoods_shape[1] == 192
-        assert z_likelihoods_shape[2] == x[1].shape[2] / 2 ** 7  # (128x128 input)
-        assert z_likelihoods_shape[3] == x[1].shape[3] / 2 ** 7
+        assert z_likelihoods_shape[2] == x[1].shape[2] / 2**7  # (128x128 input)
+        assert z_likelihoods_shape[3] == x[1].shape[3] / 2**7
 
 
 def test_scale_table_default():

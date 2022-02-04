@@ -38,7 +38,7 @@ from .image import (
 from .pretrained import load_pretrained as load_state_dict
 from .video import ssf2020
 
-models = {
+image_models = {
     "bmshj2018-factorized": bmshj2018_factorized,
     "bmshj2018-hyperprior": bmshj2018_hyperprior,
     "mbt2018-mean": mbt2018_mean,
@@ -47,6 +47,10 @@ models = {
     "cheng2020-attn": cheng2020_attn,
 }
 
-models_video = {
+video_models = {
     "ssf2020": ssf2020,
 }
+
+models = {}
+models.update(image_models)
+models.update(video_models)

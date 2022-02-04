@@ -44,7 +44,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 from compressai.datasets import VideoFolder
-from compressai.zoo import models_video
+from compressai.zoo import video_models
 
 
 def collect_likelihoods_list(likelihoods_list, num_pixels: int):
@@ -76,7 +76,7 @@ class RateDistortionLoss(nn.Module):
         super().__init__()
         self.mse = nn.MSELoss(reduction="none")
         self.lmbda = lmbda
-        self._scaling_functions = lambda x: (2 ** bitdepth - 1) ** 2 * x
+        self._scaling_functions = lambda x: (2**bitdepth - 1) ** 2 * x
         self.return_details = bool(return_details)
 
     @staticmethod
@@ -323,7 +323,7 @@ def parse_args(argv):
         "-m",
         "--model",
         default="ssf2020",
-        choices=models_video.keys(),
+        choices=video_models.keys(),
         help="Model architecture (default: %(default)s)",
     )
     parser.add_argument(
@@ -403,12 +403,13 @@ def main(argv):
         torch.manual_seed(args.seed)
         random.seed(args.seed)
 
+    # Warning, the order of the transform composition should be kept.
     train_transforms = transforms.Compose(
-        [transforms.RandomCrop(args.patch_size), transforms.ToTensor()]
+        [transforms.ToTensor(), transforms.RandomCrop(args.patch_size)]
     )
 
     test_transforms = transforms.Compose(
-        [transforms.CenterCrop(args.patch_size), transforms.ToTensor()]
+        [transforms.ToTensor(), transforms.CenterCrop(args.patch_size)]
     )
 
     train_dataset = VideoFolder(
@@ -444,7 +445,7 @@ def main(argv):
         pin_memory=(device == "cuda"),
     )
 
-    net = models_video[args.model](quality=3)
+    net = video_models[args.model](quality=3)
     net = net.to(device)
 
     optimizer, aux_optimizer = configure_optimizers(net, args)

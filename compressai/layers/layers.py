@@ -86,7 +86,7 @@ def conv3x3(in_ch: int, out_ch: int, stride: int = 1) -> nn.Module:
 def subpel_conv3x3(in_ch: int, out_ch: int, r: int = 1) -> nn.Sequential:
     """3x3 sub-pixel convolution for up-sampling."""
     return nn.Sequential(
-        nn.Conv2d(in_ch, out_ch * r ** 2, kernel_size=3, padding=1), nn.PixelShuffle(r)
+        nn.Conv2d(in_ch, out_ch * r**2, kernel_size=3, padding=1), nn.PixelShuffle(r)
     )
 
 
@@ -271,7 +271,7 @@ class QReLU(Function):
         # pre-computed scale with gamma function
         ctx.alpha = 0.9943258522851727
         ctx.beta = beta
-        ctx.max_value = 2 ** bit_depth - 1
+        ctx.max_value = 2**bit_depth - 1
         ctx.save_for_backward(input)
 
         return input.clamp(min=0, max=ctx.max_value)
@@ -284,7 +284,7 @@ class QReLU(Function):
         grad_input = grad_output.clone()
         grad_sub = (
             torch.exp(
-                (-ctx.alpha ** ctx.beta)
+                (-ctx.alpha**ctx.beta)
                 * torch.abs(2.0 * input / ctx.max_value - 1) ** ctx.beta
             )
             * grad_output.clone()

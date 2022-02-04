@@ -549,9 +549,9 @@ class VTM(Codec):
 
         if not self.rgb:
             # convert rgb content to YCbCr
-            rgb = torch.from_numpy(arr.copy()).float() / (2 ** bitdepth - 1)
+            rgb = torch.from_numpy(arr.copy()).float() / (2**bitdepth - 1)
             arr = np.clip(rgb2ycbcr(rgb).numpy(), 0, 1)
-            arr = (arr * (2 ** bitdepth - 1)).astype(np.uint8)
+            arr = (arr * (2**bitdepth - 1)).astype(np.uint8)
 
         with open(yuv_path, "wb") as f:
             f.write(arr.tobytes())
@@ -610,8 +610,8 @@ class VTM(Codec):
         rec_arr = np.fromfile(yuv_path, dtype=np.uint8)
         rec_arr = rec_arr.reshape(arr.shape)
 
-        arr = arr.astype(np.float32) / (2 ** bitdepth - 1)
-        rec_arr = rec_arr.astype(np.float32) / (2 ** bitdepth - 1)
+        arr = arr.astype(np.float32) / (2**bitdepth - 1)
+        rec_arr = rec_arr.astype(np.float32) / (2**bitdepth - 1)
         if not self.rgb:
             arr = ycbcr2rgb(torch.from_numpy(arr.copy())).numpy()
             rec_arr = ycbcr2rgb(torch.from_numpy(rec_arr.copy())).numpy()
@@ -686,9 +686,9 @@ class HM(Codec):
 
         if not self.rgb:
             # convert rgb content to YCbCr
-            rgb = torch.from_numpy(arr.copy()).float() / (2 ** bitdepth - 1)
+            rgb = torch.from_numpy(arr.copy()).float() / (2**bitdepth - 1)
             arr = np.clip(rgb2ycbcr(rgb).numpy(), 0, 1)
-            arr = (arr * (2 ** bitdepth - 1)).astype(np.uint8)
+            arr = (arr * (2**bitdepth - 1)).astype(np.uint8)
 
         with open(yuv_path, "wb") as f:
             f.write(arr.tobytes())
@@ -750,8 +750,8 @@ class HM(Codec):
         # Compute PSNR
         rec_arr = np.fromfile(yuv_path, dtype=np.uint8)
         rec_arr = rec_arr.reshape(arr.shape)
-        arr = arr.astype(np.float32) / (2 ** bitdepth - 1)
-        rec_arr = rec_arr.astype(np.float32) / (2 ** bitdepth - 1)
+        arr = arr.astype(np.float32) / (2**bitdepth - 1)
+        rec_arr = rec_arr.astype(np.float32) / (2**bitdepth - 1)
         if not self.rgb:
             arr = ycbcr2rgb(torch.from_numpy(arr.copy())).numpy()
             rec_arr = ycbcr2rgb(torch.from_numpy(rec_arr.copy())).numpy()
@@ -817,9 +817,9 @@ class AV1(Codec):
         arr = arr.transpose((2, 0, 1))  # color channel first
 
         # convert rgb content to YCbCr
-        rgb = torch.from_numpy(arr.copy()).float() / (2 ** bitdepth - 1)
+        rgb = torch.from_numpy(arr.copy()).float() / (2**bitdepth - 1)
         arr = np.clip(rgb2ycbcr(rgb).numpy(), 0, 1)
-        arr = (arr * (2 ** bitdepth - 1)).astype(np.uint8)
+        arr = (arr * (2**bitdepth - 1)).astype(np.uint8)
 
         with open(yuv_path, "wb") as f:
             f.write(arr.tobytes())
@@ -876,8 +876,8 @@ class AV1(Codec):
         rec_arr = np.fromfile(yuv_path, dtype=np.uint8)
         rec_arr = rec_arr.reshape(arr.shape)
 
-        arr = arr.astype(np.float32) / (2 ** bitdepth - 1)
-        rec_arr = rec_arr.astype(np.float32) / (2 ** bitdepth - 1)
+        arr = arr.astype(np.float32) / (2**bitdepth - 1)
+        rec_arr = rec_arr.astype(np.float32) / (2**bitdepth - 1)
 
         arr = ycbcr2rgb(torch.from_numpy(arr.copy())).numpy()
         rec_arr = ycbcr2rgb(torch.from_numpy(rec_arr.copy())).numpy()

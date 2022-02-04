@@ -103,12 +103,34 @@ evaluation script:
 python3 -m compressai.utils.eval_model checkpoint /path/to/images/folder/ -a $ARCH -p $MODEL_CHECKPOINT...
 ```
 
-To evaluate traditional image/video codecs:
+To evaluate provided pre-trained models:
+
+```bash
+python3 -m compressai.utils.eval_model pretrained /path/to/images/folder/ -a $ARCH -q $QUALITY_LEVELS...
+```
+
+To plot results from bench/eval_model simulations (requires matplotlib by default): 
+
+```bash
+python3 -m compressai.utils.plot --help
+```
+
+To evaluate traditional codecs:
 
 ```bash
 python3 -m compressai.utils.bench --help
 python3 -m compressai.utils.bench bpg --help
 python3 -m compressai.utils.bench vtm --help
+```
+
+For video, similar tests can be run, CompressAI only includes ssf2020 for now:
+
+```bash
+python3 -m compressai.utils.video.eval_model checkpoint /path/to/video/folder/ -a ssf2020 -p $MODEL_CHECKPOINT...
+python3 -m compressai.utils.video.eval_model pretrained /path/to/video/folder/ -a ssf2020 -q $QUALITY_LEVELS...
+python3 -m compressai.utils.video.bench x265 --help
+python3 -m compressai.utils.video.bench VTM --help
+python3 -m compressai.utils.video.plot --help
 ```
 
 ## Tests
@@ -135,7 +157,7 @@ Before contributing, please read the CONTRIBUTING.md file.
 
 ## Authors
 
-* Jean Bégaint, Fabien Racapé, Simon Feltman and Akshay Pushparaja, InterDigital AI Lab.
+* Jean Bégaint, Fabien Racapé, Simon Feltman and Hyomin Choi, InterDigital AI Lab.
 
 ## Citation
 

@@ -49,9 +49,9 @@ from torch.utils.model_zoo import tqdm
 from compressai.datasets.rawvideo import RawVideoSequence, VideoFormat
 from compressai.transforms.functional import ycbcr2rgb, yuv_420_to_444
 
-from .codecs import Codec, x264, x265
+from .codecs import HM, VTM, Codec, x264, x265
 
-codec_classes = [x264, x265]
+codec_classes = [x264, x265, VTM, HM]
 
 
 Frame = Union[Tuple[Tensor, Tensor, Tensor], Tuple[Tensor, ...]]
@@ -59,35 +59,45 @@ Frame = Union[Tuple[Tensor, Tensor, Tensor], Tuple[Tensor, ...]]
 
 def func(codec, i, filepath, qp, outputdir, cuda, force, dry_run):
     encode_cmd = codec.get_encode_cmd(filepath, qp, outputdir)
-    outputpath = codec.get_output_path(filepath, qp, outputdir)
+    binpath = codec.get_bin_path(filepath, qp, outputdir)
 
     # encode sequence if not already encoded
     if force:
-        outputpath.unlink(missing_ok=True)
-    if not outputpath.is_file():
-        logpath = outputpath.with_suffix(".log")
+        binpath.unlink(missing_ok=True)
+    if not binpath.is_file():
+        logpath = binpath.with_suffix(".log")
         run_cmdline(encode_cmd, logpath=logpath, dry_run=dry_run)
 
     # compute metrics if not already performed
-    sequence_metrics_path = outputpath.with_suffix(".json")
-    # results_paths.append(sequence_metrics_path)
+    sequence_metrics_path = binpath.with_suffix(".json")
 
     if force:
         sequence_metrics_path.unlink(missing_ok=True)
     if sequence_metrics_path.is_file():
-        return
+        print(
+            f"warning: using existing results {sequence_metrics_path}", file=sys.stderr
+        )
+        with sequence_metrics_path.open("r") as f:
+            metrics = json.load(f)["results"]
+        return i, qp, metrics
 
     with tempfile.NamedTemporaryFile(suffix=".yuv", delete=True) as f:
         # decode sequence
-        cmd = ["ffmpeg", "-y", "-i", outputpath, "-pix_fmt", "yuv420p", f.name]
-        run_cmdline(cmd)
+        decode_cmd = codec.get_decode_cmd(binpath, f.name, filepath)
+        run_cmdline(decode_cmd)
 
         # compute metrics
-        metrics = evaluate(filepath, Path(f.name), outputpath, cuda)
+        metrics = evaluate(filepath, Path(f.name), binpath, cuda)
+        output = {
+            "source": filepath.stem,
+            "name": codec.name_config(),
+            "description": codec.description(),
+            "results": metrics,
+        }
         with sequence_metrics_path.open("wb") as f:
-            f.write(json.dumps(metrics, indent=2).encode())
-
-    return i, metrics
+            f.write(json.dumps(output, indent=2).encode())
+    print(type(metrics))
+    return i, qp, metrics
 
 
 def to_tensors(
@@ -134,21 +144,21 @@ def compute_metrics_for_frame(
     dec_frame = tuple(p.unsqueeze(0).unsqueeze(0) for p in dec_frame)  # type:ignore
     out: Dict[str, Any] = {}
 
-    max_val = 2 ** bitdepth - 1
+    max_val = 2**bitdepth - 1
 
     # YCbCr metrics
     for i, component in enumerate("yuv"):
-        out[f"{component}_mse"] = (org_frame[i] - dec_frame[i]).pow(2).mean()
+        out[f"mse-{component}"] = (org_frame[i] - dec_frame[i]).pow(2).mean()
 
-    org = ycbcr2rgb(yuv_420_to_444(org_frame, mode="bicubic").true_divide(max_val))  # type: ignore
-    dec = ycbcr2rgb(yuv_420_to_444(dec_frame, mode="bicubic").true_divide(max_val))  # type: ignore
+    org_rgb = ycbcr2rgb(yuv_420_to_444(org_frame, mode="bicubic").true_divide(max_val))  # type: ignore
+    dec_rgb = ycbcr2rgb(yuv_420_to_444(dec_frame, mode="bicubic").true_divide(max_val))  # type: ignore
 
-    org = (org * max_val).clamp(0, max_val).round()
-    dec = (dec * max_val).clamp(0, max_val).round()
-    mse = (org - dec).pow(2).mean()
+    org_rgb = (org_rgb * max_val).clamp(0, max_val).round()
+    dec_rgb = (dec_rgb * max_val).clamp(0, max_val).round()
+    mse_rgb = (org_rgb - dec_rgb).pow(2).mean()
 
-    ms_ssim_val = ms_ssim(org, dec, data_range=max_val)
-    out.update({"ms-ssim": ms_ssim_val, "mse": mse})
+    ms_ssim_rgb = ms_ssim(org_rgb, dec_rgb, data_range=max_val)
+    out.update({"ms-ssim-rgb": ms_ssim_rgb, "mse-rgb": mse_rgb})
     return out
 
 
@@ -157,13 +167,16 @@ def get_filesize(filepath: Union[Path, str]) -> int:
 
 
 def evaluate(
-    org_seq_path: Path, dec_seq_path: Path, bitstream_path: Path, cuda: bool = False
+    org_seq_path: Path,
+    dec_seq_path: Path,
+    bitstream_path: Path,
+    cuda: bool = False,
 ) -> Dict[str, Any]:
     # load original and decoded sequences
     org_seq = RawVideoSequence.from_file(str(org_seq_path))
     dec_seq = RawVideoSequence.new_like(org_seq, str(dec_seq_path))
 
-    max_val = 2 ** org_seq.bitdepth - 1
+    max_val = 2**org_seq.bitdepth - 1
     num_frames = len(org_seq)
 
     if len(dec_seq) != num_frames:
@@ -194,14 +207,17 @@ def evaluate(
     filesize = get_filesize(bitstream_path)
     seq_results["bitrate"] = float(filesize * org_seq.framerate / (num_frames * 1000))
 
-    seq_results["rgb_psnr"] = (
-        20 * np.log10(max_val) - 10 * torch.log10(seq_results.pop("mse")).item()
+    seq_results["psnr-rgb"] = (
+        20 * np.log10(max_val) - 10 * torch.log10(seq_results.pop("mse-rgb")).item()
     )
     for component in "yuv":
-        seq_results[f"{component}_psnr"] = (
+        seq_results[f"psnr-{component}"] = (
             20 * np.log10(max_val)
-            - 10 * torch.log10(seq_results.pop(f"{component}_mse")).item()
+            - 10 * torch.log10(seq_results.pop(f"mse-{component}")).item()
         )
+    seq_results["psnr-yuv"] = (
+        4 * seq_results["psnr-y"] + seq_results["psnr-u"] + seq_results["psnr-v"]
+    ) / 6
     for k, v in seq_results.items():
         if isinstance(v, torch.Tensor):
             seq_results[k] = v.item()
@@ -259,14 +275,16 @@ def collect(
 
     results = [defaultdict(float) for _ in range(len(qps))]
 
-    for i, metrics in rv:
+    for i, qp, metrics in rv:
+        results[i]["qp"] = qp
         for k, v in metrics.items():
             results[i][k] += v
 
     # aggregate results for all videos
     for i, _ in enumerate(results):
         for k, v in results[i].items():
-            results[i][k] = v / len(filepaths)
+            if k != "qp":
+                results[i][k] = v / len(filepaths)
 
     # list of dict -> dict of list
     out = defaultdict(list)
@@ -285,7 +303,7 @@ def create_parser() -> Tuple[
     )
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument("dataset", type=str, help="sequences directory")
-    parent_parser.add_argument("output", type=str, help="output directory")
+    parent_parser.add_argument("outputdir", type=str, help="output directory")
     parent_parser.add_argument("-n", "--dry-run", action="store_true", help="dry run")
     parent_parser.add_argument(
         "-f", "--force", action="store_true", help="overwrite previous runs"
@@ -336,10 +354,12 @@ def main(args: Any = None) -> None:
     codec_class.set_args(args)
 
     args = vars(args)
+    outputdir = args.pop("outputdir")
+
     results = collect(
         args.pop("dataset"),
         codec_class,
-        args["output"],
+        outputdir,
         args.pop("qps"),
         **args,
     )
@@ -350,6 +370,8 @@ def main(args: Any = None) -> None:
         "results": results,
     }
 
+    with (Path(f"{outputdir}/{codec_class.name_config()}.json")).open("wb") as f:
+        f.write(json.dumps(output, indent=2).encode())
     print(json.dumps(output, indent=2))
 
 

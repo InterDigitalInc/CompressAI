@@ -51,7 +51,7 @@ def test_eval_model_cmd():
 
 
 @pytest.mark.skip(reason="test to be fixed")
-@pytest.mark.parametrize("codec", ("x264",))
+@pytest.mark.parametrize("codec", ("x264", "x264", "VTM", "HM"))
 def test_bench_codec_video(capsys, codec, tmp_path):
     here = Path(__file__).parent
     input_dir_path = here / "assets/dataset/video"

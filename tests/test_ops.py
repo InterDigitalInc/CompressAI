@@ -87,7 +87,7 @@ class TestNonNegativeParametrizer:
         x_init = parametrizer.init(x)
 
         assert x_init.shape == x.shape
-        assert torch.allclose(x_init, torch.sqrt(torch.max(x, x - x)), atol=2 ** -18)
+        assert torch.allclose(x_init, torch.sqrt(torch.max(x, x - x)), atol=2**-18)
 
     def test_non_negative_min(self):
         for _ in range(10):
