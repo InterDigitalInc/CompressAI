@@ -73,6 +73,7 @@ isort:
     - docker
 
 test:
+  cache: []
   stage: test
   image: pytorch/pytorch:$PYTORCH_IMAGE
   before_script:

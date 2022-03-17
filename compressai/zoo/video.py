@@ -45,15 +45,15 @@ root_url = "https://compressai.s3.amazonaws.com/models/v1"
 model_urls = {
     "ssf2020": {
         "mse": {
-            1: f"{root_url}/ssf2020-mse-1-46b536a2.pth.tar",
-            2: f"{root_url}/ssf2020-mse-2-026aaa94.pth.tar",
-            3: f"{root_url}/ssf2020-mse-3-e97377db.pth.tar",
-            4: f"{root_url}/ssf2020-mse-4-948386e6.pth.tar",
-            5: f"{root_url}/ssf2020-mse-5-bc25abf9.pth.tar",
-            6: f"{root_url}/ssf2020-mse-6-d08f1dcc.pth.tar",
-            7: f"{root_url}/ssf2020-mse-7-fdbf0c38.pth.tar",
-            8: f"{root_url}/ssf2020-mse-8-36699fba.pth.tar",
-            9: f"{root_url}/ssf2020-mse-9-d0e007f0.pth.tar",
+            1: f"{root_url}/ssf2020-mse-1-c1ac1a47.pth.tar",
+            2: f"{root_url}/ssf2020-mse-2-79ed4e19.pth.tar",
+            3: f"{root_url}/ssf2020-mse-3-9c8b998d.pth.tar",
+            4: f"{root_url}/ssf2020-mse-4-577c1eda.pth.tar",
+            5: f"{root_url}/ssf2020-mse-5-1dd7d574.pth.tar",
+            6: f"{root_url}/ssf2020-mse-6-59dfb6f9.pth.tar",
+            7: f"{root_url}/ssf2020-mse-7-4d867411.pth.tar",
+            8: f"{root_url}/ssf2020-mse-8-26439e20.pth.tar",
+            9: f"{root_url}/ssf2020-mse-9-e89345c4.pth.tar",
         }
     }
 }

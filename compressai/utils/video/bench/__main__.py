@@ -80,23 +80,22 @@ def func(codec, i, filepath, qp, outputdir, cuda, force, dry_run):
         with sequence_metrics_path.open("r") as f:
             metrics = json.load(f)["results"]
         return i, qp, metrics
+    else:
+        with tempfile.NamedTemporaryFile(suffix=".yuv", delete=True) as f:
+            # decode sequence
+            decode_cmd = codec.get_decode_cmd(binpath, f.name, filepath)
+            run_cmdline(decode_cmd)
 
-    with tempfile.NamedTemporaryFile(suffix=".yuv", delete=True) as f:
-        # decode sequence
-        decode_cmd = codec.get_decode_cmd(binpath, f.name, filepath)
-        run_cmdline(decode_cmd)
-
-        # compute metrics
-        metrics = evaluate(filepath, Path(f.name), binpath, cuda)
-        output = {
-            "source": filepath.stem,
-            "name": codec.name_config(),
-            "description": codec.description(),
-            "results": metrics,
-        }
-        with sequence_metrics_path.open("wb") as f:
-            f.write(json.dumps(output, indent=2).encode())
-    print(type(metrics))
+            # compute metrics
+            metrics = evaluate(filepath, Path(f.name), binpath, cuda)
+            output = {
+                "source": filepath.stem,
+                "name": codec.name_config(),
+                "description": codec.description(),
+                "results": metrics,
+            }
+            with sequence_metrics_path.open("wb") as f:
+                f.write(json.dumps(output, indent=2).encode())
     return i, qp, metrics
 
 
@@ -205,7 +204,9 @@ def evaluate(
         k: torch.mean(torch.stack(v)) for k, v in results.items()
     }
     filesize = get_filesize(bitstream_path)
-    seq_results["bitrate"] = float(filesize * org_seq.framerate / (num_frames * 1000))
+    seq_results["bitrate"] = float(
+        filesize * 8 * org_seq.framerate / (num_frames * 1000)
+    )
 
     seq_results["psnr-rgb"] = (
         20 * np.log10(max_val) - 10 * torch.log10(seq_results.pop("mse-rgb")).item()
@@ -222,21 +223,6 @@ def evaluate(
         if isinstance(v, torch.Tensor):
             seq_results[k] = v.item()
     return seq_results
-
-
-def aggregate_results(filepaths: List[Path]) -> Dict[str, Any]:
-    metrics = defaultdict(list)
-
-    # sum
-    for f in filepaths:
-        with f.open("r") as fd:
-            data = json.load(fd)
-        for k, v in data.items():
-            metrics[k].append(v)
-
-    # normalize
-    agg = {k: np.mean(v) for k, v in metrics.items()}
-    return agg
 
 
 def collect(

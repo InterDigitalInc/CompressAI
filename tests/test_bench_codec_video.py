@@ -42,7 +42,7 @@ bench_codec = importlib.import_module("compressai.utils.video.bench.__main__")
 GENERATE_EXPECTED = os.getenv("GENERATE_EXPECTED")
 
 
-def test_eval_model_cmd():
+def test_bench_codec_cmd():
     with pytest.raises(SystemExit):
         bench_codec.main([])
 
@@ -50,8 +50,8 @@ def test_eval_model_cmd():
         bench_codec.main(["x264"])
 
 
-@pytest.mark.skip(reason="test to be fixed")
-@pytest.mark.parametrize("codec", ("x264", "x264", "VTM", "HM"))
+@pytest.mark.skip(reason="test requires ffmpeg")
+@pytest.mark.parametrize("codec", ("x264", "x265"))  # , "VTM", "HM"))
 def test_bench_codec_video(capsys, codec, tmp_path):
     here = Path(__file__).parent
     input_dir_path = here / "assets/dataset/video"
@@ -75,7 +75,15 @@ def test_bench_codec_video(capsys, codec, tmp_path):
 
     assert expected["name"] == output["name"]
 
-    for key in ("psnr", "ms-ssim", "bpp"):
+    for key in (
+        "psnr-y",
+        "psnr-u",
+        "psnr-v",
+        "psnr-yuv",
+        "psnr-rgb",
+        "ms-ssim-rgb",
+        "bitrate",
+    ):
         if key not in expected["results"]:
             continue
         assert np.allclose(

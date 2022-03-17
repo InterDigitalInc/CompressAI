@@ -222,9 +222,6 @@ def convert_yuv420_rgb(
 def convert_rgb_yuv420(frame: Tensor) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     # yuv420 [0, 2**bitdepth-1] to rgb 444 [0, 1] only for now
     return yuv_444_to_420(rgb2ycbcr(frame), mode="avg_pool")
-    # frame = yuv_444_to_420(rgb2ycbcr(frame), mode="avg_pool")
-    # frame = tuple((c * max_val).clamp(0, max_val).round() for c in frame)
-    # return frame
 
 
 def pad(x, p=2**6):
@@ -324,6 +321,8 @@ def encode_video(input, codec: CodecInfo, output):
         raise NotImplementedError(f"Unsupported video format: {org_seq.format}")
 
     num_frames = codec.codec_header[2]
+    if num_frames < 0:
+        num_frames = org_seq.total_frms
 
     avg_frame_enc_time = []
 
@@ -343,7 +342,7 @@ def encode_video(input, codec: CodecInfo, output):
             for i in range(num_frames):
                 frm_enc_start = time.time()
 
-                x_cur = convert_yuv420_rgb(org_seq[0], codec.device, max_val)
+                x_cur = convert_yuv420_rgb(org_seq[i], codec.device, max_val)
                 h, w = x_cur.size(2), x_cur.size(3)
                 p = 128  # maximum 7 strides of 2
                 x_cur = pad(x_cur, p)
@@ -488,7 +487,7 @@ def _decode(inputpath, coder, show, device, output=None):
         start = time.time()
         model_info = models[model]
         net = (
-            model_info[0](quality=quality, metric=metric, pretrained=True)
+            model_info(quality=quality, metric=metric, pretrained=True)
             .to(device)
             .eval()
         )
@@ -608,8 +607,8 @@ def parse_args(argv):
 
 
 def main(argv):
-    args = parse_args(argv[1:2])
-    argv = argv[2:]
+    args = parse_args(argv[0:1])
+    argv = argv[1:]
     torch.set_num_threads(1)  # just to be sure
     if args.command == "encode":
         encode(argv)
@@ -618,4 +617,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main(sys.argv[1:])

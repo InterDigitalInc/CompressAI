@@ -78,15 +78,17 @@ def test_eval_model_video():
 @pytest.mark.parametrize("model", ("ssf2020",))
 @pytest.mark.parametrize("quality", ("1", "4", "8"))
 @pytest.mark.parametrize("metric", ("mse",))
-@pytest.mark.parametrize("entropy_estimation", (True,))
-def test_eval_model_pretrained(capsys, model, quality, metric, entropy_estimation):
+@pytest.mark.parametrize("entropy_estimation", (True, False))
+def test_eval_model_pretrained(
+    capsys, model, quality, metric, entropy_estimation, tmpdir
+):
     here = os.path.dirname(__file__)
     dirpath = os.path.join(here, "assets/dataset/video")
 
     cmd = [
         "pretrained",
         dirpath,
-        here,
+        str(tmpdir),
         "-a",
         model,
         "-m",
@@ -118,7 +120,15 @@ def test_eval_model_pretrained(capsys, model, quality, metric, entropy_estimatio
     for key in ("name", "description"):
         assert expected[key] == output[key]
 
-    for key in ("psnr", "ms-ssim", "bpp"):
+    for key in (
+        "psnr-y",
+        "psnr-u",
+        "psnr-v",
+        "psnr-yuv",
+        "psnr-rgb",
+        "ms-ssim-rgb",
+        "bitrate",
+    ):
         if key not in expected["results"]:
             continue
         assert np.allclose(

@@ -1,0 +1,1 @@
+{"name": "x265-medium-tune-psnr", "description": "x265 medium, tuned for psnr, ffmpeg version 5.0", "results": {"qp": [32], "ms-ssim-rgb": [0.9411741495132446], "bitrate": [343.53], "psnr-rgb": [29.210145973943995], "psnr-y": [31.166024708532618], "psnr-u": [36.0165994403594], "psnr-v": [36.95904543378286], "psnr-yuv": [32.93995728471213]}}

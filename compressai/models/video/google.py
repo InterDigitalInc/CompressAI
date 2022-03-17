@@ -429,7 +429,7 @@ class ScaleSpaceFlow(nn.Module):
         for i in range(1, len(strings)):
             string = strings[i]
             shape = shapes[i]
-            x_ref, out_interframe = self.decoder_inter(x_ref, string, shape)
+            x_ref = self.decode_inter(x_ref, string, shape)
             dec_frames.append(x_ref)
 
         return dec_frames
@@ -492,16 +492,17 @@ class ScaleSpaceFlow(nn.Module):
         updated = self.img_hyperprior.gaussian_conditional.update_scale_table(
             scale_table, force=force
         )
-        # updated |= super().update(force=force)
 
-        updated = self.res_hyperprior.gaussian_conditional.update_scale_table(
+        updated |= self.img_hyperprior.entropy_bottleneck.update(force=force)
+
+        updated |= self.res_hyperprior.gaussian_conditional.update_scale_table(
             scale_table, force=force
         )
-        # updated |= super().update(force=force)
+        updated |= self.res_hyperprior.entropy_bottleneck.update(force=force)
 
-        updated = self.motion_hyperprior.gaussian_conditional.update_scale_table(
+        updated |= self.motion_hyperprior.gaussian_conditional.update_scale_table(
             scale_table, force=force
         )
-        # updated |= super().update(force=force)
+        updated |= self.motion_hyperprior.entropy_bottleneck.update(force=force)
 
         return updated

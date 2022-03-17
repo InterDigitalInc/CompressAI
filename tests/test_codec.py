@@ -27,12 +27,20 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import hashlib
+import importlib.util
 import itertools
+import os
+
+from pathlib import Path
 
 import pytest
 import torch
 
 from compressai.zoo import image_models
+
+# Example: GENERATE_EXPECTED=1 pytest -sx tests/test_bench_codec_video.py
+GENERATE_EXPECTED = os.getenv("GENERATE_EXPECTED")
 
 archs = [
     "bmshj2018-factorized",
@@ -78,3 +86,137 @@ class TestCompressDecompress:
         mse = torch.mean((x - x_hat) ** 2)
         psnr = -10 * torch.log10(mse).item()
         assert 35 < psnr < 41
+
+
+class TestCodecExample:
+    @pytest.mark.parametrize("model", ("bmshj2018-factorized",))
+    def test_encode_decode_image(self, tmpdir, model):
+        cwd = Path(__file__).resolve().parent
+        rootdir = cwd.parent
+
+        spec = importlib.util.spec_from_file_location(
+            "examples.codec", rootdir / "examples/codec.py"
+        )
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        inputpath = str(rootdir / "tests/assets/dataset/image/stmalo_fracape.png")
+        binpath = f"{tmpdir}/{model}_stmalo_fracape.bin"
+        argv = [
+            "encode",
+            inputpath,
+            "--model",
+            model,
+            "-o",
+            binpath,
+        ]
+        module.main(argv)
+
+        md5sum_bin = hashlib.md5(open(binpath, "rb").read()).hexdigest()
+        expected_md5sum_bin_file = (
+            cwd / "expected" / f"md5sum-bin-{model}-stmalo_fracape.txt"
+        )
+        if not expected_md5sum_bin_file.is_file():
+            if not GENERATE_EXPECTED:
+                raise RuntimeError(f"Missing expected file {expected_md5sum_bin_file}")
+
+            with expected_md5sum_bin_file.open("wt") as f:
+                f.write(md5sum_bin)
+
+        with expected_md5sum_bin_file.open("r") as f:
+            expected_md5sum_bin = f.read()
+
+        assert expected_md5sum_bin == md5sum_bin
+
+        decpath = f"{tmpdir}/{model}_dec_stmalo_fracape.png"
+        argv = [
+            "decode",
+            binpath,
+            "-o",
+            decpath,
+        ]
+        module.main(argv)
+
+        md5sum_dec = hashlib.md5(open(decpath, "rb").read()).hexdigest()
+        expected_md5sum_dec_file = (
+            cwd / "expected" / f"md5sum-dec-model-{model}-stmalo_fracape.txt"
+        )
+        if not expected_md5sum_dec_file.is_file():
+            if not GENERATE_EXPECTED:
+                raise RuntimeError(f"Missing expected file {expected_md5sum_dec_file}")
+
+            with expected_md5sum_dec_file.open("wt") as f:
+                f.write(md5sum_dec)
+
+        with expected_md5sum_dec_file.open("r") as f:
+            expected_md5sum_dec = f.read()
+
+        assert expected_md5sum_dec == md5sum_dec
+
+    @pytest.mark.parametrize("model", ("ssf2020",))
+    @pytest.mark.parametrize("nb_frames", ("1",))
+    def test_encode_decode_video(self, tmpdir, model, nb_frames):
+        cwd = Path(__file__).resolve().parent
+        rootdir = cwd.parent
+
+        spec = importlib.util.spec_from_file_location(
+            "examples.codec", rootdir / "examples/codec.py"
+        )
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        inputpath = str(
+            rootdir
+            / "tests/assets/dataset/video/C_RaceHorses_2frames_832x480_30Hz_8bit_P420.yuv"
+        )
+        binpath = f"{tmpdir}/{model}_RaceHorses_{nb_frames}fr.bin"
+        argv = [
+            "encode",
+            inputpath,
+            "--model",
+            model,
+            "-o",
+            binpath,
+            "-f",
+            nb_frames,
+        ]
+        module.main(argv)
+
+        md5sum_bin = hashlib.md5(open(binpath, "rb").read()).hexdigest()
+        expected_md5sum_bin_file = (
+            cwd / "expected" / f"md5sum-bin-{model}-RaceHorses-{nb_frames}fr.txt"
+        )
+        if not expected_md5sum_bin_file.is_file():
+            if not GENERATE_EXPECTED:
+                raise RuntimeError(f"Missing expected file {expected_md5sum_bin_file}")
+
+            with expected_md5sum_bin_file.open("wt") as f:
+                f.write(md5sum_bin)
+
+        with expected_md5sum_bin_file.open("r") as f:
+            expected_md5sum_bin = f.read()
+
+        assert expected_md5sum_bin == md5sum_bin
+
+        decpath = f"{tmpdir}/{model}_dec_C_RaceHorses_{nb_frames}fr.yuv"
+        argv = [
+            "decode",
+            binpath,
+            "-o",
+            decpath,
+        ]
+        module.main(argv)
+
+        md5sum_dec = hashlib.md5(open(decpath, "rb").read()).hexdigest()
+        expected_md5sum_dec_file = (
+            cwd / "expected" / f"md5sum-dec-model-{model}-RaceHorses_{nb_frames}fr.txt"
+        )
+        if not expected_md5sum_dec_file.is_file():
+            if not GENERATE_EXPECTED:
+                raise RuntimeError(f"Missing expected file {expected_md5sum_dec_file}")
+
+            with expected_md5sum_dec_file.open("wt") as f:
+                f.write(md5sum_dec)
+
+        with expected_md5sum_dec_file.open("r") as f:
+            expected_md5sum_dec = f.read()
+
+        assert expected_md5sum_dec == md5sum_dec

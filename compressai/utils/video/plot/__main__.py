@@ -157,7 +157,7 @@ def setup_args():
         "--metric",
         metavar="",
         type=str,
-        default="rgb_psnr",
+        default="psnr-rgb",
         help="Metric ,default: %(default)s)",
     )
     parser.add_argument("-t", "--title", metavar="", type=str, help="Plot title")
@@ -192,6 +192,9 @@ def setup_args():
 
 def main(argv):
     args = setup_args().parse_args(argv)
+
+    if not args.show and not args.output:
+        raise ValueError("select output file destination or --show")
 
     scatters = []
     for f in args.results_file:

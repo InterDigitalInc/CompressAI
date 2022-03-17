@@ -102,7 +102,7 @@ class x264(Codec):
         return "x264"
 
     def description(self):
-        return f"{self.name} {self.preset}, tuned for {self.tune}, ffmpeg version {get_ffmpeg_version()}"
+        return f"{self.name} {self.preset}, {self.tune}, ffmpeg version {get_ffmpeg_version()}"
 
     def name_config(self):
         return f"{self.name}-{self.preset}-tune-{self.tune}"
@@ -131,6 +131,7 @@ class x264(Codec):
         binpath = self.get_bin_path(filepath, qp, bindir)
         cmd = [
             "ffmpeg",
+            "-y",
             "-s:v",
             f"{info['width']}x{info['height']}",
             "-i",

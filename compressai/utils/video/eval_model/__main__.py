@@ -30,6 +30,7 @@
 import argparse
 import json
 import math
+import struct
 import sys
 
 from collections import defaultdict
@@ -46,9 +47,16 @@ from torch import Tensor
 from torch.cuda import amp
 from torch.utils.model_zoo import tqdm
 
+import compressai
+
 from compressai.datasets import RawVideoSequence, VideoFormat
 from compressai.models.video.google import ScaleSpaceFlow
-from compressai.transforms.functional import ycbcr2rgb, yuv_420_to_444
+from compressai.transforms.functional import (
+    rgb2ycbcr,
+    ycbcr2rgb,
+    yuv_420_to_444,
+    yuv_444_to_420,
+)
 from compressai.zoo import video_models as pretrained_models
 
 models = {"ssf2020": ScaleSpaceFlow}
@@ -77,7 +85,6 @@ def to_tensors(
     )
 
 
-# TODO (racapef) duplicate from bench
 def aggregate_results(filepaths: List[Path]) -> Dict[str, Any]:
     metrics = defaultdict(list)
 
@@ -85,7 +92,7 @@ def aggregate_results(filepaths: List[Path]) -> Dict[str, Any]:
     for f in filepaths:
         with f.open("r") as fd:
             data = json.load(fd)
-        for k, v in data.items():
+        for k, v in data["results"].items():
             metrics[k].append(v)
 
     # normalize
@@ -93,7 +100,7 @@ def aggregate_results(filepaths: List[Path]) -> Dict[str, Any]:
     return agg
 
 
-def convert_frame(
+def convert_yuv420_to_rgb(
     frame: Tuple[np.ndarray, np.ndarray, np.ndarray], device: torch.device, max_val: int
 ) -> Tensor:
     # yuv420 [0, 2**bitdepth-1] to rgb 444 [0, 1] only for now
@@ -102,6 +109,11 @@ def convert_frame(
         tuple(c.unsqueeze(0).unsqueeze(0) for c in out), mode="bicubic"  # type: ignore
     )
     return ycbcr2rgb(out)  # type: ignore
+
+
+def convert_rgb_to_yuv420(frame: Tensor) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    # yuv420 [0, 2**bitdepth-1] to rgb 444 [0, 1] only for now
+    return yuv_444_to_420(rgb2ycbcr(frame), mode="avg_pool")
 
 
 def pad(x: Tensor, p: int = 2 ** (4 + 3)) -> Tuple[Tensor, Tuple[int, ...]]:
@@ -113,7 +125,12 @@ def pad(x: Tensor, p: int = 2 ** (4 + 3)) -> Tuple[Tensor, Tuple[int, ...]]:
     padding_top = (new_h - h) // 2
     padding_bottom = new_h - h - padding_top
     padding = (padding_left, padding_right, padding_top, padding_bottom)
-    x = F.pad(x, padding, mode="replicate")
+    x = F.pad(
+        x,
+        padding,
+        mode="constant",
+        value=0,
+    )
     return x, padding
 
 
@@ -121,41 +138,112 @@ def crop(x: Tensor, padding: Tuple[int, ...]) -> Tensor:
     return F.pad(x, tuple(-p for p in padding))
 
 
-def compute_metrics(tst, ref, max_val: float = 1.0):
-    """Returns PSNR and MS-SSIM between images `a` and `b`."""
-    # input tensor should be in a form of (N, C, H, W)
-    a = tst.detach()
-    b = ref.detach()
+def compute_metrics_for_frame(
+    org_frame: Frame,
+    rec_frame: Tensor,
+    device: str = "cpu",
+    max_val: int = 255,
+) -> Dict[str, Any]:
+    out: Dict[str, Any] = {}
 
-    mse = torch.mean((a - b) ** 2).item()
-    p = -10 * np.log10(mse)
-    m = ms_ssim(a, b, data_range=max_val).item()
-    return p, m
+    # YCbCr metrics
+    org_yuv = to_tensors(org_frame, device=str(device), max_value=max_val)
+    org_yuv = tuple(p.unsqueeze(0).unsqueeze(0) for p in org_yuv)  # type: ignore
+    rec_yuv = convert_rgb_to_yuv420(rec_frame)
+    for i, component in enumerate("yuv"):
+        org = (org_yuv[i] * max_val).clamp(0, max_val).round()
+        rec = (rec_yuv[i] * max_val).clamp(0, max_val).round()
+        out[f"psnr-{component}"] = 20 * np.log10(max_val) - 10 * torch.log10(
+            (org - rec).pow(2).mean()
+        )
+    out["psnr-yuv"] = (4 * out["psnr-y"] + out["psnr-u"] + out["psnr-v"]) / 6
+
+    # RGB metrics
+    org_rgb = convert_yuv420_to_rgb(
+        org_frame, device, max_val
+    )  # ycbcr2rgb(yuv_420_to_444(org_frame, mode="bicubic"))  # type: ignore
+    org_rgb = (org_rgb * max_val).clamp(0, max_val).round()
+    rec_frame = (rec_frame * max_val).clamp(0, max_val).round()
+    mse_rgb = (org_rgb - rec_frame).pow(2).mean()
+    psnr_rgb = 20 * np.log10(max_val) - 10 * torch.log10(mse_rgb)
+
+    ms_ssim_rgb = ms_ssim(org_rgb, rec_frame, data_range=max_val)
+    out.update({"ms-ssim-rgb": ms_ssim_rgb, "mse-rgb": mse_rgb, "psnr-rgb": psnr_rgb})
+
+    return out
 
 
-def compute_metrics_for_frame(org: Tensor, rec: Tensor, max_val: int) -> Dict[str, Any]:
-    rec = torch.clamp(rec, 0.0, 1.0)
-    mse = torch.mean((org - rec) ** 2)
-    p = -10 * torch.log10(mse)
-    m = ms_ssim(org, rec, data_range=1.0)
-
-    return {
-        "mse": mse * (max_val * max_val),
-        "rgb_psnr": p,
-        "msssim": m,
-    }
-
-
-def compute_bpp(likelihoods, num_pixels: int) -> float:
+def estimate_bits_frame(likelihoods) -> float:
     bpp = sum(
-        (torch.log(lkl[k]).sum() / (-math.log(2) * num_pixels))
+        (torch.log(lkl[k]).sum() / (-math.log(2)))
         for lkl in likelihoods.values()
         for k in ("y", "z")
     )
     return bpp
 
 
-def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
+def filesize(filepath: str) -> int:
+    if not Path(filepath).is_file():
+        raise ValueError(f'Invalid file "{filepath}".')
+    return Path(filepath).stat().st_size
+
+
+def write_uints(fd, values, fmt=">{:d}I"):
+    fd.write(struct.pack(fmt.format(len(values)), *values))
+    return len(values) * 4
+
+
+def write_uchars(fd, values, fmt=">{:d}B"):
+    fd.write(struct.pack(fmt.format(len(values)), *values))
+    return len(values) * 1
+
+
+def read_uints(fd, n, fmt=">{:d}I"):
+    sz = struct.calcsize("I")
+    return struct.unpack(fmt.format(n), fd.read(n * sz))
+
+
+def read_uchars(fd, n, fmt=">{:d}B"):
+    sz = struct.calcsize("B")
+    return struct.unpack(fmt.format(n), fd.read(n * sz))
+
+
+def write_bytes(fd, values, fmt=">{:d}s"):
+    if len(values) == 0:
+        return
+    fd.write(struct.pack(fmt.format(len(values)), values))
+    return len(values) * 1
+
+
+def read_bytes(fd, n, fmt=">{:d}s"):
+    sz = struct.calcsize("s")
+    return struct.unpack(fmt.format(n), fd.read(n * sz))[0]
+
+
+def read_body(fd):
+    lstrings = []
+    shape = read_uints(fd, 2)
+    n_strings = read_uints(fd, 1)[0]
+    for _ in range(n_strings):
+        s = read_bytes(fd, read_uints(fd, 1)[0])
+        lstrings.append([s])
+
+    return lstrings, shape
+
+
+def write_body(fd, shape, out_strings):
+    bytes_cnt = 0
+    bytes_cnt = write_uints(fd, (shape[0], shape[1], len(out_strings)))
+    for s in out_strings:
+        bytes_cnt += write_uints(fd, (len(s[0]),))
+        bytes_cnt += write_bytes(fd, s[0])
+    return bytes_cnt
+
+
+@torch.no_grad()
+def eval_model(
+    net: nn.Module, sequence: Path, binpath: Path, keep_binaries: bool = False
+) -> Dict[str, Any]:
     org_seq = RawVideoSequence.from_file(str(sequence))
 
     if org_seq.format != VideoFormat.YUV420:
@@ -163,28 +251,96 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
 
     device = next(net.parameters()).device
     num_frames = len(org_seq)
-    num_pixels = org_seq.height * org_seq.width
     max_val = 2**org_seq.bitdepth - 1
     results = defaultdict(list)
 
+    f = binpath.open("wb")
+
+    print(f" encoding {sequence.stem}", file=sys.stderr)
+    # write original image size
+    write_uints(f, (org_seq.height, org_seq.width))
+    # write original bitdepth
+    write_uchars(f, (org_seq.bitdepth,))
+    # write number of coded frames
+    write_uints(f, (num_frames,))
     with tqdm(total=num_frames) as pbar:
         for i in range(num_frames):
-            cur_frame = convert_frame(org_seq[i], device, max_val)
-            cur_frame, padding = pad(cur_frame)
+            x_cur = convert_yuv420_to_rgb(org_seq[i], device, max_val)
+            x_cur, padding = pad(x_cur)
 
             if i == 0:
-                rec_frame, likelihoods = net.forward_keyframe(cur_frame)  # type:ignore
+                x_rec, enc_info = net.encode_keyframe(x_cur)
+                write_body(f, enc_info["shape"], enc_info["strings"])
+                # x_rec = net.decode_keyframe(enc_info["strings"], enc_info["shape"])
             else:
-                rec_frame, likelihoods = net.forward_inter(
-                    cur_frame, rec_frame
-                )  # type:ignore
+                x_rec, enc_info = net.encode_inter(x_cur, x_rec)
+                for shape, out in zip(
+                    enc_info["shape"].items(), enc_info["strings"].items()
+                ):
+                    write_body(f, shape[1], out[1])
+                # x_rec = net.decode_inter(x_rec, enc_info["strings"], enc_info["shape"])
 
-            rec_frame = rec_frame.clamp(0, 1)
+            x_rec = x_rec.clamp(0, 1)
+            metrics = compute_metrics_for_frame(
+                org_seq[i],
+                crop(x_rec, padding),
+                device,
+                max_val,
+            )
+
+            for k, v in metrics.items():
+                results[k].append(v)
+            pbar.update(1)
+    f.close()
+
+    seq_results: Dict[str, Any] = {
+        k: torch.mean(torch.stack(v)) for k, v in results.items()
+    }
+
+    seq_results["bitrate"] = (
+        float(filesize(binpath)) * 8 * org_seq.framerate / (num_frames * 1000)
+    )
+
+    if not keep_binaries:
+        binpath.unlink()
+
+    for k, v in seq_results.items():
+        if isinstance(v, torch.Tensor):
+            seq_results[k] = v.item()
+    return seq_results
+
+
+@torch.no_grad()
+def eval_model_entropy_estimation(net: nn.Module, sequence: Path) -> Dict[str, Any]:
+    org_seq = RawVideoSequence.from_file(str(sequence))
+
+    if org_seq.format != VideoFormat.YUV420:
+        raise NotImplementedError(f"Unsupported video format: {org_seq.format}")
+
+    device = next(net.parameters()).device
+    num_frames = len(org_seq)
+    max_val = 2**org_seq.bitdepth - 1
+    results = defaultdict(list)
+    print(f" encoding {sequence.stem}", file=sys.stderr)
+    with tqdm(total=num_frames) as pbar:
+        for i in range(num_frames):
+            x_cur = convert_yuv420_to_rgb(org_seq[i], device, max_val)
+            x_cur, padding = pad(x_cur)
+
+            if i == 0:
+                x_rec, likelihoods = net.forward_keyframe(x_cur)  # type:ignore
+            else:
+                x_rec, likelihoods = net.forward_inter(x_cur, x_rec)  # type:ignore
+
+            x_rec = x_rec.clamp(0, 1)
 
             metrics = compute_metrics_for_frame(
-                crop(cur_frame, padding), crop(rec_frame, padding), max_val
+                org_seq[i],
+                crop(x_rec, padding),
+                device,
+                max_val,
             )
-            metrics["bpp"] = compute_bpp(likelihoods, num_pixels)
+            metrics["bitrate"] = estimate_bits_frame(likelihoods)
 
             for k, v in metrics.items():
                 results[k].append(v)
@@ -193,6 +349,7 @@ def eval_model(net: nn.Module, sequence: Path) -> Dict[str, Any]:
     seq_results: Dict[str, Any] = {
         k: torch.mean(torch.stack(v)) for k, v in results.items()
     }
+    seq_results["bitrate"] = float(seq_results["bitrate"]) * org_seq.framerate / 1000
     for k, v in seq_results.items():
         if isinstance(v, torch.Tensor):
             seq_results[k] = v.item()
@@ -205,15 +362,14 @@ def run_inference(
     outputdir: Path,
     force: bool = False,
     entropy_estimation: bool = False,
+    trained_net: str = "",
+    description: str = "",
     **args: Any,
 ) -> Dict[str, Any]:
-    # create output directory
-    Path(outputdir).mkdir(parents=True, exist_ok=True)
     results_paths = []
 
     for filepath in filepaths:
-        outputpath = Path(outputdir) / filepath.with_suffix(".bin").name
-        sequence_metrics_path = outputpath.with_suffix(".json")
+        sequence_metrics_path = Path(outputdir) / f"{filepath.stem}-{trained_net}.json"
         results_paths.append(sequence_metrics_path)
 
         if force:
@@ -221,16 +377,23 @@ def run_inference(
         if sequence_metrics_path.is_file():
             continue
 
-        if not entropy_estimation:
-            print("please use --entropy-estimation for now.", file=sys.stderr)
-            raise NotImplementedError()
-
-        else:
-            with amp.autocast(enabled=args["half"]):
-                with torch.no_grad():
-                    metrics = eval_model(net, filepath)
-            with sequence_metrics_path.open("wb") as f:
-                f.write(json.dumps(metrics, indent=2).encode())
+        with amp.autocast(enabled=args["half"]):
+            with torch.no_grad():
+                if entropy_estimation:
+                    metrics = eval_model_entropy_estimation(net, filepath)
+                else:
+                    sequence_bin = sequence_metrics_path.with_suffix(".bin")
+                    metrics = eval_model(
+                        net, filepath, sequence_bin, args["keep_binaries"]
+                    )
+        with sequence_metrics_path.open("wb") as f:
+            output = {
+                "source": filepath.stem,
+                "name": args["architecture"],
+                "description": f"Inference ({description})",
+                "results": metrics,
+            }
+            f.write(json.dumps(output, indent=2).encode())
     results = aggregate_results(results_paths)
     return results
 
@@ -277,10 +440,30 @@ def create_parser() -> argparse.ArgumentParser:
         help="use evaluated entropy estimation (no entropy coding)",
     )
     parent_parser.add_argument(
+        "-c",
+        "--entropy-coder",
+        choices=compressai.available_entropy_coders(),
+        default=compressai.available_entropy_coders()[0],
+        help="entropy coder (default: %(default)s)",
+    )
+    parent_parser.add_argument(
+        "--keep_binaries",
+        action="store_true",
+        help="keep bitstream files in output directory",
+    )
+    parent_parser.add_argument(
         "-v",
         "--verbose",
         action="store_true",
         help="verbose mode",
+    )
+    parent_parser.add_argument(
+        "-m",
+        "--metric",
+        type=str,
+        choices=["mse", "ms-ssim"],
+        default="mse",
+        help="metric trained against (default: %(default)s)",
     )
 
     subparsers = parser.add_subparsers(help="model source", dest="source")
@@ -289,14 +472,6 @@ def create_parser() -> argparse.ArgumentParser:
     # Options for pretrained models
     pretrained_parser = subparsers.add_parser("pretrained", parents=[parent_parser])
     pretrained_parser.add_argument(
-        "-m",
-        "--metric",
-        type=str,
-        choices=["mse", "ms-ssim"],
-        default="mse",
-        help="metric trained against (default: %(default)s)",
-    )
-    pretrained_parser.add_argument(
         "-q",
         "--quality",
         dest="qualities",
@@ -304,7 +479,6 @@ def create_parser() -> argparse.ArgumentParser:
         type=int,
         default=(1,),
     )
-
     checkpoint_parser = subparsers.add_parser("checkpoint", parents=[parent_parser])
     checkpoint_parser.add_argument(
         "-p",
@@ -328,18 +502,24 @@ def main(args: Any = None) -> None:
         print("Error: missing 'checkpoint' or 'pretrained' source.", file=sys.stderr)
         parser.print_help()
         raise SystemExit(1)
-
+    description = (
+        "entropy-estimation" if args.entropy_estimation else args.entropy_coder
+    )
     filepaths = collect_videos(args.dataset)
     if len(filepaths) == 0:
         print("Error: no video found in directory.", file=sys.stderr)
         raise SystemExit(1)
+
+    # create output directory
+    outputdir = args.output
+    Path(outputdir).mkdir(parents=True, exist_ok=True)
 
     if args.source == "pretrained":
         runs = sorted(args.qualities)
         opts = (args.architecture, args.metric)
         load_func = load_pretrained
         log_fmt = "\rEvaluating {0} | {run:d}"
-    elif args.source == "checkpoint":
+    else:
         runs = args.paths
         opts = (args.architecture,)
         load_func = load_checkpoint
@@ -351,23 +531,37 @@ def main(args: Any = None) -> None:
             sys.stderr.write(log_fmt.format(*opts, run=run))
             sys.stderr.flush()
         model = load_func(*opts, run)
+        if args.source == "pretrained":
+            trained_net = f"{args.architecture}-{args.metric}-{run}-{description}"
+        else:
+            cpt_name = Path(run).name[: -len(".tar.pth")]  # removesuffix() python3.9
+            trained_net = f"{cpt_name}-{description}"
+        print(f"Using trained model {trained_net}", file=sys.stderr)
         if args.cuda and torch.cuda.is_available():
             model = model.to("cuda")
             if args.half:
                 model = model.half()
         args_dict = vars(args)
-        metrics = run_inference(filepaths, model, args_dict.pop("output"), **args_dict)
+        metrics = run_inference(
+            filepaths,
+            model,
+            outputdir,
+            trained_net=trained_net,
+            description=description,
+            **args_dict,
+        )
+        results["q"].append(trained_net)
         for k, v in metrics.items():
             results[k].append(v)
 
-    description = (
-        "entropy estimation" if args.entropy_estimation else args.entropy_coder
-    )
     output = {
-        "name": args.architecture,
+        "name": f"{args.architecture}-{args.metric}",
         "description": f"Inference ({description})",
         "results": results,
     }
+
+    with (Path(f"{outputdir}/{args.architecture}-{description}.json")).open("wb") as f:
+        f.write(json.dumps(output, indent=2).encode())
     print(json.dumps(output, indent=2))
 
 
