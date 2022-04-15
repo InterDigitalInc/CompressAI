@@ -465,6 +465,13 @@ def create_parser() -> argparse.ArgumentParser:
         default="mse",
         help="metric trained against (default: %(default)s)",
     )
+    parent_parser.add_argument(
+        "-o",
+        "--output-file",
+        type=str,
+        default="",
+        help="output json file name, (default: architecture-entropy_coder.json)",
+    )
 
     subparsers = parser.add_subparsers(help="model source", dest="source")
     subparsers.required = True
@@ -560,7 +567,12 @@ def main(args: Any = None) -> None:
         "results": results,
     }
 
-    with (Path(f"{outputdir}/{args.architecture}-{description}.json")).open("wb") as f:
+    if args.output_file == "":
+        output_file = f"{args.architecture}-{description}"
+    else:
+        output_file = args.output_file
+
+    with (Path(f"{outputdir}/{output_file}").with_suffix(".json")).open("wb") as f:
         f.write(json.dumps(output, indent=2).encode())
     print(json.dumps(output, indent=2))
 
