@@ -78,13 +78,16 @@ def test_eval_model():
 @pytest.mark.parametrize("quality", ("1", "4", "8"))
 @pytest.mark.parametrize("metric", ("mse", "ms-ssim"))
 @pytest.mark.parametrize("entropy_estimation", (False, True))
-def test_eval_model_pretrained(capsys, model, quality, metric, entropy_estimation):
+def test_eval_model_pretrained(
+    capsys, model, quality, metric, entropy_estimation, tmpdir
+):
     here = os.path.dirname(__file__)
     dirpath = os.path.join(here, "assets/dataset/image")
 
     cmd = [
         "pretrained",
         dirpath,
+        str(tmpdir),
         "-a",
         model,
         "-m",
@@ -125,7 +128,11 @@ def test_eval_model_pretrained(capsys, model, quality, metric, entropy_estimatio
 
 
 @pytest.mark.parametrize("model_name", ("factorized-prior", "bmshj2018-factorized"))
-def test_eval_model_ckpt(tmp_path, model_name):
+def test_eval_model_ckpt(
+    tmp_path,
+    model_name,
+    tmpdir,
+):
     here = os.path.dirname(__file__)
     parent = os.path.dirname(here)
 
@@ -140,6 +147,7 @@ def test_eval_model_ckpt(tmp_path, model_name):
     argv = [
         "-d",
         datapath,
+        str(tmpdir),
         "-e",
         "1",
         "--batch-size",

@@ -32,12 +32,12 @@ Evaluate an end-to-end compression model on an image dataset.
 import argparse
 import json
 import math
-import os
 import sys
 import time
 
 from collections import defaultdict
-from typing import List
+from pathlib import Path
+from typing import Any, Dict, List
 
 import torch
 import torch.nn as nn
@@ -71,11 +71,10 @@ IMG_EXTENSIONS = (
 
 
 def collect_images(rootpath: str) -> List[str]:
-    return [
-        os.path.join(rootpath, f)
-        for f in os.listdir(rootpath)
-        if os.path.splitext(f)[-1].lower() in IMG_EXTENSIONS
-    ]
+    image_files = []
+    for ext in IMG_EXTENSIONS:
+        image_files.extend(Path(rootpath).glob(f"*{ext}"))
+    return image_files
 
 
 def psnr(a: torch.Tensor, b: torch.Tensor) -> float:
@@ -84,7 +83,7 @@ def psnr(a: torch.Tensor, b: torch.Tensor) -> float:
 
 
 def read_image(filepath: str) -> torch.Tensor:
-    assert os.path.isfile(filepath)
+    assert filepath.is_file()
     img = Image.open(filepath).convert("RGB")
     return transforms.ToTensor()(img)
 
@@ -165,13 +164,22 @@ def load_checkpoint(arch: str, checkpoint_path: str) -> nn.Module:
     return architectures[arch].from_state_dict(state_dict).eval()
 
 
-def eval_model(model, filepaths, entropy_estimation=False, half=False):
+def eval_model(
+    model: nn.Module,
+    outputdir: Path,
+    filepaths,
+    entropy_estimation: bool = False,
+    trained_net: str = "",
+    description: str = "",
+    **args: Any,
+) -> Dict[str, Any]:
     device = next(model.parameters()).device
     metrics = defaultdict(float)
-    for f in filepaths:
-        x = read_image(f).to(device)
+    for filepath in filepaths:
+        sequence_metrics_path = Path(outputdir) / f"{filepath.stem}-{trained_net}.json"
+        x = read_image(filepath).to(device)
         if not entropy_estimation:
-            if half:
+            if args["half"]:
                 model = model.half()
                 x = x.half()
             rv = inference(model, x)
@@ -179,6 +187,16 @@ def eval_model(model, filepaths, entropy_estimation=False, half=False):
             rv = inference_entropy_estimation(model, x)
         for k, v in rv.items():
             metrics[k] += v
+
+        with sequence_metrics_path.open("wb") as f:
+            output = {
+                "source": filepath.stem,
+                "name": args["architecture"],
+                "description": f"Inference ({description})",
+                "results": metrics,
+            }
+            f.write(json.dumps(output, indent=2).encode())
+
     for k, v in metrics.items():
         metrics[k] = v / len(filepaths)
     return metrics
@@ -191,6 +209,7 @@ def setup_args():
 
     # Common options.
     parent_parser.add_argument("dataset", type=str, help="dataset path")
+    parent_parser.add_argument("output", type=str, help="output directory")
     parent_parser.add_argument(
         "-a",
         "--architecture",
@@ -227,6 +246,21 @@ def setup_args():
         action="store_true",
         help="verbose mode",
     )
+    parent_parser.add_argument(
+        "-m",
+        "--metric",
+        type=str,
+        choices=["mse", "ms-ssim"],
+        default="mse",
+        help="metric trained against (default: %(default)s)",
+    )
+    parent_parser.add_argument(
+        "-o",
+        "--output-file",
+        type=str,
+        default="",
+        help="output json file name, (default: architecture-entropy_coder.json)",
+    )
 
     parser = argparse.ArgumentParser(
         description="Evaluate a model on an image dataset.", add_help=True
@@ -235,14 +269,6 @@ def setup_args():
 
     # Options for pretrained models
     pretrained_parser = subparsers.add_parser("pretrained", parents=[parent_parser])
-    pretrained_parser.add_argument(
-        "-m",
-        "--metric",
-        type=str,
-        choices=["mse", "ms-ssim"],
-        default="mse",
-        help="metric trained against (default: %(default)s)",
-    )
     pretrained_parser.add_argument(
         "-q",
         "--quality",
@@ -275,12 +301,20 @@ def main(argv):
         parser.print_help()
         raise SystemExit(1)
 
+    description = (
+        "entropy-estimation" if args.entropy_estimation else args.entropy_coder
+    )
+
     filepaths = collect_images(args.dataset)
     if len(filepaths) == 0:
         print("Error: no images found in directory.", file=sys.stderr)
         raise SystemExit(1)
 
     compressai.set_entropy_coder(args.entropy_coder)
+
+    # create output directory
+    outputdir = args.output
+    Path(outputdir).mkdir(parents=True, exist_ok=True)
 
     if args.source == "pretrained":
         runs = sorted(args.qualities)
@@ -299,9 +333,23 @@ def main(argv):
             sys.stderr.write(log_fmt.format(*opts, run=run))
             sys.stderr.flush()
         model = load_func(*opts, run)
+        if args.source == "pretrained":
+            trained_net = f"{args.architecture}-{args.metric}-{run}-{description}"
+        else:
+            cpt_name = Path(run).name[: -len(".tar.pth")]  # removesuffix() python3.9
+            trained_net = f"{cpt_name}-{description}"
+        print(f"Using trained model {trained_net}", file=sys.stderr)
         if args.cuda and torch.cuda.is_available():
             model = model.to("cuda")
-        metrics = eval_model(model, filepaths, args.entropy_estimation, args.half)
+        args_dict = vars(args)
+        metrics = eval_model(
+            model,
+            outputdir,
+            filepaths,
+            trained_net=trained_net,
+            description=description,
+            **args_dict,
+        )
         for k, v in metrics.items():
             results[k].append(v)
 
@@ -313,11 +361,18 @@ def main(argv):
         "entropy estimation" if args.entropy_estimation else args.entropy_coder
     )
     output = {
-        "name": args.architecture,
+        "name": f"{args.architecture}-{args.metric}",
         "description": f"Inference ({description})",
         "results": results,
     }
 
+    if args.output_file == "":
+        output_file = f"{args.architecture}-{description}"
+    else:
+        output_file = args.output_file
+
+    with (Path(f"{outputdir}/{output_file}").with_suffix(".json")).open("wb") as f:
+        f.write(json.dumps(output, indent=2).encode())
     print(json.dumps(output, indent=2))
 
 
