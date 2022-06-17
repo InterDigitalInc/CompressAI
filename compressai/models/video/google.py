@@ -39,6 +39,7 @@ from torch.cuda import amp
 
 from compressai.entropy_models import GaussianConditional
 from compressai.layers import QReLU
+from compressai.registry import register_model
 
 from ..google import CompressionModel, get_scale_table
 from ..utils import (
@@ -52,6 +53,7 @@ from ..utils import (
 )
 
 
+@register_model("ssf2020")
 class ScaleSpaceFlow(nn.Module):
     r"""Google's first end-to-end optimized video compression from E.
     Agustsson, D. Minnen, N. Johnston, J. Balle, S. J. Hwang, G. Toderici: `"Scale-space flow for end-to-end

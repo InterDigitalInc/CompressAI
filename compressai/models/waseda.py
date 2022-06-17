@@ -37,10 +37,12 @@ from compressai.layers import (
     conv3x3,
     subpel_conv3x3,
 )
+from compressai.registry import register_model
 
 from .google import JointAutoregressiveHierarchicalPriors
 
 
+@register_model("cheng2020-anchor")
 class Cheng2020Anchor(JointAutoregressiveHierarchicalPriors):
     """Anchor model variant from `"Learned Image Compression with
     Discretized Gaussian Mixture Likelihoods and Attention Modules"
@@ -111,6 +113,7 @@ class Cheng2020Anchor(JointAutoregressiveHierarchicalPriors):
         return net
 
 
+@register_model("cheng2020-attn")
 class Cheng2020Attention(Cheng2020Anchor):
     """Self-attention model variant from `"Learned Image Compression with
     Discretized Gaussian Mixture Likelihoods and Attention Modules"
