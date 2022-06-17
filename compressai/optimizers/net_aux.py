@@ -32,7 +32,10 @@ from typing import Any, Dict, Mapping, cast
 import torch.nn as nn
 import torch.optim as optim
 
+from compressai.registry import register_optimizer
 
+
+@register_optimizer("net_aux")
 def net_aux_optimizer(
     net: nn.Module, conf: Mapping[str, Any]
 ) -> Dict[str, optim.Optimizer]:
