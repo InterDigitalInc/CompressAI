@@ -27,75 +27,30 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from compressai import (
-    datasets,
-    entropy_models,
-    layers,
-    losses,
-    models,
-    ops,
-    transforms,
-    zoo,
-)
+import math
 
-try:
-    from .version import __version__
-except ImportError:
-    pass
-
-_entropy_coder = "ans"
-_available_entropy_coders = [_entropy_coder]
-
-try:
-    import range_coder
-
-    _available_entropy_coders.append("rangecoder")
-except ImportError:
-    pass
+import torch
+import torch.nn as nn
 
 
-def set_entropy_coder(entropy_coder):
-    """
-    Specifies the default entropy coder used to encode the bit-streams.
+class RateDistortionLoss(nn.Module):
+    """Custom rate distortion loss with a Lagrangian parameter."""
 
-    Use :mod:`available_entropy_coders` to list the possible values.
+    def __init__(self, lmbda=1e-2):
+        super().__init__()
+        self.mse = nn.MSELoss()
+        self.lmbda = lmbda
 
-    Args:
-        entropy_coder (string): Name of the entropy coder
-    """
-    global _entropy_coder
-    if entropy_coder not in _available_entropy_coders:
-        raise ValueError(
-            f'Invalid entropy coder "{entropy_coder}", choose from'
-            f'({", ".join(_available_entropy_coders)}).'
+    def forward(self, output, target):
+        N, _, H, W = target.size()
+        out = {}
+        num_pixels = N * H * W
+
+        out["bpp_loss"] = sum(
+            (torch.log(likelihoods).sum() / (-math.log(2) * num_pixels))
+            for likelihoods in output["likelihoods"].values()
         )
-    _entropy_coder = entropy_coder
+        out["mse_loss"] = self.mse(output["x_hat"], target)
+        out["loss"] = self.lmbda * 255**2 * out["mse_loss"] + out["bpp_loss"]
 
-
-def get_entropy_coder():
-    """
-    Return the name of the default entropy coder used to encode the bit-streams.
-    """
-    return _entropy_coder
-
-
-def available_entropy_coders():
-    """
-    Return the list of available entropy coders.
-    """
-    return _available_entropy_coders
-
-
-__all__ = [
-    "datasets",
-    "entropy_models",
-    "layers",
-    "losses",
-    "models",
-    "ops",
-    "transforms",
-    "zoo",
-    "available_entropy_coders",
-    "get_entropy_coder",
-    "set_entropy_coder",
-]
+        return out
