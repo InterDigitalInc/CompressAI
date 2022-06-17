@@ -32,7 +32,10 @@ from pathlib import Path
 from PIL import Image
 from torch.utils.data import Dataset
 
+from compressai.registry import register_dataset
 
+
+@register_dataset("Vimeo90kDataset")
 class Vimeo90kDataset(Dataset):
     """Load a Vimeo-90K structured dataset.
 

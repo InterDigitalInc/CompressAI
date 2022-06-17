@@ -32,7 +32,10 @@ from pathlib import Path
 from PIL import Image
 from torch.utils.data import Dataset
 
+from compressai.registry import register_dataset
 
+
+@register_dataset("ImageFolder")
 class ImageFolder(Dataset):
     """Load an image folder database. Training and testing image samples
     are respectively stored in separate directories:
