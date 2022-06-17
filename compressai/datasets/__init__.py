@@ -30,8 +30,10 @@
 from .image import ImageFolder
 from .rawvideo import *
 from .video import VideoFolder
+from .vimeo90k import Vimeo90kDataset
 
 __all__ = [
     "ImageFolder",
     "VideoFolder",
+    "Vimeo90kDataset",
 ]
