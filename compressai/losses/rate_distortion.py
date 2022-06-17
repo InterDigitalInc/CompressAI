@@ -32,7 +32,10 @@ import math
 import torch
 import torch.nn as nn
 
+from compressai.registry import register_criterion
 
+
+@register_criterion("RateDistortionLoss")
 class RateDistortionLoss(nn.Module):
     """Custom rate distortion loss with a Lagrangian parameter."""
 
