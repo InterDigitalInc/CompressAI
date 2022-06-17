@@ -31,4 +31,7 @@ from .image import ImageFolder
 from .rawvideo import *
 from .video import VideoFolder
 
-__all__ = ["ImageFolder", "VideoFolder"]
+__all__ = [
+    "ImageFolder",
+    "VideoFolder",
+]
