@@ -27,77 +27,48 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from compressai import (
-    datasets,
-    entropy_models,
-    layers,
-    losses,
-    models,
-    ops,
-    optimizers,
-    transforms,
-    zoo,
-)
+from typing import Any, Dict, Mapping, cast
 
-try:
-    from .version import __version__
-except ImportError:
-    pass
-
-_entropy_coder = "ans"
-_available_entropy_coders = [_entropy_coder]
-
-try:
-    import range_coder
-
-    _available_entropy_coders.append("rangecoder")
-except ImportError:
-    pass
+import torch.nn as nn
+import torch.optim as optim
 
 
-def set_entropy_coder(entropy_coder):
+def net_aux_optimizer(
+    net: nn.Module, conf: Mapping[str, Any]
+) -> Dict[str, optim.Optimizer]:
+    """Returns separate optimizers for net and auxiliary losses.
+
+    Each optimizer operates on a mutually exclusive set of parameters.
     """
-    Specifies the default entropy coder used to encode the bit-streams.
+    parameters = {
+        "net": {
+            name
+            for name, param in net.named_parameters()
+            if param.requires_grad and not name.endswith(".quantiles")
+        },
+        "aux": {
+            name
+            for name, param in net.named_parameters()
+            if param.requires_grad and name.endswith(".quantiles")
+        },
+    }
 
-    Use :mod:`available_entropy_coders` to list the possible values.
+    # Make sure we don't have an intersection of parameters
+    params_dict = dict(net.named_parameters())
+    inter_params = parameters["net"] & parameters["aux"]
+    union_params = parameters["net"] | parameters["aux"]
+    assert len(inter_params) == 0
+    assert len(union_params) - len(params_dict.keys()) == 0
 
-    Args:
-        entropy_coder (string): Name of the entropy coder
-    """
-    global _entropy_coder
-    if entropy_coder not in _available_entropy_coders:
-        raise ValueError(
-            f'Invalid entropy coder "{entropy_coder}", choose from'
-            f'({", ".join(_available_entropy_coders)}).'
-        )
-    _entropy_coder = entropy_coder
+    optimizer = {
+        "net": optim.Adam(
+            (params_dict[name] for name in sorted(parameters["net"])),
+            lr=conf["net"]["lr"],
+        ),
+        "aux": optim.Adam(
+            (params_dict[name] for name in sorted(parameters["aux"])),
+            lr=conf["aux"]["lr"],
+        ),
+    }
 
-
-def get_entropy_coder():
-    """
-    Return the name of the default entropy coder used to encode the bit-streams.
-    """
-    return _entropy_coder
-
-
-def available_entropy_coders():
-    """
-    Return the list of available entropy coders.
-    """
-    return _available_entropy_coders
-
-
-__all__ = [
-    "datasets",
-    "entropy_models",
-    "layers",
-    "losses",
-    "models",
-    "ops",
-    "optimizers",
-    "transforms",
-    "zoo",
-    "available_entropy_coders",
-    "get_entropy_coder",
-    "set_entropy_coder",
-]
+    return cast(Dict[str, optim.Optimizer], optimizer)
