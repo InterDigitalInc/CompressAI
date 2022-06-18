@@ -27,17 +27,17 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from typing import Callable, Type, TypeVar
+from typing import Callable, Dict, Type, TypeVar
 
 from torch.optim import lr_scheduler
 
 from compressai.typing import TCriterion, TDataset, TModel, TOptimizer, TScheduler
 
-CRITERIONS: dict[str, Callable[..., TCriterion]] = {}
-DATASETS: dict[str, Callable[..., TDataset]] = {}
-MODELS: dict[str, Callable[..., TModel]] = {}
-OPTIMIZERS: dict[str, Callable[..., TOptimizer]] = {}
-SCHEDULERS: dict[str, Callable[..., TScheduler]] = {
+CRITERIONS: Dict[str, Callable[..., TCriterion]] = {}
+DATASETS: Dict[str, Callable[..., TDataset]] = {}
+MODELS: Dict[str, Callable[..., TModel]] = {}
+OPTIMIZERS: Dict[str, Callable[..., TOptimizer]] = {}
+SCHEDULERS: Dict[str, Callable[..., TScheduler]] = {
     k: v for k, v in lr_scheduler.__dict__.items() if k[0].isupper()
 }
 
