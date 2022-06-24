@@ -43,7 +43,7 @@ class GDN(nn.Module):
 
     Introduced in `"Density Modeling of Images Using a Generalized Normalization
     Transformation" <https://arxiv.org/abs/1511.06281>`_,
-    by Balle Johannes, Valero Laparra, and Eero P. Simoncelli, (2016).
+    by Ballé Johannes, Valero Laparra, and Eero P. Simoncelli, (2016).
 
     .. math::
 

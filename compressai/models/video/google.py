@@ -56,7 +56,7 @@ from ..utils import (
 @register_model("ssf2020")
 class ScaleSpaceFlow(nn.Module):
     r"""Google's first end-to-end optimized video compression from E.
-    Agustsson, D. Minnen, N. Johnston, J. Balle, S. J. Hwang, G. Toderici: `"Scale-space flow for end-to-end
+    Agustsson, D. Minnen, N. Johnston, J. Ballé, S. J. Hwang, G. Toderici: `"Scale-space flow for end-to-end
     optimized video compression" <https://openaccess.thecvf.com/content_CVPR_2020/html/Agustsson_Scale-Space_Flow_for_End-to-End_Optimized_Video_Compression_CVPR_2020_paper.html>`_,
     IEEE Conference on Computer Vision and Pattern Recognition (CVPR 2020).
 

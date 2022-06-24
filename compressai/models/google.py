@@ -119,7 +119,7 @@ class CompressionModel(nn.Module):
 
 @register_model("bmshj2018-factorized")
 class FactorizedPrior(CompressionModel):
-    r"""Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
+    r"""Factorized Prior model from J. Ballé, D. Minnen, S. Singh, S.J. Hwang,
     N. Johnston: `"Variational Image Compression with a Scale Hyperprior"
     <https://arxiv.org/abs/1802.01436>`_, Int Conf. on Learning Representations
     (ICLR), 2018.
@@ -193,7 +193,7 @@ class FactorizedPrior(CompressionModel):
         return {"x_hat": x_hat}
 
 
-# From Balle's tensorflow compression examples
+# From Ballé's tensorflow compression examples
 SCALES_MIN = 0.11
 SCALES_MAX = 256
 SCALES_LEVELS = 64
@@ -205,7 +205,7 @@ def get_scale_table(min=SCALES_MIN, max=SCALES_MAX, levels=SCALES_LEVELS):
 
 @register_model("bmshj2018-hyperprior")
 class ScaleHyperprior(CompressionModel):
-    r"""Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
+    r"""Scale Hyperprior model from J. Ballé, D. Minnen, S. Singh, S.J. Hwang,
     N. Johnston: `"Variational Image Compression with a Scale Hyperprior"
     <https://arxiv.org/abs/1802.01436>`_ Int. Conf. on Learning Representations
     (ICLR), 2018.
@@ -327,7 +327,7 @@ class ScaleHyperprior(CompressionModel):
 @register_model("mbt2018-mean")
 class MeanScaleHyperprior(ScaleHyperprior):
     r"""Scale Hyperprior with non zero-mean Gaussian conditionals from D.
-    Minnen, J. Balle, G.D. Toderici: `"Joint Autoregressive and Hierarchical
+    Minnen, J. Ballé, G.D. Toderici: `"Joint Autoregressive and Hierarchical
     Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_,
     Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).
 
@@ -399,7 +399,7 @@ class MeanScaleHyperprior(ScaleHyperprior):
 @register_model("mbt2018")
 class JointAutoregressiveHierarchicalPriors(MeanScaleHyperprior):
     r"""Joint Autoregressive Hierarchical Priors model from D.
-    Minnen, J. Balle, G.D. Toderici: `"Joint Autoregressive and Hierarchical
+    Minnen, J. Ballé, G.D. Toderici: `"Joint Autoregressive and Hierarchical
     Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_,
     Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).
 

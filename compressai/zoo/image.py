@@ -276,7 +276,7 @@ def _load_model(
 def bmshj2018_factorized(
     quality, metric="mse", pretrained=False, progress=True, **kwargs
 ):
-    r"""Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
+    r"""Factorized Prior model from J. Ballé, D. Minnen, S. Singh, S.J. Hwang,
     N. Johnston: `"Variational Image Compression with a Scale Hyperprior"
     <https://arxiv.org/abs/1802.01436>`_, Int Conf. on Learning Representations
     (ICLR), 2018.
@@ -301,7 +301,7 @@ def bmshj2018_factorized(
 def bmshj2018_hyperprior(
     quality, metric="mse", pretrained=False, progress=True, **kwargs
 ):
-    r"""Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
+    r"""Scale Hyperprior model from J. Ballé, D. Minnen, S. Singh, S.J. Hwang,
     N. Johnston: `"Variational Image Compression with a Scale Hyperprior"
     <https://arxiv.org/abs/1802.01436>`_ Int. Conf. on Learning Representations
     (ICLR), 2018.
@@ -325,7 +325,7 @@ def bmshj2018_hyperprior(
 
 def mbt2018_mean(quality, metric="mse", pretrained=False, progress=True, **kwargs):
     r"""Scale Hyperprior with non zero-mean Gaussian conditionals from D.
-    Minnen, J. Balle, G.D. Toderici: `"Joint Autoregressive and Hierarchical
+    Minnen, J. Ballé, G.D. Toderici: `"Joint Autoregressive and Hierarchical
     Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_,
     Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).
 
@@ -346,7 +346,7 @@ def mbt2018_mean(quality, metric="mse", pretrained=False, progress=True, **kwarg
 
 def mbt2018(quality, metric="mse", pretrained=False, progress=True, **kwargs):
     r"""Joint Autoregressive Hierarchical Priors model from D.
-    Minnen, J. Balle, G.D. Toderici: `"Joint Autoregressive and Hierarchical
+    Minnen, J. Ballé, G.D. Toderici: `"Joint Autoregressive and Hierarchical
     Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_,
     Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).
 
