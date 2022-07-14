@@ -176,7 +176,7 @@ def eval_model(
     device = next(model.parameters()).device
     metrics = defaultdict(float)
     for filepath in filepaths:
-        sequence_metrics_path = Path(outputdir) / f"{filepath.stem}-{trained_net}.json"
+
         x = read_image(filepath).to(device)
         if not entropy_estimation:
             if args["half"]:
@@ -188,14 +188,16 @@ def eval_model(
         for k, v in rv.items():
             metrics[k] += v
 
-        with sequence_metrics_path.open("wb") as f:
-            output = {
-                "source": filepath.stem,
-                "name": args["architecture"],
-                "description": f"Inference ({description})",
-                "results": metrics,
-            }
-            f.write(json.dumps(output, indent=2).encode())
+        if outputdir:
+            image_metrics_path = Path(outputdir) / f"{filepath.stem}-{trained_net}.json"
+            with image_metrics_path.open("wb") as f:
+                output = {
+                    "source": filepath.stem,
+                    "name": args["architecture"],
+                    "description": f"Inference ({description})",
+                    "results": rv,
+                }
+                f.write(json.dumps(output, indent=2).encode())
 
     for k, v in metrics.items():
         metrics[k] = v / len(filepaths)
@@ -203,13 +205,16 @@ def eval_model(
 
 
 def setup_args():
-    parent_parser = argparse.ArgumentParser(
-        add_help=False,
-    )
-
     # Common options.
+    parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument("dataset", type=str, help="dataset path")
-    parent_parser.add_argument("output", type=str, help="output directory")
+    parent_parser.add_argument(
+        "-d",
+        "--output_directory",
+        type=str,
+        default="",
+        help="path of output directory",
+    )
     parent_parser.add_argument(
         "-a",
         "--architecture",
@@ -296,7 +301,7 @@ def main(argv):
     parser = setup_args()
     args = parser.parse_args(argv)
 
-    if not args.source:
+    if args.source not in ["checkpoint", "pretrained"]:
         print("Error: missing 'checkpoint' or 'pretrained' source.", file=sys.stderr)
         parser.print_help()
         raise SystemExit(1)
@@ -313,15 +318,15 @@ def main(argv):
     compressai.set_entropy_coder(args.entropy_coder)
 
     # create output directory
-    outputdir = args.output
-    Path(outputdir).mkdir(parents=True, exist_ok=True)
+    if args.output_directory:
+        Path(args.output_directory).mkdir(parents=True, exist_ok=True)
 
     if args.source == "pretrained":
         runs = sorted(args.qualities)
         opts = (args.architecture, args.metric)
         load_func = load_pretrained
         log_fmt = "\rEvaluating {0} | {run:d}"
-    elif args.source == "checkpoint":
+    else:
         runs = args.paths
         opts = (args.architecture,)
         load_func = load_checkpoint
@@ -344,7 +349,7 @@ def main(argv):
         args_dict = vars(args)
         metrics = eval_model(
             model,
-            outputdir,
+            args.output_directory,
             filepaths,
             trained_net=trained_net,
             description=description,
@@ -365,14 +370,18 @@ def main(argv):
         "description": f"Inference ({description})",
         "results": results,
     }
+    if args.output_directory:
+        output_file = (
+            args.output_file
+            if args.output_file
+            else f"{args.architecture}-{description}"
+        )
 
-    if args.output_file == "":
-        output_file = f"{args.architecture}-{description}"
-    else:
-        output_file = args.output_file
+        with (Path(f"{args.output_directory}/{output_file}").with_suffix(".json")).open(
+            "wb"
+        ) as f:
+            f.write(json.dumps(output, indent=2).encode())
 
-    with (Path(f"{outputdir}/{output_file}").with_suffix(".json")).open("wb") as f:
-        f.write(json.dumps(output, indent=2).encode())
     print(json.dumps(output, indent=2))
 
 

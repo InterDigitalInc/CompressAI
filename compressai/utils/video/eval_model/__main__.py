@@ -415,7 +415,7 @@ def load_pretrained(model: str, metric: str, quality: int) -> nn.Module:
 
 def create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Video compression network evaluation.",
+        description="Evaluate a video compression network on a video dataset.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parent_parser = argparse.ArgumentParser(add_help=False)

@@ -87,7 +87,6 @@ def test_eval_model_pretrained(
     cmd = [
         "pretrained",
         dirpath,
-        str(tmpdir),
         "-a",
         model,
         "-m",
@@ -145,9 +144,10 @@ def test_eval_model_ckpt(
     spec.loader.exec_module(module)
 
     argv = [
+        "-m",
+        "bmshj2018-factorized",
         "-d",
         datapath,
-        str(tmpdir),
         "-e",
         "1",
         "--batch-size",
