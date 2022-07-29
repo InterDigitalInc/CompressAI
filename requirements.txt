@@ -45,7 +45,7 @@ lazy-object-proxy==1.4.3
 MarkupSafe==1.1.1
 matplotlib==3.3.4
 mccabe==0.6.1
-mistune==0.8.4
+mistune==2.0.3
 mypy==0.812
 mypy-extensions==0.4.3
 nbclient==0.5.2
