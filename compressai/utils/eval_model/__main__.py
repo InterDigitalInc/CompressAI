@@ -32,6 +32,7 @@ Evaluate an end-to-end compression model on an image dataset.
 import argparse
 import json
 import math
+import os
 import sys
 import time
 
@@ -77,9 +78,19 @@ def collect_images(rootpath: str) -> List[str]:
     return image_files
 
 
-def psnr(a: torch.Tensor, b: torch.Tensor) -> float:
-    mse = F.mse_loss(a, b).item()
-    return -10 * math.log10(mse)
+def psnr(a: torch.Tensor, b: torch.Tensor, max_val: int = 255) -> float:
+    return 20 * math.log10(max_val) - 10 * torch.log10((a - b).pow(2).mean())
+
+
+def compute_metrics(
+    org: torch.Tensor, rec: torch.Tensor, max_val: int = 255
+) -> Dict[str, Any]:
+    metrics: Dict[str, Any] = {}
+    org = (org * max_val).clamp(0, max_val).round()
+    rec = (rec * max_val).clamp(0, max_val).round()
+    metrics["psnr"] = psnr(org, rec).item()
+    metrics["ms-ssim"] = ms_ssim(org, rec, data_range=max_val).item()
+    return metrics
 
 
 def read_image(filepath: str) -> torch.Tensor:
@@ -119,12 +130,14 @@ def inference(model, x):
         out_dec["x_hat"], (-padding_left, -padding_right, -padding_top, -padding_bottom)
     )
 
+    # input images are 8bit RGB for now
+    metrics = compute_metrics(x, out_dec["x_hat"], 255)
     num_pixels = x.size(0) * x.size(2) * x.size(3)
     bpp = sum(len(s[0]) for s in out_enc["strings"]) * 8.0 / num_pixels
 
     return {
-        "psnr": psnr(x, out_dec["x_hat"]),
-        "ms-ssim": ms_ssim(x, out_dec["x_hat"], data_range=1.0).item(),
+        "psnr": metrics["psnr"],
+        "ms-ssim": metrics["ms-ssim"],
         "bpp": bpp,
         "encoding_time": enc_time,
         "decoding_time": dec_time,
