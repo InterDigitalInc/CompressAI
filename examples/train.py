@@ -43,6 +43,8 @@ from torchvision import transforms
 from compressai.datasets import ImageFolder
 from compressai.zoo import image_models
 
+import math
+
 
 class RateDistortionLoss(nn.Module):
     """Custom rate distortion loss with a Lagrangian parameter."""
