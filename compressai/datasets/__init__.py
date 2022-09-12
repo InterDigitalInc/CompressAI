@@ -28,12 +28,14 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from .image import ImageFolder
+from .pregenerated import PreGeneratedMemmapDataset
 from .rawvideo import *
 from .video import VideoFolder
 from .vimeo90k import Vimeo90kDataset
 
 __all__ = [
     "ImageFolder",
+    "PreGeneratedMemmapDataset",
     "VideoFolder",
     "Vimeo90kDataset",
 ]
