@@ -32,7 +32,6 @@ Evaluate an end-to-end compression model on an image dataset.
 import argparse
 import json
 import math
-import os
 import sys
 import time
 
@@ -200,17 +199,21 @@ def eval_model(
             rv = inference_entropy_estimation(model, x)
         for k, v in rv.items():
             metrics[k] += v
-
-        if outputdir:
-            image_metrics_path = Path(outputdir) / f"{filepath.stem}-{trained_net}.json"
-            with image_metrics_path.open("wb") as f:
-                output = {
-                    "source": filepath.stem,
-                    "name": args["architecture"],
-                    "description": f"Inference ({description})",
-                    "results": rv,
-                }
-                f.write(json.dumps(output, indent=2).encode())
+        if args["per_image"]:
+            if Path(outputdir).is_dir():
+                image_metrics_path = (
+                    Path(outputdir) / f"{filepath.stem}-{trained_net}.json"
+                )
+                with image_metrics_path.open("wb") as f:
+                    output = {
+                        "source": filepath.stem,
+                        "name": args["architecture"],
+                        "description": f"Inference ({description})",
+                        "results": rv,
+                    }
+                    f.write(json.dumps(output, indent=2).encode())
+            else:
+                raise FileNotFoundError("Please specify output directory")
 
     for k, v in metrics.items():
         metrics[k] = v / len(filepaths)
@@ -221,13 +224,6 @@ def setup_args():
     # Common options.
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument("dataset", type=str, help="dataset path")
-    parent_parser.add_argument(
-        "-d",
-        "--output_directory",
-        type=str,
-        default="",
-        help="path of output directory",
-    )
     parent_parser.add_argument(
         "-a",
         "--architecture",
@@ -273,11 +269,23 @@ def setup_args():
         help="metric trained against (default: %(default)s)",
     )
     parent_parser.add_argument(
+        "-d",
+        "--output_directory",
+        type=str,
+        default="",
+        help="path of output directory. Optional, required for output json file, results per image. Default will just print the output results.",
+    )
+    parent_parser.add_argument(
         "-o",
         "--output-file",
         type=str,
         default="",
         help="output json file name, (default: architecture-entropy_coder.json)",
+    )
+    parent_parser.add_argument(
+        "--per-image",
+        action="store_true",
+        help="store results for each image of the dataset, separately",
     )
 
     parser = argparse.ArgumentParser(
