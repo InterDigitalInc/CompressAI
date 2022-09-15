@@ -63,7 +63,6 @@ def test_eval_model():
         eval_model.main(
             [
                 "pretrained",
-                ".",
                 "-a",
                 "bmshj2018-factorized",
                 "-m",

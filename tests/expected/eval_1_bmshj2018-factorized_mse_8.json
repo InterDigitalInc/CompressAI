@@ -1,1 +1,1 @@
-{"name": "bmshj2018-factorized-mse", "description": "Inference (entropy estimation)", "results": {"psnr": [37.29373603242085], "bpp": [1.9624892473220825], "encoding_time": [1.230018973350525], "decoding_time": [1.230018973350525]}}
+{"name": "bmshj2018-factorized-mse", "description": "Inference (entropy estimation)", "results": {"psnr": [37.26597595214844], "ms-ssim": [0.9952630400657654], "bpp": [1.9624894857406616], "encoding_time": [1.0375230312347412], "decoding_time": [1.0375230312347412]}}
