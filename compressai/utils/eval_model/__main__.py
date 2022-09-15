@@ -151,6 +151,8 @@ def inference_entropy_estimation(model, x):
     out_net = model.forward(x)
     elapsed_time = time.time() - start
 
+    # input images are 8bit RGB for now
+    metrics = compute_metrics(x, out_net["x_hat"], 255)
     num_pixels = x.size(0) * x.size(2) * x.size(3)
     bpp = sum(
         (torch.log(likelihoods).sum() / (-math.log(2) * num_pixels))
@@ -158,7 +160,8 @@ def inference_entropy_estimation(model, x):
     )
 
     return {
-        "psnr": psnr(x, out_net["x_hat"]),
+        "psnr": metrics["psnr"],
+        "ms-ssim": metrics["ms-ssim"],
         "bpp": bpp.item(),
         "encoding_time": elapsed_time / 2.0,  # broad estimation
         "decoding_time": elapsed_time / 2.0,
