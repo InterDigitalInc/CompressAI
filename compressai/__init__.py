@@ -27,7 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from compressai import datasets, entropy_models, layers, models, ops
+from compressai import datasets, entropy_models, layers, models, ops, zoo
 
 try:
     from .version import __version__
