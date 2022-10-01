@@ -398,11 +398,18 @@ def run_inference(
     return results
 
 
-def load_checkpoint(arch: str, checkpoint_path: str) -> nn.Module:
-    state_dict = torch.load(checkpoint_path)
-    state_dict = state_dict.get("network", state_dict)
+def load_checkpoint(arch: str, no_update: bool, checkpoint_path: str) -> nn.Module:
+    checkpoint = torch.load(checkpoint_path)
+    state_dict = checkpoint
+    # compatibility with 'not updated yet' trained nets
+    for key in ["network", "state_dict", "model_state_dict"]:
+        if key in checkpoint:
+            state_dict = checkpoint[key]
+
     net = models[arch]()
     net.load_state_dict(state_dict)
+    if not no_update:
+        net.update(force=True)
     net.eval()
     return net
 
@@ -496,6 +503,11 @@ def create_parser() -> argparse.ArgumentParser:
         required=True,
         help="checkpoint path",
     )
+    checkpoint_parser.add_argument(
+        "--no-update",
+        action="store_true",
+        help="Disable the default update of the model entropy parameters before eval",
+    )
     return parser
 
 
@@ -528,7 +540,7 @@ def main(args: Any = None) -> None:
         log_fmt = "\rEvaluating {0} | {run:d}"
     else:
         runs = args.paths
-        opts = (args.architecture,)
+        opts = (args.architecture, args.no_update)
         load_func = load_checkpoint
         log_fmt = "\rEvaluating {run:s}"
 

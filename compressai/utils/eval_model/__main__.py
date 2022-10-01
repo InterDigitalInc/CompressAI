@@ -50,7 +50,6 @@ from torchvision import transforms
 import compressai
 
 from compressai.zoo import image_models as pretrained_models
-from compressai.zoo import load_state_dict
 from compressai.zoo.image import model_architectures as architectures
 
 torch.backends.cudnn.deterministic = True
@@ -174,9 +173,20 @@ def load_pretrained(model: str, metric: str, quality: int) -> nn.Module:
     ).eval()
 
 
-def load_checkpoint(arch: str, checkpoint_path: str) -> nn.Module:
-    state_dict = load_state_dict(torch.load(checkpoint_path))
-    return architectures[arch].from_state_dict(state_dict).eval()
+def load_checkpoint(arch: str, no_update: bool, checkpoint_path: str) -> nn.Module:
+    # update model if need be
+    checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    state_dict = checkpoint
+    # compatibility with 'not updated yet' trained nets
+    for key in ["network", "state_dict", "model_state_dict"]:
+        if key in checkpoint:
+            state_dict = checkpoint[key]
+
+    model_cls = architectures[arch]
+    net = model_cls.from_state_dict(state_dict)
+    if not no_update:
+        net.update(force=True)
+    return net.eval()
 
 
 def eval_model(
@@ -317,7 +327,11 @@ def setup_args():
         required=True,
         help="checkpoint path",
     )
-
+    checkpoint_parser.add_argument(
+        "--no-update",
+        action="store_true",
+        help="Disable the default update of the model entropy parameters before eval",
+    )
     return parser
 
 
@@ -352,7 +366,7 @@ def main(argv):
         log_fmt = "\rEvaluating {0} | {run:d}"
     else:
         runs = args.paths
-        opts = (args.architecture,)
+        opts = (args.architecture, args.no_update)
         load_func = load_checkpoint
         log_fmt = "\rEvaluating {run:s}"
 
