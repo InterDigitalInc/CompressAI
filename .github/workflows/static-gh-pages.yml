@@ -1,0 +1,43 @@
+name: publish documentation
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  docs_to_gh-pages:
+    runs-on: ubuntu-latest
+    name: publish documentation
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: install dependencies pip
+        run: |
+          python3 -m pip install -U pip
+          python3 -m pip install .[doc]
+
+      - name: make docs
+        run: |
+          make -C docs clean
+          make -C docs html
+
+      - name: Init repo for generated files
+        run: |
+          cd docs/_build/html
+          git init
+          touch .nojekyll
+          git add --all
+          git config --local user.email "compressai@interdigital.com"
+          git config --local user.name "CompressAI"
+          git commit -m "deploy"
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/master'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build/html
