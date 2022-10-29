@@ -56,10 +56,6 @@ class Codec(abc.ABC):
     description = ""
     help = ""
 
-    @classmethod
-    def setup_args(cls, parser):
-        pass
-
     @property
     @abc.abstractmethod
     def name(self):
@@ -69,6 +65,7 @@ class Codec(abc.ABC):
     def description(self):
         return self._description
 
+    @abc.abstractmethod
     def add_parser_args(self, parser: argparse.ArgumentParser) -> None:
         pass
 

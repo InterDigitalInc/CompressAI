@@ -154,7 +154,8 @@ class Codec(abc.ABC):
         return args
 
     @classmethod
-    def setup_args(cls, parser):
+    @abc.abstractmethod
+    def setup_args(cls, _parser):
         pass
 
     @property
@@ -195,6 +196,10 @@ class PillowCodec(Codec):
     @property
     def name(self):
         raise NotImplementedError()
+
+    @classmethod
+    def setup_args(cls, _parser):
+        pass
 
     def _run_impl(self, in_filepath, quality):
         img = self._load_img(in_filepath)
