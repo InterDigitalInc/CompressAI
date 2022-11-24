@@ -146,12 +146,6 @@ def deconv(in_channels, out_channels, kernel_size=5, stride=2):
     )
 
 
-def quantize_ste(x):
-    """Differentiable quantization via the Straight-Through-Estimator."""
-    # STE (straight-through estimator) trick: x_hard - x_soft.detach() + x_soft
-    return (torch.round(x) - x).detach() + x
-
-
 def gaussian_kernel1d(
     kernel_size: int, sigma: float, device: torch.device, dtype: torch.dtype
 ):

@@ -31,17 +31,17 @@ import pytest
 import torch
 
 from compressai._CXX import pmf_to_quantized_cdf
-from compressai.ops import LowerBound, NonNegativeParametrizer, ste_round
+from compressai.ops import LowerBound, NonNegativeParametrizer, quantize_ste
 
 
-class TestSTERound:
-    def test_ste_round_ok(self):
+class TestQuantizeSTE:
+    def test_quantize_ste_ok(self):
         x = torch.rand(16)
-        assert (ste_round(x) == torch.round(x)).all()
+        assert (quantize_ste(x) == torch.round(x)).all()
 
-    def test_ste_round_grads(self):
+    def test_quantize_ste_grads(self):
         x = torch.rand(24, requires_grad=True)
-        y = ste_round(x)
+        y = quantize_ste(x)
         y.backward(x)
         assert x.grad is not None
         assert (x.grad == x).all()

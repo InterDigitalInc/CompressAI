@@ -32,7 +32,7 @@ import torch
 from torch import Tensor
 
 
-def ste_round(x: Tensor) -> Tensor:
+def quantize_ste(x: Tensor) -> Tensor:
     """
     Rounding with non-zero gradients. Gradients are approximated by replacing
     the derivative by the identity function.
@@ -46,4 +46,4 @@ def ste_round(x: Tensor) -> Tensor:
 
         `x_round = x_round - x.detach() + x`
     """
-    return torch.round(x) - x.detach() + x
+    return (torch.round(x) - x).detach() + x
