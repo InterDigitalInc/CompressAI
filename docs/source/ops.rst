@@ -4,9 +4,9 @@ compressai.ops
 .. currentmodule:: compressai.ops
 
 
-ste_round
+quantize_ste
 ---------
-.. autofunction:: ste_round
+.. autofunction:: quantize_ste
 
 LowerBound
 ----------

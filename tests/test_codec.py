@@ -89,6 +89,7 @@ class TestCompressDecompress:
 
 
 class TestCodecExample:
+    @pytest.mark.skip(reason="find a better way to test this")
     @pytest.mark.parametrize("model", ("bmshj2018-factorized",))
     def test_encode_decode_image(self, tmpdir, model):
         cwd = Path(__file__).resolve().parent
@@ -152,6 +153,7 @@ class TestCodecExample:
 
         assert expected_md5sum_dec == md5sum_dec
 
+    @pytest.mark.skip(reason="find a better way to test this")
     @pytest.mark.parametrize("model", ("ssf2020",))
     @pytest.mark.parametrize("nb_frames", ("1",))
     def test_encode_decode_video(self, tmpdir, model, nb_frames):

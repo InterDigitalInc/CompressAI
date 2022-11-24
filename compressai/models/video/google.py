@@ -41,6 +41,7 @@ from compressai.entropy_models import GaussianConditional
 from compressai.layers import QReLU
 from compressai.ops import quantize_ste
 from compressai.registry import register_model
+
 from ..google import CompressionModel, get_scale_table
 from ..utils import (
     conv,

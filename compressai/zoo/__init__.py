@@ -29,6 +29,7 @@
 
 from .image import (
     bmshj2018_factorized,
+    bmshj2018_factorized_relu,
     bmshj2018_hyperprior,
     cheng2020_anchor,
     cheng2020_attn,
@@ -40,6 +41,7 @@ from .video import ssf2020
 
 image_models = {
     "bmshj2018-factorized": bmshj2018_factorized,
+    "bmshj2018-factorized-relu": bmshj2018_factorized_relu,
     "bmshj2018-hyperprior": bmshj2018_hyperprior,
     "mbt2018-mean": mbt2018_mean,
     "mbt2018": mbt2018,

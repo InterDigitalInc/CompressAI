@@ -44,6 +44,7 @@ from .utils import conv, deconv, update_registered_buffers
 __all__ = [
     "CompressionModel",
     "FactorizedPrior",
+    "FactorizedPriorReLU",
     "ScaleHyperprior",
     "MeanScaleHyperprior",
     "JointAutoregressiveHierarchicalPriors",
@@ -191,6 +192,44 @@ class FactorizedPrior(CompressionModel):
         y_hat = self.entropy_bottleneck.decompress(strings[0], shape)
         x_hat = self.g_s(y_hat).clamp_(0, 1)
         return {"x_hat": x_hat}
+
+
+@register_model("bmshj2018-factorized-relu")
+class FactorizedPriorReLU(FactorizedPrior):
+    r"""Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
+    N. Johnston: `"Variational Image Compression with a Scale Hyperprior"
+    <https://arxiv.org/abs/1802.01436>`_, Int Conf. on Learning Representations
+    (ICLR), 2018.
+    GDN activations are replaced by ReLU
+
+    Args:
+        N (int): Number of channels
+        M (int): Number of channels in the expansion layers (last layer of the
+            encoder and last layer of the hyperprior decoder)
+    """
+
+    def __init__(self, N, M, **kwargs):
+        super().__init__(entropy_bottleneck_channels=M, **kwargs)
+
+        self.g_a = nn.Sequential(
+            conv(3, N),
+            nn.ReLU(inplace=True),
+            conv(N, N),
+            nn.ReLU(inplace=True),
+            conv(N, N),
+            nn.ReLU(inplace=True),
+            conv(N, M),
+        )
+
+        self.g_s = nn.Sequential(
+            deconv(M, N),
+            nn.ReLU(inplace=True),
+            deconv(N, N),
+            nn.ReLU(inplace=True),
+            deconv(N, N),
+            nn.ReLU(inplace=True),
+            deconv(N, 3),
+        )
 
 
 # From Balle's tensorflow compression examples
