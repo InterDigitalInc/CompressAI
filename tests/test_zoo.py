@@ -39,6 +39,7 @@ from compressai.models import (
 )
 from compressai.zoo import (
     bmshj2018_factorized,
+    bmshj2018_factorized_relu,
     bmshj2018_hyperprior,
     cheng2020_anchor,
     cheng2020_attn,
@@ -98,6 +99,33 @@ class TestBmshj2018Factorized:
             assert net.state_dict()["g_a.6.weight"].size(0) == 320
 
 
+class TestBmshj2018FactorizedReLU:
+    def test_params(self):
+        for i in range(1, 6):
+            net = bmshj2018_factorized_relu(i, metric="mse")
+            assert isinstance(net, FactorizedPrior)
+            assert net.state_dict()["g_a.0.weight"].size(0) == 128
+            assert net.state_dict()["g_a.6.weight"].size(0) == 192
+
+        for i in range(6, 9):
+            net = bmshj2018_factorized_relu(i, metric="mse")
+            assert isinstance(net, FactorizedPrior)
+            assert net.state_dict()["g_a.0.weight"].size(0) == 192
+
+    def test_invalid_params(self):
+        with pytest.raises(ValueError):
+            bmshj2018_factorized_relu(-1)
+
+        with pytest.raises(ValueError):
+            bmshj2018_factorized_relu(10)
+
+        with pytest.raises(ValueError):
+            bmshj2018_factorized_relu(10, metric="ssim")
+
+        with pytest.raises(ValueError):
+            bmshj2018_factorized_relu(1, metric="ssim")
+
+
 class TestBmshj2018Hyperprior:
     def test_params(self):
         for i in range(1, 6):
@@ -131,12 +159,12 @@ class TestBmshj2018Hyperprior:
     def test_pretrained(self, metric):
         # test we can load the correct models from the urls
         for i in range(1, 6):
-            net = bmshj2018_factorized(i, metric=metric, pretrained=True)
+            net = bmshj2018_hyperprior(i, metric=metric, pretrained=True)
             assert net.state_dict()["g_a.0.weight"].size(0) == 128
             assert net.state_dict()["g_a.6.weight"].size(0) == 192
 
         for i in range(6, 9):
-            net = bmshj2018_factorized(i, metric=metric, pretrained=True)
+            net = bmshj2018_hyperprior(i, metric=metric, pretrained=True)
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
             assert net.state_dict()["g_a.6.weight"].size(0) == 320
 
