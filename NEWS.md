@@ -9,3 +9,5 @@
 * use `load_pretrained` to convert `state_dict`s to the new format
 
 2020-06-21: First release of CompressAI !
+
+2022-11-27: CompressAI now includes sadl_codec, which enables to run c++ inteference with full integer operations decoder.
