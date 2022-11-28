@@ -1,15 +1,15 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Image compression" href="zoo.html" />
 
-    <meta name="generator" content="sphinx-4.3.0, furo 2021.10.09"/>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
         <title>Command line usage - CompressAI</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
 
@@ -22,38 +22,38 @@
   --color-brand-content: #00aaee;
   
   }
-  body[data-theme="dark"] {
-    --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-  }
-  @media (prefers-color-scheme: dark) {
-    body:not([data-theme="light"]) {
+  @media not print {
+    body[data-theme="dark"] {
       --color-code-background: #202020;
   --color-code-foreground: #d0d0d0;
   
     }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
   }
 </style></head>
   <body>
+    
     <script>
       document.body.dataset.theme = localStorage.getItem("theme") || "auto";
     </script>
     
+
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="svg-toc" viewBox="0 0 24 24">
     <title>Contents</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path stroke="none" d="M0 0h24v24H0z" />
-      <line x1="4" y1="6" x2="20" y2="6" />
-      <line x1="10" y1="12" x2="20" y2="12" />
-      <line x1="6" y1="18" x2="20" y2="18" />
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
     </svg>
   </symbol>
   <symbol id="svg-menu" viewBox="0 0 24 24">
     <title>Menu</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
       <line x1="3" y1="12" x2="21" y2="12"></line>
       <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -62,14 +62,14 @@
   </symbol>
   <symbol id="svg-arrow-right" viewBox="0 0 24 24">
     <title>Expand</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
       <polyline points="9 18 15 12 9 6"></polyline>
     </svg>
   </symbol>
   <symbol id="svg-sun" viewBox="0 0 24 24">
     <title>Light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
       <circle cx="12" cy="12" r="5"></circle>
       <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -84,7 +84,7 @@
   </symbol>
   <symbol id="svg-moon" viewBox="0 0 24 24">
     <title>Dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
@@ -92,7 +92,7 @@
   </symbol>
   <symbol id="svg-sun-half" viewBox="0 0 24 24">
     <title>Auto light/dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <circle cx="12" cy="12" r="9" />
@@ -194,6 +194,7 @@
 
 </div>
 </div>
+
       </div>
       
     </div>
@@ -201,8 +202,15 @@
   <div class="main">
     <div class="content">
       <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -217,44 +225,9 @@
         </div>
         <article role="main">
           <section id="command-line-usage">
-<h1>Command line usage<a class="headerlink" href="#command-line-usage" title="Permalink to this headline">¶</a></h1>
-<section id="bench">
-<h2>bench<a class="headerlink" href="#bench" title="Permalink to this headline">¶</a></h2>
-<p>Collect performance metrics of published traditional or end-to-end image
-codecs.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.bench [-h] {} ...
-
-Collect codec metrics.
-
-positional arguments:
-  {}          Select codec
-
-optional arguments:
-  -h, --help  show this help message and exit
-</pre></div>
-</div>
-</section>
-<section id="plot">
-<h2>plot<a class="headerlink" href="#plot" title="Permalink to this headline">¶</a></h2>
-<p>Simple plotting utility to display Rate-Distortion curves (RD) comparison
-between codecs.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.plot [-h] -f [...] [-m] [-t] [-o] [--figsize ] [--axes   ] [--backend] [--show]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -f [ ...], --results-file [ ...]
-  -m , --metric         Metric (default: psnr)
-  -t , --title          Plot title
-  -o , --output         Output file name
-  --figsize             Figure relative size (width, height), default: (9, 6)
-  --axes                Axes limit (xmin, xmax, ymin, ymax), default: autorange
-  --backend             Change plot backend (default: matplotlib)
-  --show                Open plot figure
-</pre></div>
-</div>
-</section>
+<h1>Command line usage<a class="headerlink" href="#command-line-usage" title="Permalink to this heading">#</a></h1>
 <section id="eval-model">
-<h2>eval_model<a class="headerlink" href="#eval-model" title="Permalink to this headline">¶</a></h2>
+<h2>eval_model<a class="headerlink" href="#eval-model" title="Permalink to this heading">#</a></h2>
 <p>Evaluate an end-to-end compression model on an image dataset.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.eval_model [-h] {pretrained,checkpoint} ...
 
@@ -270,7 +243,7 @@ optional arguments:
 </div>
 </section>
 <section id="find-close">
-<h2>find_close<a class="headerlink" href="#find-close" title="Permalink to this headline">¶</a></h2>
+<h2>find_close<a class="headerlink" href="#find-close" title="Permalink to this heading">#</a></h2>
 <p>Find the closest codec quality parameter to reach a given metric (bpp, ms-ssim,
 or psnr).</p>
 <dl class="simple">
@@ -280,7 +253,9 @@ or psnr).</p>
 </ul>
 </dd>
 </dl>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.find_close [-h] [-m {bpp,psnr,ms-ssim}] [--save] {} ... image target
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.find_close [-h] [-m {bpp,psnr,ms-ssim}]
+                                             [--save]
+                                             {} ... image target
 
 Collect codec metrics and performances.
 
@@ -296,16 +271,34 @@ optional arguments:
 </pre></div>
 </div>
 </section>
+<section id="bench">
+<h2>bench<a class="headerlink" href="#bench" title="Permalink to this heading">#</a></h2>
+<p>Collect performance metrics of published traditional or end-to-end image
+codecs.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.bench [-h] {} ...
+
+Collect codec metrics.
+
+positional arguments:
+  {}          Select codec
+
+optional arguments:
+  -h, --help  show this help message and exit
+</pre></div>
+</div>
+</section>
 <section id="update-model">
-<h2>update_model<a class="headerlink" href="#update-model" title="Permalink to this headline">¶</a></h2>
+<h2>update_model<a class="headerlink" href="#update-model" title="Permalink to this heading">#</a></h2>
 <p>Update the CDFs parameters of a trained model.</p>
 <p>To be called on a model checkpoint after training. This will update the internal
 CDFs related buffers required for entropy coding.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.update_model [-h] [-n NAME] [-d DIR] [--no-update]
-                                               [-a {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.update_model [-h] [-n NAME] [-d DIR]
+                                               [--no-update]
+                                               [-a {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018_factorized_relu,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}]
                                                filepath
 
-Export a trained model to a new checkpoint with an updated CDFs parameters and a hash prefix, so that it can be loaded later via `load_state_dict_from_url`.
+Export a trained model to a new checkpoint with updated CDFs and a hash prefix
+so that it can be loaded later via `load_state_dict_from_url`.
 
 positional arguments:
   filepath              Path to the checkpoint model to be exported.
@@ -315,8 +308,30 @@ optional arguments:
   -n NAME, --name NAME  Exported model name.
   -d DIR, --dir DIR     Exported model directory.
   --no-update           Do not update the model CDFs parameters.
-  -a {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}, --architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}
+  -a {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018_factorized_relu,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}, --architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018_factorized_relu,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}
                         Set model architecture (default: scale-hyperprior).
+</pre></div>
+</div>
+</section>
+<section id="plot">
+<h2>plot<a class="headerlink" href="#plot" title="Permalink to this heading">#</a></h2>
+<p>Simple plotting utility to display Rate-Distortion curves (RD) comparison
+between codecs.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.plot [-h] -f [...] [-m] [-t] [-o]
+                                       [--figsize ] [--axes   ] [--backend]
+                                       [--show]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f [ ...], --results-file [ ...]
+  -m , --metric         Metric (default: psnr)
+  -t , --title          Plot title
+  -o , --output         Output file name
+  --figsize             Figure relative size (width, height), default: (9, 6)
+  --axes                Axes limit (xmin, xmax, ymin, ymax), default:
+                        autorange
+  --backend             Change plot backend (default: matplotlib)
+  --show                Open plot figure
 </pre></div>
 </div>
 </section>
@@ -329,7 +344,7 @@ optional arguments:
         <div class="related-pages">
           
           <a class="prev-page" href="zoo.html">
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
@@ -340,13 +355,20 @@ optional arguments:
               </div>
             </a>
         </div>
-
-        <div class="related-information">
-              Copyright &#169; 2021, InterDigital Communications, Inc. |
-            <a class="muted-link" href="_sources/cli_usage.rst.txt"
-               rel="nofollow">
-              Show Source
-            </a>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021, InterDigital Communications, Inc.
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
         </div>
         
       </footer>
@@ -357,18 +379,18 @@ optional arguments:
       <div class="toc-sticky toc-scroll">
         <div class="toc-title-container">
           <span class="toc-title">
-            Contents
+            On this page
           </span>
         </div>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Command line usage</a><ul>
-<li><a class="reference internal" href="#bench">bench</a></li>
-<li><a class="reference internal" href="#plot">plot</a></li>
 <li><a class="reference internal" href="#eval-model">eval_model</a></li>
 <li><a class="reference internal" href="#find-close">find_close</a></li>
+<li><a class="reference internal" href="#bench">bench</a></li>
 <li><a class="reference internal" href="#update-model">update_model</a></li>
+<li><a class="reference internal" href="#plot">plot</a></li>
 </ul>
 </li>
 </ul>
@@ -383,7 +405,9 @@ optional arguments:
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/scripts/main.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/furo.js"></script>
     </body>
 </html>

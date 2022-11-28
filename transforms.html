@@ -1,15 +1,15 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Image compression" href="zoo.html" /><link rel="prev" title="compressai.ops" href="ops.html" />
 
-    <meta name="generator" content="sphinx-4.3.0, furo 2021.10.09"/>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
         <title>compressai.transforms - CompressAI</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
 
@@ -22,38 +22,38 @@
   --color-brand-content: #00aaee;
   
   }
-  body[data-theme="dark"] {
-    --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-  }
-  @media (prefers-color-scheme: dark) {
-    body:not([data-theme="light"]) {
+  @media not print {
+    body[data-theme="dark"] {
       --color-code-background: #202020;
   --color-code-foreground: #d0d0d0;
   
     }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
   }
 </style></head>
   <body>
+    
     <script>
       document.body.dataset.theme = localStorage.getItem("theme") || "auto";
     </script>
     
+
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="svg-toc" viewBox="0 0 24 24">
     <title>Contents</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path stroke="none" d="M0 0h24v24H0z" />
-      <line x1="4" y1="6" x2="20" y2="6" />
-      <line x1="10" y1="12" x2="20" y2="12" />
-      <line x1="6" y1="18" x2="20" y2="18" />
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
     </svg>
   </symbol>
   <symbol id="svg-menu" viewBox="0 0 24 24">
     <title>Menu</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
       <line x1="3" y1="12" x2="21" y2="12"></line>
       <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -62,14 +62,14 @@
   </symbol>
   <symbol id="svg-arrow-right" viewBox="0 0 24 24">
     <title>Expand</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
       <polyline points="9 18 15 12 9 6"></polyline>
     </svg>
   </symbol>
   <symbol id="svg-sun" viewBox="0 0 24 24">
     <title>Light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
       <circle cx="12" cy="12" r="5"></circle>
       <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -84,7 +84,7 @@
   </symbol>
   <symbol id="svg-moon" viewBox="0 0 24 24">
     <title>Dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
@@ -92,7 +92,7 @@
   </symbol>
   <symbol id="svg-sun-half" viewBox="0 0 24 24">
     <title>Auto light/dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <circle cx="12" cy="12" r="9" />
@@ -194,6 +194,7 @@
 
 </div>
 </div>
+
       </div>
       
     </div>
@@ -201,8 +202,15 @@
   <div class="main">
     <div class="content">
       <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -217,29 +225,31 @@
         </div>
         <article role="main">
           <section id="compressai-transforms">
-<h1>compressai.transforms<a class="headerlink" href="#compressai-transforms" title="Permalink to this headline">¶</a></h1>
+<h1>compressai.transforms<a class="headerlink" href="#compressai-transforms" title="Permalink to this heading">#</a></h1>
 <section id="transforms-on-tensors">
-<h2>Transforms on Tensors<a class="headerlink" href="#transforms-on-tensors" title="Permalink to this headline">¶</a></h2>
+<h2>Transforms on Tensors<a class="headerlink" href="#transforms-on-tensors" title="Permalink to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.RGB2YCbCr">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">RGB2YCbCr</span></span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#RGB2YCbCr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.RGB2YCbCr" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">RGB2YCbCr</span></span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#RGB2YCbCr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.RGB2YCbCr" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a RGB tensor to YCbCr.
 The tensor is expected to be in the [0, 1] floating point range, with a
 shape of (3xHxW) or (Nx3xHxW).</p>
 </dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.YCbCr2RGB">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YCbCr2RGB</span></span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YCbCr2RGB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YCbCr2RGB" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YCbCr2RGB</span></span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YCbCr2RGB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YCbCr2RGB" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a YCbCr tensor to RGB.
 The tensor is expected to be in the [0, 1] floating point range, with a
 shape of (3xHxW) or (Nx3xHxW).</p>
 </dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.YUV420To444">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YUV420To444</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tuple</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YUV420To444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YUV420To444" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YUV420To444</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tuple</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YUV420To444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YUV420To444" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a YUV 420 input to a 444 representation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mode</strong> (<em>str</em>) – algorithm used for upsampling: <code class="docutils literal notranslate"><span class="pre">'bilinear'</span></code> | <code class="docutils literal notranslate"><span class="pre">'nearest'</span></code>.
 Default <code class="docutils literal notranslate"><span class="pre">'bilinear'</span></code></p></li>
@@ -257,12 +267,13 @@ tensor (default: False)</p></li>
 </pre></div>
 </div>
 </dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.YUV444To420">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YUV444To420</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'avg_pool'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YUV444To420"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YUV444To420" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YUV444To420</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'avg_pool'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YUV444To420"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YUV444To420" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a YUV 444 tensor to a 420 representation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>mode</strong> (<em>str</em>) – algorithm used for downsampling: <code class="docutils literal notranslate"><span class="pre">'avg_pool'</span></code>. Default
 <code class="docutils literal notranslate"><span class="pre">'avg_pool'</span></code></p>
 </dd>
@@ -275,50 +286,53 @@ tensor (default: False)</p></li>
 </pre></div>
 </div>
 </dd></dl>
+
 </section>
 <section id="functional-transforms">
-<h2>Functional Transforms<a class="headerlink" href="#functional-transforms" title="Permalink to this headline">¶</a></h2>
+<h2>Functional Transforms<a class="headerlink" href="#functional-transforms" title="Permalink to this heading">#</a></h2>
 <p>Functional transforms can be used to define custom transform classes.</p>
 <span class="target" id="module-compressai.transforms.functional"></span><dl class="py function">
 <dt class="sig sig-object py" id="compressai.transforms.functional.rgb2ycbcr">
-<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">rgb2ycbcr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#rgb2ycbcr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.rgb2ycbcr" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">rgb2ycbcr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#rgb2ycbcr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.rgb2ycbcr" title="Permalink to this definition">#</a></dt>
 <dd><p>RGB to YCbCr conversion for torch Tensor.
 Using ITU-R BT.709 coefficients.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rgb</strong> (<em>torch.Tensor</em>) – 3D or 4D floating point RGB tensor</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>converted tensor</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>ycbcr (torch.Tensor)</p>
 </dd>
 </dl>
 </dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai.transforms.functional.ycbcr2rgb">
-<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">ycbcr2rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ycbcr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#ycbcr2rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.ycbcr2rgb" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">ycbcr2rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ycbcr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#ycbcr2rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.ycbcr2rgb" title="Permalink to this definition">#</a></dt>
 <dd><p>YCbCr to RGB conversion for torch Tensor.
 Using ITU-R BT.709 coefficients.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>ycbcr</strong> (<em>torch.Tensor</em>) – 3D or 4D floating point RGB tensor</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>converted tensor</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>rgb (torch.Tensor)</p>
 </dd>
 </dl>
 </dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai.transforms.functional.yuv_420_to_444">
-<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">yuv_420_to_444</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yuv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tuple</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#yuv_420_to_444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.yuv_420_to_444" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">yuv_420_to_444</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yuv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tuple</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#yuv_420_to_444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.yuv_420_to_444" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a 420 input to a 444 representation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>yuv</strong> (<em>torch.Tensor</em><em>, </em><em>torch.Tensor</em><em>, </em><em>torch.Tensor</em>) – 420 input frames in
 (Nx1xHxW) format</p></li>
@@ -329,24 +343,25 @@ concatenated tensor, 3 (Nx1xHxW) tensors instead of one (Nx3xHxW)
 tensor (default: False)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><dl class="simple">
 <dt>Converted</dt><dd><p>444</p>
 </dd>
 </dl>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(torch.Tensor or (torch.Tensor, torch.Tensor, torch.Tensor))</p>
 </dd>
 </dl>
 </dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai.transforms.functional.yuv_444_to_420">
-<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">yuv_444_to_420</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yuv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'avg_pool'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#yuv_444_to_420"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.yuv_444_to_420" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">yuv_444_to_420</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yuv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'avg_pool'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#yuv_444_to_420"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.yuv_444_to_420" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a 444 tensor to a 420 representation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>yuv</strong> (<em>torch.Tensor</em><em> or </em><em>(</em><em>torch.Tensor</em><em>, </em><em>torch.Tensor</em><em>, </em><em>torch.Tensor</em><em>)</em>) – 444
 input to be downsampled. Takes either a (Nx3xHxW) tensor or a tuple
@@ -355,14 +370,15 @@ of 3 (Nx1xHxW) tensors.</p></li>
 <code class="docutils literal notranslate"><span class="pre">'avg_pool'</span></code></p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Converted 420</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(torch.Tensor, torch.Tensor, torch.Tensor)</p>
 </dd>
 </dl>
 </dd></dl>
+
 </section>
 </section>
 
@@ -378,10 +394,10 @@ of 3 (Nx1xHxW) tensors.</p></li>
                 </div>
                 <div class="title">Image compression</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
           <a class="prev-page" href="ops.html">
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
@@ -392,13 +408,20 @@ of 3 (Nx1xHxW) tensors.</p></li>
               </div>
             </a>
         </div>
-
-        <div class="related-information">
-              Copyright &#169; 2021, InterDigital Communications, Inc. |
-            <a class="muted-link" href="_sources/transforms.rst.txt"
-               rel="nofollow">
-              Show Source
-            </a>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021, InterDigital Communications, Inc.
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
         </div>
         
       </footer>
@@ -409,15 +432,27 @@ of 3 (Nx1xHxW) tensors.</p></li>
       <div class="toc-sticky toc-scroll">
         <div class="toc-title-container">
           <span class="toc-title">
-            Contents
+            On this page
           </span>
         </div>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">compressai.transforms</a><ul>
-<li><a class="reference internal" href="#transforms-on-tensors">Transforms on Tensors</a></li>
-<li><a class="reference internal" href="#functional-transforms">Functional Transforms</a></li>
+<li><a class="reference internal" href="#transforms-on-tensors">Transforms on Tensors</a><ul>
+<li><a class="reference internal" href="#compressai.transforms.RGB2YCbCr"><code class="docutils literal notranslate"><span class="pre">RGB2YCbCr</span></code></a></li>
+<li><a class="reference internal" href="#compressai.transforms.YCbCr2RGB"><code class="docutils literal notranslate"><span class="pre">YCbCr2RGB</span></code></a></li>
+<li><a class="reference internal" href="#compressai.transforms.YUV420To444"><code class="docutils literal notranslate"><span class="pre">YUV420To444</span></code></a></li>
+<li><a class="reference internal" href="#compressai.transforms.YUV444To420"><code class="docutils literal notranslate"><span class="pre">YUV444To420</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#functional-transforms">Functional Transforms</a><ul>
+<li><a class="reference internal" href="#compressai.transforms.functional.rgb2ycbcr"><code class="docutils literal notranslate"><span class="pre">rgb2ycbcr()</span></code></a></li>
+<li><a class="reference internal" href="#compressai.transforms.functional.ycbcr2rgb"><code class="docutils literal notranslate"><span class="pre">ycbcr2rgb()</span></code></a></li>
+<li><a class="reference internal" href="#compressai.transforms.functional.yuv_420_to_444"><code class="docutils literal notranslate"><span class="pre">yuv_420_to_444()</span></code></a></li>
+<li><a class="reference internal" href="#compressai.transforms.functional.yuv_444_to_420"><code class="docutils literal notranslate"><span class="pre">yuv_444_to_420()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -432,7 +467,9 @@ of 3 (Nx1xHxW) tensors.</p></li>
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/scripts/main.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/furo.js"></script>
     </body>
 </html>
