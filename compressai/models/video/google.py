@@ -37,12 +37,12 @@ import torch.nn.functional as F
 
 from torch.cuda import amp
 
-from compressai.entropy_models import GaussianConditional
+from compressai.entropy_models import EntropyBottleneck, GaussianConditional
 from compressai.layers import QReLU
 from compressai.ops import quantize_ste
 from compressai.registry import register_model
 
-from ..google import CompressionModel, get_scale_table
+from ..base import CompressionModel, get_scale_table
 from ..utils import (
     conv,
     deconv,
@@ -151,7 +151,8 @@ class ScaleSpaceFlow(nn.Module):
 
         class Hyperprior(CompressionModel):
             def __init__(self, planes: int = 192, mid_planes: int = 192):
-                super().__init__(entropy_bottleneck_channels=mid_planes)
+                super().__init__()
+                self.entropy_bottleneck = EntropyBottleneck(mid_planes)
                 self.hyper_encoder = HyperEncoder(planes, mid_planes, planes)
                 self.hyper_decoder_mean = HyperDecoder(planes, mid_planes, planes)
                 self.hyper_decoder_scale = HyperDecoderWithQReLU(

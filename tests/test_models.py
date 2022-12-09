@@ -31,6 +31,7 @@ import pytest
 import torch
 import torch.nn as nn
 
+from compressai.entropy_models import EntropyBottleneck
 from compressai.models.google import (
     SCALES_LEVELS,
     SCALES_MAX,
@@ -50,15 +51,21 @@ from compressai.models.utils import (
 from compressai.models.video.google import ScaleSpaceFlow
 
 
+class DummyCompressionModel(CompressionModel):
+    def __init__(self, entropy_bottleneck_channels):
+        super().__init__()
+        self.entropy_bottleneck = EntropyBottleneck(entropy_bottleneck_channels)
+
+
 class TestCompressionModel:
     def test_parameters(self):
-        model = CompressionModel(32)
+        model = DummyCompressionModel(32)
         assert len(list(model.parameters())) == 15
         with pytest.raises(NotImplementedError):
             model(torch.rand(1))
 
     def test_init(self):
-        class Model(CompressionModel):
+        class Model(DummyCompressionModel):
             def __init__(self):
                 super().__init__(3)
                 self.conv = nn.Conv2d(3, 3, 3)

@@ -27,7 +27,6 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import math
 import warnings
 
 import torch
@@ -39,7 +38,14 @@ from compressai.entropy_models import EntropyBottleneck, GaussianConditional
 from compressai.layers import GDN, MaskedConv2d
 from compressai.registry import register_model
 
-from .utils import conv, deconv, update_registered_buffers
+from .base import (
+    SCALES_LEVELS,
+    SCALES_MAX,
+    SCALES_MIN,
+    CompressionModel,
+    get_scale_table,
+)
+from .utils import conv, deconv
 
 __all__ = [
     "CompressionModel",
@@ -53,69 +59,6 @@ __all__ = [
     "SCALES_MAX",
     "SCALES_LEVELS",
 ]
-
-
-class CompressionModel(nn.Module):
-    """Base class for constructing an auto-encoder with at least one entropy
-    bottleneck module.
-
-    Args:
-        entropy_bottleneck_channels (int): Number of channels of the entropy
-            bottleneck
-    """
-
-    def __init__(self, entropy_bottleneck_channels, init_weights=None):
-        super().__init__()
-        self.entropy_bottleneck = EntropyBottleneck(entropy_bottleneck_channels)
-
-        if init_weights is not None:
-            warnings.warn(
-                "init_weights was removed as it was never functional",
-                DeprecationWarning,
-            )
-
-    def aux_loss(self):
-        """Return the aggregated loss over the auxiliary entropy bottleneck
-        module(s).
-        """
-        aux_loss = sum(
-            m.loss() for m in self.modules() if isinstance(m, EntropyBottleneck)
-        )
-        return aux_loss
-
-    def forward(self, *args):
-        raise NotImplementedError()
-
-    def update(self, force=False):
-        """Updates the entropy bottleneck(s) CDF values.
-
-        Needs to be called once after training to be able to later perform the
-        evaluation with an actual entropy coder.
-
-        Args:
-            force (bool): overwrite previous values (default: False)
-
-        Returns:
-            updated (bool): True if one of the EntropyBottlenecks was updated.
-
-        """
-        updated = False
-        for m in self.children():
-            if not isinstance(m, EntropyBottleneck):
-                continue
-            rv = m.update(force=force)
-            updated |= rv
-        return updated
-
-    def load_state_dict(self, state_dict):
-        # Dynamically update the entropy bottleneck buffers related to the CDFs
-        update_registered_buffers(
-            self.entropy_bottleneck,
-            "entropy_bottleneck",
-            ["_quantized_cdf", "_offset", "_cdf_length"],
-            state_dict,
-        )
-        super().load_state_dict(state_dict)
 
 
 @register_model("bmshj2018-factorized")
@@ -132,7 +75,9 @@ class FactorizedPrior(CompressionModel):
     """
 
     def __init__(self, N, M, **kwargs):
-        super().__init__(entropy_bottleneck_channels=M, **kwargs)
+        super().__init__(**kwargs)
+
+        self.entropy_bottleneck = EntropyBottleneck(M)
 
         self.g_a = nn.Sequential(
             conv(3, N),
@@ -209,7 +154,7 @@ class FactorizedPriorReLU(FactorizedPrior):
     """
 
     def __init__(self, N, M, **kwargs):
-        super().__init__(entropy_bottleneck_channels=M, **kwargs)
+        super().__init__(N=N, M=M, **kwargs)
 
         self.g_a = nn.Sequential(
             conv(3, N),
@@ -232,16 +177,6 @@ class FactorizedPriorReLU(FactorizedPrior):
         )
 
 
-# From Balle's tensorflow compression examples
-SCALES_MIN = 0.11
-SCALES_MAX = 256
-SCALES_LEVELS = 64
-
-
-def get_scale_table(min=SCALES_MIN, max=SCALES_MAX, levels=SCALES_LEVELS):
-    return torch.exp(torch.linspace(math.log(min), math.log(max), levels))
-
-
 @register_model("bmshj2018-hyperprior")
 class ScaleHyperprior(CompressionModel):
     r"""Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
@@ -256,7 +191,9 @@ class ScaleHyperprior(CompressionModel):
     """
 
     def __init__(self, N, M, **kwargs):
-        super().__init__(entropy_bottleneck_channels=N, **kwargs)
+        super().__init__(**kwargs)
+
+        self.entropy_bottleneck = EntropyBottleneck(N)
 
         self.g_a = nn.Sequential(
             conv(3, N),
@@ -316,15 +253,6 @@ class ScaleHyperprior(CompressionModel):
             "likelihoods": {"y": y_likelihoods, "z": z_likelihoods},
         }
 
-    def load_state_dict(self, state_dict):
-        update_registered_buffers(
-            self.gaussian_conditional,
-            "gaussian_conditional",
-            ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
-            state_dict,
-        )
-        super().load_state_dict(state_dict)
-
     @classmethod
     def from_state_dict(cls, state_dict):
         """Return a new model instance from `state_dict`."""
@@ -333,13 +261,6 @@ class ScaleHyperprior(CompressionModel):
         net = cls(N, M)
         net.load_state_dict(state_dict)
         return net
-
-    def update(self, scale_table=None, force=False):
-        if scale_table is None:
-            scale_table = get_scale_table()
-        updated = self.gaussian_conditional.update_scale_table(scale_table, force=force)
-        updated |= super().update(force=force)
-        return updated
 
     def compress(self, x):
         y = self.g_a(x)
@@ -377,7 +298,7 @@ class MeanScaleHyperprior(ScaleHyperprior):
     """
 
     def __init__(self, N, M, **kwargs):
-        super().__init__(N, M, **kwargs)
+        super().__init__(N=N, M=M, **kwargs)
 
         self.h_a = nn.Sequential(
             conv(M, N, stride=1, kernel_size=3),
