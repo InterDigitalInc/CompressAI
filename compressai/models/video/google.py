@@ -42,19 +42,12 @@ from compressai.layers import QReLU
 from compressai.ops import quantize_ste
 from compressai.registry import register_model
 
-from ..base import CompressionModel, get_scale_table
-from ..utils import (
-    conv,
-    deconv,
-    gaussian_blur,
-    gaussian_kernel2d,
-    meshgrid2d,
-    update_registered_buffers,
-)
+from ..base import CompressionModel
+from ..utils import conv, deconv, gaussian_blur, gaussian_kernel2d, meshgrid2d
 
 
 @register_model("ssf2020")
-class ScaleSpaceFlow(nn.Module):
+class ScaleSpaceFlow(CompressionModel):
     r"""Google's first end-to-end optimized video compression from E.
     Agustsson, D. Minnen, N. Johnston, J. Balle, S. J. Hwang, G. Toderici: `"Scale-space flow for end-to-end
     optimized video compression" <https://openaccess.thecvf.com/content_CVPR_2020/html/Agustsson_Scale-Space_Flow_for_End-to-End_Optimized_Video_Compression_CVPR_2020_paper.html>`_,
@@ -437,75 +430,9 @@ class ScaleSpaceFlow(nn.Module):
 
         return dec_frames
 
-    def load_state_dict(self, state_dict):
-
-        # Dynamically update the entropy bottleneck buffers related to the CDFs
-        update_registered_buffers(
-            self.img_hyperprior.gaussian_conditional,
-            "img_hyperprior.gaussian_conditional",
-            ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
-            state_dict,
-        )
-        update_registered_buffers(
-            self.img_hyperprior.entropy_bottleneck,
-            "img_hyperprior.entropy_bottleneck",
-            ["_quantized_cdf", "_offset", "_cdf_length"],
-            state_dict,
-        )
-
-        update_registered_buffers(
-            self.res_hyperprior.gaussian_conditional,
-            "res_hyperprior.gaussian_conditional",
-            ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
-            state_dict,
-        )
-        update_registered_buffers(
-            self.res_hyperprior.entropy_bottleneck,
-            "res_hyperprior.entropy_bottleneck",
-            ["_quantized_cdf", "_offset", "_cdf_length"],
-            state_dict,
-        )
-
-        update_registered_buffers(
-            self.motion_hyperprior.gaussian_conditional,
-            "motion_hyperprior.gaussian_conditional",
-            ["_quantized_cdf", "_offset", "_cdf_length", "scale_table"],
-            state_dict,
-        )
-        update_registered_buffers(
-            self.motion_hyperprior.entropy_bottleneck,
-            "motion_hyperprior.entropy_bottleneck",
-            ["_quantized_cdf", "_offset", "_cdf_length"],
-            state_dict,
-        )
-
-        super().load_state_dict(state_dict)
-
     @classmethod
     def from_state_dict(cls, state_dict):
         """Return a new model instance from `state_dict`."""
         net = cls()
         net.load_state_dict(state_dict)
         return net
-
-    def update(self, scale_table=None, force=False):
-        if scale_table is None:
-            scale_table = get_scale_table()
-
-        updated = self.img_hyperprior.gaussian_conditional.update_scale_table(
-            scale_table, force=force
-        )
-
-        updated |= self.img_hyperprior.entropy_bottleneck.update(force=force)
-
-        updated |= self.res_hyperprior.gaussian_conditional.update_scale_table(
-            scale_table, force=force
-        )
-        updated |= self.res_hyperprior.entropy_bottleneck.update(force=force)
-
-        updated |= self.motion_hyperprior.gaussian_conditional.update_scale_table(
-            scale_table, force=force
-        )
-        updated |= self.motion_hyperprior.entropy_bottleneck.update(force=force)
-
-        return updated
