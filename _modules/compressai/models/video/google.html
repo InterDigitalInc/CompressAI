@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" />
 
-    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>compressai.models.video.google - CompressAI</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -152,7 +152,7 @@
   
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
-  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -262,24 +262,17 @@
 
 <span class="kn">from</span> <span class="nn">torch.cuda</span> <span class="kn">import</span> <span class="n">amp</span>
 
-<span class="kn">from</span> <span class="nn">compressai.entropy_models</span> <span class="kn">import</span> <span class="n">GaussianConditional</span>
+<span class="kn">from</span> <span class="nn">compressai.entropy_models</span> <span class="kn">import</span> <span class="n">EntropyBottleneck</span><span class="p">,</span> <span class="n">GaussianConditional</span>
 <span class="kn">from</span> <span class="nn">compressai.layers</span> <span class="kn">import</span> <span class="n">QReLU</span>
 <span class="kn">from</span> <span class="nn">compressai.ops</span> <span class="kn">import</span> <span class="n">quantize_ste</span>
 <span class="kn">from</span> <span class="nn">compressai.registry</span> <span class="kn">import</span> <span class="n">register_model</span>
 
-<span class="kn">from</span> <span class="nn">..google</span> <span class="kn">import</span> <span class="n">CompressionModel</span><span class="p">,</span> <span class="n">get_scale_table</span>
-<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">conv</span><span class="p">,</span>
-    <span class="n">deconv</span><span class="p">,</span>
-    <span class="n">gaussian_blur</span><span class="p">,</span>
-    <span class="n">gaussian_kernel2d</span><span class="p">,</span>
-    <span class="n">meshgrid2d</span><span class="p">,</span>
-    <span class="n">update_registered_buffers</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..base</span> <span class="kn">import</span> <span class="n">CompressionModel</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">conv</span><span class="p">,</span> <span class="n">deconv</span><span class="p">,</span> <span class="n">gaussian_blur</span><span class="p">,</span> <span class="n">gaussian_kernel2d</span><span class="p">,</span> <span class="n">meshgrid2d</span>
 
 
 <div class="viewcode-block" id="ScaleSpaceFlow"><a class="viewcode-back" href="../../../../models.html#compressai.models.video.ScaleSpaceFlow">[docs]</a><span class="nd">@register_model</span><span class="p">(</span><span class="s2">&quot;ssf2020&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ScaleSpaceFlow</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">ScaleSpaceFlow</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Google&#39;s first end-to-end optimized video compression from E.</span>
 <span class="sd">    Agustsson, D. Minnen, N. Johnston, J. Balle, S. J. Hwang, G. Toderici: `&quot;Scale-space flow for end-to-end</span>
 <span class="sd">    optimized video compression&quot; &lt;https://openaccess.thecvf.com/content_CVPR_2020/html/Agustsson_Scale-Space_Flow_for_End-to-End_Optimized_Video_Compression_CVPR_2020_paper.html&gt;`_,</span>
@@ -376,7 +369,8 @@
 
         <span class="k">class</span> <span class="nc">Hyperprior</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">):</span>
             <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">planes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">192</span><span class="p">,</span> <span class="n">mid_planes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">192</span><span class="p">):</span>
-                <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">entropy_bottleneck_channels</span><span class="o">=</span><span class="n">mid_planes</span><span class="p">)</span>
+                <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span> <span class="o">=</span> <span class="n">EntropyBottleneck</span><span class="p">(</span><span class="n">mid_planes</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">hyper_encoder</span> <span class="o">=</span> <span class="n">HyperEncoder</span><span class="p">(</span><span class="n">planes</span><span class="p">,</span> <span class="n">mid_planes</span><span class="p">,</span> <span class="n">planes</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">hyper_decoder_mean</span> <span class="o">=</span> <span class="n">HyperDecoder</span><span class="p">(</span><span class="n">planes</span><span class="p">,</span> <span class="n">mid_planes</span><span class="p">,</span> <span class="n">planes</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">hyper_decoder_scale</span> <span class="o">=</span> <span class="n">HyperDecoderWithQReLU</span><span class="p">(</span>
@@ -661,78 +655,12 @@
 
         <span class="k">return</span> <span class="n">dec_frames</span>
 
-<div class="viewcode-block" id="ScaleSpaceFlow.load_state_dict"><a class="viewcode-back" href="../../../../models.html#compressai.models.video.ScaleSpaceFlow.load_state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
-
-        <span class="c1"># Dynamically update the entropy bottleneck buffers related to the CDFs</span>
-        <span class="n">update_registered_buffers</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">img_hyperprior</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="p">,</span>
-            <span class="s2">&quot;img_hyperprior.gaussian_conditional&quot;</span><span class="p">,</span>
-            <span class="p">[</span><span class="s2">&quot;_quantized_cdf&quot;</span><span class="p">,</span> <span class="s2">&quot;_offset&quot;</span><span class="p">,</span> <span class="s2">&quot;_cdf_length&quot;</span><span class="p">,</span> <span class="s2">&quot;scale_table&quot;</span><span class="p">],</span>
-            <span class="n">state_dict</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">update_registered_buffers</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">img_hyperprior</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">,</span>
-            <span class="s2">&quot;img_hyperprior.entropy_bottleneck&quot;</span><span class="p">,</span>
-            <span class="p">[</span><span class="s2">&quot;_quantized_cdf&quot;</span><span class="p">,</span> <span class="s2">&quot;_offset&quot;</span><span class="p">,</span> <span class="s2">&quot;_cdf_length&quot;</span><span class="p">],</span>
-            <span class="n">state_dict</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="n">update_registered_buffers</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">res_hyperprior</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="p">,</span>
-            <span class="s2">&quot;res_hyperprior.gaussian_conditional&quot;</span><span class="p">,</span>
-            <span class="p">[</span><span class="s2">&quot;_quantized_cdf&quot;</span><span class="p">,</span> <span class="s2">&quot;_offset&quot;</span><span class="p">,</span> <span class="s2">&quot;_cdf_length&quot;</span><span class="p">,</span> <span class="s2">&quot;scale_table&quot;</span><span class="p">],</span>
-            <span class="n">state_dict</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">update_registered_buffers</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">res_hyperprior</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">,</span>
-            <span class="s2">&quot;res_hyperprior.entropy_bottleneck&quot;</span><span class="p">,</span>
-            <span class="p">[</span><span class="s2">&quot;_quantized_cdf&quot;</span><span class="p">,</span> <span class="s2">&quot;_offset&quot;</span><span class="p">,</span> <span class="s2">&quot;_cdf_length&quot;</span><span class="p">],</span>
-            <span class="n">state_dict</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="n">update_registered_buffers</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">motion_hyperprior</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="p">,</span>
-            <span class="s2">&quot;motion_hyperprior.gaussian_conditional&quot;</span><span class="p">,</span>
-            <span class="p">[</span><span class="s2">&quot;_quantized_cdf&quot;</span><span class="p">,</span> <span class="s2">&quot;_offset&quot;</span><span class="p">,</span> <span class="s2">&quot;_cdf_length&quot;</span><span class="p">,</span> <span class="s2">&quot;scale_table&quot;</span><span class="p">],</span>
-            <span class="n">state_dict</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">update_registered_buffers</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">motion_hyperprior</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">,</span>
-            <span class="s2">&quot;motion_hyperprior.entropy_bottleneck&quot;</span><span class="p">,</span>
-            <span class="p">[</span><span class="s2">&quot;_quantized_cdf&quot;</span><span class="p">,</span> <span class="s2">&quot;_offset&quot;</span><span class="p">,</span> <span class="s2">&quot;_cdf_length&quot;</span><span class="p">],</span>
-            <span class="n">state_dict</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span></div>
-
 <div class="viewcode-block" id="ScaleSpaceFlow.from_state_dict"><a class="viewcode-back" href="../../../../models.html#compressai.models.video.ScaleSpaceFlow.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
         <span class="n">net</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">net</span></div>
-
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_table</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">scale_table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">scale_table</span> <span class="o">=</span> <span class="n">get_scale_table</span><span class="p">()</span>
-
-        <span class="n">updated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_hyperprior</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">update_scale_table</span><span class="p">(</span>
-            <span class="n">scale_table</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span>
-        <span class="p">)</span>
-
-        <span class="n">updated</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_hyperprior</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
-
-        <span class="n">updated</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res_hyperprior</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">update_scale_table</span><span class="p">(</span>
-            <span class="n">scale_table</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span>
-        <span class="p">)</span>
-        <span class="n">updated</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res_hyperprior</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
-
-        <span class="n">updated</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">motion_hyperprior</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">update_scale_table</span><span class="p">(</span>
-            <span class="n">scale_table</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span>
-        <span class="p">)</span>
-        <span class="n">updated</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">motion_hyperprior</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">updated</span></div>
+        <span class="k">return</span> <span class="n">net</span></div></div>
 </pre></div>
         </article>
       </div>
@@ -752,9 +680,7 @@
             
           </div>
           <div class="right-details">
-            <div class="icons">
-              
-            </div>
+            
           </div>
         </div>
         
