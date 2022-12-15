@@ -69,11 +69,13 @@ IMG_EXTENSIONS = (
 )
 
 
-def collect_images(rootpath: str) -> List[str]:
+def collect_images(rootpath: str, recursive: bool = False) -> List[str]:
     image_files = []
+
     for ext in IMG_EXTENSIONS:
-        image_files.extend(Path(rootpath).glob(f"*{ext}"))
-    return image_files
+        pattern = f"**/*{ext}" if recursive else f"*{ext}"
+        image_files.extend(Path(rootpath).glob(pattern))
+    return sorted(image_files)
 
 
 def psnr(a: torch.Tensor, b: torch.Tensor, max_val: int = 255) -> float:
@@ -192,6 +194,7 @@ def load_checkpoint(arch: str, no_update: bool, checkpoint_path: str) -> nn.Modu
 def eval_model(
     model: nn.Module,
     outputdir: Path,
+    inputdir: Path,
     filepaths,
     entropy_estimation: bool = False,
     trained_net: str = "",
@@ -201,7 +204,6 @@ def eval_model(
     device = next(model.parameters()).device
     metrics = defaultdict(float)
     for filepath in filepaths:
-
         x = read_image(filepath).to(device)
         if not entropy_estimation:
             if args["half"]:
@@ -213,20 +215,22 @@ def eval_model(
         for k, v in rv.items():
             metrics[k] += v
         if args["per_image"]:
-            if Path(outputdir).is_dir():
-                image_metrics_path = (
-                    Path(outputdir) / f"{filepath.stem}-{trained_net}.json"
-                )
-                with image_metrics_path.open("wb") as f:
-                    output = {
-                        "source": filepath.stem,
-                        "name": args["architecture"],
-                        "description": f"Inference ({description})",
-                        "results": rv,
-                    }
-                    f.write(json.dumps(output, indent=2).encode())
-            else:
+            if not Path(outputdir).is_dir():
                 raise FileNotFoundError("Please specify output directory")
+
+            output_subdir = Path(outputdir) / Path(filepath).parent.relative_to(
+                inputdir
+            )
+            output_subdir.mkdir(parents=True, exist_ok=True)
+            image_metrics_path = output_subdir / f"{filepath.stem}-{trained_net}.json"
+            with image_metrics_path.open("wb") as f:
+                output = {
+                    "source": filepath.stem,
+                    "name": args["architecture"],
+                    "description": f"Inference ({description})",
+                    "results": rv,
+                }
+                f.write(json.dumps(output, indent=2).encode())
 
     for k, v in metrics.items():
         metrics[k] = v / len(filepaths)
@@ -300,6 +304,12 @@ def setup_args():
         action="store_true",
         help="store results for each image of the dataset, separately",
     )
+    parent_parser.add_argument(
+        "-R",
+        "--recursive",
+        action="store_true",
+        help="process input dataset directory recursively",
+    )
 
     parser = argparse.ArgumentParser(
         description="Evaluate a model on an image dataset.", add_help=True
@@ -321,7 +331,7 @@ def setup_args():
     checkpoint_parser.add_argument(
         "-p",
         "--path",
-        dest="paths",
+        dest="checkpoint_paths",
         type=str,
         nargs="*",
         required=True,
@@ -348,7 +358,7 @@ def main(argv):
         "entropy-estimation" if args.entropy_estimation else args.entropy_coder
     )
 
-    filepaths = collect_images(args.dataset)
+    filepaths = collect_images(args.dataset, args.recursive)
     if len(filepaths) == 0:
         print("Error: no images found in directory.", file=sys.stderr)
         raise SystemExit(1)
@@ -365,7 +375,7 @@ def main(argv):
         load_func = load_pretrained
         log_fmt = "\rEvaluating {0} | {run:d}"
     else:
-        runs = args.paths
+        runs = args.checkpoint_paths
         opts = (args.architecture, args.no_update)
         load_func = load_checkpoint
         log_fmt = "\rEvaluating {run:s}"
@@ -388,6 +398,7 @@ def main(argv):
         metrics = eval_model(
             model,
             args.output_directory,
+            args.dataset,
             filepaths,
             trained_net=trained_net,
             description=description,
