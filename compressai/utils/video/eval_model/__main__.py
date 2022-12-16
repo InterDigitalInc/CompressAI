@@ -489,9 +489,9 @@ def create_parser() -> argparse.ArgumentParser:
         "-q",
         "--quality",
         dest="qualities",
-        nargs="+",
-        type=int,
-        default=(1,),
+        type=str,
+        default="1",
+        help="Pretrained model qualities. (example: '1,2,3,4') (default: %(default)s)",
     )
     checkpoint_parser = subparsers.add_parser("checkpoint", parents=[parent_parser])
     checkpoint_parser.add_argument(
@@ -534,6 +534,7 @@ def main(args: Any = None) -> None:
     Path(outputdir).mkdir(parents=True, exist_ok=True)
 
     if args.source == "pretrained":
+        args.qualities = [int(q) for q in args.qualities.split(",") if q]
         runs = sorted(args.qualities)
         opts = (args.architecture, args.metric)
         load_func = load_pretrained
