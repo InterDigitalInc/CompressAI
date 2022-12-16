@@ -382,7 +382,7 @@ class ScaleSpaceFlow(CompressionModel):
 
         aux_loss_list = []
         for m in self.modules():
-            if isinstance(m, CompressionModel):
+            if isinstance(m, CompressionModel) and m is not self:
                 aux_loss_list.append(m.aux_loss())
 
         return aux_loss_list
