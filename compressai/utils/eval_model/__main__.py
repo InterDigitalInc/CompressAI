@@ -69,12 +69,11 @@ IMG_EXTENSIONS = (
 )
 
 
-def collect_images(rootpath: str, recursive: bool = False) -> List[str]:
+def collect_images(rootpath: str) -> List[str]:
     image_files = []
 
     for ext in IMG_EXTENSIONS:
-        pattern = f"**/*{ext}" if recursive else f"*{ext}"
-        image_files.extend(Path(rootpath).glob(pattern))
+        image_files.extend(Path(rootpath).rglob(f"*{ext}"))
     return sorted(image_files)
 
 
@@ -304,13 +303,6 @@ def setup_args():
         action="store_true",
         help="store results for each image of the dataset, separately",
     )
-    parent_parser.add_argument(
-        "-R",
-        "--recursive",
-        action="store_true",
-        help="process input dataset directory recursively",
-    )
-
     parser = argparse.ArgumentParser(
         description="Evaluate a model on an image dataset.", add_help=True
     )
@@ -358,7 +350,7 @@ def main(argv):
         "entropy-estimation" if args.entropy_estimation else args.entropy_coder
     )
 
-    filepaths = collect_images(args.dataset, args.recursive)
+    filepaths = collect_images(args.dataset)
     if len(filepaths) == 0:
         print("Error: no images found in directory.", file=sys.stderr)
         raise SystemExit(1)

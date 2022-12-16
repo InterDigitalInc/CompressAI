@@ -57,9 +57,9 @@ codec_classes = [x264, x265, VTM, HM]
 Frame = Union[Tuple[Tensor, Tensor, Tensor], Tuple[Tensor, ...]]
 
 
-def func(codec, i, filepath, qp, outputdir, cuda, force, dry_run):
-    encode_cmd = codec.get_encode_cmd(filepath, qp, outputdir)
-    binpath = codec.get_bin_path(filepath, qp, outputdir)
+def func(codec, i, filepath, qp, outputdir, inputdir, cuda, force, dry_run):
+    binpath = codec.get_bin_path(filepath, qp, outputdir, inputdir)
+    encode_cmd = codec.get_encode_cmd(filepath, qp, binpath)
 
     # encode sequence if not already encoded
     if force:
@@ -238,7 +238,7 @@ def collect(
 
     pool = mp.Pool(num_jobs) if num_jobs > 1 else None
 
-    filepaths = sorted(Path(dataset).glob("*.yuv"))
+    filepaths = sorted(Path(dataset).rglob("*.yuv"))
     args = [
         (
             codec_class,
@@ -246,6 +246,7 @@ def collect(
             f,
             q,
             outputdir,
+            dataset,
             args["cuda"],
             args["force"],
             args["dry_run"],
@@ -306,11 +307,9 @@ def create_parser() -> Tuple[
         "-q",
         "--qps",
         dest="qps",
-        metavar="Q",
-        default=[32],
-        nargs="+",
-        type=int,
-        help="list of quality/quantization parameter (default: %(default)s)",
+        type=str,
+        default="1",
+        help="list of quality/quantization parameter. (example: '22,27,32,37') (default: %(default)s)",
     )
     parent_parser.add_argument("--cuda", action="store_true", help="use cuda")
     subparsers = parser.add_subparsers(dest="codec", help="video codec")
@@ -341,12 +340,12 @@ def main(args: Any = None) -> None:
 
     args = vars(args)
     outputdir = args.pop("outputdir")
-
+    qps = [int(q) for q in args.pop("qps").split(",") if q]
     results = collect(
         args.pop("dataset"),
         codec_class,
         outputdir,
-        args.pop("qps"),
+        sorted(qps),
         **args,
     )
 

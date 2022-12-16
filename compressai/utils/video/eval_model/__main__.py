@@ -69,8 +69,8 @@ RAWVIDEO_EXTENSIONS = (".yuv",)  # read raw yuv videos for now
 def collect_videos(rootpath: str) -> List[str]:
     video_files = []
     for ext in RAWVIDEO_EXTENSIONS:
-        video_files.extend(Path(rootpath).glob(f"*{ext}"))
-    return video_files
+        video_files.extend(Path(rootpath).rglob(f"*{ext}"))
+    return sorted(video_files)
 
 
 # TODO (racapef) duplicate from bench
@@ -358,6 +358,7 @@ def eval_model_entropy_estimation(net: nn.Module, sequence: Path) -> Dict[str, A
 
 def run_inference(
     filepaths,
+    inputdir: Path,
     net: nn.Module,
     outputdir: Path,
     force: bool = False,
@@ -369,7 +370,9 @@ def run_inference(
     results_paths = []
 
     for filepath in filepaths:
-        sequence_metrics_path = Path(outputdir) / f"{filepath.stem}-{trained_net}.json"
+        output_subdir = Path(outputdir) / Path(filepath).parent.relative_to(inputdir)
+        output_subdir.mkdir(parents=True, exist_ok=True)
+        sequence_metrics_path = output_subdir / f"{filepath.stem}-{trained_net}.json"
         results_paths.append(sequence_metrics_path)
 
         if force:
@@ -564,6 +567,7 @@ def main(args: Any = None) -> None:
         args_dict = vars(args)
         metrics = run_inference(
             filepaths,
+            args.dataset,
             model,
             outputdir,
             trained_net=trained_net,

@@ -73,11 +73,13 @@ class Codec(abc.ABC):
         return args
 
     @abc.abstractmethod
-    def get_bin_path(self, filepath: Path, **args: Any) -> Path:
+    def get_bin_path(self, filepath: Path, inputdir: Path, **args: Any) -> Path:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_encode_cmd(self, filepath: Path, **args: Any) -> List[Any]:
+    def get_encode_cmd(
+        self, filepath: Path, qp: int, binpath: Path, **args: Any
+    ) -> List[Any]:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -118,14 +120,15 @@ class x264(Codec):
         self.tune = args.tune
         return args
 
-    def get_bin_path(self, filepath: Path, qp, binpath: str) -> Path:
-        return Path(binpath) / (
+    def get_bin_path(self, filepath: Path, qp, binpath: str, inputdir: Path) -> Path:
+        bin_subdir = Path(binpath) / Path(filepath).parent.relative_to(inputdir)
+        bin_subdir.mkdir(parents=True, exist_ok=True)
+        return bin_subdir / (
             f"{filepath.stem}_{self.name}_{self.preset}_tune-{self.tune}_qp{qp}.mp4"
         )
 
-    def get_encode_cmd(self, filepath: Path, qp, bindir) -> List[Any]:
+    def get_encode_cmd(self, filepath: Path, qp: int, binpath: Path) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
-        binpath = self.get_bin_path(filepath, qp, bindir)
         cmd = [
             "ffmpeg",
             "-y",
@@ -172,9 +175,8 @@ class x265(x264):
     def name(self):
         return "x265"
 
-    def get_encode_cmd(self, filepath: Path, qp, bindir) -> List[Any]:
+    def get_encode_cmd(self, filepath: Path, qp: int, binpath: Path) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
-        binpath = self.get_bin_path(filepath, qp, bindir)
         cmd = [
             "ffmpeg",
             "-s:v",
@@ -267,10 +269,9 @@ class VTM(Codec):
         self.rgb = args.rgb
         return args
 
-    def get_encode_cmd(self, filepath: Path, qp, bindir) -> List[Any]:
+    def get_encode_cmd(self, filepath: Path, qp, binpath) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
         num_frames = len(RawVideoSequence.from_file(str(filepath)))
-        binpath = self.get_bin_path(filepath, qp, bindir)
         cmd = [
             self.encoder_path,
             "-i",
@@ -304,8 +305,10 @@ class VTM(Codec):
             ]
         return cmd
 
-    def get_bin_path(self, filepath: Path, qp, binpath: str) -> Path:
-        return Path(binpath) / (
+    def get_bin_path(self, filepath: Path, qp, binpath: str, inputdir: Path) -> Path:
+        bin_subdir = Path(binpath) / Path(filepath).parent.relative_to(inputdir)
+        bin_subdir.mkdir(parents=True, exist_ok=True)
+        return bin_subdir / (
             f"{filepath.stem}_{self.name}_{self.config}_qp{qp}.{self.binext}"
         )
 
@@ -359,10 +362,9 @@ class HM(VTM):
         self.rgb = args.rgb
         return args
 
-    def get_encode_cmd(self, filepath: Path, qp, bindir) -> List[Any]:
+    def get_encode_cmd(self, filepath: Path, qp, binpath) -> List[Any]:
         info = get_raw_video_file_info(filepath.stem)
         num_frames = len(RawVideoSequence.from_file(str(filepath)))
-        binpath = self.get_bin_path(filepath, qp, bindir)
         cmd = [
             self.encoder_path,
             "-i",

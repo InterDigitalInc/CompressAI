@@ -84,7 +84,9 @@ def collect(
         print("No images found in the dataset directory")
         sys.exit(1)
 
-    args = [(codec, i, f, q, metrics) for i, q in enumerate(qps) for f in filepaths]
+    args = [
+        (codec, i, f, q, metrics) for i, q in enumerate(qps) for f in sorted(filepaths)
+    ]
 
     if pool:
         rv = pool.starmap(func, args)
@@ -132,10 +134,8 @@ def setup_common_args(parser):
         "-q",
         "--qps",
         dest="qps",
-        metavar="Q",
-        default=[75],
-        nargs="+",
-        type=int,
+        type=str,
+        default="75",
         help="list of quality/quantization parameter (default: %(default)s)",
     )
     parser.add_argument(
@@ -157,10 +157,11 @@ def main(argv):
 
     codec_cls = next(c for c in codecs if c.__name__.lower() == args.codec)
     codec = codec_cls(args)
+    qps = [int(q) for q in args.qps.split(",") if q]
     results = collect(
         codec,
         args.dataset,
-        args.qps,
+        sorted(qps),
         args.metrics,
         args.num_jobs,
     )
