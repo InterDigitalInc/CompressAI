@@ -68,6 +68,30 @@ class FactorizedPrior(CompressionModel):
     <https://arxiv.org/abs/1802.01436>`_, Int Conf. on Learning Representations
     (ICLR), 2018.
 
+    .. code-block:: none
+
+                  ┌───┐    y
+            x ──►─┤g_a├──►─┐
+                  └───┘    │
+                           ▼
+                         ┌─┴─┐
+                         │ Q │
+                         └─┬─┘
+                           │
+                     y_hat ▼
+                           │
+                           ·
+                        EB :
+                           ·
+                           │
+                     y_hat ▼
+                           │
+                  ┌───┐    │
+        x_hat ──◄─┤g_s├────┘
+                  └───┘
+
+        EB = Entropy bottleneck
+
     Args:
         N (int): Number of channels
         M (int): Number of channels in the expansion layers (last layer of the
@@ -145,7 +169,7 @@ class FactorizedPriorReLU(FactorizedPrior):
     N. Johnston: `"Variational Image Compression with a Scale Hyperprior"
     <https://arxiv.org/abs/1802.01436>`_, Int Conf. on Learning Representations
     (ICLR), 2018.
-    GDN activations are replaced by ReLU
+    GDN activations are replaced by ReLU.
 
     Args:
         N (int): Number of channels
@@ -183,6 +207,31 @@ class ScaleHyperprior(CompressionModel):
     N. Johnston: `"Variational Image Compression with a Scale Hyperprior"
     <https://arxiv.org/abs/1802.01436>`_ Int. Conf. on Learning Representations
     (ICLR), 2018.
+
+    .. code-block:: none
+
+                  ┌───┐    y     ┌───┐  z  ┌───┐ z_hat      z_hat ┌───┐
+            x ──►─┤g_a├──►─┬──►──┤h_a├──►──┤ Q ├───►───·⋯⋯·───►───┤h_s├─┐
+                  └───┘    │     └───┘     └───┘        EB        └───┘ │
+                           ▼                                            │
+                         ┌─┴─┐                                          │
+                         │ Q │                                          ▼
+                         └─┬─┘                                          │
+                           │                                            │
+                     y_hat ▼                                            │
+                           │                                            │
+                           ·                                            │
+                        GC : ◄─────────────────────◄────────────────────┘
+                           ·                 scales_hat
+                           │
+                     y_hat ▼
+                           │
+                  ┌───┐    │
+        x_hat ──◄─┤g_s├────┘
+                  └───┘
+
+        EB = Entropy bottleneck
+        GC = Gaussian conditional
 
     Args:
         N (int): Number of channels
@@ -291,6 +340,31 @@ class MeanScaleHyperprior(ScaleHyperprior):
     Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_,
     Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).
 
+    .. code-block:: none
+
+                  ┌───┐    y     ┌───┐  z  ┌───┐ z_hat      z_hat ┌───┐
+            x ──►─┤g_a├──►─┬──►──┤h_a├──►──┤ Q ├───►───·⋯⋯·───►───┤h_s├─┐
+                  └───┘    │     └───┘     └───┘        EB        └───┘ │
+                           ▼                                            │
+                         ┌─┴─┐                                          │
+                         │ Q │                                          ▼
+                         └─┬─┘                                          │
+                           │                                            │
+                     y_hat ▼                                            │
+                           │                                            │
+                           ·                                            │
+                        GC : ◄─────────────────────◄────────────────────┘
+                           ·                 scales_hat
+                           │                 means_hat
+                     y_hat ▼
+                           │
+                  ┌───┐    │
+        x_hat ──◄─┤g_s├────┘
+                  └───┘
+
+        EB = Entropy bottleneck
+        GC = Gaussian conditional
+
     Args:
         N (int): Number of channels
         M (int): Number of channels in the expansion layers (last layer of the
@@ -362,6 +436,35 @@ class JointAutoregressiveHierarchicalPriors(MeanScaleHyperprior):
     Minnen, J. Balle, G.D. Toderici: `"Joint Autoregressive and Hierarchical
     Priors for Learned Image Compression" <https://arxiv.org/abs/1809.02736>`_,
     Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).
+
+    .. code-block:: none
+
+                  ┌───┐    y     ┌───┐  z  ┌───┐ z_hat      z_hat ┌───┐
+            x ──►─┤g_a├──►─┬──►──┤h_a├──►──┤ Q ├───►───·⋯⋯·───►───┤h_s├─┐
+                  └───┘    │     └───┘     └───┘        EB        └───┘ │
+                           ▼                                            │
+                         ┌─┴─┐                                          │
+                         │ Q │                                   params ▼
+                         └─┬─┘                                          │
+                     y_hat ▼                  ┌─────┐                   │
+                           ├──────────►───────┤  CP ├────────►──────────┤
+                           │                  └─────┘                   │
+                           ▼                                            ▼
+                           │                                            │
+                           ·                  ┌─────┐                   │
+                        GC : ◄────────◄───────┤  EP ├────────◄──────────┘
+                           ·     scales_hat   └─────┘
+                           │      means_hat
+                     y_hat ▼
+                           │
+                  ┌───┐    │
+        x_hat ──◄─┤g_s├────┘
+                  └───┘
+
+        EB = Entropy bottleneck
+        GC = Gaussian conditional
+        EP = Entropy parameters network
+        CP = Context prediction (masked convolution)
 
     Args:
         N (int): Number of channels
