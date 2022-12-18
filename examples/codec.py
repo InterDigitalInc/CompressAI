@@ -234,11 +234,7 @@ def pad(x, p=2**6):
 def crop(x, size):
     H, W = x.size(2), x.size(3)
     h, w = size
-    padding_left = (W - w) // 2
-    padding_right = W - w - padding_left
-    padding_top = (H - h) // 2
-    padding_bottom = H - h - padding_top
-    unpad = (-padding_left, -padding_right, -padding_top, -padding_bottom)
+    _, unpad = compute_padding(h, w, out_h=H, out_w=W)
     return F.pad(x, unpad, mode="constant", value=0)
 
 
