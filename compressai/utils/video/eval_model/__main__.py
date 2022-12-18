@@ -51,6 +51,7 @@ import compressai
 
 from compressai.datasets import RawVideoSequence, VideoFormat
 from compressai.models.video.google import ScaleSpaceFlow
+from compressai.ops import compute_padding
 from compressai.transforms.functional import (
     rgb2ycbcr,
     ycbcr2rgb,
@@ -118,19 +119,8 @@ def convert_rgb_to_yuv420(frame: Tensor) -> Tuple[np.ndarray, np.ndarray, np.nda
 
 def pad(x: Tensor, p: int = 2 ** (4 + 3)) -> Tuple[Tensor, Tuple[int, ...]]:
     h, w = x.size(2), x.size(3)
-    new_h = (h + p - 1) // p * p
-    new_w = (w + p - 1) // p * p
-    padding_left = (new_w - w) // 2
-    padding_right = new_w - w - padding_left
-    padding_top = (new_h - h) // 2
-    padding_bottom = new_h - h - padding_top
-    padding = (padding_left, padding_right, padding_top, padding_bottom)
-    x = F.pad(
-        x,
-        padding,
-        mode="constant",
-        value=0,
-    )
+    padding, _ = compute_padding(h, w, min_div=p)
+    x = F.pad(x, padding, mode="constant", value=0)
     return x, padding
 
 

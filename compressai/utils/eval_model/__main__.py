@@ -49,6 +49,7 @@ from torchvision import transforms
 
 import compressai
 
+from compressai.ops import compute_padding
 from compressai.zoo import image_models as pretrained_models
 from compressai.zoo.image import model_architectures as architectures
 
@@ -103,19 +104,9 @@ def inference(model, x):
     x = x.unsqueeze(0)
 
     h, w = x.size(2), x.size(3)
-    p = 64  # maximum 6 strides of 2
-    new_h = (h + p - 1) // p * p
-    new_w = (w + p - 1) // p * p
-    padding_left = (new_w - w) // 2
-    padding_right = new_w - w - padding_left
-    padding_top = (new_h - h) // 2
-    padding_bottom = new_h - h - padding_top
-    x_padded = F.pad(
-        x,
-        (padding_left, padding_right, padding_top, padding_bottom),
-        mode="constant",
-        value=0,
-    )
+    pad, unpad = compute_padding(h, w, min_div=2**6)  # pad to allow 6 strides of 2
+
+    x_padded = F.pad(x, pad, mode="constant", value=0)
 
     start = time.time()
     out_enc = model.compress(x_padded)
@@ -125,9 +116,7 @@ def inference(model, x):
     out_dec = model.decompress(out_enc["strings"], out_enc["shape"])
     dec_time = time.time() - start
 
-    out_dec["x_hat"] = F.pad(
-        out_dec["x_hat"], (-padding_left, -padding_right, -padding_top, -padding_bottom)
-    )
+    out_dec["x_hat"] = F.pad(out_dec["x_hat"], unpad)
 
     # input images are 8bit RGB for now
     metrics = compute_metrics(x, out_dec["x_hat"], 255)

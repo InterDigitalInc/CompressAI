@@ -48,6 +48,7 @@ from torchvision.transforms import ToPILImage, ToTensor
 import compressai
 
 from compressai.datasets import RawVideoSequence, VideoFormat
+from compressai.ops import compute_padding
 from compressai.transforms.functional import (
     rgb2ycbcr,
     ycbcr2rgb,
@@ -226,18 +227,8 @@ def convert_rgb_yuv420(frame: Tensor) -> Tuple[np.ndarray, np.ndarray, np.ndarra
 
 def pad(x, p=2**6):
     h, w = x.size(2), x.size(3)
-    H = (h + p - 1) // p * p
-    W = (w + p - 1) // p * p
-    padding_left = (W - w) // 2
-    padding_right = W - w - padding_left
-    padding_top = (H - h) // 2
-    padding_bottom = H - h - padding_top
-    return F.pad(
-        x,
-        (padding_left, padding_right, padding_top, padding_bottom),
-        mode="constant",
-        value=0,
-    )
+    pad, _ = compute_padding(h, w, min_div=p)
+    return F.pad(x, pad, mode="constant", value=0)
 
 
 def crop(x, size):
@@ -247,12 +238,8 @@ def crop(x, size):
     padding_right = W - w - padding_left
     padding_top = (H - h) // 2
     padding_bottom = H - h - padding_top
-    return F.pad(
-        x,
-        (-padding_left, -padding_right, -padding_top, -padding_bottom),
-        mode="constant",
-        value=0,
-    )
+    unpad = (-padding_left, -padding_right, -padding_top, -padding_bottom)
+    return F.pad(x, unpad, mode="constant", value=0)
 
 
 def convert_output(t: Tensor, bitdepth: int = 8) -> np.array:
