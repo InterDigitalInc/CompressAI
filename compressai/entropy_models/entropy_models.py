@@ -333,7 +333,7 @@ class EntropyBottleneck(EntropyModel):
     This is a re-implementation of the entropy bottleneck layer in
     *tensorflow/compression*. See the original paper and the `tensorflow
     documentation
-    <https://tensorflow.github.io/compression/docs/entropy_bottleneck.html>`__
+    <https://github.com/tensorflow/compression/blob/v1.3/docs/entropy_bottleneck.md>`__
     for an introduction.
     """
 
@@ -555,7 +555,7 @@ class GaussianConditional(EntropyModel):
 
     This is a re-implementation of the Gaussian conditional layer in
     *tensorflow/compression*. See the `tensorflow documentation
-    <https://tensorflow.github.io/compression/docs/api_docs/python/tfc/GaussianConditional.html>`__
+    <https://github.com/tensorflow/compression/blob/v1.3/docs/api_docs/python/tfc/GaussianConditional.md>`__
     for more information.
     """
 
