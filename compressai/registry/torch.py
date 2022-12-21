@@ -31,11 +31,19 @@ from typing import Callable, Dict, Type, TypeVar
 
 from torch.optim import lr_scheduler
 
-from compressai.typing import TCriterion, TDataset, TModel, TOptimizer, TScheduler
+from compressai.typing import (
+    TCriterion,
+    TDataset,
+    TModel,
+    TModule,
+    TOptimizer,
+    TScheduler,
+)
 
 CRITERIONS: Dict[str, Callable[..., TCriterion]] = {}
 DATASETS: Dict[str, Callable[..., TDataset]] = {}
 MODELS: Dict[str, Callable[..., TModel]] = {}
+MODULES: Dict[str, Callable[..., TModule]] = {}
 OPTIMIZERS: Dict[str, Callable[..., TOptimizer]] = {}
 SCHEDULERS: Dict[str, Callable[..., TScheduler]] = {
     k: v for k, v in lr_scheduler.__dict__.items() if k[0].isupper()
@@ -44,6 +52,7 @@ SCHEDULERS: Dict[str, Callable[..., TScheduler]] = {
 TCriterion_b = TypeVar("TCriterion_b", bound=TCriterion)
 TDataset_b = TypeVar("TDataset_b", bound=TDataset)
 TModel_b = TypeVar("TModel_b", bound=TModel)
+TModule_b = TypeVar("TModule_b", bound=TModule)
 TOptimizer_b = TypeVar("TOptimizer_b", bound=TOptimizer)
 TScheduler_b = TypeVar("TScheduler_b", bound=TScheduler)
 
@@ -73,6 +82,16 @@ def register_model(name: str):
 
     def decorator(cls: Type[TModel_b]) -> Type[TModel_b]:
         MODELS[name] = cls
+        return cls
+
+    return decorator
+
+
+def register_module(name: str):
+    """Decorator for registering a module."""
+
+    def decorator(cls: Type[TModule_b]) -> Type[TModule_b]:
+        MODULES[name] = cls
         return cls
 
     return decorator

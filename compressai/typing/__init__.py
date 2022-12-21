@@ -27,13 +27,22 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .torch import TCriterion, TDataLoader, TDataset, TModel, TOptimizer, TScheduler
+from .torch import (
+    TCriterion,
+    TDataLoader,
+    TDataset,
+    TModel,
+    TModule,
+    TOptimizer,
+    TScheduler,
+)
 
 __all__ = [
     "TCriterion",
     "TDataLoader",
     "TDataset",
     "TModel",
+    "TModule",
     "TOptimizer",
     "TScheduler",
 ]
