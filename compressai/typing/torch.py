@@ -40,5 +40,5 @@ TDataLoader = DataLoader
 TDataset = Dataset
 TModel = nn.Module
 TModule = nn.Module
-TOptimizer = Dict[str, Optimizer]
+TOptimizer = Union[Optimizer, Dict[str, Optimizer]]
 TScheduler = Union[ReduceLROnPlateau, _LRScheduler]

@@ -32,7 +32,7 @@ from typing import Any, Dict, Mapping, cast
 import torch.nn as nn
 import torch.optim as optim
 
-from compressai.registry import register_optimizer
+from compressai.registry import OPTIMIZERS, register_optimizer
 
 
 @register_optimizer("net_aux")
@@ -63,15 +63,12 @@ def net_aux_optimizer(
     assert len(inter_params) == 0
     assert len(union_params) - len(params_dict.keys()) == 0
 
-    optimizer = {
-        "net": optim.Adam(
-            (params_dict[name] for name in sorted(parameters["net"])),
-            lr=conf["net"]["lr"],
-        ),
-        "aux": optim.Adam(
-            (params_dict[name] for name in sorted(parameters["aux"])),
-            lr=conf["aux"]["lr"],
-        ),
-    }
+    def make_optimizer(key):
+        kwargs = dict(conf[key])
+        del kwargs["type"]
+        params = (params_dict[name] for name in sorted(parameters[key]))
+        return OPTIMIZERS[conf[key]["type"]](params, **kwargs)
+
+    optimizer = {key: make_optimizer(key) for key in ["net", "aux"]}
 
     return cast(Dict[str, optim.Optimizer], optimizer)

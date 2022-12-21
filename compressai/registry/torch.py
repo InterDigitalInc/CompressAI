@@ -29,6 +29,7 @@
 
 from typing import Callable, Dict, Type, TypeVar
 
+from torch import optim
 from torch.optim import lr_scheduler
 
 from compressai.typing import (
@@ -44,7 +45,9 @@ CRITERIONS: Dict[str, Callable[..., TCriterion]] = {}
 DATASETS: Dict[str, Callable[..., TDataset]] = {}
 MODELS: Dict[str, Callable[..., TModel]] = {}
 MODULES: Dict[str, Callable[..., TModule]] = {}
-OPTIMIZERS: Dict[str, Callable[..., TOptimizer]] = {}
+OPTIMIZERS: Dict[str, Callable[..., TOptimizer]] = {
+    k: v for k, v in optim.__dict__.items() if k[0].isupper()
+}
 SCHEDULERS: Dict[str, Callable[..., TScheduler]] = {
     k: v for k, v in lr_scheduler.__dict__.items() if k[0].isupper()
 }
