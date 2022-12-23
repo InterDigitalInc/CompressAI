@@ -226,6 +226,26 @@
         <article role="main">
           <section id="compressai-ops">
 <h1>compressai.ops<a class="headerlink" href="#compressai-ops" title="Permalink to this heading">#</a></h1>
+<section id="compute-padding">
+<h2>compute_padding<a class="headerlink" href="#compute-padding" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai.ops.compute_padding">
+<span class="sig-prename descclassname"><span class="pre">compressai.ops.</span></span><span class="sig-name descname"><span class="pre">compute_padding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_h</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_w</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_div</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/ops/ops.html#compute_padding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.ops.compute_padding" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns tuples for padding and unpadding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_h</strong> – Input height.</p></li>
+<li><p><strong>in_w</strong> – Input width.</p></li>
+<li><p><strong>out_h</strong> – Output height.</p></li>
+<li><p><strong>out_w</strong> – Output width.</p></li>
+<li><p><strong>min_div</strong> – Length that output dimensions should be divisible by.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="quantize-ste">
 <h2>quantize_ste<a class="headerlink" href="#quantize-ste" title="Permalink to this heading">#</a></h2>
 <dl class="py function">
@@ -321,6 +341,10 @@ towards the <cite>bound</cite>, otherwise the gradient is kept to zero.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">compressai.ops</a><ul>
+<li><a class="reference internal" href="#compute-padding">compute_padding</a><ul>
+<li><a class="reference internal" href="#compressai.ops.compute_padding"><code class="docutils literal notranslate"><span class="pre">compute_padding()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#quantize-ste">quantize_ste</a><ul>
 <li><a class="reference internal" href="#compressai.ops.quantize_ste"><code class="docutils literal notranslate"><span class="pre">quantize_ste()</span></code></a></li>
 </ul>

@@ -293,6 +293,30 @@
 <span class="sd">    &lt;https://arxiv.org/abs/1802.01436&gt;`_, Int Conf. on Learning Representations</span>
 <span class="sd">    (ICLR), 2018.</span>
 
+<span class="sd">    .. code-block:: none</span>
+
+<span class="sd">                  ┌───┐    y</span>
+<span class="sd">            x ──►─┤g_a├──►─┐</span>
+<span class="sd">                  └───┘    │</span>
+<span class="sd">                           ▼</span>
+<span class="sd">                         ┌─┴─┐</span>
+<span class="sd">                         │ Q │</span>
+<span class="sd">                         └─┬─┘</span>
+<span class="sd">                           │</span>
+<span class="sd">                     y_hat ▼</span>
+<span class="sd">                           │</span>
+<span class="sd">                           ·</span>
+<span class="sd">                        EB :</span>
+<span class="sd">                           ·</span>
+<span class="sd">                           │</span>
+<span class="sd">                     y_hat ▼</span>
+<span class="sd">                           │</span>
+<span class="sd">                  ┌───┐    │</span>
+<span class="sd">        x_hat ──◄─┤g_s├────┘</span>
+<span class="sd">                  └───┘</span>
+
+<span class="sd">        EB = Entropy bottleneck</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        N (int): Number of channels</span>
 <span class="sd">        M (int): Number of channels in the expansion layers (last layer of the</span>
@@ -370,7 +394,7 @@
 <span class="sd">    N. Johnston: `&quot;Variational Image Compression with a Scale Hyperprior&quot;</span>
 <span class="sd">    &lt;https://arxiv.org/abs/1802.01436&gt;`_, Int Conf. on Learning Representations</span>
 <span class="sd">    (ICLR), 2018.</span>
-<span class="sd">    GDN activations are replaced by ReLU</span>
+<span class="sd">    GDN activations are replaced by ReLU.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        N (int): Number of channels</span>
@@ -408,6 +432,31 @@
 <span class="sd">    N. Johnston: `&quot;Variational Image Compression with a Scale Hyperprior&quot;</span>
 <span class="sd">    &lt;https://arxiv.org/abs/1802.01436&gt;`_ Int. Conf. on Learning Representations</span>
 <span class="sd">    (ICLR), 2018.</span>
+
+<span class="sd">    .. code-block:: none</span>
+
+<span class="sd">                  ┌───┐    y     ┌───┐  z  ┌───┐ z_hat      z_hat ┌───┐</span>
+<span class="sd">            x ──►─┤g_a├──►─┬──►──┤h_a├──►──┤ Q ├───►───·⋯⋯·───►───┤h_s├─┐</span>
+<span class="sd">                  └───┘    │     └───┘     └───┘        EB        └───┘ │</span>
+<span class="sd">                           ▼                                            │</span>
+<span class="sd">                         ┌─┴─┐                                          │</span>
+<span class="sd">                         │ Q │                                          ▼</span>
+<span class="sd">                         └─┬─┘                                          │</span>
+<span class="sd">                           │                                            │</span>
+<span class="sd">                     y_hat ▼                                            │</span>
+<span class="sd">                           │                                            │</span>
+<span class="sd">                           ·                                            │</span>
+<span class="sd">                        GC : ◄─────────────────────◄────────────────────┘</span>
+<span class="sd">                           ·                 scales_hat</span>
+<span class="sd">                           │</span>
+<span class="sd">                     y_hat ▼</span>
+<span class="sd">                           │</span>
+<span class="sd">                  ┌───┐    │</span>
+<span class="sd">        x_hat ──◄─┤g_s├────┘</span>
+<span class="sd">                  └───┘</span>
+
+<span class="sd">        EB = Entropy bottleneck</span>
+<span class="sd">        GC = Gaussian conditional</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        N (int): Number of channels</span>
@@ -516,6 +565,31 @@
 <span class="sd">    Priors for Learned Image Compression&quot; &lt;https://arxiv.org/abs/1809.02736&gt;`_,</span>
 <span class="sd">    Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</span>
 
+<span class="sd">    .. code-block:: none</span>
+
+<span class="sd">                  ┌───┐    y     ┌───┐  z  ┌───┐ z_hat      z_hat ┌───┐</span>
+<span class="sd">            x ──►─┤g_a├──►─┬──►──┤h_a├──►──┤ Q ├───►───·⋯⋯·───►───┤h_s├─┐</span>
+<span class="sd">                  └───┘    │     └───┘     └───┘        EB        └───┘ │</span>
+<span class="sd">                           ▼                                            │</span>
+<span class="sd">                         ┌─┴─┐                                          │</span>
+<span class="sd">                         │ Q │                                          ▼</span>
+<span class="sd">                         └─┬─┘                                          │</span>
+<span class="sd">                           │                                            │</span>
+<span class="sd">                     y_hat ▼                                            │</span>
+<span class="sd">                           │                                            │</span>
+<span class="sd">                           ·                                            │</span>
+<span class="sd">                        GC : ◄─────────────────────◄────────────────────┘</span>
+<span class="sd">                           ·                 scales_hat</span>
+<span class="sd">                           │                 means_hat</span>
+<span class="sd">                     y_hat ▼</span>
+<span class="sd">                           │</span>
+<span class="sd">                  ┌───┐    │</span>
+<span class="sd">        x_hat ──◄─┤g_s├────┘</span>
+<span class="sd">                  └───┘</span>
+
+<span class="sd">        EB = Entropy bottleneck</span>
+<span class="sd">        GC = Gaussian conditional</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        N (int): Number of channels</span>
 <span class="sd">        M (int): Number of channels in the expansion layers (last layer of the</span>
@@ -587,6 +661,35 @@
 <span class="sd">    Minnen, J. Balle, G.D. Toderici: `&quot;Joint Autoregressive and Hierarchical</span>
 <span class="sd">    Priors for Learned Image Compression&quot; &lt;https://arxiv.org/abs/1809.02736&gt;`_,</span>
 <span class="sd">    Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</span>
+
+<span class="sd">    .. code-block:: none</span>
+
+<span class="sd">                  ┌───┐    y     ┌───┐  z  ┌───┐ z_hat      z_hat ┌───┐</span>
+<span class="sd">            x ──►─┤g_a├──►─┬──►──┤h_a├──►──┤ Q ├───►───·⋯⋯·───►───┤h_s├─┐</span>
+<span class="sd">                  └───┘    │     └───┘     └───┘        EB        └───┘ │</span>
+<span class="sd">                           ▼                                            │</span>
+<span class="sd">                         ┌─┴─┐                                          │</span>
+<span class="sd">                         │ Q │                                   params ▼</span>
+<span class="sd">                         └─┬─┘                                          │</span>
+<span class="sd">                     y_hat ▼                  ┌─────┐                   │</span>
+<span class="sd">                           ├──────────►───────┤  CP ├────────►──────────┤</span>
+<span class="sd">                           │                  └─────┘                   │</span>
+<span class="sd">                           ▼                                            ▼</span>
+<span class="sd">                           │                                            │</span>
+<span class="sd">                           ·                  ┌─────┐                   │</span>
+<span class="sd">                        GC : ◄────────◄───────┤  EP ├────────◄──────────┘</span>
+<span class="sd">                           ·     scales_hat   └─────┘</span>
+<span class="sd">                           │      means_hat</span>
+<span class="sd">                     y_hat ▼</span>
+<span class="sd">                           │</span>
+<span class="sd">                  ┌───┐    │</span>
+<span class="sd">        x_hat ──◄─┤g_s├────┘</span>
+<span class="sd">                  └───┘</span>
+
+<span class="sd">        EB = Entropy bottleneck</span>
+<span class="sd">        GC = Gaussian conditional</span>
+<span class="sd">        EP = Entropy parameters network</span>
+<span class="sd">        CP = Context prediction (masked convolution)</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        N (int): Number of channels</span>

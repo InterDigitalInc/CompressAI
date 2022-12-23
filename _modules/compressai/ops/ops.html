@@ -257,6 +257,37 @@
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
 
+<div class="viewcode-block" id="compute_padding"><a class="viewcode-back" href="../../../ops.html#compressai.ops.compute_padding">[docs]</a><span class="k">def</span> <span class="nf">compute_padding</span><span class="p">(</span><span class="n">in_h</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">in_w</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">out_h</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out_w</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_div</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns tuples for padding and unpadding.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        in_h: Input height.</span>
+<span class="sd">        in_w: Input width.</span>
+<span class="sd">        out_h: Output height.</span>
+<span class="sd">        out_w: Output width.</span>
+<span class="sd">        min_div: Length that output dimensions should be divisible by.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">out_h</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">in_h</span> <span class="o">+</span> <span class="n">min_div</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">min_div</span> <span class="o">*</span> <span class="n">min_div</span>
+    <span class="k">if</span> <span class="n">out_w</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out_w</span> <span class="o">=</span> <span class="p">(</span><span class="n">in_w</span> <span class="o">+</span> <span class="n">min_div</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">min_div</span> <span class="o">*</span> <span class="n">min_div</span>
+
+    <span class="k">if</span> <span class="n">out_h</span> <span class="o">%</span> <span class="n">min_div</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">out_w</span> <span class="o">%</span> <span class="n">min_div</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Padded output height and width are not divisible by min_div=</span><span class="si">{</span><span class="n">min_div</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">left</span> <span class="o">=</span> <span class="p">(</span><span class="n">out_w</span> <span class="o">-</span> <span class="n">in_w</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="n">out_w</span> <span class="o">-</span> <span class="n">in_w</span> <span class="o">-</span> <span class="n">left</span>
+    <span class="n">top</span> <span class="o">=</span> <span class="p">(</span><span class="n">out_h</span> <span class="o">-</span> <span class="n">in_h</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">bottom</span> <span class="o">=</span> <span class="n">out_h</span> <span class="o">-</span> <span class="n">in_h</span> <span class="o">-</span> <span class="n">top</span>
+
+    <span class="n">pad</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+    <span class="n">unpad</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">left</span><span class="p">,</span> <span class="o">-</span><span class="n">right</span><span class="p">,</span> <span class="o">-</span><span class="n">top</span><span class="p">,</span> <span class="o">-</span><span class="n">bottom</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pad</span><span class="p">,</span> <span class="n">unpad</span></div>
+
+
 <div class="viewcode-block" id="quantize_ste"><a class="viewcode-back" href="../../../ops.html#compressai.ops.quantize_ste">[docs]</a><span class="k">def</span> <span class="nf">quantize_ste</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Rounding with non-zero gradients. Gradients are approximated by replacing</span>

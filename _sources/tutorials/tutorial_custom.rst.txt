@@ -59,7 +59,7 @@ entropy estimation of the latent tensors while training.
 
    See the original paper: `"Variational image compression with a scale
    hyperprior" <https://arxiv.org/abs/1802.01436>`_, and the **tensorflow/compression**
-   `documentation <https://tensorflow.github.io/compression/docs/entropy_bottleneck.html>`_
+   `documentation <https://github.com/tensorflow/compression/blob/v1.3/docs/entropy_bottleneck.md>`_
    for a detailed explanation of the EntropyBottleneck module.
 
 

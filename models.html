@@ -236,28 +236,30 @@ EntropyBottleneck or GaussianConditional modules.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="compressai.models.CompressionModel.aux_loss">
 <span class="sig-name descname"><span class="pre">aux_loss</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/compressai/models/base.html#CompressionModel.aux_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.CompressionModel.aux_loss" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns the total auxiliary loss over all <a href="#id1"><span class="problematic" id="id2">`</span></a>EntropyBottleneck`s.</p>
+<dd><p>Returns the total auxiliary loss over all <code class="docutils literal notranslate"><span class="pre">EntropyBottleneck</span></code>s.</p>
 <p>In contrast to the primary “net” loss used by the “net”
 optimizer, the “aux” loss is only used by the “aux” optimizer to
-update <em>only</em> the <cite>EntropyBottleneck.quantiles</cite> parameters. In
+update <em>only</em> the <code class="docutils literal notranslate"><span class="pre">EntropyBottleneck.quantiles</span></code> parameters. In
 fact, the “aux” loss does not depend on image data at all.</p>
 <p>The purpose of the “aux” loss is to determine the range within
 which most of the mass of a given distribution is contained, as
 well as its median (i.e. 50% probability). That is, for a given
 distribution, the “aux” loss converges towards satisfying the
-following conditions for some chosen <cite>tail_mass</cite> probability:
-- <cite>cdf(quantiles[0]) = tail_mass / 2</cite>,
-- <cite>cdf(quantiles[1]) = 0.5</cite>, and
-- <cite>cdf(quantiles[2]) = 1 - tail_mass / 2</cite>.
-This ensures that the concrete <cite>_quantized_cdf`s operate
+following conditions for some chosen <code class="docutils literal notranslate"><span class="pre">tail_mass</span></code> probability:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cdf(quantiles[0])</span> <span class="pre">=</span> <span class="pre">tail_mass</span> <span class="pre">/</span> <span class="pre">2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdf(quantiles[1])</span> <span class="pre">=</span> <span class="pre">0.5</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cdf(quantiles[2])</span> <span class="pre">=</span> <span class="pre">1</span> <span class="pre">-</span> <span class="pre">tail_mass</span> <span class="pre">/</span> <span class="pre">2</span></code></p></li>
+</ul>
+<p>This ensures that the concrete <code class="docutils literal notranslate"><span class="pre">_quantized_cdf</span></code>s operate
 primarily within a finitely supported region. Any symbols
 outside this range must be coded using some alternative method
-that does *not* involve the `_quantized_cdf`s. Luckily, one may
-choose a `tail_mass</cite> probability that is sufficiently small so
-that this rarely occurs. It is important that we work with
-<cite>_quantized_cdf`s that have a small finite support; otherwise,
-entropy coding runtime performance would suffer. Thus,
-`tail_mass</cite> should not be too small, either!</p>
+that does <em>not</em> involve the <code class="docutils literal notranslate"><span class="pre">_quantized_cdf</span></code>s. Luckily, one
+may choose a <code class="docutils literal notranslate"><span class="pre">tail_mass</span></code> probability that is sufficiently
+small so that this rarely occurs. It is important that we work
+with <code class="docutils literal notranslate"><span class="pre">_quantized_cdf</span></code>s that have a small finite support;
+otherwise, entropy coding runtime performance would suffer.
+Thus, <code class="docutils literal notranslate"><span class="pre">tail_mass</span></code> should not be too small, either!</p>
 </dd></dl>
 
 <dl class="py method">
@@ -331,6 +333,29 @@ for initializing the Gaussian distributions
 <dd><p>Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
 N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational Image Compression with a Scale Hyperprior”</a>, Int Conf. on Learning Representations
 (ICLR), 2018.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>          ┌───┐    y
+    x ──►─┤g_a├──►─┐
+          └───┘    │
+                   ▼
+                 ┌─┴─┐
+                 │ Q │
+                 └─┬─┘
+                   │
+             y_hat ▼
+                   │
+                   ·
+                EB :
+                   ·
+                   │
+             y_hat ▼
+                   │
+          ┌───┐    │
+x_hat ──◄─┤g_s├────┘
+          └───┘
+
+EB = Entropy bottleneck
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -371,6 +396,30 @@ registered hooks while the latter silently ignores them.</p>
 <dd><p>Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
 N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational Image Compression with a Scale Hyperprior”</a> Int. Conf. on Learning Representations
 (ICLR), 2018.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>          ┌───┐    y     ┌───┐  z  ┌───┐ z_hat      z_hat ┌───┐
+    x ──►─┤g_a├──►─┬──►──┤h_a├──►──┤ Q ├───►───·⋯⋯·───►───┤h_s├─┐
+          └───┘    │     └───┘     └───┘        EB        └───┘ │
+                   ▼                                            │
+                 ┌─┴─┐                                          │
+                 │ Q │                                          ▼
+                 └─┬─┘                                          │
+                   │                                            │
+             y_hat ▼                                            │
+                   │                                            │
+                   ·                                            │
+                GC : ◄─────────────────────◄────────────────────┘
+                   ·                 scales_hat
+                   │
+             y_hat ▼
+                   │
+          ┌───┐    │
+x_hat ──◄─┤g_s├────┘
+          └───┘
+
+EB = Entropy bottleneck
+GC = Gaussian conditional
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -412,6 +461,30 @@ registered hooks while the latter silently ignores them.</p>
 Minnen, J. Balle, G.D. Toderici: <a class="reference external" href="https://arxiv.org/abs/1809.02736">“Joint Autoregressive and Hierarchical
 Priors for Learned Image Compression”</a>,
 Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>          ┌───┐    y     ┌───┐  z  ┌───┐ z_hat      z_hat ┌───┐
+    x ──►─┤g_a├──►─┬──►──┤h_a├──►──┤ Q ├───►───·⋯⋯·───►───┤h_s├─┐
+          └───┘    │     └───┘     └───┘        EB        └───┘ │
+                   ▼                                            │
+                 ┌─┴─┐                                          │
+                 │ Q │                                          ▼
+                 └─┬─┘                                          │
+                   │                                            │
+             y_hat ▼                                            │
+                   │                                            │
+                   ·                                            │
+                GC : ◄─────────────────────◄────────────────────┘
+                   ·                 scales_hat
+                   │                 means_hat
+             y_hat ▼
+                   │
+          ┌───┐    │
+x_hat ──◄─┤g_s├────┘
+          └───┘
+
+EB = Entropy bottleneck
+GC = Gaussian conditional
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -447,6 +520,34 @@ registered hooks while the latter silently ignores them.</p>
 Minnen, J. Balle, G.D. Toderici: <a class="reference external" href="https://arxiv.org/abs/1809.02736">“Joint Autoregressive and Hierarchical
 Priors for Learned Image Compression”</a>,
 Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>          ┌───┐    y     ┌───┐  z  ┌───┐ z_hat      z_hat ┌───┐
+    x ──►─┤g_a├──►─┬──►──┤h_a├──►──┤ Q ├───►───·⋯⋯·───►───┤h_s├─┐
+          └───┘    │     └───┘     └───┘        EB        └───┘ │
+                   ▼                                            │
+                 ┌─┴─┐                                          │
+                 │ Q │                                   params ▼
+                 └─┬─┘                                          │
+             y_hat ▼                  ┌─────┐                   │
+                   ├──────────►───────┤  CP ├────────►──────────┤
+                   │                  └─────┘                   │
+                   ▼                                            ▼
+                   │                                            │
+                   ·                  ┌─────┐                   │
+                GC : ◄────────◄───────┤  EP ├────────◄──────────┘
+                   ·     scales_hat   └─────┘
+                   │      means_hat
+             y_hat ▼
+                   │
+          ┌───┐    │
+x_hat ──◄─┤g_s├────┘
+          └───┘
+
+EB = Entropy bottleneck
+GC = Gaussian conditional
+EP = Entropy parameters network
+CP = Context prediction (masked convolution)
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

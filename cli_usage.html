@@ -293,6 +293,22 @@ optional arguments:
 </pre></div>
 </div>
 </section>
+<section id="bench">
+<h2>bench<a class="headerlink" href="#bench" title="Permalink to this heading">#</a></h2>
+<p>Collect performance metrics of published traditional or end-to-end image
+codecs.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.bench [-h] {} ...
+
+Collect codec metrics.
+
+positional arguments:
+  {}          Select codec
+
+optional arguments:
+  -h, --help  show this help message and exit
+</pre></div>
+</div>
+</section>
 <section id="update-model">
 <h2>update_model<a class="headerlink" href="#update-model" title="Permalink to this heading">#</a></h2>
 <p>Update the CDFs parameters of a trained model.</p>
@@ -316,22 +332,6 @@ optional arguments:
   --no-update           Do not update the model CDFs parameters.
   -a {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018_factorized_relu,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}, --architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018_factorized_relu,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}
                         Set model architecture (default: scale-hyperprior).
-</pre></div>
-</div>
-</section>
-<section id="bench">
-<h2>bench<a class="headerlink" href="#bench" title="Permalink to this heading">#</a></h2>
-<p>Collect performance metrics of published traditional or end-to-end image
-codecs.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.bench [-h] {} ...
-
-Collect codec metrics.
-
-positional arguments:
-  {}          Select codec
-
-optional arguments:
-  -h, --help  show this help message and exit
 </pre></div>
 </div>
 </section>
@@ -387,8 +387,8 @@ optional arguments:
 <li><a class="reference internal" href="#find-close">find_close</a></li>
 <li><a class="reference internal" href="#eval-model">eval_model</a></li>
 <li><a class="reference internal" href="#plot">plot</a></li>
-<li><a class="reference internal" href="#update-model">update_model</a></li>
 <li><a class="reference internal" href="#bench">bench</a></li>
+<li><a class="reference internal" href="#update-model">update_model</a></li>
 </ul>
 </li>
 </ul>

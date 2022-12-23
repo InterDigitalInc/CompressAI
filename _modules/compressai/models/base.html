@@ -338,30 +338,32 @@
         <span class="k">return</span> <span class="n">updated</span></div>
 
 <div class="viewcode-block" id="CompressionModel.aux_loss"><a class="viewcode-back" href="../../../models.html#compressai.models.CompressionModel.aux_loss">[docs]</a>    <span class="k">def</span> <span class="nf">aux_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the total auxiliary loss over all `EntropyBottleneck`s.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the total auxiliary loss over all ``EntropyBottleneck``\s.</span>
 
 <span class="sd">        In contrast to the primary &quot;net&quot; loss used by the &quot;net&quot;</span>
 <span class="sd">        optimizer, the &quot;aux&quot; loss is only used by the &quot;aux&quot; optimizer to</span>
-<span class="sd">        update *only* the `EntropyBottleneck.quantiles` parameters. In</span>
+<span class="sd">        update *only* the ``EntropyBottleneck.quantiles`` parameters. In</span>
 <span class="sd">        fact, the &quot;aux&quot; loss does not depend on image data at all.</span>
 
 <span class="sd">        The purpose of the &quot;aux&quot; loss is to determine the range within</span>
 <span class="sd">        which most of the mass of a given distribution is contained, as</span>
 <span class="sd">        well as its median (i.e. 50% probability). That is, for a given</span>
 <span class="sd">        distribution, the &quot;aux&quot; loss converges towards satisfying the</span>
-<span class="sd">        following conditions for some chosen `tail_mass` probability:</span>
-<span class="sd">        - `cdf(quantiles[0]) = tail_mass / 2`,</span>
-<span class="sd">        - `cdf(quantiles[1]) = 0.5`, and</span>
-<span class="sd">        - `cdf(quantiles[2]) = 1 - tail_mass / 2`.</span>
-<span class="sd">        This ensures that the concrete `_quantized_cdf`s operate</span>
+<span class="sd">        following conditions for some chosen ``tail_mass`` probability:</span>
+
+<span class="sd">        * ``cdf(quantiles[0]) = tail_mass / 2``</span>
+<span class="sd">        * ``cdf(quantiles[1]) = 0.5``</span>
+<span class="sd">        * ``cdf(quantiles[2]) = 1 - tail_mass / 2``</span>
+
+<span class="sd">        This ensures that the concrete ``_quantized_cdf``\s operate</span>
 <span class="sd">        primarily within a finitely supported region. Any symbols</span>
 <span class="sd">        outside this range must be coded using some alternative method</span>
-<span class="sd">        that does *not* involve the `_quantized_cdf`s. Luckily, one may</span>
-<span class="sd">        choose a `tail_mass` probability that is sufficiently small so</span>
-<span class="sd">        that this rarely occurs. It is important that we work with</span>
-<span class="sd">        `_quantized_cdf`s that have a small finite support; otherwise,</span>
-<span class="sd">        entropy coding runtime performance would suffer. Thus,</span>
-<span class="sd">        `tail_mass` should not be too small, either!</span>
+<span class="sd">        that does *not* involve the ``_quantized_cdf``\s. Luckily, one</span>
+<span class="sd">        may choose a ``tail_mass`` probability that is sufficiently</span>
+<span class="sd">        small so that this rarely occurs. It is important that we work</span>
+<span class="sd">        with ``_quantized_cdf``\s that have a small finite support;</span>
+<span class="sd">        otherwise, entropy coding runtime performance would suffer.</span>
+<span class="sd">        Thus, ``tail_mass`` should not be too small, either!</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">loss</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">EntropyBottleneck</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">loss</span><span class="p">)</span></div></div>
