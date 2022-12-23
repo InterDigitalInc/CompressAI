@@ -1,5 +1,5 @@
 Sphinx==4.3.0
-furo==2021.10.9
+sphinx-book-theme==0.3.3
 sphinxcontrib-applehelp==1.0.2
 sphinxcontrib-devhelp==1.0.2
 sphinxcontrib-htmlhelp==2.0.0

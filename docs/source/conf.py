@@ -47,7 +47,7 @@ sys.path.insert(0, os.path.abspath("../compressai/"))
 # -- Project information -----------------------------------------------------
 
 project = "compressai"
-copyright = "2021, InterDigital Communications, Inc."
+copyright = "2021, InterDigital Communications, Inc"
 author = "InterDigital Communications, Inc."
 
 # -- General configuration ---------------------------------------------------
@@ -78,16 +78,16 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # a list of builtin themes.
 #
 # html_theme = "sphinx_rtd_theme"
-html_theme = "furo"
+html_theme = "sphinx_book_theme"
 html_title = "CompressAI"
 html_logo = "_static/logo.png"
 html_show_sphinx = False
 html_theme_options = {
-    "sidebar_hide_name": True,
-    "light_css_variables": {
-        "color-brand-primary": "#00aaee",
-        "color-brand-content": "#00aaee",
-    },
+    "repository_url": "https://github.com/InterDigitalInc/CompressAI/",
+    "use_repository_button": True,
+    "use_fullscreen_button": False,
+    "logo_only": True,
+    "extra_navbar": "",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
