@@ -410,16 +410,9 @@ class EntropyBottleneck(EntropyModel):
         max_length = pmf_length.max().item()
         device = pmf_start.device
         samples = torch.arange(max_length, device=device)
-
         samples = samples[None, :] + pmf_start[:, None, None]
 
-        half = float(0.5)
-
-        lower = self._logits_cumulative(samples - half, stop_gradient=True)
-        upper = self._logits_cumulative(samples + half, stop_gradient=True)
-        sign = -torch.sign(lower + upper)
-        pmf = torch.abs(torch.sigmoid(sign * upper) - torch.sigmoid(sign * lower))
-
+        pmf, lower, upper = self._likelihood(samples, stop_gradient=True)
         pmf = pmf[:, 0, :]
         tail_mass = torch.sigmoid(lower[:, 0, :1]) + torch.sigmoid(-upper[:, 0, -1:])
 
@@ -455,18 +448,14 @@ class EntropyBottleneck(EntropyModel):
         return logits
 
     @torch.jit.unused
-    def _likelihood(self, inputs: Tensor) -> Tensor:
+    def _likelihood(
+        self, inputs: Tensor, stop_gradient: bool = False
+    ) -> Tuple[Tensor, Tensor, Tensor]:
         half = float(0.5)
-        v0 = inputs - half
-        v1 = inputs + half
-        lower = self._logits_cumulative(v0, stop_gradient=False)
-        upper = self._logits_cumulative(v1, stop_gradient=False)
-        sign = -torch.sign(lower + upper)
-        sign = sign.detach()
-        likelihood = torch.abs(
-            torch.sigmoid(sign * upper) - torch.sigmoid(sign * lower)
-        )
-        return likelihood
+        lower = self._logits_cumulative(inputs - half, stop_gradient=stop_gradient)
+        upper = self._logits_cumulative(inputs + half, stop_gradient=stop_gradient)
+        likelihood = torch.sigmoid(upper) - torch.sigmoid(lower)
+        return likelihood, lower, upper
 
     def forward(
         self, x: Tensor, training: Optional[bool] = None
@@ -498,7 +487,7 @@ class EntropyBottleneck(EntropyModel):
         )
 
         if not torch.jit.is_scripting():
-            likelihood = self._likelihood(outputs)
+            likelihood, _, _ = self._likelihood(outputs)
             if self.use_likelihood_bound:
                 likelihood = self.likelihood_lower_bound(likelihood)
         else:
