@@ -27,83 +27,49 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from compressai import (
-    datasets,
-    entropy_models,
-    latent_codecs,
-    layers,
-    losses,
-    models,
-    ops,
-    optimizers,
-    registry,
-    transforms,
-    typing,
-    zoo,
-)
+from typing import Any, Dict, List
 
-try:
-    from .version import __version__
-except ImportError:
-    pass
+import torch.nn as nn
 
-_entropy_coder = "ans"
-_available_entropy_coders = [_entropy_coder]
-
-try:
-    import range_coder
-
-    _available_entropy_coders.append("rangecoder")
-except ImportError:
-    pass
-
-
-def set_entropy_coder(entropy_coder):
-    """
-    Specifies the default entropy coder used to encode the bit-streams.
-
-    Use :mod:`available_entropy_coders` to list the possible values.
-
-    Args:
-        entropy_coder (string): Name of the entropy coder
-    """
-    global _entropy_coder
-    if entropy_coder not in _available_entropy_coders:
-        raise ValueError(
-            f'Invalid entropy coder "{entropy_coder}", choose from'
-            f'({", ".join(_available_entropy_coders)}).'
-        )
-    _entropy_coder = entropy_coder
-
-
-def get_entropy_coder():
-    """
-    Return the name of the default entropy coder used to encode the bit-streams.
-    """
-    return _entropy_coder
-
-
-def available_entropy_coders():
-    """
-    Return the list of available entropy coders.
-    """
-    return _available_entropy_coders
-
+from torch import Tensor
 
 __all__ = [
-    "datasets",
-    "entropy_models",
-    "latent_codecs",
-    "layers",
-    "losses",
-    "models",
-    "ops",
-    "optimizers",
-    "registry",
-    "transforms",
-    "typing",
-    "zoo",
-    "available_entropy_coders",
-    "get_entropy_coder",
-    "set_entropy_coder",
+    "LatentCodec",
 ]
+
+
+class _SetDefaultMixin:
+    """Convenience functions for initializing classes with defaults."""
+
+    _kwargs: Dict[str, Any]
+
+    def _setdefault(self, k, f):
+        v = self._kwargs.get(k, None) or f()
+        setattr(self, k, v)
+
+    # TODO instead of save_direct, override load_state_dict() and state_dict()
+    def _set_group_defaults(self, group_key, defaults, save_direct=False):
+        group_dict = self._kwargs.get(group_key, {})
+        for k, f in defaults.items():
+            if k in group_dict:
+                continue
+            group_dict[k] = f()
+        if save_direct:
+            for k, v in group_dict.items():
+                setattr(self, k, v)
+        else:
+            group_dict = nn.ModuleDict(group_dict)
+        setattr(self, group_key, group_dict)
+
+
+class LatentCodec(nn.Module, _SetDefaultMixin):
+    def forward(self, y: Tensor, *args, **kwargs) -> Dict[str, Any]:
+        raise NotImplementedError
+
+    def compress(self, y: Tensor, *args, **kwargs) -> Dict[str, Any]:
+        raise NotImplementedError
+
+    def decompress(
+        self, strings: List[List[bytes]], shape: Any, *args, **kwargs
+    ) -> Dict[str, Any]:
+        raise NotImplementedError
