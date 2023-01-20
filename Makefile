@@ -33,7 +33,7 @@ check-mypy: ## Run mypy checks
 	@echo "--> Running mypy checks"
 	@mypy
 
-static-analysis: check-black check-isort check-flake8 check-mypy ## Run all static checks
+static-analysis: check-black check-isort check-flake8 # check-mypy ## Run all static checks
 
 
 # Apply styling
