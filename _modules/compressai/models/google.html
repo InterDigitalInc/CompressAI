@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
         <title>compressai.models.google - CompressAI</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
@@ -144,7 +144,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand centered" href="../../../index.html">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="../../../_static/logo.png" alt="Logo"/>
@@ -288,7 +288,7 @@
 
 <div class="viewcode-block" id="FactorizedPrior"><a class="viewcode-back" href="../../../models.html#compressai.models.FactorizedPrior">[docs]</a><span class="nd">@register_model</span><span class="p">(</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">FactorizedPrior</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,</span>
 <span class="sd">    N. Johnston: `&quot;Variational Image Compression with a Scale Hyperprior&quot;</span>
 <span class="sd">    &lt;https://arxiv.org/abs/1802.01436&gt;`_, Int Conf. on Learning Representations</span>
 <span class="sd">    (ICLR), 2018.</span>
@@ -369,7 +369,7 @@
 
 <div class="viewcode-block" id="FactorizedPrior.from_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.FactorizedPrior.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;g_a.0.weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">M</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;g_a.6.weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">net</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
@@ -390,7 +390,7 @@
 
 <span class="nd">@register_model</span><span class="p">(</span><span class="s2">&quot;bmshj2018-factorized-relu&quot;</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">FactorizedPriorReLU</span><span class="p">(</span><span class="n">FactorizedPrior</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,</span>
 <span class="sd">    N. Johnston: `&quot;Variational Image Compression with a Scale Hyperprior&quot;</span>
 <span class="sd">    &lt;https://arxiv.org/abs/1802.01436&gt;`_, Int Conf. on Learning Representations</span>
 <span class="sd">    (ICLR), 2018.</span>
@@ -428,7 +428,7 @@
 
 <div class="viewcode-block" id="ScaleHyperprior"><a class="viewcode-back" href="../../../models.html#compressai.models.ScaleHyperprior">[docs]</a><span class="nd">@register_model</span><span class="p">(</span><span class="s2">&quot;bmshj2018-hyperprior&quot;</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">ScaleHyperprior</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,</span>
 <span class="sd">    N. Johnston: `&quot;Variational Image Compression with a Scale Hyperprior&quot;</span>
 <span class="sd">    &lt;https://arxiv.org/abs/1802.01436&gt;`_ Int. Conf. on Learning Representations</span>
 <span class="sd">    (ICLR), 2018.</span>
@@ -529,7 +529,7 @@
 
 <div class="viewcode-block" id="ScaleHyperprior.from_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.ScaleHyperprior.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;g_a.0.weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">M</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;g_a.6.weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">net</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
@@ -560,7 +560,7 @@
 
 <div class="viewcode-block" id="MeanScaleHyperprior"><a class="viewcode-back" href="../../../models.html#compressai.models.MeanScaleHyperprior">[docs]</a><span class="nd">@register_model</span><span class="p">(</span><span class="s2">&quot;mbt2018-mean&quot;</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">MeanScaleHyperprior</span><span class="p">(</span><span class="n">ScaleHyperprior</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scale Hyperprior with non zero-mean Gaussian conditionals from D.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scale Hyperprior with non zero-mean Gaussian conditionals from D.</span>
 <span class="sd">    Minnen, J. Balle, G.D. Toderici: `&quot;Joint Autoregressive and Hierarchical</span>
 <span class="sd">    Priors for Learned Image Compression&quot; &lt;https://arxiv.org/abs/1809.02736&gt;`_,</span>
 <span class="sd">    Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</span>
@@ -657,7 +657,7 @@
 
 <div class="viewcode-block" id="JointAutoregressiveHierarchicalPriors"><a class="viewcode-back" href="../../../models.html#compressai.models.JointAutoregressiveHierarchicalPriors">[docs]</a><span class="nd">@register_model</span><span class="p">(</span><span class="s2">&quot;mbt2018&quot;</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">JointAutoregressiveHierarchicalPriors</span><span class="p">(</span><span class="n">MeanScaleHyperprior</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Joint Autoregressive Hierarchical Priors model from D.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Joint Autoregressive Hierarchical Priors model from D.</span>
 <span class="sd">    Minnen, J. Balle, G.D. Toderici: `&quot;Joint Autoregressive and Hierarchical</span>
 <span class="sd">    Priors for Learned Image Compression&quot; &lt;https://arxiv.org/abs/1809.02736&gt;`_,</span>
 <span class="sd">    Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</span>
@@ -780,7 +780,7 @@
 
 <div class="viewcode-block" id="JointAutoregressiveHierarchicalPriors.from_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.JointAutoregressiveHierarchicalPriors.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;g_a.0.weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">M</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;g_a.6.weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">net</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
@@ -984,9 +984,6 @@
     </aside>
   </div>
 </div><script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/scripts/furo.js"></script>

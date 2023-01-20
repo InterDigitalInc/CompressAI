@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
         <title>compressai.transforms.transforms - CompressAI</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
@@ -144,7 +144,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand centered" href="../../../index.html">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="../../../_static/logo.png" alt="Logo"/>
@@ -234,13 +234,13 @@
 
 
 <div class="viewcode-block" id="RGB2YCbCr"><a class="viewcode-back" href="../../../transforms.html#compressai.transforms.RGB2YCbCr">[docs]</a><span class="k">class</span> <span class="nc">RGB2YCbCr</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Convert a RGB tensor to YCbCr.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a RGB tensor to YCbCr.</span>
 <span class="sd">    The tensor is expected to be in the [0, 1] floating point range, with a</span>
 <span class="sd">    shape of (3xHxW) or (Nx3xHxW).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rgb</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            rgb (torch.Tensor): 3D or 4D floating point RGB tensor</span>
 
@@ -254,13 +254,13 @@
 
 
 <div class="viewcode-block" id="YCbCr2RGB"><a class="viewcode-back" href="../../../transforms.html#compressai.transforms.YCbCr2RGB">[docs]</a><span class="k">class</span> <span class="nc">YCbCr2RGB</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Convert a YCbCr tensor to RGB.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a YCbCr tensor to RGB.</span>
 <span class="sd">    The tensor is expected to be in the [0, 1] floating point range, with a</span>
 <span class="sd">    shape of (3xHxW) or (Nx3xHxW).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ycbcr</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            ycbcr(torch.Tensor): 3D or 4D floating point RGB tensor</span>
 
@@ -274,7 +274,7 @@
 
 
 <div class="viewcode-block" id="YUV444To420"><a class="viewcode-back" href="../../../transforms.html#compressai.transforms.YUV444To420">[docs]</a><span class="k">class</span> <span class="nc">YUV444To420</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Convert a YUV 444 tensor to a 420 representation.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a YUV 444 tensor to a 420 representation.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        mode (str): algorithm used for downsampling: ``&#39;avg_pool&#39;``. Default</span>
@@ -291,7 +291,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yuv</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            yuv (torch.Tensor or (torch.Tensor, torch.Tensor, torch.Tensor)):</span>
 <span class="sd">                444 input to be downsampled. Takes either a (Nx3xHxW) tensor or</span>
@@ -307,7 +307,7 @@
 
 
 <div class="viewcode-block" id="YUV420To444"><a class="viewcode-back" href="../../../transforms.html#compressai.transforms.YUV420To444">[docs]</a><span class="k">class</span> <span class="nc">YUV420To444</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Convert a YUV 420 input to a 444 representation.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a YUV 420 input to a 444 representation.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        mode (str): algorithm used for upsampling: ``&#39;bilinear&#39;`` | ``&#39;nearest&#39;``.</span>
@@ -328,7 +328,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">return_tuple</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">return_tuple</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yuv</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            yuv (torch.Tensor, torch.Tensor, torch.Tensor): 420 input frames in</span>
 <span class="sd">                (Nx1xHxW) format</span>
@@ -373,9 +373,6 @@
     </aside>
   </div>
 </div><script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/scripts/furo.js"></script>

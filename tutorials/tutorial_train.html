@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Train your own model" href="tutorial_custom.html" /><link rel="prev" title="Installation" href="../installation.html" />
 
-    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
         <title>Training - CompressAI</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
@@ -145,7 +145,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand centered" href="../index.html">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="../_static/logo.png" alt="Logo"/>
@@ -229,8 +229,8 @@
 <p>An example training script <code class="code docutils literal notranslate"><span class="pre">train.py</span></code> is provided script in the
 <code class="code docutils literal notranslate"><span class="pre">examples/</span></code> folder of the CompressAI source tree.</p>
 <p>Example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 examples/train.py -m mbt2018-mean -d /path/to/image/dataset <span class="se">\</span>
-    --batch-size <span class="m">16</span> -lr 1e-4 --save --cuda
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>examples/train.py<span class="w"> </span>-m<span class="w"> </span>mbt2018-mean<span class="w"> </span>-d<span class="w"> </span>/path/to/image/dataset<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--batch-size<span class="w"> </span><span class="m">16</span><span class="w"> </span>-lr<span class="w"> </span>1e-4<span class="w"> </span>--save<span class="w"> </span>--cuda
 </pre></div>
 </div>
 <p>Run <cite>train.py –help</cite> to list the available options. See also the model zoo
@@ -240,7 +240,7 @@ pretrained models.</p>
 <h2>Model update<a class="headerlink" href="#model-update" title="Permalink to this heading">#</a></h2>
 <p>Once a model has been trained, you need to run the <code class="code docutils literal notranslate"><span class="pre">update_model</span></code> script
 to update the internal parameters of the entropy bottlenecks:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m compressai.utils.update_model --architecture ARCH checkpoint_best_loss.pth.tar
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>compressai.utils.update_model<span class="w"> </span>--architecture<span class="w"> </span>ARCH<span class="w"> </span>checkpoint_best_loss.pth.tar
 </pre></div>
 </div>
 <p>This will modify the buffers related to the learned cumulative distribution
@@ -256,8 +256,8 @@ training script, before saving the model checkpoint.</p>
 <h2>Model evaluation<a class="headerlink" href="#model-evaluation" title="Permalink to this heading">#</a></h2>
 <p>Once a model checkpoint has been updated, you can use <code class="code docutils literal notranslate"><span class="pre">eval_model</span></code> to get
 its performances on an image dataset:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m compressai.utils.eval_model checkpoint /path/to/image/dataset <span class="se">\</span>
-    -a ARCH -p path/to/checkpoint-xxxxxxxx.pth.tar
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>compressai.utils.eval_model<span class="w"> </span>checkpoint<span class="w"> </span>/path/to/image/dataset<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-a<span class="w"> </span>ARCH<span class="w"> </span>-p<span class="w"> </span>path/to/checkpoint-xxxxxxxx.pth.tar
 </pre></div>
 </div>
 <p>You can run <code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">compressai.utils.eval_model</span> <span class="pre">--help</span></code> to get the
@@ -358,9 +358,6 @@ of the implemented entropy coders and change the default entropy coder via
     </aside>
   </div>
 </div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>

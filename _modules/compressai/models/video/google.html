@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" />
 
-    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
         <title>compressai.models.video.google - CompressAI</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
@@ -144,7 +144,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand centered" href="../../../../index.html">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../index.html">
   
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="../../../../_static/logo.png" alt="Logo"/>
@@ -273,7 +273,7 @@
 
 <div class="viewcode-block" id="ScaleSpaceFlow"><a class="viewcode-back" href="../../../../models.html#compressai.models.video.ScaleSpaceFlow">[docs]</a><span class="nd">@register_model</span><span class="p">(</span><span class="s2">&quot;ssf2020&quot;</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">ScaleSpaceFlow</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Google&#39;s first end-to-end optimized video compression from E.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Google&#39;s first end-to-end optimized video compression from E.</span>
 <span class="sd">    Agustsson, D. Minnen, N. Johnston, J. Balle, S. J. Hwang, G. Toderici: `&quot;Scale-space flow for end-to-end</span>
 <span class="sd">    optimized video compression&quot; &lt;https://openaccess.thecvf.com/content_CVPR_2020/html/Agustsson_Scale-Space_Flow_for_End-to-End_Optimized_Video_Compression_CVPR_2020_paper.html&gt;`_,</span>
 <span class="sd">    IEEE Conference on Computer Vision and Pattern Recognition (CVPR 2020).</span>
@@ -551,7 +551,7 @@
 
 <div class="viewcode-block" id="ScaleSpaceFlow.gaussian_volume"><a class="viewcode-back" href="../../../../models.html#compressai.models.video.ScaleSpaceFlow.gaussian_volume">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">gaussian_volume</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">num_levels</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Efficient gaussian volume construction.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Efficient gaussian volume construction.</span>
 
 <span class="sd">        From: &quot;Generative Video Compression as Hierarchical Variational Inference&quot;,</span>
 <span class="sd">        by Yang et al.</span>
@@ -577,7 +577,7 @@
 
 <div class="viewcode-block" id="ScaleSpaceFlow.warp_volume"><a class="viewcode-back" href="../../../../models.html#compressai.models.video.ScaleSpaceFlow.warp_volume">[docs]</a>    <span class="nd">@amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">warp_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">flow</span><span class="p">,</span> <span class="n">scale_field</span><span class="p">,</span> <span class="n">padding_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;border&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;3D volume warping.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;3D volume warping.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">volume</span><span class="o">.</span><span class="n">ndimension</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Invalid number of dimensions for volume </span><span class="si">{</span><span class="n">volume</span><span class="o">.</span><span class="n">ndimension</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -603,7 +603,7 @@
         <span class="k">return</span> <span class="n">x_pred</span>
 
 <div class="viewcode-block" id="ScaleSpaceFlow.aux_loss"><a class="viewcode-back" href="../../../../models.html#compressai.models.video.ScaleSpaceFlow.aux_loss">[docs]</a>    <span class="k">def</span> <span class="nf">aux_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a list of the auxiliary entropy bottleneck over module(s).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of the auxiliary entropy bottleneck over module(s).&quot;&quot;&quot;</span>
 
         <span class="n">aux_loss_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
@@ -657,7 +657,7 @@
 
 <div class="viewcode-block" id="ScaleSpaceFlow.from_state_dict"><a class="viewcode-back" href="../../../../models.html#compressai.models.video.ScaleSpaceFlow.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
         <span class="n">net</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">net</span></div></div>
@@ -693,9 +693,6 @@
     </aside>
   </div>
 </div><script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/scripts/furo.js"></script>

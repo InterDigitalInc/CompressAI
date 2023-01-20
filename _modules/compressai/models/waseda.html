@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
         <title>compressai.models.waseda - CompressAI</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
@@ -144,7 +144,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand centered" href="../../../index.html">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="../../../_static/logo.png" alt="Logo"/>
@@ -269,7 +269,7 @@
 
 <div class="viewcode-block" id="Cheng2020Anchor"><a class="viewcode-back" href="../../../models.html#compressai.models.Cheng2020Anchor">[docs]</a><span class="nd">@register_model</span><span class="p">(</span><span class="s2">&quot;cheng2020-anchor&quot;</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">Cheng2020Anchor</span><span class="p">(</span><span class="n">JointAutoregressiveHierarchicalPriors</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Anchor model variant from `&quot;Learned Image Compression with</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Anchor model variant from `&quot;Learned Image Compression with</span>
 <span class="sd">    Discretized Gaussian Mixture Likelihoods and Attention Modules&quot;</span>
 <span class="sd">    &lt;https://arxiv.org/abs/2001.01568&gt;`_, by Zhengxue Cheng, Heming Sun, Masaru</span>
 <span class="sd">    Takeuchi, Jiro Katto.</span>
@@ -331,7 +331,7 @@
 
 <div class="viewcode-block" id="Cheng2020Anchor.from_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.Cheng2020Anchor.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;g_a.0.conv1.weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">net</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
         <span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
@@ -340,7 +340,7 @@
 
 <div class="viewcode-block" id="Cheng2020Attention"><a class="viewcode-back" href="../../../models.html#compressai.models.Cheng2020Attention">[docs]</a><span class="nd">@register_model</span><span class="p">(</span><span class="s2">&quot;cheng2020-attn&quot;</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">Cheng2020Attention</span><span class="p">(</span><span class="n">Cheng2020Anchor</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Self-attention model variant from `&quot;Learned Image Compression with</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Self-attention model variant from `&quot;Learned Image Compression with</span>
 <span class="sd">    Discretized Gaussian Mixture Likelihoods and Attention Modules&quot;</span>
 <span class="sd">    &lt;https://arxiv.org/abs/2001.01568&gt;`_, by Zhengxue Cheng, Heming Sun, Masaru</span>
 <span class="sd">    Takeuchi, Jiro Katto.</span>
@@ -411,9 +411,6 @@
     </aside>
   </div>
 </div><script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/scripts/furo.js"></script>
