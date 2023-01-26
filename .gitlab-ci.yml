@@ -80,7 +80,7 @@ test:
     - python --version
     - pip install -e .
     - pip install -r requirements.txt
-    - pip install click pytest pytest-cov plotly
+    - pip install pytest pytest-cov plotly
   script:
     - >
       if [ "$CI_COMMIT_BRANCH" == "master" ]; then

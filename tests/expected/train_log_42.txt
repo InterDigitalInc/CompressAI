@@ -1,0 +1,40 @@
+Learning rate: 0.0001
+Train epoch 0: [0/1 (0%)]	Loss: 84.627 |	MSE loss: 0.124 |	Bpp loss: 4.06 |	Aux loss: 7920.82
+Test epoch 0: Average losses:	Loss: 80.056 |	MSE loss: 0.117 |	Bpp loss: 4.06 |	Aux loss: 7920.77
+
+Learning rate: 0.0001
+Train epoch 1: [0/1 (0%)]	Loss: 84.168 |	MSE loss: 0.123 |	Bpp loss: 4.06 |	Aux loss: 7920.41
+Test epoch 1: Average losses:	Loss: 78.999 |	MSE loss: 0.115 |	Bpp loss: 4.06 |	Aux loss: 7920.35
+
+Learning rate: 0.0001
+Train epoch 2: [0/1 (0%)]	Loss: 73.066 |	MSE loss: 0.106 |	Bpp loss: 4.06 |	Aux loss: 7919.99
+Test epoch 2: Average losses:	Loss: 77.956 |	MSE loss: 0.114 |	Bpp loss: 4.06 |	Aux loss: 7919.94
+
+Learning rate: 0.0001
+Train epoch 3: [0/1 (0%)]	Loss: 67.116 |	MSE loss: 0.097 |	Bpp loss: 4.06 |	Aux loss: 7919.57
+Test epoch 3: Average losses:	Loss: 76.912 |	MSE loss: 0.112 |	Bpp loss: 4.06 |	Aux loss: 7919.52
+
+Learning rate: 0.0001
+Train epoch 4: [0/1 (0%)]	Loss: 79.141 |	MSE loss: 0.115 |	Bpp loss: 4.06 |	Aux loss: 7919.16
+Test epoch 4: Average losses:	Loss: 74.926 |	MSE loss: 0.109 |	Bpp loss: 4.06 |	Aux loss: 7919.10
+
+Learning rate: 0.0001
+Train epoch 5: [0/1 (0%)]	Loss: 69.781 |	MSE loss: 0.101 |	Bpp loss: 4.06 |	Aux loss: 7918.74
+Test epoch 5: Average losses:	Loss: 69.533 |	MSE loss: 0.101 |	Bpp loss: 4.06 |	Aux loss: 7918.68
+
+Learning rate: 0.0001
+Train epoch 6: [0/1 (0%)]	Loss: 69.088 |	MSE loss: 0.100 |	Bpp loss: 4.06 |	Aux loss: 7918.33
+Test epoch 6: Average losses:	Loss: 59.660 |	MSE loss: 0.086 |	Bpp loss: 4.06 |	Aux loss: 7918.27
+
+Learning rate: 0.0001
+Train epoch 7: [0/1 (0%)]	Loss: 61.615 |	MSE loss: 0.089 |	Bpp loss: 4.06 |	Aux loss: 7917.91
+Test epoch 7: Average losses:	Loss: 55.244 |	MSE loss: 0.079 |	Bpp loss: 4.06 |	Aux loss: 7917.85
+
+Learning rate: 0.0001
+Train epoch 8: [0/1 (0%)]	Loss: 56.082 |	MSE loss: 0.080 |	Bpp loss: 4.06 |	Aux loss: 7917.49
+Test epoch 8: Average losses:	Loss: 55.819 |	MSE loss: 0.080 |	Bpp loss: 4.06 |	Aux loss: 7917.43
+
+Learning rate: 0.0001
+Train epoch 9: [0/1 (0%)]	Loss: 57.600 |	MSE loss: 0.082 |	Bpp loss: 4.06 |	Aux loss: 7917.09
+Test epoch 9: Average losses:	Loss: 51.170 |	MSE loss: 0.072 |	Bpp loss: 4.06 |	Aux loss: 7917.03
+

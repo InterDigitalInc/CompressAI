@@ -97,7 +97,7 @@ def get_extensions():
     return ext_modules
 
 
-TEST_REQUIRES = ["pytest", "pytest-cov"]
+TEST_REQUIRES = ["pytest", "pytest-cov", "plotly"]
 DEV_REQUIRES = TEST_REQUIRES + [
     "black",
     "flake8",

@@ -159,7 +159,7 @@ def inference_entropy_estimation(model, x):
 
 def load_pretrained(model: str, metric: str, quality: int) -> nn.Module:
     return pretrained_models[model](
-        quality=quality, metric=metric, pretrained=True
+        quality=quality, metric=metric, pretrained=True, progress=False
     ).eval()
 
 

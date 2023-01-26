@@ -29,12 +29,16 @@
 
 import importlib.util
 import io
+import os
 import re
 
 from contextlib import redirect_stdout
 from pathlib import Path
 
 import pytest
+
+# Example: GENERATE_EXPECTED=1 pytest -sx tests/test_eval_model.py
+GENERATE_EXPECTED = os.getenv("GENERATE_EXPECTED")
 
 
 @pytest.mark.slow
@@ -59,7 +63,9 @@ def test_train_example():
         "48",
         "128",
         "--seed",
-        "3.14",
+        "42",
+        "--num-workers",
+        "2",
     ]
 
     f = io.StringIO()
@@ -67,8 +73,10 @@ def test_train_example():
         module.main(argv)
     log = f.getvalue()
 
-    logpath = cwd / "expected" / "train_log_3.14.txt"
+    logpath = cwd / "expected" / "train_log_42.txt"
     if not logpath.is_file():
+        if not GENERATE_EXPECTED:
+            raise RuntimeError(f"Missing expected file {logpath}")
         with logpath.open("w") as f:
             f.write(log)
 
@@ -85,4 +93,4 @@ def test_train_example():
         try:
             assert int(a) == int(b)
         except ValueError:
-            assert pytest.approx(float(a), float(b))
+            assert float(a) == pytest.approx(float(b), rel=1e-3)

@@ -58,7 +58,7 @@ class TestCompressDecompress:
         x[:, :, h // 4 : -h // 4, w // 4 : -w // 4].fill_(1)
 
         model = image_models[arch]
-        net = model(quality=1, metric="mse", pretrained=True).eval()
+        net = model(quality=1, metric="mse", pretrained=True, progress=False).eval()
         with torch.no_grad():
             rv = net.compress(x)
 

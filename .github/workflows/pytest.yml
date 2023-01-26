@@ -1,10 +1,10 @@
-name: Static Analysis
+name: Pytest
 
 on:
   push:
 
 jobs:
-  static_analysis:
+  tests:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -25,6 +25,6 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Python dependencies
-      run: pip install -e .[dev]
-    - name: Run static analysis checks
-      run: make static-analysis
+      run: pip install -e .[test]
+    - name: Run unit tests
+      run: python -m pytest -m "not slow" --cov=compressai -s tests/

@@ -61,13 +61,13 @@ class TestLoadModel:
 class TestBmshj2018Factorized:
     def test_params(self):
         for i in range(1, 6):
-            net = bmshj2018_factorized(i, metric="mse")
+            net = bmshj2018_factorized(i, metric="mse", progress=False)
             assert isinstance(net, FactorizedPrior)
             assert net.state_dict()["g_a.0.weight"].size(0) == 128
             assert net.state_dict()["g_a.6.weight"].size(0) == 192
 
         for i in range(6, 9):
-            net = bmshj2018_factorized(i, metric="mse")
+            net = bmshj2018_factorized(i, metric="mse", progress=False)
             assert isinstance(net, FactorizedPrior)
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
 
@@ -89,12 +89,16 @@ class TestBmshj2018Factorized:
     @pytest.mark.parametrize("metric", ("mse", "ms-ssim"))
     def test_pretrained(self, metric):
         for i in range(1, 6):
-            net = bmshj2018_factorized(i, metric=metric, pretrained=True)
+            net = bmshj2018_factorized(
+                i, metric=metric, pretrained=True, progress=False
+            )
             assert net.state_dict()["g_a.0.weight"].size(0) == 128
             assert net.state_dict()["g_a.6.weight"].size(0) == 192
 
         for i in range(6, 9):
-            net = bmshj2018_factorized(i, metric=metric, pretrained=True)
+            net = bmshj2018_factorized(
+                i, metric=metric, pretrained=True, progress=False
+            )
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
             assert net.state_dict()["g_a.6.weight"].size(0) == 320
 
@@ -102,7 +106,7 @@ class TestBmshj2018Factorized:
 class TestBmshj2018FactorizedReLU:
     def test_params(self):
         for i in range(1, 6):
-            net = bmshj2018_factorized_relu(i, metric="mse")
+            net = bmshj2018_factorized_relu(i, metric="mse", progress=False)
             assert isinstance(net, FactorizedPrior)
             assert net.state_dict()["g_a.0.weight"].size(0) == 128
             assert net.state_dict()["g_a.6.weight"].size(0) == 192
@@ -129,13 +133,13 @@ class TestBmshj2018FactorizedReLU:
 class TestBmshj2018Hyperprior:
     def test_params(self):
         for i in range(1, 6):
-            net = bmshj2018_hyperprior(i, metric="mse")
+            net = bmshj2018_hyperprior(i, metric="mse", progress=False)
             assert isinstance(net, ScaleHyperprior)
             assert net.state_dict()["g_a.0.weight"].size(0) == 128
             assert net.state_dict()["g_a.6.weight"].size(0) == 192
 
         for i in range(6, 9):
-            net = bmshj2018_hyperprior(i, metric="mse")
+            net = bmshj2018_hyperprior(i, metric="mse", progress=False)
             assert isinstance(net, ScaleHyperprior)
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
             assert net.state_dict()["g_a.6.weight"].size(0) == 320
@@ -159,12 +163,16 @@ class TestBmshj2018Hyperprior:
     def test_pretrained(self, metric):
         # test we can load the correct models from the urls
         for i in range(1, 6):
-            net = bmshj2018_hyperprior(i, metric=metric, pretrained=True)
+            net = bmshj2018_hyperprior(
+                i, metric=metric, pretrained=True, progress=False
+            )
             assert net.state_dict()["g_a.0.weight"].size(0) == 128
             assert net.state_dict()["g_a.6.weight"].size(0) == 192
 
         for i in range(6, 9):
-            net = bmshj2018_hyperprior(i, metric=metric, pretrained=True)
+            net = bmshj2018_hyperprior(
+                i, metric=metric, pretrained=True, progress=False
+            )
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
             assert net.state_dict()["g_a.6.weight"].size(0) == 320
 
@@ -172,13 +180,13 @@ class TestBmshj2018Hyperprior:
 class TestMbt2018Mean:
     def test_parameters(self):
         for i in range(1, 5):
-            net = mbt2018_mean(i, metric="mse")
+            net = mbt2018_mean(i, metric="mse", progress=False)
             assert isinstance(net, MeanScaleHyperprior)
             assert net.state_dict()["g_a.0.weight"].size(0) == 128
             assert net.state_dict()["g_a.6.weight"].size(0) == 192
 
         for i in range(5, 9):
-            net = mbt2018_mean(i, metric="mse")
+            net = mbt2018_mean(i, metric="mse", progress=False)
             assert isinstance(net, MeanScaleHyperprior)
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
             assert net.state_dict()["g_a.6.weight"].size(0) == 320
@@ -202,12 +210,12 @@ class TestMbt2018Mean:
     def test_pretrained(self, metric):
         # test we can load the correct models from the urls
         for i in range(1, 5):
-            net = mbt2018_mean(i, metric=metric, pretrained=True)
+            net = mbt2018_mean(i, metric=metric, pretrained=True, progress=False)
             assert net.state_dict()["g_a.0.weight"].size(0) == 128
             assert net.state_dict()["g_a.6.weight"].size(0) == 192
 
         for i in range(5, 9):
-            net = mbt2018_mean(i, metric=metric, pretrained=True)
+            net = mbt2018_mean(i, metric=metric, pretrained=True, progress=False)
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
             assert net.state_dict()["g_a.6.weight"].size(0) == 320
 
@@ -215,13 +223,13 @@ class TestMbt2018Mean:
 class TestMbt2018:
     def test_ok(self):
         for i in range(1, 5):
-            net = mbt2018(i, metric="mse")
+            net = mbt2018(i, metric="mse", progress=False)
             assert isinstance(net, JointAutoregressiveHierarchicalPriors)
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
             assert net.state_dict()["g_a.6.weight"].size(0) == 192
 
         for i in range(5, 9):
-            net = mbt2018(i, metric="mse")
+            net = mbt2018(i, metric="mse", progress=False)
             assert isinstance(net, JointAutoregressiveHierarchicalPriors)
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
             assert net.state_dict()["g_a.6.weight"].size(0) == 320
@@ -245,12 +253,12 @@ class TestMbt2018:
     def test_pretrained(self, metric):
         # test we can load the correct models from the urls
         for i in range(1, 5):
-            net = mbt2018(i, metric=metric, pretrained=True)
+            net = mbt2018(i, metric=metric, pretrained=True, progress=False)
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
             assert net.state_dict()["g_a.6.weight"].size(0) == 192
 
         for i in range(5, 9):
-            net = mbt2018(i, metric=metric, pretrained=True)
+            net = mbt2018(i, metric=metric, pretrained=True, progress=False)
             assert net.state_dict()["g_a.0.weight"].size(0) == 192
             assert net.state_dict()["g_a.6.weight"].size(0) == 320
 
@@ -265,12 +273,12 @@ class TestCheng2020:
     )
     def test_anchor_ok(self, func, cls):
         for i in range(1, 4):
-            net = func(i, metric="mse")
+            net = func(i, metric="mse", progress=False)
             assert isinstance(net, cls)
             assert net.state_dict()["g_a.0.conv1.weight"].size(0) == 128
 
         for i in range(4, 7):
-            net = func(i, metric="mse")
+            net = func(i, metric="mse", progress=False)
             assert isinstance(net, cls)
             assert net.state_dict()["g_a.0.conv1.weight"].size(0) == 192
 
@@ -280,9 +288,9 @@ class TestCheng2020:
     @pytest.mark.parametrize("metric", ("mse", "ms-ssim"))
     def test_pretrained(self, model_entrypoint, metric):
         for i in range(1, 4):
-            net = model_entrypoint(i, metric=metric, pretrained=True)
+            net = model_entrypoint(i, metric=metric, pretrained=True, progress=False)
             assert net.state_dict()["g_a.0.conv1.weight"].size(0) == 128
 
         for i in range(4, 7):
-            net = model_entrypoint(i, metric=metric, pretrained=True)
+            net = model_entrypoint(i, metric=metric, pretrained=True, progress=False)
             assert net.state_dict()["g_a.0.conv1.weight"].size(0) in (128, 192)

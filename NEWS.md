@@ -1,3 +1,4 @@
+2022-11-27: CompressAI now includes sadl_codec, which enables to run c++ inteference with full integer operations
 2021-12-23: Compressai v1.2.0 now includes video bench pipeline and the Scale-Space-Flow model [Agustsson et al. 2020]
             The license has been changed BSD-3-Clause-Clear
 
@@ -10,4 +11,3 @@
 
 2020-06-21: First release of CompressAI !
 
-2022-11-27: CompressAI now includes sadl_codec, which enables to run c++ inteference with full integer operations decoder.
