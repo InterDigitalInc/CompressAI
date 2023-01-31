@@ -117,7 +117,7 @@ def test_eval_model_pretrained(
     for key in ("name", "description"):
         assert expected[key] == output[key]
 
-    for key in ("psnr", "ms-ssim", "bpp"):
+    for key in ("psnr-rgb", "ms-ssim-rgb", "bpp"):
         if key not in expected["results"]:
             continue
         assert np.allclose(

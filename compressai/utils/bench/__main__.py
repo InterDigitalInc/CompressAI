@@ -141,7 +141,7 @@ def setup_common_args(parser):
     parser.add_argument(
         "--metrics",
         dest="metrics",
-        default=["psnr", "ms-ssim"],
+        default=["psnr-rgb", "ms-ssim-rgb"],
         nargs="+",
         help="do not return PSNR and MS-SSIM metrics (use for very small images)",
     )

@@ -110,7 +110,7 @@ class x264(Codec):
         parser.add_argument("-p", "--preset", default="medium", help="preset")
         parser.add_argument(
             "--tune",
-            default="psnr",
+            default="psnr-rgb",
             help="tune encoder for psnr or ssim (default: %(default)s)",
         )
 

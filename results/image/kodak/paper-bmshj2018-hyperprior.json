@@ -2,7 +2,7 @@
   "name": "official bmshj2018-hyperprior",
   "description": "official results (mse)",
   "results": {
-    "psnr": [
+    "psnr-rgb": [
       27.106351,
       28.679134,
       30.616753,

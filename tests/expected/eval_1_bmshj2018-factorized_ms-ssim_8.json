@@ -1,1 +1,21 @@
-{"name": "bmshj2018-factorized-ms-ssim", "description": "Inference (entropy estimation)", "results": {"psnr": [31.70499038696289], "ms-ssim": [0.9949069023132324], "bpp": [1.1392645835876465], "encoding_time": [1.0612114667892456], "decoding_time": [1.0612114667892456]}}
+{
+    "name": "bmshj2018-factorized-ms-ssim",
+    "description": "Inference (entropy estimation)",
+    "results": {
+        "psnr-rgb": [
+            31.70499038696289
+        ],
+        "ms-ssim-rgb": [
+            0.9949069023132324
+        ],
+        "bpp": [
+            1.1392645835876465
+        ],
+        "encoding_time": [
+            1.0612114667892456
+        ],
+        "decoding_time": [
+            1.0612114667892456
+        ]
+    }
+}

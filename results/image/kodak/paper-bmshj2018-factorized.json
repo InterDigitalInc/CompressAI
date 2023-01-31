@@ -2,7 +2,7 @@
   "name": "official bmshj2018-factorized",
   "description": "official results (mse)",
   "results": {
-    "psnr": [
+    "psnr-rgb": [
       26.775134,
       28.348719,
       30.020793,

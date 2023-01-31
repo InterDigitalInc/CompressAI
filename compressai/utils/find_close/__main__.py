@@ -65,7 +65,7 @@ def get_codec_q_bounds(codec: Codec) -> Tuple[bool, int, int]:
 
 
 def find_closest(
-    codec: Codec, img: str, target: float, metric: str = "psnr"
+    codec: Codec, img: str, target: float, metric: str = "psnr-rgb"
 ) -> Tuple[int, Dict[str, float], Image.Image]:
     rev, lower, upper = get_codec_q_bounds(codec)
 
@@ -112,7 +112,11 @@ def setup_args():
     parser.add_argument("image", type=str, help="image filepath")
     parser.add_argument("target", type=float, help="target value to match")
     parser.add_argument(
-        "-m", "--metric", type=str, choices=["bpp", "psnr", "ms-ssim"], default="bpp"
+        "-m",
+        "--metric",
+        type=str,
+        choices=["bpp", "psnr-rgb", "ms-ssim-rgb"],
+        default="bpp",
     )
     parser.add_argument(
         "--save", action="store_true", help="Save reconstructed image to disk"

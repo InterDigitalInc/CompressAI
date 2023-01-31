@@ -1,1 +1,21 @@
-{"name": "bmshj2018-factorized-ms-ssim", "description": "Inference (ans)", "results": {"psnr": [24.673641204833984], "ms-ssim": [0.938518762588501], "bpp": [0.13313802083333334], "encoding_time": [0.4573390483856201], "decoding_time": [0.5872910022735596]}}
+{
+    "name": "bmshj2018-factorized-ms-ssim",
+    "description": "Inference (ans)",
+    "results": {
+        "psnr-rgb": [
+            24.673641204833984
+        ],
+        "ms-ssim-rgb": [
+            0.938518762588501
+        ],
+        "bpp": [
+            0.13313802083333334
+        ],
+        "encoding_time": [
+            0.4573390483856201
+        ],
+        "decoding_time": [
+            0.5872910022735596
+        ]
+    }
+}

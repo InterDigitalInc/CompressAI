@@ -1,1 +1,21 @@
-{"name": "WebP", "description": "WebP. Pillow version 8.1.2", "results": {"bpp": [1.3546956380208333], "encoding_time": [0.7515659332275391], "decoding_time": [0.01021265983581543], "psnr": [33.38907973813301], "ms-ssim": [0.9805199503898621]}}
+{
+    "name": "WebP",
+    "description": "WebP. Pillow version 8.1.2",
+    "results": {
+        "bpp": [
+            1.3546956380208333
+        ],
+        "encoding_time": [
+            0.7515659332275391
+        ],
+        "decoding_time": [
+            0.01021265983581543
+        ],
+        "psnr-rgb": [
+            33.38907973813301
+        ],
+        "ms-ssim-rgb": [
+            0.9805199503898621
+        ]
+    }
+}

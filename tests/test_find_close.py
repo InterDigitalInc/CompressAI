@@ -43,7 +43,7 @@ GENERATE_EXPECTED = os.getenv("GENERATE_EXPECTED")
 @pytest.mark.parametrize(
     "metric, target",
     (
-        ("psnr", "30"),
+        ("psnr-rgb", "30"),
         ("bpp", "0.2"),
     ),
 )

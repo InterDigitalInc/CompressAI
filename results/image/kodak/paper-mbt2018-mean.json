@@ -2,7 +2,7 @@
   "name": "official mbt2018-mean",
   "description": "official results (mse)",
   "results": {
-    "psnr": [
+    "psnr-rgb": [
       27.869507,
       28.844869,
       31.025364,

@@ -38,7 +38,7 @@ matplotlib.use("Agg")
 plot = importlib.import_module("compressai.utils.plot.__main__")
 
 
-@pytest.mark.parametrize("metric", ("psnr", "ms-ssim"))
+@pytest.mark.parametrize("metric", ("psnr", "psnr-rgb", "ms-ssim-rgb"))
 @pytest.mark.parametrize("backend", ("matplotlib", "plotly"))
 def test_plot(metric, backend):
     here = os.path.dirname(__file__)

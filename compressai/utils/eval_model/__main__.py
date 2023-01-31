@@ -88,8 +88,8 @@ def compute_metrics(
     metrics: Dict[str, Any] = {}
     org = (org * max_val).clamp(0, max_val).round()
     rec = (rec * max_val).clamp(0, max_val).round()
-    metrics["psnr"] = psnr(org, rec).item()
-    metrics["ms-ssim"] = ms_ssim(org, rec, data_range=max_val).item()
+    metrics["psnr-rgb"] = psnr(org, rec).item()
+    metrics["ms-ssim-rgb"] = ms_ssim(org, rec, data_range=max_val).item()
     return metrics
 
 
@@ -124,8 +124,8 @@ def inference(model, x):
     bpp = sum(len(s[0]) for s in out_enc["strings"]) * 8.0 / num_pixels
 
     return {
-        "psnr": metrics["psnr"],
-        "ms-ssim": metrics["ms-ssim"],
+        "psnr-rgb": metrics["psnr-rgb"],
+        "ms-ssim-rgb": metrics["ms-ssim-rgb"],
         "bpp": bpp,
         "encoding_time": enc_time,
         "decoding_time": dec_time,
@@ -149,8 +149,8 @@ def inference_entropy_estimation(model, x):
     )
 
     return {
-        "psnr": metrics["psnr"],
-        "ms-ssim": metrics["ms-ssim"],
+        "psnr-rgb": metrics["psnr-rgb"],
+        "ms-ssim-rgb": metrics["ms-ssim-rgb"],
         "bpp": bpp.item(),
         "encoding_time": elapsed_time / 2.0,  # broad estimation
         "decoding_time": elapsed_time / 2.0,

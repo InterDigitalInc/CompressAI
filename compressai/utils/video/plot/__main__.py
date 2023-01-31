@@ -64,7 +64,7 @@ def parse_json_file(filepath, metric):
         )
 
     try:
-        if metric == "ms-ssim":
+        if "ms-ssim" in metric:
             # Convert to db
             values = np.array(results[metric])
             results[metric] = -10 * np.log10(1 - values)
