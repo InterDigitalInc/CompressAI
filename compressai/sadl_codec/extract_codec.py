@@ -35,7 +35,6 @@ import torch
 
 
 def parse_args(argv):
-
     parser = argparse.ArgumentParser(
         description="Extract the decoder from the full model and convert it into ONNX. Extract decoder info to a pickle."
     )
@@ -56,7 +55,6 @@ def parse_args(argv):
 
 
 def main(argv):
-
     if False:  # torch.cuda.is_available():
         device = torch.device("cuda:{}".format(torch.cuda.current_device()))
         print("[INFO] Using device:", torch.cuda.get_device_name(device))

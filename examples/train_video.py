@@ -106,7 +106,7 @@ class RateDistortionLoss(nn.Module):
 
         # compute metric over each component (eg: y, u and v)
         metric_values = []
-        for (x0, x1) in zip(x, target):
+        for x0, x1 in zip(x, target):
             v = self.mse(x0.float(), x1.float())
             if v.ndimension() == 4:
                 v = v.mean(dim=(1, 2, 3))

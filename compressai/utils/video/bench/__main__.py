@@ -281,9 +281,9 @@ def collect(
     return out
 
 
-def create_parser() -> Tuple[
-    argparse.ArgumentParser, argparse.ArgumentParser, argparse._SubParsersAction
-]:
+def create_parser() -> (
+    Tuple[argparse.ArgumentParser, argparse.ArgumentParser, argparse._SubParsersAction]
+):
     parser = argparse.ArgumentParser(
         description="Video codec baselines.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,

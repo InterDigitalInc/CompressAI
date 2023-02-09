@@ -41,7 +41,6 @@ min_cdf_bound = 2
 
 
 def parse_args(argv):
-
     parser = argparse.ArgumentParser(description="extract latent from dataset")
     parser.add_argument("--model", type=str, required=True, help="model pth")
     parser.add_argument("--input", type=str, required=True, help="npy batch")

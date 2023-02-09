@@ -409,7 +409,6 @@ class ScaleSpaceFlow(CompressionModel):
         return frame_strings, shape_infos
 
     def decompress(self, strings, shapes):
-
         if not isinstance(strings, List) or not isinstance(shapes, List):
             raise RuntimeError(f"Invalid number of frames: {len(strings)}.")
 
