@@ -847,7 +847,8 @@ title="Source repository"
         <span class="k">if</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="o">.</span><span class="n">device</span> <span class="o">!=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">):</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Inference on GPU is not recommended for the autoregressive &quot;</span>
-                <span class="s2">&quot;models (the entropy coder is run sequentially on CPU).&quot;</span>
+                <span class="s2">&quot;models (the entropy coder is run sequentially on CPU).&quot;</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -931,7 +932,8 @@ title="Source repository"
         <span class="k">if</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="o">.</span><span class="n">device</span> <span class="o">!=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">):</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Inference on GPU is not recommended for the autoregressive &quot;</span>
-                <span class="s2">&quot;models (the entropy coder is run sequentially on CPU).&quot;</span>
+                <span class="s2">&quot;models (the entropy coder is run sequentially on CPU).&quot;</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="c1"># FIXME: we don&#39;t respect the default entropy coder and directly call the</span>
