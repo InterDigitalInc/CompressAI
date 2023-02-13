@@ -182,7 +182,7 @@ class EntropyModel(nn.Module):
     def _quantize(
         self, inputs: Tensor, mode: str, means: Optional[Tensor] = None
     ) -> Tensor:
-        warnings.warn("_quantize is deprecated. Use quantize instead.")
+        warnings.warn("_quantize is deprecated. Use quantize instead.", stacklevel=2)
         return self.quantize(inputs, mode, means)
 
     @staticmethod
@@ -198,7 +198,7 @@ class EntropyModel(nn.Module):
 
     @classmethod
     def _dequantize(cls, inputs: Tensor, means: Optional[Tensor] = None) -> Tensor:
-        warnings.warn("_dequantize. Use dequantize instead.")
+        warnings.warn("_dequantize. Use dequantize instead.", stacklevel=2)
         return cls.dequantize(inputs, means)
 
     def _pmf_to_cdf(self, pmf, tail_mass, pmf_length, max_length):

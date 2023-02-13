@@ -566,7 +566,8 @@ class JointAutoregressiveHierarchicalPriors(MeanScaleHyperprior):
         if next(self.parameters()).device != torch.device("cpu"):
             warnings.warn(
                 "Inference on GPU is not recommended for the autoregressive "
-                "models (the entropy coder is run sequentially on CPU)."
+                "models (the entropy coder is run sequentially on CPU).",
+                stacklevel=2,
             )
 
         y = self.g_a(x)
@@ -650,7 +651,8 @@ class JointAutoregressiveHierarchicalPriors(MeanScaleHyperprior):
         if next(self.parameters()).device != torch.device("cpu"):
             warnings.warn(
                 "Inference on GPU is not recommended for the autoregressive "
-                "models (the entropy coder is run sequentially on CPU)."
+                "models (the entropy coder is run sequentially on CPU).",
+                stacklevel=2,
             )
 
         # FIXME: we don't respect the default entropy coder and directly call the
