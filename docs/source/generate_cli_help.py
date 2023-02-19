@@ -39,7 +39,7 @@ import compressai.utils
 
 def get_utils():
     rootdir = Path(compressai.utils.__file__).parent
-    for d in rootdir.iterdir():
+    for d in sorted(rootdir.iterdir()):
         if d.is_dir() and (d / "__main__.py").is_file():
             yield d
 
