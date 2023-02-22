@@ -263,7 +263,7 @@ def encode_image(input, codec: CodecInfo, output):
         x = convert_yuv420_rgb(org_seq[0], codec.device, max_val)
     else:
         img = load_image(input)
-        x = img2torch(img)
+        x = img2torch(img).to(codec.device)
         bitdepth = 8
 
     h, w = x.size(2), x.size(3)
