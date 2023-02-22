@@ -325,13 +325,8 @@ title="Print to PDF"
     <nav id="bd-toc-nav" aria-label="Page">
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#plot">
-   plot
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#find-close">
-   find_close
+  <a class="reference internal nav-link" href="#bench">
+   bench
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -340,13 +335,18 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#update-model">
-   update_model
+  <a class="reference internal nav-link" href="#find-close">
+   find_close
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#bench">
-   bench
+  <a class="reference internal nav-link" href="#plot">
+   plot
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#update-model">
+   update_model
   </a>
  </li>
 </ul>
@@ -369,13 +369,8 @@ title="Print to PDF"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#plot">
-   plot
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#find-close">
-   find_close
+  <a class="reference internal nav-link" href="#bench">
+   bench
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -384,13 +379,18 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#update-model">
-   update_model
+  <a class="reference internal nav-link" href="#find-close">
+   find_close
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#bench">
-   bench
+  <a class="reference internal nav-link" href="#plot">
+   plot
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#update-model">
+   update_model
   </a>
  </li>
 </ul>
@@ -405,25 +405,35 @@ title="Print to PDF"
                 
   <section id="command-line-usage">
 <h1>Command line usage<a class="headerlink" href="#command-line-usage" title="Permalink to this headline">¶</a></h1>
-<section id="plot">
-<h2>plot<a class="headerlink" href="#plot" title="Permalink to this headline">¶</a></h2>
-<p>Simple plotting utility to display Rate-Distortion curves (RD) comparison
-between codecs.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.plot [-h] -f [...] [-m] [-t] [-o]
-                                       [--figsize ] [--axes   ] [--backend]
-                                       [--show]
+<section id="bench">
+<h2>bench<a class="headerlink" href="#bench" title="Permalink to this headline">¶</a></h2>
+<p>Collect performance metrics of published traditional or end-to-end image
+codecs.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.bench [-h] {} ...
+
+Collect codec metrics.
+
+positional arguments:
+  {}          Select codec
+
+optional arguments:
+  -h, --help  show this help message and exit
+</pre></div>
+</div>
+</section>
+<section id="eval-model">
+<h2>eval_model<a class="headerlink" href="#eval-model" title="Permalink to this headline">¶</a></h2>
+<p>Evaluate an end-to-end compression model on an image dataset.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.eval_model [-h] {pretrained,checkpoint} ...
+
+Evaluate a model on an image dataset.
+
+positional arguments:
+  {pretrained,checkpoint}
+                        model source
 
 optional arguments:
   -h, --help            show this help message and exit
-  -f [ ...], --results-file [ ...]
-  -m , --metric         Metric (default: psnr)
-  -t , --title          Plot title
-  -o , --output         Output file name
-  --figsize             Figure relative size (width, height), default: (9, 6)
-  --axes                Axes limit (xmin, xmax, ymin, ymax), default:
-                        autorange
-  --backend             Change plot backend (default: matplotlib)
-  --show                Open plot figure
 </pre></div>
 </div>
 </section>
@@ -457,19 +467,25 @@ optional arguments:
 </pre></div>
 </div>
 </section>
-<section id="eval-model">
-<h2>eval_model<a class="headerlink" href="#eval-model" title="Permalink to this headline">¶</a></h2>
-<p>Evaluate an end-to-end compression model on an image dataset.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.eval_model [-h] {pretrained,checkpoint} ...
-
-Evaluate a model on an image dataset.
-
-positional arguments:
-  {pretrained,checkpoint}
-                        model source
+<section id="plot">
+<h2>plot<a class="headerlink" href="#plot" title="Permalink to this headline">¶</a></h2>
+<p>Simple plotting utility to display Rate-Distortion curves (RD) comparison
+between codecs.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.plot [-h] -f [...] [-m] [-t] [-o]
+                                       [--figsize ] [--axes   ] [--backend]
+                                       [--show]
 
 optional arguments:
   -h, --help            show this help message and exit
+  -f [ ...], --results-file [ ...]
+  -m , --metric         Metric (default: psnr)
+  -t , --title          Plot title
+  -o , --output         Output file name
+  --figsize             Figure relative size (width, height), default: (9, 6)
+  --axes                Axes limit (xmin, xmax, ymin, ymax), default:
+                        autorange
+  --backend             Change plot backend (default: matplotlib)
+  --show                Open plot figure
 </pre></div>
 </div>
 </section>
@@ -496,22 +512,6 @@ optional arguments:
   --no-update           Do not update the model CDFs parameters.
   -a {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018_factorized_relu,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}, --architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018_factorized_relu,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}
                         Set model architecture (default: scale-hyperprior).
-</pre></div>
-</div>
-</section>
-<section id="bench">
-<h2>bench<a class="headerlink" href="#bench" title="Permalink to this headline">¶</a></h2>
-<p>Collect performance metrics of published traditional or end-to-end image
-codecs.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.bench [-h] {} ...
-
-Collect codec metrics.
-
-positional arguments:
-  {}          Select codec
-
-optional arguments:
-  -h, --help  show this help message and exit
 </pre></div>
 </div>
 </section>
