@@ -257,6 +257,10 @@ class BinaryCodec(Codec):
     def name(self):
         raise NotImplementedError()
 
+    @classmethod
+    def setup_args(cls, _parser):
+        pass
+
     def _run_impl(self, in_filepath, quality):
         fd0, png_filepath = mkstemp(suffix=".png")
         fd1, out_filepath = mkstemp(suffix=self.fmt)
