@@ -135,8 +135,7 @@ def setup_common_args(parser):
         "--qps",
         dest="qps",
         type=str,
-        default=["75"],
-        nargs="+",
+        default="75",
         help="list of quality/quantization parameter (default: %(default)s)",
     )
     parser.add_argument(
@@ -158,10 +157,11 @@ def main(argv):
 
     codec_cls = next(c for c in codecs if c.__name__.lower() == args.codec)
     codec = codec_cls(args)
+    qps = [int(q) for q in args.qps.split(",") if q]
     results = collect(
         codec,
         args.dataset,
-        sorted(args.qps),
+        sorted(qps),
         args.metrics,
         args.num_jobs,
     )
