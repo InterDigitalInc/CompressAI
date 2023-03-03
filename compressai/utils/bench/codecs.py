@@ -398,7 +398,7 @@ class BPG(BinaryCodec):
         return args
 
     def _get_encode_cmd(self, in_filepath, quality, out_filepath):
-        if not 0 <= quality <= 51:
+        if not 0 <= int(quality) <= 51:
             raise ValueError(f"Invalid quality value: {quality} (0,51)")
         cmd = [
             self.encoder_path,
