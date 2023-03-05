@@ -37,10 +37,12 @@ import torch.nn as nn
 from torch import Tensor
 
 from compressai.entropy_models import EntropyBottleneck, GaussianConditional
+from compressai.latent_codecs import LatentCodec
 from compressai.models.utils import update_registered_buffers
 
 __all__ = [
     "CompressionModel",
+    "SimpleVAECompressionModel",
     "get_scale_table",
     "SCALES_MIN",
     "SCALES_MAX",
@@ -142,3 +144,41 @@ class CompressionModel(nn.Module):
         """
         loss = sum(m.loss() for m in self.modules() if isinstance(m, EntropyBottleneck))
         return cast(Tensor, loss)
+
+
+class SimpleVAECompressionModel(CompressionModel):
+    """Simple VAE model with arbitrary latent codec.
+
+    .. code-block:: none
+
+               ┌───┐  y  ┌────┐ y_hat ┌───┐
+        x ──►──┤g_a├──►──┤ lc ├───►───┤g_s├──►── x_hat
+               └───┘     └────┘       └───┘
+    """
+
+    g_a: nn.Module
+    g_s: nn.Module
+    latent_codec: LatentCodec
+
+    def forward(self, x):
+        y = self.g_a(x)
+        y_out = self.latent_codec(y)
+        y_hat = y_out["y_hat"]
+        x_hat = self.g_s(y_hat)
+        return {
+            "x_hat": x_hat,
+            "likelihoods": y_out["likelihoods"],
+        }
+
+    def compress(self, x):
+        y = self.g_a(x)
+        outputs = self.latent_codec.compress(y)
+        return outputs
+
+    def decompress(self, strings, shape):
+        y_out = self.latent_codec.decompress(strings, shape)
+        y_hat = y_out["y_hat"]
+        x_hat = self.g_s(y_hat).clamp_(0, 1)
+        return {
+            "x_hat": x_hat,
+        }

@@ -10,6 +10,11 @@ CompressionModel
     :members:
 
 
+SimpleVAECompressionModel
+-------------------------
+.. autoclass:: SimpleVAECompressionModel
+
+
 FactorizedPrior
 ----------------
 .. autoclass:: FactorizedPrior
