@@ -40,6 +40,7 @@ from .gdn import GDN
 __all__ = [
     "AttentionBlock",
     "MaskedConv2d",
+    "CheckerboardMaskedConv2d",
     "ResidualBlock",
     "ResidualBlockUpsample",
     "ResidualBlockWithStride",
@@ -76,6 +77,32 @@ class MaskedConv2d(nn.Conv2d):
         # TODO(begaintj): weight assigment is not supported by torchscript
         self.weight.data *= self.mask
         return super().forward(x)
+
+
+class CheckerboardMaskedConv2d(MaskedConv2d):
+    r"""Checkerboard masked 2D convolution; mask future "unseen" pixels.
+
+    Checkerboard mask variant used in
+    `"Checkerboard Context Model for Efficient Learned Image Compression"
+    <https://arxiv.org/abs/2103.15306>`_, by Dailan He, Yaoyan Zheng,
+    Baocheng Sun, Yan Wang, and Hongwei Qin, CVPR 2021.
+
+    Inherits the same arguments as a `nn.Conv2d`. Use `mask_type='A'` for the
+    first layer (which also masks the "current pixel"), `mask_type='B'` for the
+    following layers.
+    """
+
+    def __init__(self, *args: Any, mask_type: str = "A", **kwargs: Any):
+        super().__init__(*args, **kwargs)
+
+        if mask_type not in ("A", "B"):
+            raise ValueError(f'Invalid "mask_type" value "{mask_type}"')
+
+        _, _, h, w = self.mask.size()
+        self.mask[:] = 1
+        self.mask[:, :, 0::2, 0::2] = 0
+        self.mask[:, :, 1::2, 1::2] = 0
+        self.mask[:, :, h // 2, w // 2] = mask_type == "B"
 
 
 def conv3x3(in_ch: int, out_ch: int, stride: int = 1) -> nn.Module:

@@ -45,6 +45,11 @@ Cheng2020Attention
 .. autoclass:: Cheng2020Attention
 
 
+Cheng2020AnchorCheckerboard
+---------------------------
+.. autoclass:: Cheng2020AnchorCheckerboard
+
+
 .. currentmodule:: compressai.models.video
 
 ScaleSpaceFlow
