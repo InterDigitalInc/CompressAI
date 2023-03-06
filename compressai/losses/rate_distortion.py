@@ -36,29 +36,6 @@ from pytorch_msssim import ms_ssim
 
 from compressai.registry import register_criterion
 
-Q2LAMBDA = {
-    "mse": {
-        1: 0.0018,
-        2: 0.0035,
-        3: 0.0067,
-        4: 0.0130,
-        5: 0.0250,
-        6: 0.0483,
-        7: 0.0932,
-        8: 0.1800,
-    },
-    "ms-ssim": {
-        1: 2.40,
-        2: 4.58,
-        3: 8.73,
-        4: 16.64,
-        5: 31.73,
-        6: 60.50,
-        7: 115.37,
-        8: 220.00,
-    },
-}
-
 
 @register_criterion("RateDistortionLoss")
 class RateDistortionLoss(nn.Module):
@@ -85,15 +62,12 @@ class RateDistortionLoss(nn.Module):
             for likelihoods in output["likelihoods"].values()
         )
         if self.metric == ms_ssim:
-            metric = self.metric(output["x_hat"], target, data_range=1)
+            out["ms_ssim_loss"] = self.metric(output["x_hat"], target, data_range=1)
+            distortion = 1 - out["ms_ssim_loss"]
         else:
-            metric = self.metric(output["x_hat"], target)
-        if isinstance(self.metric, nn.MSELoss):
-            out["mse_loss"] = metric
-            distortion = 255**2 * metric
-        else:
-            out["ms_ssim"] = metric
-            distortion = 1 - metric
+            out["mse_loss"] = self.metric(output["x_hat"], target)
+            distortion = 255**2 * out["mse_loss"]
+
         out["loss"] = self.lmbda * distortion + out["bpp_loss"]
         if self.return_type == "all":
             return out
