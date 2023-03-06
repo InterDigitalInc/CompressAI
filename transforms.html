@@ -1,402 +1,357 @@
 
+
 <!DOCTYPE html>
 
-<html>
+
+<html lang="en" >
+
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>compressai.transforms &#8212; CompressAI</title>
-    
-    <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
   
-    
-    <link rel="stylesheet"
-      href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
   
-    
-      
   
-    
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css" type="text/css" />
-    
-    <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
   
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'transforms';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Image compression" href="zoo.html" />
     <link rel="prev" title="compressai.ops" href="ops.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
-    
-
-    <!-- Google Analytics -->
-    
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
-<!-- Checkboxes to toggle the left sidebar -->
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
-<label class="overlay overlay-navbar" for="__navigation">
-    <div class="visually-hidden">Toggle navigation sidebar</div>
-</label>
-<!-- Checkboxes to toggle the in-page toc -->
-<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
-<label class="overlay overlay-pagetoc" for="__page-toc">
-    <div class="visually-hidden">Toggle in-page Table of Contents</div>
-</label>
-<!-- Headers at the top -->
-<div class="announcement header-item noprint"></div>
-<div class="header header-item noprint"></div>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-    
-    <div class="container-fluid" id="banner"></div>
-
-    
-
-    <div class="container-xl">
-      <div class="row">
-          
-<!-- Sidebar -->
-<div class="bd-sidebar noprint" id="site-navigation">
-    <div class="bd-sidebar__content">
-        <div class="bd-sidebar__top"><div class="navbar-brand-box">
-    <a class="navbar-brand text-wrap" href="index.html">
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
       
-        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+      <div class="bd-sidebar-primary bd-sidebar">
         
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+    
+    
       
-      
-      <img src="_static/logo.png" class="logo" alt="logo">
-      
-      
-    </a>
-</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
-    <div class="bd-toc-item active">
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="intro.html">
-   Introduction
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="installation.html">
-   Installation
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 </ul>
-<p>
- <span class="caption-text">
-  Tutorials
- </span>
-</p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="tutorials/tutorial_train.html">
-   Training
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="tutorials/tutorial_custom.html">
-   Custom model
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tutorial_train.html">Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tutorial_custom.html">Custom model</a></li>
 </ul>
-<p>
- <span class="caption-text">
-  Library API
- </span>
-</p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Library API</span></p>
 <ul class="current nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="compressai.html">
-   compressai
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="ans.html">
-   compressai.ans
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="datasets.html">
-   compressai.datasets
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="entropy_models.html">
-   compressai.entropy_models
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="layers.html">
-   compressai.layers
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="models.html">
-   compressai.models
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="ops.html">
-   compressai.ops
-  </a>
- </li>
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
-   compressai.transforms
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="compressai.html">compressai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ans.html">compressai.ans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">compressai.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">compressai.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">compressai.transforms</a></li>
 </ul>
-<p>
- <span class="caption-text">
-  Model Zoo
- </span>
-</p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Model Zoo</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="zoo.html">
-   Image compression
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="zoo.html">Image compression</a></li>
+
 </ul>
-<p>
- <span class="caption-text">
-  Utils
- </span>
-</p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Utils</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="cli_usage.html">
-   Command line usage
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="cli_usage.html">Command line usage</a></li>
 </ul>
-<p>
- <span class="caption-text">
-  Development
- </span>
-</p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference external" href="https://github.com/InterDigitalInc/CompressAI/">
-   Github repository
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/InterDigitalInc/CompressAI/">Github repository</a></li>
 </ul>
 
     </div>
 </nav></div>
-        <div class="bd-sidebar__bottom">
-             <!-- To handle the deprecated key -->
-            
-        </div>
     </div>
-    <div id="rtd-footer-container"></div>
-</div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
 
 
-          
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
 
-
-          
-<!-- A tiny helper pixel to detect if we've scrolled -->
 <div class="sbt-scroll-pixel-helper"></div>
-<!-- Main content -->
-<div class="col py-0 content-container">
-    
-    <div class="header-article row sticky-top noprint">
-        
 
-
-
-<div class="col py-1 d-flex header-article-main">
-    <div class="header-article__left">
-        
-        <label for="__navigation"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="right"
-title="Toggle navigation"
->
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
   
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-bars"></i>
-  </span>
-
-</label>
-
-        
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
     </div>
-    <div class="header-article__right"><a href="https://github.com/InterDigitalInc/CompressAI/"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="bottom"
-title="Source repository"
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/InterDigitalInc/CompressAI" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
   <i class="fab fa-github"></i>
   </span>
 
 </a>
 
-<div class="menu-dropdown menu-dropdown-download-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Download this page">
-      <i class="fas fa-download"></i>
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="_sources/transforms.rst.txt"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Download source file"
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/transforms.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
   <i class="fas fa-file"></i>
   </span>
-<span class="headerbtn__text-container">.rst</span>
+<span class="btn__text-container">.rst</span>
 </a>
-
-      </li>
+</li>
+      
+      
+      
       
       <li>
-        
-<button onclick="printPdf(this)"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="left"
-title="Print to PDF"
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
   <i class="fas fa-file-pdf"></i>
   </span>
-<span class="headerbtn__text-container">.pdf</span>
+<span class="btn__text-container">.pdf</span>
 </button>
-
-      </li>
+</li>
       
-    </ul>
-  </div>
+  </ul>
 </div>
-<label for="__page-toc"
-  class="headerbtn headerbtn-page-toc"
-  
->
-  
 
-<span class="headerbtn__icon-container">
-  <i class="fas fa-list"></i>
-  </span>
 
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
 </label>
-
+</div></div>
+      
     </div>
+  
 </div>
-
-<!-- Table of contents -->
-<div class="col-md-3 bd-toc show noprint">
-    <div class="tocsection onthispage pt-5 pb-3">
-        <i class="fas fa-list"></i> Contents
-    </div>
-    <nav id="bd-toc-nav" aria-label="Page">
-        <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#transforms-on-tensors">
-   Transforms on Tensors
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#functional-transforms">
-   Functional Transforms
-  </a>
- </li>
-</ul>
-
-    </nav>
 </div>
-    </div>
-    <div class="article row">
-        <div class="col pl-md-3 pl-lg-5 content-container">
-            <!-- Table of contents that is only displayed when printing the page -->
-            <div id="jb-print-docs-body" class="onlyprint">
-                <h1>compressai.transforms</h1>
-                <!-- Table of contents -->
-                <div id="print-main-content">
-                    <div id="jb-print-toc">
-                        
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#transforms-on-tensors">
-   Transforms on Tensors
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#functional-transforms">
-   Functional Transforms
-  </a>
- </li>
-</ul>
+              
+              
 
-                        </nav>
-                    </div>
-                </div>
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>compressai.transforms</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
             </div>
-            <main id="main-content" role="main">
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transforms-on-tensors">Transforms on Tensors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.RGB2YCbCr"><code class="docutils literal notranslate"><span class="pre">RGB2YCbCr</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.YCbCr2RGB"><code class="docutils literal notranslate"><span class="pre">YCbCr2RGB</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.YUV420To444"><code class="docutils literal notranslate"><span class="pre">YUV420To444</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.YUV444To420"><code class="docutils literal notranslate"><span class="pre">YUV444To420</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functional-transforms">Functional Transforms</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.rgb2ycbcr"><code class="docutils literal notranslate"><span class="pre">rgb2ycbcr()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.ycbcr2rgb"><code class="docutils literal notranslate"><span class="pre">ycbcr2rgb()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.yuv_420_to_444"><code class="docutils literal notranslate"><span class="pre">yuv_420_to_444()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.yuv_444_to_420"><code class="docutils literal notranslate"><span class="pre">yuv_444_to_420()</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
                 
-              <div>
-                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
   <section id="compressai-transforms">
-<h1>compressai.transforms<a class="headerlink" href="#compressai-transforms" title="Permalink to this headline">¶</a></h1>
+<h1>compressai.transforms<a class="headerlink" href="#compressai-transforms" title="Permalink to this heading">#</a></h1>
 <section id="transforms-on-tensors">
-<h2>Transforms on Tensors<a class="headerlink" href="#transforms-on-tensors" title="Permalink to this headline">¶</a></h2>
+<h2>Transforms on Tensors<a class="headerlink" href="#transforms-on-tensors" title="Permalink to this heading">#</a></h2>
 <dl class="py class">
-<dt id="compressai.transforms.RGB2YCbCr">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></code><code class="sig-name descname"><span class="pre">RGB2YCbCr</span></code><a class="reference internal" href="_modules/compressai/transforms/transforms.html#RGB2YCbCr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.RGB2YCbCr" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.transforms.RGB2YCbCr">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">RGB2YCbCr</span></span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#RGB2YCbCr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.RGB2YCbCr" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a RGB tensor to YCbCr.
 The tensor is expected to be in the [0, 1] floating point range, with a
 shape of (3xHxW) or (Nx3xHxW).</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="compressai.transforms.YCbCr2RGB">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></code><code class="sig-name descname"><span class="pre">YCbCr2RGB</span></code><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YCbCr2RGB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YCbCr2RGB" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.transforms.YCbCr2RGB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YCbCr2RGB</span></span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YCbCr2RGB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YCbCr2RGB" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a YCbCr tensor to RGB.
 The tensor is expected to be in the [0, 1] floating point range, with a
 shape of (3xHxW) or (Nx3xHxW).</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="compressai.transforms.YUV420To444">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></code><code class="sig-name descname"><span class="pre">YUV420To444</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tuple</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YUV420To444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YUV420To444" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.transforms.YUV420To444">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YUV420To444</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tuple</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YUV420To444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YUV420To444" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a YUV 420 input to a 444 representation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -419,8 +374,8 @@ tensor (default: False)</p></li>
 </dd></dl>
 
 <dl class="py class">
-<dt id="compressai.transforms.YUV444To420">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></code><code class="sig-name descname"><span class="pre">YUV444To420</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'avg_pool'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YUV444To420"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YUV444To420" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.transforms.YUV444To420">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YUV444To420</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'avg_pool'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YUV444To420"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YUV444To420" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a YUV 444 tensor to a 420 representation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -439,11 +394,11 @@ tensor (default: False)</p></li>
 
 </section>
 <section id="functional-transforms">
-<h2>Functional Transforms<a class="headerlink" href="#functional-transforms" title="Permalink to this headline">¶</a></h2>
+<h2>Functional Transforms<a class="headerlink" href="#functional-transforms" title="Permalink to this heading">#</a></h2>
 <p>Functional transforms can be used to define custom transform classes.</p>
 <span class="target" id="module-compressai.transforms.functional"></span><dl class="py function">
-<dt id="compressai.transforms.functional.rgb2ycbcr">
-<code class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></code><code class="sig-name descname"><span class="pre">rgb2ycbcr</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torch.Tensor</span><a class="reference internal" href="_modules/compressai/transforms/functional.html#rgb2ycbcr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.rgb2ycbcr" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.transforms.functional.rgb2ycbcr">
+<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">rgb2ycbcr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#rgb2ycbcr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.rgb2ycbcr" title="Permalink to this definition">#</a></dt>
 <dd><p>RGB to YCbCr conversion for torch Tensor.
 Using ITU-R BT.709 coefficients.</p>
 <dl class="field-list simple">
@@ -460,8 +415,8 @@ Using ITU-R BT.709 coefficients.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="compressai.transforms.functional.ycbcr2rgb">
-<code class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></code><code class="sig-name descname"><span class="pre">ycbcr2rgb</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ycbcr</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">torch.Tensor</span><a class="reference internal" href="_modules/compressai/transforms/functional.html#ycbcr2rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.ycbcr2rgb" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.transforms.functional.ycbcr2rgb">
+<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">ycbcr2rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ycbcr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#ycbcr2rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.ycbcr2rgb" title="Permalink to this definition">#</a></dt>
 <dd><p>YCbCr to RGB conversion for torch Tensor.
 Using ITU-R BT.709 coefficients.</p>
 <dl class="field-list simple">
@@ -478,8 +433,8 @@ Using ITU-R BT.709 coefficients.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="compressai.transforms.functional.yuv_420_to_444">
-<code class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></code><code class="sig-name descname"><span class="pre">yuv_420_to_444</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yuv</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tuple</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#yuv_420_to_444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.yuv_420_to_444" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.transforms.functional.yuv_420_to_444">
+<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">yuv_420_to_444</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yuv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tuple</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#yuv_420_to_444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.yuv_420_to_444" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a 420 input to a 444 representation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -507,8 +462,8 @@ tensor (default: False)</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="compressai.transforms.functional.yuv_444_to_420">
-<code class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></code><code class="sig-name descname"><span class="pre">yuv_444_to_420</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yuv</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'avg_pool'</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#yuv_444_to_420"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.yuv_444_to_420" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compressai.transforms.functional.yuv_444_to_420">
+<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">yuv_444_to_420</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yuv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'avg_pool'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#yuv_444_to_420"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.yuv_444_to_420" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a 444 tensor to a 420 representation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -533,49 +488,112 @@ of 3 (Nx1xHxW) tensors.</p></li>
 </section>
 
 
-              </div>
+                </article>
               
-            </main>
-            <footer class="footer-article noprint">
-                
-    <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="ops.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">compressai.ops</p>
-        </div>
+
+              
+              
+                <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="ops.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">compressai.ops</p>
+      </div>
     </a>
-    <a class='right-next' id="next-link" href="zoo.html" title="next page">
-    <div class="prev-next-info">
+    <a class="right-next"
+       href="zoo.html"
+       title="next page">
+      <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Image compression</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
-            </footer>
-        </div>
-    </div>
-    <div class="footer-content row">
-        <footer class="col footer"><p>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transforms-on-tensors">Transforms on Tensors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.RGB2YCbCr"><code class="docutils literal notranslate"><span class="pre">RGB2YCbCr</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.YCbCr2RGB"><code class="docutils literal notranslate"><span class="pre">YCbCr2RGB</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.YUV420To444"><code class="docutils literal notranslate"><span class="pre">YUV420To444</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.YUV444To420"><code class="docutils literal notranslate"><span class="pre">YUV444To420</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functional-transforms">Functional Transforms</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.rgb2ycbcr"><code class="docutils literal notranslate"><span class="pre">rgb2ycbcr()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.ycbcr2rgb"><code class="docutils literal notranslate"><span class="pre">ycbcr2rgb()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.yuv_420_to_444"><code class="docutils literal notranslate"><span class="pre">yuv_420_to_444()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.yuv_444_to_420"><code class="docutils literal notranslate"><span class="pre">yuv_444_to_420()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            <div class="bd-footer-content__inner">
+<div class="bd-footer-content__inner container">
   
-    By InterDigital Communications, Inc.<br/>
-  
-      &copy; Copyright 2021, InterDigital Communications, Inc.<br/>
-</p>
-        </footer>
-    </div>
+  <div class="footer-item">
     
-</div>
+<p class="component-author">
+By InterDigital Communications, Inc.
+</p>
 
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2021, InterDigital Communications, Inc.
+      <br/>
+    
+  </p>
 
-      </div>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div></div>
+          </footer>
+        
+
+      </main>
     </div>
+  </div>
   
-    <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
 
+  <footer class="bd-footer">
+  </footer>
   </body>
 </html>
