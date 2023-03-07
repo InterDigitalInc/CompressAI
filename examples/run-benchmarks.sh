@@ -95,41 +95,25 @@ BPGDEC="$(which bpgdec)"
 # edit below to provide the path to the chosen version of VTM
 AV1_BIN_DIR="${HOME}/av1/aom/build_gcc"
 
-gen_qps(){
-    if [ $# -eq 2 ]; then
-        qps=`echo $(seq $1 $2) | awk '{gsub(/ /, ",");print $0}'`
-    elif [ $# -eq 3 ]; then
-        qps=`echo $(seq $1 $2 $3) | awk '{gsub(/ /, ",");print $0}'`
-    else
-        echo "gen_qps: invalid number of arguments"
-        exit 1
-    fi
-    echo $qps
-}
-
 jpeg() {
-    qps=`gen_qps 5 5 95`
     python3 -m compressai.utils.bench jpeg "$dataset"            \
-        -q $qps -j "$NJOBS" > "results/${dataset_name}/jpeg.json"
+        -q $(seq -s, 5 5 95) -j "$NJOBS" > "results/${dataset_name}/jpeg.json"
 }
 
 jpeg2000() {
-    qps=`gen_qps 5 5 95`
     python3 -m compressai.utils.bench jpeg2000 "$dataset"        \
-        -q $qps -j "$NJOBS" > "results/${dataset_name}/jpeg2000.json"
+        -q $(seq -s, 5 5 95) -j "$NJOBS" > "results/${dataset_name}/jpeg2000.json"
 }
 
 webp() {
-    qps=`gen_qps 5 5 95`
     python3 -m compressai.utils.bench webp "$dataset"            \
-        -q $qps -j "$NJOBS" > "results/${dataset_name}/webp.json"
+        -q $(seq -s, 5 5 95) -j "$NJOBS" > "results/${dataset_name}/webp.json"
 }
 
 bpg() {
     if [ -z ${BPGENC+x} ] || [ -z ${BPGDEC+x} ]; then echo "install libBPG"; exit 1; fi
-    qps=`gen_qps 5 5 95`
     python3 -m compressai.utils.bench bpg "$dataset"             \
-        -q $qps -m "$1" -e "$2" -c "$3"                          \
+        -q $(seq -s, 47 -5 12) -m "$1" -e "$2" -c "$3"           \
         --encoder-path "$BPGENC"                                 \
         --decoder-path "$BPGDEC"                                 \
         -j "$NJOBS" > "results/${dataset_name}/$4"
@@ -138,35 +122,31 @@ bpg() {
 hm() {
     if [ -z ${HM_BIN_DIR+x} ]; then echo "set HM bin directory HM_BIN_DIR"; exit 1; fi
     echo "using HM version $HM_VERSION"
-    qps=`gen_qps 47 -5 12`
     python3 -m compressai.utils.bench hm "$dataset"             \
-        -q $qps -b "$HM_BIN_DIR" -c "$HM_CFG"                   \
+        -q $(seq -s, 47 -5 12) -b "$HM_BIN_DIR" -c "$HM_CFG"    \
         -j "$NJOBS" > "results/${dataset_name}/hm.json"
 }
 
 vtm() {
     if [ -z ${VTM_BIN_DIR+x} ]; then echo "set VTM bin directory VTM_BIN_DIR"; exit 1; fi
     echo "using VTM version $VTM_VERSION"
-    qps=`gen_qps 47 -5 12`
     python3 -m compressai.utils.bench vtm "$dataset"            \
-        -q $qps -b "$VTM_BIN_DIR" -c "$VTM_CFG"                 \
+        -q $(seq -s, 47 -5 12) -b "$VTM_BIN_DIR" -c "$VTM_CFG"  \
         -j "$NJOBS" > "results/${dataset_name}/vtm.json"
 }
 
 av1() {
     if [ -z ${AV1_BIN_DIR+x} ]; then echo "set AV1 bin directory AV1_BIN_DIR"; exit 1; fi
-    qps=`gen_qps 62 -5 7`
     python3 -m compressai.utils.bench av1 "$dataset"            \
-        -q $qps -b "${AV1_BIN_DIR}"                             \
+        -q $(seq -s, 62 -5 7) -b "${AV1_BIN_DIR}"               \
         -j "$NJOBS" > "results/${dataset_name}/av1.json"
 }
 
 tfci() {
     if [ -z ${TFCI_SCRIPT+x} ]; then echo "set TFCI_SCRIPT bin path"; exit 1; fi
-    qps=`gen_qps 1 8`
     python3 -m compressai.utils.bench tfci "$dataset"           \
         --path "$TFCI_SCRIPT" --model "$1"                      \
-        -q $qps -j "$NJOBS" > "results/${dataset_name}/official-$1.json"
+        -q $(seq -s, 1 8) -j "$NJOBS" > "results/${dataset_name}/official-$1.json"
 }
 
 mkdir -p "results/${dataset_name}"
