@@ -114,9 +114,8 @@ class CheckerboardLatentCodec(LatentCodec):
 
     def forward(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
         y_hat = self.quantize(y)
-        ctx_params = self.entropy_parameters(
-            self.merge(side_params, self.context_prediction(y_hat))
-        )
+        y_ctx = self._mask_anchor(self.context_prediction(y_hat))
+        ctx_params = self.entropy_parameters(self.merge(side_params, y_ctx))
         y_out = self.latent_codec["y"](y, ctx_params)
         return {
             "likelihoods": {
@@ -206,6 +205,11 @@ class CheckerboardLatentCodec(LatentCodec):
         y[..., 1::2, 1::2] = y_[0, ..., 1::2, :]
         y[..., 0::2, 1::2] = y_[1, ..., 0::2, :]
         y[..., 1::2, 0::2] = y_[1, ..., 1::2, :]
+        return y
+
+    def _mask_anchor(self, y: Tensor) -> Tensor:
+        y[..., 0::2, 0::2] = 0
+        y[..., 1::2, 1::2] = 0
         return y
 
     def merge(self, *args):
