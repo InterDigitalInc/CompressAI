@@ -29,9 +29,9 @@
 
 import torch.nn as nn
 
-from compressai.entropy_models import EntropyBottleneck, GaussianConditional
 from compressai.latent_codecs import (
     CheckerboardLatentCodec,
+    GaussianConditionalLatentCodec,
     HyperLatentCodec,
     HyperpriorLatentCodec,
 )
@@ -126,7 +126,9 @@ class Cheng2020AnchorCheckerboard(SimpleVAECompressionModel):
             N,
             latent_codec={
                 "y": CheckerboardLatentCodec(
-                    gaussian_conditional=GaussianConditional(None),
+                    latent_codec={
+                        "y": GaussianConditionalLatentCodec(quantizer="ste"),
+                    },
                     entropy_parameters=nn.Sequential(
                         nn.Conv2d(N * 12 // 3, N * 10 // 3, 1),
                         nn.LeakyReLU(inplace=True),
@@ -138,12 +140,7 @@ class Cheng2020AnchorCheckerboard(SimpleVAECompressionModel):
                         N, 2 * N, kernel_size=5, padding=2, stride=1
                     ),
                 ),
-                "hyper": HyperLatentCodec(
-                    N,
-                    h_a=h_a,
-                    h_s=h_s,
-                    entropy_bottleneck=EntropyBottleneck(N),
-                ),
+                "hyper": HyperLatentCodec(N, h_a=h_a, h_s=h_s),
             },
         )
 

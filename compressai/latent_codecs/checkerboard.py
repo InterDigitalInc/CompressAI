@@ -36,6 +36,7 @@ from torch import Tensor
 
 from compressai.entropy_models import EntropyModel
 from compressai.layers import CheckerboardMaskedConv2d
+from compressai.ops import quantize_ste
 from compressai.registry import register_module
 
 from .base import LatentCodec
@@ -99,20 +100,23 @@ class CheckerboardLatentCodec(LatentCodec):
     entropy_parameters: nn.Module
     context_prediction: CheckerboardMaskedConv2d
 
-    def __init__(self, **kwargs):
+    def __init__(self, forward_method="twopass", **kwargs):
         super().__init__()
         self._kwargs = kwargs
+        self.forward_method = forward_method
         self._setdefault("entropy_parameters", nn.Identity)
         self._setdefault("context_prediction", nn.Identity)
         self._set_group_defaults(
             "latent_codec",
             defaults={
-                "y": GaussianConditionalLatentCodec,
+                "y": lambda: GaussianConditionalLatentCodec(quantizer="ste"),
             },
             save_direct=True,
         )
 
     def forward(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
+        if self.forward_method == "twopass":
+            return self._forward_twopass(y, side_params)
         y_hat = self.quantize(y)
         y_ctx = self._mask_anchor(self.context_prediction(y_hat))
         ctx_params = self.entropy_parameters(self.merge(side_params, y_ctx))
@@ -123,6 +127,33 @@ class CheckerboardLatentCodec(LatentCodec):
             },
             "y_hat": y_hat,
         }
+
+    def _forward_twopass(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
+        """Do context prediction on STE-quantized y_hat instead."""
+        y_hat_anchors = self._y_hat_anchors(y, side_params)
+        y_ctx = self._mask_anchor(self.context_prediction(y_hat_anchors))
+        ctx_params = self.entropy_parameters(self.merge(side_params, y_ctx))
+        y_out = self.latent_codec["y"](y, ctx_params)
+        # Reuse quantized y_hat that was used for non-anchor context prediction.
+        y_hat = y_out["y_hat"]
+        y_hat[..., 0::2, 0::2] = y_hat_anchors[..., 0::2, 0::2]
+        y_hat[..., 1::2, 1::2] = y_hat_anchors[..., 1::2, 1::2]
+        return {
+            "likelihoods": {
+                "y": y_out["likelihoods"]["y"],
+            },
+            "y_hat": y_hat,
+        }
+
+    def _y_hat_anchors(self, y, side_params):
+        y_ctx = self.context_prediction(y).detach()
+        y_ctx[:] = 0
+        ctx_params = self.entropy_parameters(self.merge(side_params, y_ctx))
+        ctx_params = self.latent_codec["y"].entropy_parameters(ctx_params)
+        ctx_params = self._mask_non_anchor(ctx_params)  # Probably not needed.
+        _, means_hat = ctx_params.chunk(2, 1)
+        y_hat = quantize_ste(y - means_hat) + means_hat
+        return y_hat
 
     def compress(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
         n, c, h, w = y.shape
@@ -210,6 +241,11 @@ class CheckerboardLatentCodec(LatentCodec):
     def _mask_anchor(self, y: Tensor) -> Tensor:
         y[..., 0::2, 0::2] = 0
         y[..., 1::2, 1::2] = 0
+        return y
+
+    def _mask_non_anchor(self, y: Tensor) -> Tensor:
+        y[..., 0::2, 1::2] = 0
+        y[..., 1::2, 0::2] = 0
         return y
 
     def merge(self, *args):
