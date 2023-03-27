@@ -18,39 +18,36 @@ SimpleVAECompressionModel
 FactorizedPrior
 ----------------
 .. autoclass:: FactorizedPrior
-    :members:
 
 
 ScaleHyperprior
 ---------------
 .. autoclass:: ScaleHyperprior
-    :members:
 
 
 MeanScaleHyperprior
 -------------------
 .. autoclass:: MeanScaleHyperprior
-    :members:
 
 
 JointAutoregressiveHierarchicalPriors
 -------------------------------------
 .. autoclass:: JointAutoregressiveHierarchicalPriors
-    :members:
+
 
 Cheng2020Anchor
 ---------------
 .. autoclass:: Cheng2020Anchor
-    :members:
+
 
 Cheng2020Attention
 ------------------
 .. autoclass:: Cheng2020Attention
-    :members:
+
 
 .. currentmodule:: compressai.models.video
 
 ScaleSpaceFlow
 ------------------
 .. autoclass:: ScaleSpaceFlow
-    :members:
+
