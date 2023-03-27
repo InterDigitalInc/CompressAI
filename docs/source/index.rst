@@ -27,6 +27,7 @@ end-to-end compression research.
    ans
    datasets
    entropy_models
+   latent_codecs
    layers
    models
    ops
