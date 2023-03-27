@@ -142,6 +142,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ans.html">compressai.ans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">compressai.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="latent_codecs.html">compressai.latent_codecs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layers.html">compressai.layers</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">compressai.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
@@ -313,42 +314,28 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#factorizedprior">FactorizedPrior</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.FactorizedPrior"><code class="docutils literal notranslate"><span class="pre">FactorizedPrior</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.FactorizedPrior.forward"><code class="docutils literal notranslate"><span class="pre">FactorizedPrior.forward()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.FactorizedPrior.from_state_dict"><code class="docutils literal notranslate"><span class="pre">FactorizedPrior.from_state_dict()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simplevaecompressionmodel">SimpleVAECompressionModel</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.SimpleVAECompressionModel"><code class="docutils literal notranslate"><span class="pre">SimpleVAECompressionModel</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#factorizedprior">FactorizedPrior</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.FactorizedPrior"><code class="docutils literal notranslate"><span class="pre">FactorizedPrior</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalehyperprior">ScaleHyperprior</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.ScaleHyperprior"><code class="docutils literal notranslate"><span class="pre">ScaleHyperprior</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.ScaleHyperprior.forward"><code class="docutils literal notranslate"><span class="pre">ScaleHyperprior.forward()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.ScaleHyperprior.from_state_dict"><code class="docutils literal notranslate"><span class="pre">ScaleHyperprior.from_state_dict()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.ScaleHyperprior"><code class="docutils literal notranslate"><span class="pre">ScaleHyperprior</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#meanscalehyperprior">MeanScaleHyperprior</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.MeanScaleHyperprior"><code class="docutils literal notranslate"><span class="pre">MeanScaleHyperprior</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.MeanScaleHyperprior.forward"><code class="docutils literal notranslate"><span class="pre">MeanScaleHyperprior.forward()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.MeanScaleHyperprior"><code class="docutils literal notranslate"><span class="pre">MeanScaleHyperprior</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#jointautoregressivehierarchicalpriors">JointAutoregressiveHierarchicalPriors</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.JointAutoregressiveHierarchicalPriors"><code class="docutils literal notranslate"><span class="pre">JointAutoregressiveHierarchicalPriors</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.JointAutoregressiveHierarchicalPriors.forward"><code class="docutils literal notranslate"><span class="pre">JointAutoregressiveHierarchicalPriors.forward()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.JointAutoregressiveHierarchicalPriors.from_state_dict"><code class="docutils literal notranslate"><span class="pre">JointAutoregressiveHierarchicalPriors.from_state_dict()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.JointAutoregressiveHierarchicalPriors"><code class="docutils literal notranslate"><span class="pre">JointAutoregressiveHierarchicalPriors</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cheng2020anchor">Cheng2020Anchor</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Cheng2020Anchor"><code class="docutils literal notranslate"><span class="pre">Cheng2020Anchor</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Cheng2020Anchor.from_state_dict"><code class="docutils literal notranslate"><span class="pre">Cheng2020Anchor.from_state_dict()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Cheng2020Anchor"><code class="docutils literal notranslate"><span class="pre">Cheng2020Anchor</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cheng2020attention">Cheng2020Attention</a><ul class="nav section-nav flex-column">
@@ -356,14 +343,7 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalespaceflow">ScaleSpaceFlow</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow.aux_loss"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow.aux_loss()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow.forward"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow.forward()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow.from_state_dict"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow.from_state_dict()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow.gaussian_volume"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow.gaussian_volume()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow.warp_volume"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow.warp_volume()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -383,7 +363,7 @@ document.write(`
 <h2>CompressionModel<a class="headerlink" href="#compressionmodel" title="Permalink to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.models.CompressionModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.models.</span></span><span class="sig-name descname"><span class="pre">CompressionModel</span></span><a class="reference internal" href="_modules/compressai/models/base.html#CompressionModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.CompressionModel" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.models.</span></span><span class="sig-name descname"><span class="pre">CompressionModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/base.html#CompressionModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.CompressionModel" title="Permalink to this definition">#</a></dt>
 <dd><p>Base class for constructing an auto-encoder with any number of
 EntropyBottleneck or GaussianConditional modules.</p>
 <dl class="py method">
@@ -478,6 +458,20 @@ for initializing the Gaussian distributions
 </dd></dl>
 
 </section>
+<section id="simplevaecompressionmodel">
+<h2>SimpleVAECompressionModel<a class="headerlink" href="#simplevaecompressionmodel" title="Permalink to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.models.SimpleVAECompressionModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.models.</span></span><span class="sig-name descname"><span class="pre">SimpleVAECompressionModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/base.html#SimpleVAECompressionModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.SimpleVAECompressionModel" title="Permalink to this definition">#</a></dt>
+<dd><p>Simple VAE model with arbitrary latent codec.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>       ┌───┐  y  ┌────┐ y_hat ┌───┐
+x ──►──┤g_a├──►──┤ lc ├───►───┤g_s├──►── x_hat
+       └───┘     └────┘       └───┘
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
 <section id="factorizedprior">
 <h2>FactorizedPrior<a class="headerlink" href="#factorizedprior" title="Permalink to this heading">#</a></h2>
 <dl class="py class">
@@ -518,26 +512,6 @@ encoder and last layer of the hyperprior decoder)</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="compressai.models.FactorizedPrior.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/google.html#FactorizedPrior.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.FactorizedPrior.forward" title="Permalink to this definition">#</a></dt>
-<dd><p>Defines the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="compressai.models.FactorizedPrior.from_state_dict">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_state_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/google.html#FactorizedPrior.from_state_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.FactorizedPrior.from_state_dict" title="Permalink to this definition">#</a></dt>
-<dd><p>Return a new model instance from <cite>state_dict</cite>.</p>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -582,26 +556,6 @@ encoder and last layer of the hyperprior decoder)</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="compressai.models.ScaleHyperprior.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/google.html#ScaleHyperprior.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.ScaleHyperprior.forward" title="Permalink to this definition">#</a></dt>
-<dd><p>Defines the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="compressai.models.ScaleHyperprior.from_state_dict">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_state_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/google.html#ScaleHyperprior.from_state_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.ScaleHyperprior.from_state_dict" title="Permalink to this definition">#</a></dt>
-<dd><p>Return a new model instance from <cite>state_dict</cite>.</p>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -647,20 +601,6 @@ encoder and last layer of the hyperprior decoder)</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="compressai.models.MeanScaleHyperprior.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/google.html#MeanScaleHyperprior.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.MeanScaleHyperprior.forward" title="Permalink to this definition">#</a></dt>
-<dd><p>Defines the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -710,26 +650,6 @@ encoder and last layer of the hyperprior decoder)</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="compressai.models.JointAutoregressiveHierarchicalPriors.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/google.html#JointAutoregressiveHierarchicalPriors.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.JointAutoregressiveHierarchicalPriors.forward" title="Permalink to this definition">#</a></dt>
-<dd><p>Defines the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="compressai.models.JointAutoregressiveHierarchicalPriors.from_state_dict">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_state_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/google.html#JointAutoregressiveHierarchicalPriors.from_state_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.JointAutoregressiveHierarchicalPriors.from_state_dict" title="Permalink to this definition">#</a></dt>
-<dd><p>Return a new model instance from <cite>state_dict</cite>.</p>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -748,12 +668,6 @@ convolutions for up-sampling.</p>
 <dd class="field-odd"><p><strong>N</strong> (<em>int</em>) – Number of channels</p>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="compressai.models.Cheng2020Anchor.from_state_dict">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_state_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/waseda.html#Cheng2020Anchor.from_state_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.Cheng2020Anchor.from_state_dict" title="Permalink to this definition">#</a></dt>
-<dd><p>Return a new model instance from <cite>state_dict</cite>.</p>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -793,46 +707,6 @@ IEEE Conference on Computer Vision and Pattern Recognition (CVPR 2020).</p>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="compressai.models.video.ScaleSpaceFlow.aux_loss">
-<span class="sig-name descname"><span class="pre">aux_loss</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/video/google.html#ScaleSpaceFlow.aux_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.video.ScaleSpaceFlow.aux_loss" title="Permalink to this definition">#</a></dt>
-<dd><p>Return a list of the auxiliary entropy bottleneck over module(s).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="compressai.models.video.ScaleSpaceFlow.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frames</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/video/google.html#ScaleSpaceFlow.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.video.ScaleSpaceFlow.forward" title="Permalink to this definition">#</a></dt>
-<dd><p>Defines the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="compressai.models.video.ScaleSpaceFlow.from_state_dict">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_state_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/video/google.html#ScaleSpaceFlow.from_state_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.video.ScaleSpaceFlow.from_state_dict" title="Permalink to this definition">#</a></dt>
-<dd><p>Return a new model instance from <cite>state_dict</cite>.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="compressai.models.video.ScaleSpaceFlow.gaussian_volume">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gaussian_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_levels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/video/google.html#ScaleSpaceFlow.gaussian_volume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.video.ScaleSpaceFlow.gaussian_volume" title="Permalink to this definition">#</a></dt>
-<dd><p>Efficient gaussian volume construction.</p>
-<p>From: “Generative Video Compression as Hierarchical Variational Inference”,
-by Yang et al.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="compressai.models.video.ScaleSpaceFlow.warp_volume">
-<span class="sig-name descname"><span class="pre">warp_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'border'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/video/google.html#ScaleSpaceFlow.warp_volume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.video.ScaleSpaceFlow.warp_volume" title="Permalink to this definition">#</a></dt>
-<dd><p>3D volume warping.</p>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -889,42 +763,28 @@ by Yang et al.</p>
 </li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#factorizedprior">FactorizedPrior</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.FactorizedPrior"><code class="docutils literal notranslate"><span class="pre">FactorizedPrior</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.FactorizedPrior.forward"><code class="docutils literal notranslate"><span class="pre">FactorizedPrior.forward()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.FactorizedPrior.from_state_dict"><code class="docutils literal notranslate"><span class="pre">FactorizedPrior.from_state_dict()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simplevaecompressionmodel">SimpleVAECompressionModel</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.SimpleVAECompressionModel"><code class="docutils literal notranslate"><span class="pre">SimpleVAECompressionModel</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#factorizedprior">FactorizedPrior</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.FactorizedPrior"><code class="docutils literal notranslate"><span class="pre">FactorizedPrior</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalehyperprior">ScaleHyperprior</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.ScaleHyperprior"><code class="docutils literal notranslate"><span class="pre">ScaleHyperprior</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.ScaleHyperprior.forward"><code class="docutils literal notranslate"><span class="pre">ScaleHyperprior.forward()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.ScaleHyperprior.from_state_dict"><code class="docutils literal notranslate"><span class="pre">ScaleHyperprior.from_state_dict()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.ScaleHyperprior"><code class="docutils literal notranslate"><span class="pre">ScaleHyperprior</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#meanscalehyperprior">MeanScaleHyperprior</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.MeanScaleHyperprior"><code class="docutils literal notranslate"><span class="pre">MeanScaleHyperprior</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.MeanScaleHyperprior.forward"><code class="docutils literal notranslate"><span class="pre">MeanScaleHyperprior.forward()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.MeanScaleHyperprior"><code class="docutils literal notranslate"><span class="pre">MeanScaleHyperprior</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#jointautoregressivehierarchicalpriors">JointAutoregressiveHierarchicalPriors</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.JointAutoregressiveHierarchicalPriors"><code class="docutils literal notranslate"><span class="pre">JointAutoregressiveHierarchicalPriors</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.JointAutoregressiveHierarchicalPriors.forward"><code class="docutils literal notranslate"><span class="pre">JointAutoregressiveHierarchicalPriors.forward()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.JointAutoregressiveHierarchicalPriors.from_state_dict"><code class="docutils literal notranslate"><span class="pre">JointAutoregressiveHierarchicalPriors.from_state_dict()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.JointAutoregressiveHierarchicalPriors"><code class="docutils literal notranslate"><span class="pre">JointAutoregressiveHierarchicalPriors</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cheng2020anchor">Cheng2020Anchor</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Cheng2020Anchor"><code class="docutils literal notranslate"><span class="pre">Cheng2020Anchor</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Cheng2020Anchor.from_state_dict"><code class="docutils literal notranslate"><span class="pre">Cheng2020Anchor.from_state_dict()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Cheng2020Anchor"><code class="docutils literal notranslate"><span class="pre">Cheng2020Anchor</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cheng2020attention">Cheng2020Attention</a><ul class="nav section-nav flex-column">
@@ -932,14 +792,7 @@ by Yang et al.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalespaceflow">ScaleSpaceFlow</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow.aux_loss"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow.aux_loss()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow.forward"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow.forward()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow.from_state_dict"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow.from_state_dict()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow.gaussian_volume"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow.gaussian_volume()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow.warp_volume"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow.warp_volume()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow</span></code></a></li>
 </ul>
 </li>
 </ul>

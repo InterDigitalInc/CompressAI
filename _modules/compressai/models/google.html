@@ -139,6 +139,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ans.html">compressai.ans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">compressai.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../latent_codecs.html">compressai.latent_codecs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../layers.html">compressai.layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">compressai.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ops.html">compressai.ops</a></li>
@@ -388,7 +389,7 @@ document.write(`
     <span class="k">def</span> <span class="nf">downsampling_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">2</span><span class="o">**</span><span class="mi">4</span>
 
-<div class="viewcode-block" id="FactorizedPrior.forward"><a class="viewcode-back" href="../../../models.html#compressai.models.FactorizedPrior.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
@@ -398,16 +399,16 @@ document.write(`
             <span class="s2">&quot;likelihoods&quot;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y_likelihoods</span><span class="p">,</span>
             <span class="p">},</span>
-        <span class="p">}</span></div>
+        <span class="p">}</span>
 
-<div class="viewcode-block" id="FactorizedPrior.from_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.FactorizedPrior.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;g_a.0.weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">M</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;g_a.6.weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">net</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
         <span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">net</span></div>
+        <span class="k">return</span> <span class="n">net</span>
 
     <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -547,7 +548,7 @@ document.write(`
     <span class="k">def</span> <span class="nf">downsampling_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">4</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ScaleHyperprior.forward"><a class="viewcode-back" href="../../../models.html#compressai.models.ScaleHyperprior.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
         <span class="n">z_hat</span><span class="p">,</span> <span class="n">z_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
@@ -558,16 +559,16 @@ document.write(`
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;x_hat&quot;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">,</span>
             <span class="s2">&quot;likelihoods&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y_likelihoods</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">z_likelihoods</span><span class="p">},</span>
-        <span class="p">}</span></div>
+        <span class="p">}</span>
 
-<div class="viewcode-block" id="ScaleHyperprior.from_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.ScaleHyperprior.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;g_a.0.weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">M</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;g_a.6.weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">net</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
         <span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">net</span></div>
+        <span class="k">return</span> <span class="n">net</span>
 
     <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -648,7 +649,7 @@ document.write(`
             <span class="n">conv</span><span class="p">(</span><span class="n">M</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">M</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="MeanScaleHyperprior.forward"><a class="viewcode-back" href="../../../models.html#compressai.models.MeanScaleHyperprior.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">z_hat</span><span class="p">,</span> <span class="n">z_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
@@ -660,7 +661,7 @@ document.write(`
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;x_hat&quot;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">,</span>
             <span class="s2">&quot;likelihoods&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y_likelihoods</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">z_likelihoods</span><span class="p">},</span>
-        <span class="p">}</span></div>
+        <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -789,7 +790,7 @@ document.write(`
     <span class="k">def</span> <span class="nf">downsampling_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">4</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
 
-<div class="viewcode-block" id="JointAutoregressiveHierarchicalPriors.forward"><a class="viewcode-back" href="../../../models.html#compressai.models.JointAutoregressiveHierarchicalPriors.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">z_hat</span><span class="p">,</span> <span class="n">z_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
@@ -809,16 +810,16 @@ document.write(`
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;x_hat&quot;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">,</span>
             <span class="s2">&quot;likelihoods&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y_likelihoods</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">z_likelihoods</span><span class="p">},</span>
-        <span class="p">}</span></div>
+        <span class="p">}</span>
 
-<div class="viewcode-block" id="JointAutoregressiveHierarchicalPriors.from_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.JointAutoregressiveHierarchicalPriors.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;g_a.0.weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">M</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;g_a.6.weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">net</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
         <span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">net</span></div>
+        <span class="k">return</span> <span class="n">net</span>
 
     <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="o">.</span><span class="n">device</span> <span class="o">!=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">):</span>

@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compressai.ops.bound_ops &#8212; CompressAI</title>
+    <title>compressai.latent_codecs.gaussian_conditional &#8212; CompressAI</title>
   
   
   
@@ -39,7 +39,7 @@
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/compressai/ops/bound_ops';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/compressai/latent_codecs/gaussian_conditional';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -256,7 +256,7 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <h1>Source code for compressai.ops.bound_ops</h1><div class="highlight"><pre>
+  <h1>Source code for compressai.latent_codecs.gaussian_conditional</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2021-2022, InterDigital Communications, Inc</span>
 <span class="c1"># All rights reserved.</span>
 
@@ -286,57 +286,95 @@ document.write(`
 <span class="c1"># OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF</span>
 <span class="c1"># ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
+<span class="kn">from</span> <span class="nn">compressai.entropy_models</span> <span class="kn">import</span> <span class="n">GaussianConditional</span>
+<span class="kn">from</span> <span class="nn">compressai.ops</span> <span class="kn">import</span> <span class="n">quantize_ste</span>
+<span class="kn">from</span> <span class="nn">compressai.registry</span> <span class="kn">import</span> <span class="n">register_module</span>
 
-<span class="k">def</span> <span class="nf">lower_bound_fwd</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">bound</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bound</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">LatentCodec</span>
 
-
-<span class="k">def</span> <span class="nf">lower_bound_bwd</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">bound</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
-    <span class="n">pass_through_if</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">bound</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">grad_output</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">pass_through_if</span> <span class="o">*</span> <span class="n">grad_output</span><span class="p">,</span> <span class="kc">None</span>
-
-
-<span class="k">class</span> <span class="nc">LowerBoundFunction</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Autograd function for the `LowerBound` operator.&quot;&quot;&quot;</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">bound</span><span class="p">):</span>
-        <span class="n">ctx</span><span class="o">.</span><span class="n">save_for_backward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bound</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">lower_bound_fwd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bound</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">):</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">bound</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">saved_tensors</span>
-        <span class="k">return</span> <span class="n">lower_bound_bwd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bound</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">)</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;GaussianConditionalLatentCodec&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 
 
-<div class="viewcode-block" id="LowerBound"><a class="viewcode-back" href="../../../ops.html#compressai.ops.LowerBound">[docs]</a><span class="k">class</span> <span class="nc">LowerBound</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lower bound operator, computes `torch.max(x, bound)` with a custom</span>
-<span class="sd">    gradient.</span>
+<div class="viewcode-block" id="GaussianConditionalLatentCodec"><a class="viewcode-back" href="../../../latent_codecs.html#compressai.latent_codecs.GaussianConditionalLatentCodec">[docs]</a><span class="nd">@register_module</span><span class="p">(</span><span class="s2">&quot;GaussianConditionalLatentCodec&quot;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">GaussianConditionalLatentCodec</span><span class="p">(</span><span class="n">LatentCodec</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gaussian conditional for compressing latent ``y`` using ``ctx_params``.</span>
 
-<span class="sd">    The derivative is replaced by the identity function when `x` is moved</span>
-<span class="sd">    towards the `bound`, otherwise the gradient is kept to zero.</span>
+<span class="sd">    Probability model for Gaussian of ``(scales, means)``.</span>
+
+<span class="sd">    Gaussian conditonal entropy model introduced in</span>
+<span class="sd">    `&quot;Variational Image Compression with a Scale Hyperprior&quot;</span>
+<span class="sd">    &lt;https://arxiv.org/abs/1802.01436&gt;`_,</span>
+<span class="sd">    by J. Balle, D. Minnen, S. Singh, S.J. Hwang, and N. Johnston,</span>
+<span class="sd">    International Conference on Learning Representations (ICLR), 2018.</span>
+
+<span class="sd">    .. note:: Unlike the original paper, which models only the scale</span>
+<span class="sd">       (i.e. &quot;width&quot;) of the Gaussian, this implementation models both</span>
+<span class="sd">       the scale and the mean (i.e. &quot;center&quot;) of the Gaussian.</span>
+
+<span class="sd">    .. code-block:: none</span>
+
+<span class="sd">                          ctx_params</span>
+<span class="sd">                              │</span>
+<span class="sd">                              ▼</span>
+<span class="sd">                              │</span>
+<span class="sd">                           ┌──┴──┐</span>
+<span class="sd">                           │  EP │</span>
+<span class="sd">                           └──┬──┘</span>
+<span class="sd">                              │</span>
+<span class="sd">               ┌───┐  y_hat   ▼</span>
+<span class="sd">        y ──►──┤ Q ├────►────····──►── y_hat</span>
+<span class="sd">               └───┘          GC</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">bound</span><span class="p">:</span> <span class="n">Tensor</span>
+    <span class="n">gaussian_conditional</span><span class="p">:</span> <span class="n">GaussianConditional</span>
+    <span class="n">entropy_parameters</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bound</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantizer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;noise&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;bound&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">bound</span><span class="p">)]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quantizer</span> <span class="o">=</span> <span class="n">quantizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setdefault</span><span class="p">(</span><span class="s2">&quot;gaussian_conditional&quot;</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">GaussianConditional</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setdefault</span><span class="p">(</span><span class="s2">&quot;entropy_parameters&quot;</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">)</span>
 
-    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">unused</span>
-    <span class="k">def</span> <span class="nf">lower_bound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">LowerBoundFunction</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bound</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">ctx_params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">gaussian_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="n">ctx_params</span><span class="p">)</span>
+        <span class="n">scales_hat</span><span class="p">,</span> <span class="n">means_hat</span> <span class="o">=</span> <span class="n">gaussian_params</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">y_hat</span><span class="p">,</span> <span class="n">y_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">scales_hat</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="n">means_hat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantizer</span> <span class="o">==</span> <span class="s2">&quot;ste&quot;</span><span class="p">:</span>
+            <span class="n">y_hat</span> <span class="o">=</span> <span class="n">quantize_ste</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">means_hat</span><span class="p">)</span> <span class="o">+</span> <span class="n">means_hat</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;likelihoods&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y_likelihoods</span><span class="p">},</span> <span class="s2">&quot;y_hat&quot;</span><span class="p">:</span> <span class="n">y_hat</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
-            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bound</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_bound</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">ctx_params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">gaussian_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="n">ctx_params</span><span class="p">)</span>
+        <span class="n">scales_hat</span><span class="p">,</span> <span class="n">means_hat</span> <span class="o">=</span> <span class="n">gaussian_params</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">build_indexes</span><span class="p">(</span><span class="n">scales_hat</span><span class="p">)</span>
+        <span class="n">y_strings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">means_hat</span><span class="p">)</span>
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span>
+            <span class="n">y_strings</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="n">means_hat</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;strings&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">y_strings</span><span class="p">],</span> <span class="s2">&quot;y_hat&quot;</span><span class="p">:</span> <span class="n">y_hat</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]],</span> <span class="n">shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">ctx_params</span><span class="p">:</span> <span class="n">Tensor</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="p">(</span><span class="n">y_strings</span><span class="p">,)</span> <span class="o">=</span> <span class="n">strings</span>
+        <span class="n">gaussian_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="n">ctx_params</span><span class="p">)</span>
+        <span class="n">scales_hat</span><span class="p">,</span> <span class="n">means_hat</span> <span class="o">=</span> <span class="n">gaussian_params</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">build_indexes</span><span class="p">(</span><span class="n">scales_hat</span><span class="p">)</span>
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussian_conditional</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span>
+            <span class="n">y_strings</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="n">means_hat</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="n">shape</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;y_hat&quot;</span><span class="p">:</span> <span class="n">y_hat</span><span class="p">}</span></div>
 </pre></div>
 
                 </article>

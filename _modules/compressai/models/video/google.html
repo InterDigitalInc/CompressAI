@@ -139,6 +139,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ans.html">compressai.ans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../datasets.html">compressai.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../latent_codecs.html">compressai.latent_codecs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../layers.html">compressai.layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../models.html">compressai.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ops.html">compressai.ops</a></li>
@@ -465,7 +466,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">num_levels</span> <span class="o">=</span> <span class="n">num_levels</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scale_field_shift</span> <span class="o">=</span> <span class="n">scale_field_shift</span>
 
-<div class="viewcode-block" id="ScaleSpaceFlow.forward"><a class="viewcode-back" href="../../../../models.html#compressai.models.video.ScaleSpaceFlow.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frames</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frames</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">List</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid number of frames: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
@@ -486,7 +487,7 @@ document.write(`
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;x_hat&quot;</span><span class="p">:</span> <span class="n">reconstructions</span><span class="p">,</span>
             <span class="s2">&quot;likelihoods&quot;</span><span class="p">:</span> <span class="n">frames_likelihoods</span><span class="p">,</span>
-        <span class="p">}</span></div>
+        <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">forward_keyframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_encoder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -582,7 +583,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">x_rec</span>
 
-<div class="viewcode-block" id="ScaleSpaceFlow.gaussian_volume"><a class="viewcode-back" href="../../../../models.html#compressai.models.video.ScaleSpaceFlow.gaussian_volume">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">gaussian_volume</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">num_levels</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Efficient gaussian volume construction.</span>
 
@@ -606,9 +607,9 @@ document.write(`
                     <span class="n">interp</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;bilinear&quot;</span><span class="p">,</span> <span class="n">align_corners</span><span class="o">=</span><span class="kc">False</span>
                 <span class="p">)</span>
             <span class="n">volume</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">interp</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ScaleSpaceFlow.warp_volume"><a class="viewcode-back" href="../../../../models.html#compressai.models.video.ScaleSpaceFlow.warp_volume">[docs]</a>    <span class="nd">@amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nd">@amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">warp_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">flow</span><span class="p">,</span> <span class="n">scale_field</span><span class="p">,</span> <span class="n">padding_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;border&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;3D volume warping.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">volume</span><span class="o">.</span><span class="n">ndimension</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">:</span>
@@ -626,7 +627,7 @@ document.write(`
         <span class="n">out</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">grid_sample</span><span class="p">(</span>
             <span class="n">volume</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span> <span class="n">volume_grid</span><span class="p">,</span> <span class="n">padding_mode</span><span class="o">=</span><span class="n">padding_mode</span><span class="p">,</span> <span class="n">align_corners</span><span class="o">=</span><span class="kc">False</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_ref</span><span class="p">,</span> <span class="n">motion_info</span><span class="p">):</span>
         <span class="n">flow</span><span class="p">,</span> <span class="n">scale_field</span> <span class="o">=</span> <span class="n">motion_info</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -635,7 +636,7 @@ document.write(`
         <span class="n">x_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">warp_volume</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">flow</span><span class="p">,</span> <span class="n">scale_field</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">x_pred</span>
 
-<div class="viewcode-block" id="ScaleSpaceFlow.aux_loss"><a class="viewcode-back" href="../../../../models.html#compressai.models.video.ScaleSpaceFlow.aux_loss">[docs]</a>    <span class="k">def</span> <span class="nf">aux_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">aux_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of the auxiliary entropy bottleneck over module(s).&quot;&quot;&quot;</span>
 
         <span class="n">aux_loss_list</span> <span class="o">=</span> <span class="p">[]</span>
@@ -643,7 +644,7 @@ document.write(`
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">CompressionModel</span><span class="p">)</span> <span class="ow">and</span> <span class="n">m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">:</span>
                 <span class="n">aux_loss_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">aux_loss</span><span class="p">())</span>
 
-        <span class="k">return</span> <span class="n">aux_loss_list</span></div>
+        <span class="k">return</span> <span class="n">aux_loss_list</span>
 
     <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frames</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">List</span><span class="p">):</span>
@@ -687,12 +688,12 @@ document.write(`
 
         <span class="k">return</span> <span class="n">dec_frames</span>
 
-<div class="viewcode-block" id="ScaleSpaceFlow.from_state_dict"><a class="viewcode-back" href="../../../../models.html#compressai.models.video.ScaleSpaceFlow.from_state_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_state_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new model instance from `state_dict`.&quot;&quot;&quot;</span>
         <span class="n">net</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="n">net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">net</span></div></div>
+        <span class="k">return</span> <span class="n">net</span></div>
 </pre></div>
 
                 </article>

@@ -139,6 +139,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ans.html">compressai.ans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">compressai.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../latent_codecs.html">compressai.latent_codecs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../layers.html">compressai.layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">compressai.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ops.html">compressai.ops</a></li>
@@ -295,10 +296,12 @@ document.write(`
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
 <span class="kn">from</span> <span class="nn">compressai.entropy_models</span> <span class="kn">import</span> <span class="n">EntropyBottleneck</span><span class="p">,</span> <span class="n">GaussianConditional</span>
+<span class="kn">from</span> <span class="nn">compressai.latent_codecs</span> <span class="kn">import</span> <span class="n">LatentCodec</span>
 <span class="kn">from</span> <span class="nn">compressai.models.utils</span> <span class="kn">import</span> <span class="n">update_registered_buffers</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;CompressionModel&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SimpleVAECompressionModel&quot;</span><span class="p">,</span>
     <span class="s2">&quot;get_scale_table&quot;</span><span class="p">,</span>
     <span class="s2">&quot;SCALES_MIN&quot;</span><span class="p">,</span>
     <span class="s2">&quot;SCALES_MAX&quot;</span><span class="p">,</span>
@@ -400,6 +403,44 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">loss</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">EntropyBottleneck</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">loss</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SimpleVAECompressionModel"><a class="viewcode-back" href="../../../models.html#compressai.models.SimpleVAECompressionModel">[docs]</a><span class="k">class</span> <span class="nc">SimpleVAECompressionModel</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple VAE model with arbitrary latent codec.</span>
+
+<span class="sd">    .. code-block:: none</span>
+
+<span class="sd">               ┌───┐  y  ┌────┐ y_hat ┌───┐</span>
+<span class="sd">        x ──►──┤g_a├──►──┤ lc ├───►───┤g_s├──►── x_hat</span>
+<span class="sd">               └───┘     └────┘       └───┘</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">g_a</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span>
+    <span class="n">g_s</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span>
+    <span class="n">latent_codec</span><span class="p">:</span> <span class="n">LatentCodec</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">y_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="n">y_out</span><span class="p">[</span><span class="s2">&quot;y_hat&quot;</span><span class="p">]</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;x_hat&quot;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">,</span>
+            <span class="s2">&quot;likelihoods&quot;</span><span class="p">:</span> <span class="n">y_out</span><span class="p">[</span><span class="s2">&quot;likelihoods&quot;</span><span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_a</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">outputs</span>
+
+    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        <span class="n">y_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span>
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="n">y_out</span><span class="p">[</span><span class="s2">&quot;y_hat&quot;</span><span class="p">]</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_s</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;x_hat&quot;</span><span class="p">:</span> <span class="n">x_hat</span><span class="p">,</span>
+        <span class="p">}</span></div>
 </pre></div>
 
                 </article>

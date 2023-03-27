@@ -139,6 +139,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ans.html">compressai.ans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">compressai.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="latent_codecs.html">compressai.latent_codecs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layers.html">compressai.layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">compressai.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
@@ -265,6 +266,7 @@ document.write(`
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#J"><strong>J</strong></a>
  | <a href="#L"><strong>L</strong></a>
@@ -275,7 +277,6 @@ document.write(`
  | <a href="#S"><strong>S</strong></a>
  | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
- | <a href="#W"><strong>W</strong></a>
  | <a href="#Y"><strong>Y</strong></a>
  
 </div>
@@ -284,14 +285,10 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="layers.html#compressai.layers.AttentionBlock">AttentionBlock (class in compressai.layers)</a>
 </li>
-      <li><a href="models.html#compressai.models.CompressionModel.aux_loss">aux_loss() (compressai.models.CompressionModel method)</a>
-
-      <ul>
-        <li><a href="models.html#compressai.models.video.ScaleSpaceFlow.aux_loss">(compressai.models.video.ScaleSpaceFlow method)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="models.html#compressai.models.CompressionModel.aux_loss">aux_loss() (compressai.models.CompressionModel method)</a>
+</li>
       <li><a href="compressai.html#compressai.available_entropy_coders">available_entropy_coders() (in module compressai)</a>
 </li>
   </ul></td>
@@ -349,6 +346,10 @@ document.write(`
       <li><a href="entropy_models.html#compressai.entropy_models.EntropyBottleneck">EntropyBottleneck (class in compressai.entropy_models)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="latent_codecs.html#compressai.latent_codecs.EntropyBottleneckLatentCodec">EntropyBottleneckLatentCodec (class in compressai.latent_codecs)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="F">F</h2>
@@ -356,49 +357,39 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="models.html#compressai.models.FactorizedPrior">FactorizedPrior (class in compressai.models)</a>
 </li>
-      <li><a href="models.html#compressai.models.FactorizedPrior.forward">forward() (compressai.models.FactorizedPrior method)</a>
-
-      <ul>
-        <li><a href="models.html#compressai.models.JointAutoregressiveHierarchicalPriors.forward">(compressai.models.JointAutoregressiveHierarchicalPriors method)</a>
-</li>
-        <li><a href="models.html#compressai.models.MeanScaleHyperprior.forward">(compressai.models.MeanScaleHyperprior method)</a>
-</li>
-        <li><a href="models.html#compressai.models.ScaleHyperprior.forward">(compressai.models.ScaleHyperprior method)</a>
-</li>
-        <li><a href="models.html#compressai.models.video.ScaleSpaceFlow.forward">(compressai.models.video.ScaleSpaceFlow method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#compressai.models.Cheng2020Anchor.from_state_dict">from_state_dict() (compressai.models.Cheng2020Anchor class method)</a>
-
-      <ul>
-        <li><a href="models.html#compressai.models.FactorizedPrior.from_state_dict">(compressai.models.FactorizedPrior class method)</a>
-</li>
-        <li><a href="models.html#compressai.models.JointAutoregressiveHierarchicalPriors.from_state_dict">(compressai.models.JointAutoregressiveHierarchicalPriors class method)</a>
-</li>
-        <li><a href="models.html#compressai.models.ScaleHyperprior.from_state_dict">(compressai.models.ScaleHyperprior class method)</a>
-</li>
-        <li><a href="models.html#compressai.models.video.ScaleSpaceFlow.from_state_dict">(compressai.models.video.ScaleSpaceFlow class method)</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#compressai.models.video.ScaleSpaceFlow.gaussian_volume">gaussian_volume() (compressai.models.video.ScaleSpaceFlow static method)</a>
+      <li><a href="latent_codecs.html#compressai.latent_codecs.GainHyperLatentCodec">GainHyperLatentCodec (class in compressai.latent_codecs)</a>
+</li>
+      <li><a href="latent_codecs.html#compressai.latent_codecs.GainHyperpriorLatentCodec">GainHyperpriorLatentCodec (class in compressai.latent_codecs)</a>
 </li>
       <li><a href="entropy_models.html#compressai.entropy_models.GaussianConditional">GaussianConditional (class in compressai.entropy_models)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="latent_codecs.html#compressai.latent_codecs.GaussianConditionalLatentCodec">GaussianConditionalLatentCodec (class in compressai.latent_codecs)</a>
+</li>
       <li><a href="layers.html#compressai.layers.GDN">GDN (class in compressai.layers)</a>
 </li>
       <li><a href="layers.html#compressai.layers.GDN1">GDN1 (class in compressai.layers)</a>
 </li>
       <li><a href="compressai.html#compressai.get_entropy_coder">get_entropy_coder() (in module compressai)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="latent_codecs.html#compressai.latent_codecs.HyperLatentCodec">HyperLatentCodec (class in compressai.latent_codecs)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="latent_codecs.html#compressai.latent_codecs.HyperpriorLatentCodec">HyperpriorLatentCodec (class in compressai.latent_codecs)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -483,6 +474,8 @@ document.write(`
 </li>
       <li><a href="ans.html#compressai.ans.RansEncoder">RansEncoder (class in compressai.ans)</a>
 </li>
+      <li><a href="latent_codecs.html#compressai.latent_codecs.RasterScanLatentCodec">RasterScanLatentCodec (class in compressai.latent_codecs)</a>
+</li>
       <li><a href="layers.html#compressai.layers.ResidualBlock">ResidualBlock (class in compressai.layers)</a>
 </li>
   </ul></td>
@@ -509,6 +502,8 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compressai.html#compressai.set_entropy_coder">set_entropy_coder() (in module compressai)</a>
 </li>
+      <li><a href="models.html#compressai.models.SimpleVAECompressionModel">SimpleVAECompressionModel (class in compressai.models)</a>
+</li>
       <li><a href="zoo.html#compressai.zoo.ssf2020">ssf2020() (in module compressai.zoo)</a>
 </li>
   </ul></td>
@@ -526,14 +521,6 @@ document.write(`
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="datasets.html#compressai.datasets.VideoFolder">VideoFolder (class in compressai.datasets)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="W">W</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#compressai.models.video.ScaleSpaceFlow.warp_volume">warp_volume() (compressai.models.video.ScaleSpaceFlow method)</a>
 </li>
   </ul></td>
 </tr></table>
