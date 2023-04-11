@@ -89,14 +89,14 @@ class HyperpriorLatentCodec(LatentCodec):
 
     latent_codec: Mapping[str, LatentCodec]
 
-    def __init__(self, N: Optional[int] = None, **kwargs):
+    def __init__(self, z_channels: Optional[int] = None, **kwargs):
         super().__init__()
         self._kwargs = kwargs
         self._set_group_defaults(
             "latent_codec",
             defaults={
                 "y": GaussianConditionalLatentCodec,
-                "hyper": lambda: HyperLatentCodec(N),
+                "hyper": lambda: HyperLatentCodec(z_channels=z_channels),
             },
             save_direct=True,
         )
