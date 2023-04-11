@@ -27,7 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import torch
 import torch.nn as nn
@@ -85,12 +85,17 @@ class RasterScanLatentCodec(LatentCodec):
     entropy_parameters: nn.Module
     context_prediction: MaskedConv2d
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        gaussian_conditional: Optional[GaussianConditional] = None,
+        entropy_parameters: Optional[nn.Module] = None,
+        context_prediction: Optional[MaskedConv2d] = None,
+        **kwargs,
+    ):
         super().__init__()
-        self._kwargs = kwargs
-        self._setdefault("gaussian_conditional", lambda: GaussianConditional(None))
-        self._setdefault("entropy_parameters", nn.Identity)
-        self._setdefault("context_prediction", lambda: None)
+        self.gaussian_conditional = gaussian_conditional or GaussianConditional()
+        self.entropy_parameters = entropy_parameters or nn.Identity()
+        self.context_prediction = context_prediction or MaskedConv2d()
         self.kernel_size = _reduce_seq(self.context_prediction.kernel_size)
         self.padding = (self.kernel_size - 1) // 2
 

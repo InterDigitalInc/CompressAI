@@ -70,12 +70,17 @@ class GainHyperLatentCodec(LatentCodec):
     h_a: nn.Module
     h_s: nn.Module
 
-    def __init__(self, z_channels: Optional[int] = None, **kwargs):
+    def __init__(
+        self,
+        entropy_bottleneck: Optional[EntropyBottleneck] = None,
+        h_a: Optional[nn.Module] = None,
+        h_s: Optional[nn.Module] = None,
+        **kwargs,
+    ):
         super().__init__()
-        self._kwargs = kwargs
-        self._setdefault("entropy_bottleneck", lambda: EntropyBottleneck(z_channels))
-        self._setdefault("h_a", nn.Identity)
-        self._setdefault("h_s", nn.Identity)
+        self.entropy_bottleneck = entropy_bottleneck or EntropyBottleneck()
+        self.h_a = h_a or nn.Identity()
+        self.h_s = h_s or nn.Identity()
 
     def forward(self, y: Tensor, gain: Tensor, gain_inv: Tensor) -> Dict[str, Any]:
         z = self.h_a(y)
