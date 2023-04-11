@@ -68,10 +68,10 @@ class HyperLatentCodec(LatentCodec):
     h_a: nn.Module
     h_s: nn.Module
 
-    def __init__(self, N: Optional[int] = None, **kwargs):
+    def __init__(self, z_channels: Optional[int] = None, **kwargs):
         super().__init__()
         self._kwargs = kwargs
-        self._setdefault("entropy_bottleneck", lambda: EntropyBottleneck(N))
+        self._setdefault("entropy_bottleneck", lambda: EntropyBottleneck(z_channels))
         self._setdefault("h_a", nn.Identity)
         self._setdefault("h_s", nn.Identity)
 
