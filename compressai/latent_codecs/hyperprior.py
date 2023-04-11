@@ -44,8 +44,8 @@ __all__ = [
 
 @register_module("HyperpriorLatentCodec")
 class HyperpriorLatentCodec(LatentCodec):
-    """Hyperprior codec constructed from latent codec for `y` that
-    compresses `y` using `params` from `hyper` branch.
+    """Hyperprior codec constructed from latent codec for ``y`` that
+    compresses ``y`` using ``params`` from ``hyper`` branch.
 
     Hyperprior entropy modeling introduced in
     `"Variational Image Compression with a Scale Hyperprior"
