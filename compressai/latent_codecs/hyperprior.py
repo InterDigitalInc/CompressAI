@@ -27,7 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from typing import Any, Dict, List, Mapping, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 from torch import Tensor
 
@@ -89,10 +89,9 @@ class HyperpriorLatentCodec(LatentCodec):
 
     latent_codec: Mapping[str, LatentCodec]
 
-    def __init__(self, N: int, **kwargs):
+    def __init__(self, N: Optional[int] = None, **kwargs):
         super().__init__()
         self._kwargs = kwargs
-        self.N = N
         self._set_group_defaults(
             "latent_codec",
             defaults={
