@@ -44,8 +44,8 @@ __all__ = [
 
 @register_module("GainHyperpriorLatentCodec")
 class GainHyperpriorLatentCodec(LatentCodec):
-    """Hyperprior codec constructed from latent codec for `y` that
-    compresses `y` using `params` from `hyper` branch.
+    """Hyperprior codec constructed from latent codec for ``y`` that
+    compresses ``y`` using ``params`` from ``hyper`` branch.
 
     Gain-controlled hyperprior introduced in
     `"Asymmetric Gained Deep Image Compression With Continuous Rate Adaptation"
@@ -90,8 +90,8 @@ class GainHyperpriorLatentCodec(LatentCodec):
                             └───┘          GC
 
     Common configurations of latent codecs include:
-     - entropy bottleneck `hyper` (default) and gaussian conditional `y` (default)
-     - entropy bottleneck `hyper` (default) and autoregressive `y`
+     - entropy bottleneck ``hyper`` (default) and gaussian conditional ``y`` (default)
+     - entropy bottleneck ``hyper`` (default) and autoregressive ``y``
     """
 
     latent_codec: Mapping[str, LatentCodec]
