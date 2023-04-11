@@ -27,7 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import torch.nn as nn
 
@@ -79,12 +79,19 @@ class GaussianConditionalLatentCodec(LatentCodec):
     gaussian_conditional: GaussianConditional
     entropy_parameters: nn.Module
 
-    def __init__(self, quantizer: str = "noise", **kwargs):
+    def __init__(
+        self,
+        gaussian_conditional: Optional[GaussianConditional] = None,
+        entropy_parameters: Optional[nn.Module] = None,
+        quantizer: str = "noise",
+        **kwargs,
+    ):
         super().__init__()
-        self._kwargs = kwargs
         self.quantizer = quantizer
-        self._setdefault("gaussian_conditional", lambda: GaussianConditional(None))
-        self._setdefault("entropy_parameters", nn.Identity)
+        self.gaussian_conditional = gaussian_conditional or GaussianConditional(
+            **kwargs
+        )
+        self.entropy_parameters = entropy_parameters or nn.Identity()
 
     def forward(self, y: Tensor, ctx_params: Tensor) -> Dict[str, Any]:
         gaussian_params = self.entropy_parameters(ctx_params)

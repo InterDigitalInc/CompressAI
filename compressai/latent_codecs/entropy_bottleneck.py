@@ -61,10 +61,13 @@ class EntropyBottleneckLatentCodec(LatentCodec):
 
     entropy_bottleneck: EntropyBottleneck
 
-    def __init__(self, channels: Optional[int] = None, **kwargs):
+    def __init__(
+        self,
+        entropy_bottleneck: Optional[EntropyBottleneck] = None,
+        **kwargs,
+    ):
         super().__init__()
-        self._kwargs = kwargs
-        self._setdefault("entropy_bottleneck", lambda: EntropyBottleneck(channels))
+        self.entropy_bottleneck = entropy_bottleneck or EntropyBottleneck(**kwargs)
 
     def forward(self, y: Tensor) -> Dict[str, Any]:
         y_hat, y_likelihoods = self.entropy_bottleneck(y)

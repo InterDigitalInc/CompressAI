@@ -96,15 +96,18 @@ class GainHyperpriorLatentCodec(LatentCodec):
 
     latent_codec: Mapping[str, LatentCodec]
 
-    def __init__(self, z_channels: Optional[int] = None, **kwargs):
+    def __init__(
+        self, latent_codec: Optional[Mapping[str, LatentCodec]] = None, **kwargs
+    ):
         super().__init__()
-        self._kwargs = kwargs
         self._set_group_defaults(
             "latent_codec",
+            latent_codec,
             defaults={
                 "y": GaussianConditionalLatentCodec,
-                "hyper": lambda: GainHyperLatentCodec(z_channels=z_channels),
+                "hyper": GainHyperLatentCodec,
             },
+            save_direct=True,
         )
 
     def forward(
