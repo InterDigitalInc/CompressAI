@@ -86,8 +86,8 @@ html_theme_options = {
     "repository_url": "https://github.com/InterDigitalInc/CompressAI/",
     "use_repository_button": True,
     "use_fullscreen_button": False,
-    "logo_only": True,
-    "extra_navbar": "",
+    "pygment_light_style": "tango",
+    "pygment_dark_style": "dracula",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
