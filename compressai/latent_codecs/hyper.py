@@ -27,7 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import torch.nn as nn
 
@@ -68,10 +68,9 @@ class HyperLatentCodec(LatentCodec):
     h_a: nn.Module
     h_s: nn.Module
 
-    def __init__(self, N: int, **kwargs):
+    def __init__(self, N: Optional[int] = None, **kwargs):
         super().__init__()
         self._kwargs = kwargs
-        self.N = N
         self._setdefault("entropy_bottleneck", lambda: EntropyBottleneck(N))
         self._setdefault("h_a", nn.Identity)
         self._setdefault("h_s", nn.Identity)
