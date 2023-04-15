@@ -27,7 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import torch.nn as nn
 
@@ -81,6 +81,7 @@ class GaussianConditionalLatentCodec(LatentCodec):
 
     def __init__(
         self,
+        scale_table: Optional[Union[List, Tuple]] = None,
         gaussian_conditional: Optional[GaussianConditional] = None,
         entropy_parameters: Optional[nn.Module] = None,
         quantizer: str = "noise",
@@ -89,7 +90,7 @@ class GaussianConditionalLatentCodec(LatentCodec):
         super().__init__()
         self.quantizer = quantizer
         self.gaussian_conditional = gaussian_conditional or GaussianConditional(
-            **kwargs
+            scale_table, **kwargs
         )
         self.entropy_parameters = entropy_parameters or nn.Identity()
 
@@ -109,7 +110,7 @@ class GaussianConditionalLatentCodec(LatentCodec):
         y_hat = self.gaussian_conditional.decompress(
             y_strings, indexes, means=means_hat
         )
-        return {"strings": [y_strings], "y_hat": y_hat}
+        return {"strings": [y_strings], "shape": y.shape[2:4], "y_hat": y_hat}
 
     def decompress(
         self, strings: List[List[bytes]], shape: Tuple[int, int], ctx_params: Tensor
