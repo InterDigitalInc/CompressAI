@@ -78,7 +78,8 @@ class GainHyperLatentCodec(LatentCodec):
         **kwargs,
     ):
         super().__init__()
-        self.entropy_bottleneck = entropy_bottleneck or EntropyBottleneck()
+        assert entropy_bottleneck is not None
+        self.entropy_bottleneck = entropy_bottleneck
         self.h_a = h_a or nn.Identity()
         self.h_s = h_s or nn.Identity()
 
