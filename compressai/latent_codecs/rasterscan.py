@@ -126,7 +126,7 @@ class RasterScanLatentCodec(LatentCodec):
             )
             for i in range(n)
         ]
-        return default_collate(ds)
+        return {**default_collate(ds), "shape": y.shape[2:4]}
 
     def _compress_single(self, **kwargs):
         encoder = BufferedRansEncoder()
