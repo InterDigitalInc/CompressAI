@@ -174,7 +174,7 @@ Using :py:class:`~compressai.models.base.SimpleVAECompressionModel`, some Google
             self.g_a = nn.Sequential(...)
             self.g_s = nn.Sequential(...)
 
-            self.latent_codec = EntropyBottleneckLatentCodec(N)
+            self.latent_codec = EntropyBottleneckLatentCodec(channels=M)
 
 
 .. code-block:: python
@@ -190,13 +190,10 @@ Using :py:class:`~compressai.models.base.SimpleVAECompressionModel`, some Google
             h_s = nn.Sequential(...)
 
             self.latent_codec = HyperpriorLatentCodec(
-                N=N,
-
                 # A HyperpriorLatentCodec is made of "hyper" and "y" latent codecs.
                 latent_codec={
                     # Side-information branch with entropy bottleneck for "z":
                     "hyper": HyperLatentCodec(
-                        N,
                         h_a=h_a,
                         h_s=h_s,
                         entropy_bottleneck=EntropyBottleneck(N),
@@ -220,13 +217,10 @@ Using :py:class:`~compressai.models.base.SimpleVAECompressionModel`, some Google
             h_s = nn.Sequential(...)
 
             self.latent_codec = HyperpriorLatentCodec(
-                N=N,
-
                 # A HyperpriorLatentCodec is made of "hyper" and "y" latent codecs.
                 latent_codec={
                     # Side-information branch with entropy bottleneck for "z":
                     "hyper": HyperLatentCodec(
-                        N,
                         h_a=h_a,
                         h_s=h_s,
                         entropy_bottleneck=EntropyBottleneck(N),
