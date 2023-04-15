@@ -27,14 +27,13 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 from torch import Tensor
-from torch.utils.data.dataloader import default_collate
 
 from compressai.ans import BufferedRansEncoder, RansDecoder
 from compressai.entropy_models import GaussianConditional
@@ -46,6 +45,9 @@ from .base import LatentCodec
 __all__ = [
     "RasterScanLatentCodec",
 ]
+
+K = TypeVar("K")
+V = TypeVar("V")
 
 
 @register_module("RasterScanLatentCodec")
@@ -309,3 +311,26 @@ def _pad_2d(x: Tensor, padding: int) -> Tensor:
 def _reduce_seq(xs):
     assert all(x == xs[0] for x in xs)
     return xs[0]
+
+
+def default_collate(batch: List[Dict[K, V]]) -> Dict[K, List[V]]:
+    if not isinstance(batch, list) or any(not isinstance(d, dict) for d in batch):
+        raise NotImplementedError
+
+    result = _ld_to_dl(batch)
+
+    for k, vs in result.items():
+        if all(isinstance(v, Tensor) for v in vs):
+            result[k] = torch.stack(vs)
+
+    return result
+
+
+def _ld_to_dl(ld: List[Dict[K, V]]) -> Dict[K, List[V]]:
+    dl = {}
+    for d in ld:
+        for k, v in d.items():
+            if k not in dl:
+                dl[k] = []
+            dl[k].append(v)
+    return dl
