@@ -386,7 +386,7 @@ class EntropyBottleneck(EntropyModel):
         medians = self.quantiles[:, :, 1:2]
         return medians
 
-    def update(self, force: bool = False, update_quantiles: bool = True) -> bool:
+    def update(self, force: bool = False, update_quantiles: bool = False) -> bool:
         # Check if we need to update the bottleneck parameters, the offsets are
         # only computed and stored when the conditonal model is update()'d.
         if self._offset.numel() > 0 and not force:
@@ -526,6 +526,10 @@ class EntropyBottleneck(EntropyModel):
 
     @torch.no_grad()
     def _update_quantiles(self, search_radius=1e5, rtol=1e-4, atol=1e-3):
+        """Fast quantile update via bisection search.
+
+        Often faster and much more precise than minimizing aux loss.
+        """
         device = self.quantiles.device
         shape = (self.channels, 1, 1)
         low = torch.full(shape, -search_radius, device=device)
