@@ -114,7 +114,7 @@ class CompressionModel(nn.Module):
 
         return nn.Module.load_state_dict(self, state_dict, strict=strict)
 
-    def update(self, scale_table=None, force=False):
+    def update(self, scale_table=None, force=False, update_quantiles: bool = False):
         """Updates EntropyBottleneck and GaussianConditional CDFs.
 
         Needs to be called once after training to be able to later perform the
@@ -125,6 +125,7 @@ class CompressionModel(nn.Module):
                 for initializing the Gaussian distributions
                 (default: 64 logarithmically spaced scales from 0.11 to 256)
             force (bool): overwrite previous values (default: False)
+            update_quantiles (bool): fast update quantiles (default: False)
 
         Returns:
             updated (bool): True if at least one of the modules was updated.
@@ -134,7 +135,7 @@ class CompressionModel(nn.Module):
         updated = False
         for _, module in self.named_modules():
             if isinstance(module, EntropyBottleneck):
-                updated |= module.update(force=force)
+                updated |= module.update(force=force, update_quantiles=update_quantiles)
             if isinstance(module, GaussianConditional):
                 updated |= module.update_scale_table(scale_table, force=force)
         return updated
