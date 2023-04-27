@@ -386,11 +386,14 @@ class EntropyBottleneck(EntropyModel):
         medians = self.quantiles[:, :, 1:2]
         return medians
 
-    def update(self, force: bool = False) -> bool:
+    def update(self, force: bool = False, update_quantiles: bool = True) -> bool:
         # Check if we need to update the bottleneck parameters, the offsets are
         # only computed and stored when the conditonal model is update()'d.
         if self._offset.numel() > 0 and not force:
             return False
+
+        if update_quantiles:
+            self._update_quantiles()
 
         medians = self.quantiles[:, 0, 1]
 
@@ -520,6 +523,35 @@ class EntropyBottleneck(EntropyModel):
     @staticmethod
     def _extend_ndims(tensor, n):
         return tensor.reshape(-1, *([1] * n)) if n > 0 else tensor.reshape(-1)
+
+    @torch.no_grad()
+    def _update_quantiles(self, search_radius=1e5, rtol=1e-4, atol=1e-3):
+        device = self.quantiles.device
+        shape = (self.channels, 1, 1)
+        low = torch.full(shape, -search_radius, device=device)
+        high = torch.full(shape, search_radius, device=device)
+
+        def f(y, self=self):
+            return self._logits_cumulative(y, stop_gradient=True)
+
+        for i in range(len(self.target)):
+            q_i = self._search_target(f, self.target[i], low, high, rtol, atol)
+            self.quantiles[:, :, i] = q_i[:, :, 0]
+
+    @staticmethod
+    def _search_target(f, target, low, high, rtol=1e-4, atol=1e-3, strict=False):
+        assert (low <= high).all()
+        if strict:
+            assert ((f(low) <= target) & (target <= f(high))).all()
+        else:
+            low = torch.where(target <= f(high), low, high)
+            high = torch.where(f(low) <= target, high, low)
+        while not torch.isclose(low, high, rtol=rtol, atol=atol).all():
+            mid = (low + high) / 2
+            f_mid = f(mid)
+            low = torch.where(f_mid <= target, mid, low)
+            high = torch.where(f_mid >= target, mid, high)
+        return (low + high) / 2
 
     def compress(self, x):
         indexes = self._build_indexes(x.size())
