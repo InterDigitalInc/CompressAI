@@ -32,6 +32,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <torch/extension.h>
 
 #include "rans64.h"
 
@@ -60,6 +61,17 @@ public:
                            const std::vector<std::vector<int32_t>> &cdfs,
                            const std::vector<int32_t> &cdfs_sizes,
                            const std::vector<int32_t> &offsets);
+
+  /* NOTE: In the case of GMM, the type conversion from Tensor to vector is
+   * better done in C++, or it will occupy ~80% of execution time, which is
+   * why an interface for torch::Tensor cdfs is provided...
+   **/
+  void encode_with_indexes(const std::vector<int32_t> &symbols,
+                           const std::vector<int32_t> &indexes,
+                           const torch::Tensor &cdfs,
+                           const std::vector<int32_t> &cdfs_sizes,
+                           const std::vector<int32_t> &offsets);
+
   py::bytes flush();
 
 private:
@@ -80,6 +92,12 @@ public:
                                 const std::vector<std::vector<int32_t>> &cdfs,
                                 const std::vector<int32_t> &cdfs_sizes,
                                 const std::vector<int32_t> &offsets);
+
+  py::bytes encode_with_indexes(const std::vector<int32_t> &symbols,
+                                const std::vector<int32_t> &indexes,
+                                const torch::Tensor &cdfs,
+                                const std::vector<int32_t> &cdfs_sizes,
+                                const std::vector<int32_t> &offsets);
 };
 
 class RansDecoder {
@@ -98,11 +116,24 @@ public:
                       const std::vector<int32_t> &cdfs_sizes,
                       const std::vector<int32_t> &offsets);
 
+  std::vector<int32_t>
+  decode_with_indexes(const std::string &encoded,
+                      const std::vector<int32_t> &indexes,
+                      const torch::Tensor &cdfs,
+                      const std::vector<int32_t> &cdfs_sizes,
+                      const std::vector<int32_t> &offsets);
+
   void set_stream(const std::string &stream);
 
   std::vector<int32_t>
   decode_stream(const std::vector<int32_t> &indexes,
                 const std::vector<std::vector<int32_t>> &cdfs,
+                const std::vector<int32_t> &cdfs_sizes,
+                const std::vector<int32_t> &offsets);
+
+  std::vector<int32_t>
+  decode_stream(const std::vector<int32_t> &indexes,
+                const torch::Tensor &cdfs,
                 const std::vector<int32_t> &cdfs_sizes,
                 const std::vector<int32_t> &offsets);
 
