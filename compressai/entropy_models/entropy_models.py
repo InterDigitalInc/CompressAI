@@ -753,6 +753,7 @@ class GaussianMixtureConditional(GaussianConditional):
         num_latents = scales.size(1)
         num_samples = abs_max * 2 + 1
         TINY = 1e-10
+        device = scales.device
 
         scales = scales.clamp_(0.11, 256)
         means += abs_max
@@ -761,7 +762,7 @@ class GaussianMixtureConditional(GaussianConditional):
         means_ = means.unsqueeze(-1).expand(-1, -1, num_samples)
         weights_ = weights.unsqueeze(-1).expand(-1, -1, num_samples)
 
-        samples = torch.arange(num_samples).unsqueeze(0).expand(num_latents, -1)
+        samples = torch.arange(num_samples).to(device).unsqueeze(0).expand(num_latents, -1)
 
         pmf = torch.zeros_like(samples).float()
         for k in range(self.K):
@@ -790,7 +791,7 @@ class GaussianMixtureConditional(GaussianConditional):
         pmf_real_zero_indices = (pmf_quantized == 0).nonzero().transpose(0, 1)
         pmf_quantized[pmf_real_zero_indices[0], pmf_real_zero_indices[1]] += 1
 
-        pmf_real_steal_indices = torch.cat((torch.arange(num_latents).unsqueeze(-1),
+        pmf_real_steal_indices = torch.cat((torch.arange(num_latents).to(device).unsqueeze(-1),
                                             pmf_first_stealable_indices.unsqueeze(-1)),
                                            dim=1).transpose(0, 1)
         pmf_quantized[pmf_real_steal_indices[0], pmf_real_steal_indices[1]] -= pmf_zero_count
