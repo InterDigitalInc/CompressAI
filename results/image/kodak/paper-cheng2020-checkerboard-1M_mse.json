@@ -1,0 +1,31 @@
+{
+  "name": "cheng2020-checkerboard-1M",
+  "description": "official results",
+  "meta": {
+    "source": "paper",
+    "url": "https://arxiv.org/abs/2103.15306",
+    "type": "image",
+    "opt_metric": "mse-rgb",
+    "dataset": "kodak",
+    "train_dataset": "imagenet_val",
+    "device": null
+  },
+  "results": {
+    "bpp": [
+      0.1018,
+      0.1705,
+      0.2980,
+      0.4523,
+      0.6648,
+      0.8077
+    ],
+    "psnr-rgb": [
+      27.924,
+      29.532,
+      31.571,
+      33.581,
+      35.405,
+      36.502
+    ]
+  }
+}
