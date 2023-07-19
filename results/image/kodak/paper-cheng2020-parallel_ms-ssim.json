@@ -1,0 +1,31 @@
+{
+  "name": "cheng2020-parallel",
+  "description": "official results",
+  "meta": {
+    "source": "paper",
+    "url": "https://arxiv.org/abs/2203.10886",
+    "type": "image",
+    "opt_metric": "ms-ssim-rgb",
+    "dataset": "kodak",
+    "train_dataset": "imagenet_val",
+    "device": null
+  },
+  "results": {
+    "bpp": [
+      0.1004,
+      0.1632,
+      0.2985,
+      0.4397,
+      0.6502,
+      0.7945
+    ],
+    "ms-ssim-db-rgb": [
+      10.575,
+      12.282,
+      14.668,
+      16.438,
+      18.437,
+      19.503
+    ]
+  }
+}

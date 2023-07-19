@@ -1,0 +1,31 @@
+{
+  "name": "minnen2018-parallel",
+  "description": "official results",
+  "meta": {
+    "source": "paper",
+    "url": "https://arxiv.org/abs/2203.10886",
+    "type": "image",
+    "opt_metric": "mse-rgb",
+    "dataset": "kodak",
+    "train_dataset": "imagenet_val",
+    "device": null
+  },
+  "results": {
+    "bpp": [
+      0.1067,
+      0.1812,
+      0.3250,
+      0.4894,
+      0.7158,
+      0.8822
+    ],
+    "psnr-rgb": [
+      27.582,
+      29.304,
+      31.476,
+      33.448,
+      35.588,
+      36.819
+    ]
+  }
+}
