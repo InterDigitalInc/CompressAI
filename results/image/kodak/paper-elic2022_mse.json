@@ -1,0 +1,31 @@
+{
+  "name": "elic2022",
+  "description": "official results",
+  "meta": {
+    "source": "paper",
+    "url": "https://arxiv.org/abs/2203.10886",
+    "type": "image",
+    "opt_metric": "mse-rgb",
+    "dataset": "kodak",
+    "train_dataset": "imagenet_val",
+    "device": null
+  },
+  "results": {
+    "bpp": [
+      0.1235,
+      0.1965,
+      0.3337,
+      0.4908,
+      0.7041,
+      0.8573
+    ],
+    "psnr-rgb": [
+      29.113,
+      30.698,
+      32.784,
+      34.577,
+      36.488,
+      37.624
+    ]
+  }
+}
