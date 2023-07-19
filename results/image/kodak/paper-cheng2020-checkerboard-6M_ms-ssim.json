@@ -1,0 +1,31 @@
+{
+  "name": "cheng2020-checkerboard-6M",
+  "description": "official results",
+  "meta": {
+    "source": "paper",
+    "url": "https://arxiv.org/abs/2103.15306",
+    "type": "image",
+    "opt_metric": "ms-ssim-rgb",
+    "dataset": "kodak",
+    "train_dataset": "imagenet_val",
+    "device": null
+  },
+  "results": {
+    "bpp": [
+      0.0260,
+      0.0659,
+      0.1834,
+      0.3528,
+      0.6057,
+      1.0317
+    ],
+    "ms-ssim-db-rgb": [
+      7.059,
+      10.675,
+      14.818,
+      17.617,
+      20.572,
+      23.797
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "minnen2020-cc10",
+  "description": "official results",
+  "meta": {
+    "source": "paper",
+    "url": "https://arxiv.org/abs/2103.15306",
+    "type": "image",
+    "opt_metric": "mse-rgb",
+    "dataset": "kodak",
+    "train_dataset": "imagenet_val",
+    "device": null
+  },
+  "results": {
+    "bpp": [
+      0.1129,
+      0.1895,
+      0.2999,
+      0.4612,
+      0.6687,
+      0.8987
+    ],
+    "psnr-rgb": [
+      28.615,
+      30.257,
+      31.963,
+      33.825,
+      35.763,
+      37.413
+    ]
+  }
+}

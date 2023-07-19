@@ -1,0 +1,31 @@
+{
+  "name": "minnen2018-checkerboard",
+  "description": "official results",
+  "meta": {
+    "source": "paper",
+    "url": "https://arxiv.org/abs/2103.15306",
+    "type": "image",
+    "opt_metric": "ms-ssim-rgb",
+    "dataset": "kodak",
+    "train_dataset": "imagenet_val",
+    "device": null
+  },
+  "results": {
+    "bpp": [
+      0.0181,
+      0.0538,
+      0.1829,
+      0.3418,
+      0.6088,
+      1.0773
+    ],
+    "ms-ssim-db-rgb": [
+      6.468,
+      9.211,
+      14.255,
+      17.055,
+      20.171,
+      23.561
+    ]
+  }
+}
