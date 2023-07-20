@@ -27,7 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from typing import Any, Dict, List, Mapping, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 import torch
 import torch.nn as nn
@@ -100,14 +100,22 @@ class CheckerboardLatentCodec(LatentCodec):
     entropy_parameters: nn.Module
     context_prediction: CheckerboardMaskedConv2d
 
-    def __init__(self, forward_method="twopass", **kwargs):
+    def __init__(
+        self,
+        latent_codec: Optional[Mapping[str, LatentCodec]] = None,
+        entropy_parameters: Optional[nn.Module] = None,
+        context_prediction: Optional[nn.Module] = None,
+        forward_method="twopass",
+        **kwargs,
+    ):
         super().__init__()
         self._kwargs = kwargs
         self.forward_method = forward_method
-        self._setdefault("entropy_parameters", nn.Identity)
-        self._setdefault("context_prediction", nn.Identity)
+        self.entropy_parameters = entropy_parameters or nn.Identity()
+        self.context_prediction = context_prediction or nn.Identity()
         self._set_group_defaults(
             "latent_codec",
+            latent_codec,
             defaults={
                 "y": lambda: GaussianConditionalLatentCodec(quantizer="ste"),
             },
