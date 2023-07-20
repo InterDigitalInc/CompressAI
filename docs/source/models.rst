@@ -50,6 +50,11 @@ Cheng2020AnchorCheckerboard
 .. autoclass:: Cheng2020AnchorCheckerboard
 
 
+Cheng2020AnchorElic
+---------------------------
+.. autoclass:: Cheng2020AnchorElic
+
+
 .. currentmodule:: compressai.models.video
 
 ScaleSpaceFlow

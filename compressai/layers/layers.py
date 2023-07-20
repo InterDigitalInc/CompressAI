@@ -27,6 +27,8 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import math
+
 from typing import Any
 
 import torch
@@ -47,6 +49,7 @@ __all__ = [
     "conv3x3",
     "subpel_conv3x3",
     "QReLU",
+    "sequential_channel_ramp",
 ]
 
 
@@ -321,3 +324,37 @@ class QReLU(Function):
         grad_input[input > ctx.max_value] = grad_sub[input > ctx.max_value]
 
         return grad_input, None, None
+
+
+def sequential_channel_ramp(
+    in_ch: int,
+    out_ch: int,
+    *,
+    num_layers: int = 3,
+    interp: str = "linear",
+    make_layer=None,
+    make_act=None,
+    skip_last_act: bool = True,
+    **layer_kwargs,
+) -> nn.Module:
+    """Interleave layers of gradually ramping channels with nonlinearities."""
+    channels = ramp(in_ch, out_ch, num_layers + 1, method=interp).floor().int().tolist()
+    layers = [
+        module
+        for ch_in, ch_out in zip(channels[:-1], channels[1:])
+        for module in [
+            make_layer(ch_in, ch_out, **layer_kwargs),
+            make_act(),
+        ]
+    ]
+    if skip_last_act:
+        layers = layers[:-1]
+    return nn.Sequential(*layers)
+
+
+def ramp(a, b, steps=None, method="linear", **kwargs):
+    if method == "linear":
+        return torch.linspace(a, b, steps, **kwargs)
+    if method == "log":
+        return torch.logspace(math.log10(a), math.log10(b), steps, **kwargs)
+    raise ValueError(f"Unknown ramp method: {method}")
