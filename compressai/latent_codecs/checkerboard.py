@@ -67,32 +67,32 @@ class CheckerboardLatentCodec(LatentCodec):
 
         0. Input:
 
-        ■ ■ ■ ■
-        ■ ■ ■ ■
-        ■ ■ ■ ■
+        □ □ □ □
+        □ □ □ □
+        □ □ □ □
 
         1. Decode anchors:
 
-        ◌ ■ ◌ ■
-        ■ ◌ ■ ◌
-        ◌ ■ ◌ ■
+        ◌ □ ◌ □
+        □ ◌ □ ◌
+        ◌ □ ◌ □
 
         2. Decode non-anchors:
 
-        □ ◌ □ ◌
-        ◌ □ ◌ □
-        □ ◌ □ ◌
+        ■ ◌ ■ ◌
+        ◌ ■ ◌ ■
+        ■ ◌ ■ ◌
 
         3. End result:
 
-        □ □ □ □
-        □ □ □ □
-        □ □ □ □
+        ■ ■ ■ ■
+        ■ ■ ■ ■
+        ■ ■ ■ ■
 
         LEGEND:
-        □   decoded
+        ■   decoded
         ◌   currently decoding
-        ■   empty
+        □   empty
     """
 
     latent_codec: Mapping[str, LatentCodec]
@@ -216,9 +216,9 @@ class CheckerboardLatentCodec(LatentCodec):
 
         .. code-block:: none
 
-            □ ■ □ ■         □ □   ■ ■
-            ■ □ ■ □   --->  □ □   ■ ■
-            □ ■ □ ■         □ □   ■ ■
+            ■ □ ■ □         ■ ■   □ □
+            □ ■ □ ■   --->  ■ ■   □ □
+            ■ □ ■ □         ■ ■   □ □
         """
         n, c, h, w = y.shape
         y_ = y.new_zeros((2, n, c, h, w // 2))
@@ -233,9 +233,9 @@ class CheckerboardLatentCodec(LatentCodec):
 
         .. code-block:: none
 
-            □ □   ■ ■         □ ■ □ ■
-            □ □   ■ ■   --->  ■ □ ■ □
-            □ □   ■ ■         □ ■ □ ■
+            ■ ■   □ □         ■ □ ■ □
+            ■ ■   □ □   --->  □ ■ □ ■
+            ■ ■   □ □         ■ □ ■ □
         """
         num_chunks, n, c, h, w_half = y_.shape
         assert num_chunks == 2
