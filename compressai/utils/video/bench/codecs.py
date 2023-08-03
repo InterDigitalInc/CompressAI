@@ -52,8 +52,8 @@ def run_command(cmd, ignore_returncodes=None):
 
 
 class Codec(abc.ABC):
-    # name = ""
-    description = ""
+    name: str
+    description: str
     help = ""
 
     @property
@@ -100,6 +100,7 @@ class x264(Codec):
     def name(self):
         return "x264"
 
+    @property
     def description(self):
         return f"{self.name} {self.preset}, {self.tune}, ffmpeg version {get_ffmpeg_version()}"
 
@@ -212,6 +213,7 @@ class VTM(Codec):
     def name(self):
         return "VTM"
 
+    @property
     def description(self):
         return f"VTM reference software, version {self.get_version(self.encoder_path)}"
 
@@ -330,6 +332,7 @@ class HM(VTM):
     def name(self):
         return "HM"
 
+    @property
     def description(self):
         return f"HM reference software, version {self.get_version(self.encoder_path)}"
 
