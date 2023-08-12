@@ -61,7 +61,7 @@ class ImageFolder(Dataset):
         splitdir = Path(root) / split
 
         if not splitdir.is_dir():
-            raise RuntimeError(f'Invalid directory "{root}"')
+            raise RuntimeError(f'Missing directory "{splitdir}"')
 
         self.samples = sorted(f for f in splitdir.iterdir() if f.is_file())
 

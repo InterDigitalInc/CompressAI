@@ -27,7 +27,6 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 import random
 
 from pathlib import Path
@@ -91,10 +90,10 @@ class VideoFolder(Dataset):
         splitdir = Path(f"{root}/sequences")
 
         if not splitfile.is_file():
-            raise RuntimeError(f'Invalid file "{root}"')
+            raise RuntimeError(f'Missing file "{splitfile}"')
 
         if not splitdir.is_dir():
-            raise RuntimeError(f'Invalid directory "{root}"')
+            raise RuntimeError(f'Missing directory "{splitdir}"')
 
         with open(splitfile, "r") as f_in:
             self.sample_folders = [Path(f"{splitdir}/{f.strip()}") for f in f_in]
