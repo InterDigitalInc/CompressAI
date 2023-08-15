@@ -287,6 +287,7 @@ document.write(`
 <span class="c1"># ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">cast</span>
 
@@ -324,6 +325,30 @@ document.write(`
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for constructing an auto-encoder with any number of</span>
 <span class="sd">    EntropyBottleneck or GaussianConditional modules.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entropy_bottleneck_channels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">init_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">entropy_bottleneck_channels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;The entropy_bottleneck_channels parameter is deprecated. &quot;</span>
+                <span class="s2">&quot;Create an entropy_bottleneck in your model directly instead:</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;class YourModel(CompressionModel):</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    def __init__(self):</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;        super().__init__()</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;        self.entropy_bottleneck = &quot;</span>
+                <span class="s2">&quot;EntropyBottleneck(entropy_bottleneck_channels)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="ne">DeprecationWarning</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span> <span class="o">=</span> <span class="n">EntropyBottleneck</span><span class="p">(</span><span class="n">entropy_bottleneck_channels</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">init_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;The init_weights parameter was removed as it was never functional.&quot;</span><span class="p">,</span>
+                <span class="ne">DeprecationWarning</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
 
 <div class="viewcode-block" id="CompressionModel.load_state_dict"><a class="viewcode-back" href="../../../models.html#compressai.models.CompressionModel.load_state_dict">[docs]</a>    <span class="k">def</span> <span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">named_modules</span><span class="p">():</span>
