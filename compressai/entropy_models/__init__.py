@@ -27,7 +27,12 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .entropy_models import EntropyBottleneck, EntropyModel, GaussianConditional, GaussianMixtureConditional
+from .entropy_models import (
+    EntropyBottleneck,
+    EntropyModel,
+    GaussianConditional,
+    GaussianMixtureConditional,
+)
 
 __all__ = [
     "EntropyModel",
