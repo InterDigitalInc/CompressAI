@@ -93,8 +93,7 @@ class ChannelGroupsLatentCodec(LatentCodec):
         y_likelihoods_ = [Tensor()] * len(self.groups)
 
         for k in range(len(self.groups)):
-            y_hat_prev = torch.cat(y_hat_[:k], dim=1) if k > 0 else Tensor()
-            params = self._get_ctx_params(k, side_params, y_hat_prev)
+            params = self._get_ctx_params(k, side_params, y_hat_)
             y_out_[k] = self.latent_codec[f"y{k}"](y_[k], params)
             y_hat_[k] = y_out_[k]["y_hat"]
             y_likelihoods_[k] = y_out_[k]["likelihoods"]["y"]
@@ -113,12 +112,12 @@ class ChannelGroupsLatentCodec(LatentCodec):
         y_ = torch.split(y, self.groups, dim=1)
         y_out_ = [{}] * len(self.groups)
         y_hat = torch.zeros_like(y)
+        y_hat_ = y_hat.split(self.groups, dim=1)
 
         for k in range(len(self.groups)):
-            y_hat_prev = y_hat[:, : self.groups_acc[k]]
-            params = self._get_ctx_params(k, side_params, y_hat_prev)
+            params = self._get_ctx_params(k, side_params, y_hat_)
             y_out_[k] = self.latent_codec[f"y{k}"].compress(y_[k], params)
-            y_hat[:, self.groups_acc[k] : self.groups_acc[k + 1]] = y_out_[k]["y_hat"]
+            y_hat_[k][:] = y_out_[k]["y_hat"]
 
         y_strings_groups = [y_out["strings"] for y_out in y_out_]
         assert all(len(y_strings_groups[0]) == len(ss) for ss in y_strings_groups)
@@ -143,24 +142,31 @@ class ChannelGroupsLatentCodec(LatentCodec):
         y_out_ = [{}] * len(self.groups)
         y_shape = (sum(s[0] for s in shape), *shape[0][1:])
         y_hat = torch.zeros((n, *y_shape), device=side_params.device)
+        y_hat_ = y_hat.split(self.groups, dim=1)
 
         for k in range(len(self.groups)):
-            y_hat_prev = y_hat[:, : self.groups_acc[k]]
-            params = self._get_ctx_params(k, side_params, y_hat_prev)
-            y_strings_k = strings[strings_per_group * k : strings_per_group * (k + 1)]
+            params = self._get_ctx_params(k, side_params, y_hat_)
             y_out_[k] = self.latent_codec[f"y{k}"].decompress(
-                y_strings_k, shape[k], params
+                strings[strings_per_group * k : strings_per_group * (k + 1)],
+                shape[k],
+                params,
             )
-            y_hat[:, self.groups_acc[k] : self.groups_acc[k + 1]] = y_out_[k]["y_hat"]
+            y_hat_[k][:] = y_out_[k]["y_hat"]
 
         return {
             "y_hat": y_hat,
         }
 
+    def merge_y(self, *args):
+        return torch.cat(args, dim=1)
+
+    def merge_params(self, *args):
+        return torch.cat(args, dim=1)
+
     def _get_ctx_params(
-        self, k: int, side_params: Tensor, y_hat_prev: Tensor
+        self, k: int, side_params: Tensor, y_hat_: List[Tensor]
     ) -> Tensor:
         if k == 0:
             return side_params
-        params_ch = self.channel_context[f"y{k}"](y_hat_prev)
-        return torch.cat([side_params, params_ch], dim=1)
+        ch_ctx_params = self.channel_context[f"y{k}"](self.merge_y(*y_hat_[:k]))
+        return self.merge_params(side_params, ch_ctx_params)
