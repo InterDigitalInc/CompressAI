@@ -122,6 +122,9 @@ class CheckerboardLatentCodec(LatentCodec):
             save_direct=True,
         )
 
+    def __getitem__(self, key: str) -> LatentCodec:
+        return self.latent_codec[key]
+
     def forward(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
         if self.forward_method == "twopass":
             return self._forward_twopass(y, side_params)

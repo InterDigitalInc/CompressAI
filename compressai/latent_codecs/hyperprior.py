@@ -103,6 +103,9 @@ class HyperpriorLatentCodec(LatentCodec):
             save_direct=True,
         )
 
+    def __getitem__(self, key: str) -> LatentCodec:
+        return self.latent_codec[key]
+
     def forward(self, y: Tensor) -> Dict[str, Any]:
         hyper_out = self.latent_codec["hyper"](y)
         y_out = self.latent_codec["y"](y, hyper_out["params"])
