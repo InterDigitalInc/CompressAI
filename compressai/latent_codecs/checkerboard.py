@@ -186,7 +186,11 @@ class CheckerboardLatentCodec(LatentCodec):
         }
 
     def decompress(
-        self, strings: List[List[bytes]], shape: Tuple[int, ...], side_params: Tensor
+        self,
+        strings: List[List[bytes]],
+        shape: Tuple[int, ...],
+        side_params: Tensor,
+        **kwargs,
     ) -> Dict[str, Any]:
         y_strings_ = strings
         n = len(y_strings_[0])
