@@ -83,6 +83,9 @@ class ChannelGroupsLatentCodec(LatentCodec):
         self.channel_context = nn.ModuleDict(channel_context)
         self.latent_codec = nn.ModuleDict(latent_codec)
 
+    def __getitem__(self, key: str) -> LatentCodec:
+        return self.latent_codec[key]
+
     def forward(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
         y_ = torch.split(y, self.groups, dim=1)
         y_out_ = [{}] * len(self.groups)

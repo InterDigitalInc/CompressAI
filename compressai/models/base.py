@@ -185,6 +185,9 @@ class SimpleVAECompressionModel(CompressionModel):
     g_s: nn.Module
     latent_codec: LatentCodec
 
+    def __getitem__(self, key: str) -> LatentCodec:
+        return self.latent_codec[key]
+
     def forward(self, x):
         y = self.g_a(x)
         y_out = self.latent_codec(y)
