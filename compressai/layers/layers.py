@@ -331,6 +331,7 @@ def sequential_channel_ramp(
     in_ch: int,
     out_ch: int,
     *,
+    min_ch: int = 0,
     num_layers: int = 3,
     interp: str = "linear",
     make_layer=None,
@@ -339,7 +340,9 @@ def sequential_channel_ramp(
     **layer_kwargs,
 ) -> nn.Module:
     """Interleave layers of gradually ramping channels with nonlinearities."""
-    channels = ramp(in_ch, out_ch, num_layers + 1, method=interp).floor().int().tolist()
+    channels = ramp(in_ch, out_ch, num_layers + 1, method=interp).floor().int()
+    channels[1:-1] = channels[1:-1].clip(min=min_ch)
+    channels = channels.tolist()
     layers = [
         module
         for ch_in, ch_out in zip(channels[:-1], channels[1:])

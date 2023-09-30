@@ -253,6 +253,7 @@ class Elic2022Official(SimpleVAECompressionModel):
             f"y{k}": sequential_channel_ramp(
                 sum(self.groups[:k]),
                 self.groups[k] * 2,
+                min_ch=N,
                 num_layers=3,
                 make_layer=nn.Conv2d,
                 make_act=lambda: nn.ReLU(inplace=True),
@@ -281,6 +282,7 @@ class Elic2022Official(SimpleVAECompressionModel):
                 # Input: spatial context, channel context, and hyper params.
                 self.groups[k] * 2 + (k > 0) * self.groups[k] * 2 + N * 2,
                 self.groups[k] * 2,
+                min_ch=N * 2,
                 num_layers=3,
                 make_layer=nn.Conv2d,
                 make_act=lambda: nn.ReLU(inplace=True),
