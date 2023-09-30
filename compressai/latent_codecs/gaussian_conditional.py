@@ -113,7 +113,11 @@ class GaussianConditionalLatentCodec(LatentCodec):
         return {"strings": [y_strings], "shape": y.shape[2:4], "y_hat": y_hat}
 
     def decompress(
-        self, strings: List[List[bytes]], shape: Tuple[int, int], ctx_params: Tensor
+        self,
+        strings: List[List[bytes]],
+        shape: Tuple[int, int],
+        ctx_params: Tensor,
+        **kwargs,
     ) -> Dict[str, Any]:
         (y_strings,) = strings
         gaussian_params = self.entropy_parameters(ctx_params)

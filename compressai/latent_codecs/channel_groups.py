@@ -131,6 +131,7 @@ class ChannelGroupsLatentCodec(LatentCodec):
         strings: List[List[bytes]],
         shape: List[Tuple[int, ...]],
         side_params: Tensor,
+        **kwargs,
     ) -> Dict[str, Any]:
         n = len(strings[0])
         assert all(len(ss) == n for ss in strings)

@@ -200,8 +200,8 @@ class SimpleVAECompressionModel(CompressionModel):
         outputs = self.latent_codec.compress(y)
         return outputs
 
-    def decompress(self, strings, shape):
-        y_out = self.latent_codec.decompress(strings, shape)
+    def decompress(self, *args, **kwargs):
+        y_out = self.latent_codec.decompress(*args, **kwargs)
         y_hat = y_out["y_hat"]
         x_hat = self.g_s(y_hat).clamp_(0, 1)
         return {

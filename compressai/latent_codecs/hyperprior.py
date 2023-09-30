@@ -125,7 +125,7 @@ class HyperpriorLatentCodec(LatentCodec):
         }
 
     def decompress(
-        self, strings: List[List[bytes]], shape: Dict[str, Tuple[int, ...]]
+        self, strings: List[List[bytes]], shape: Dict[str, Tuple[int, ...]], **kwargs
     ) -> Dict[str, Any]:
         *y_strings_, z_strings = strings
         assert all(len(y_strings) == len(z_strings) for y_strings in y_strings_)

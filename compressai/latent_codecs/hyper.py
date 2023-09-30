@@ -96,7 +96,7 @@ class HyperLatentCodec(LatentCodec):
         return {"strings": [z_strings], "shape": shape, "params": params}
 
     def decompress(
-        self, strings: List[List[bytes]], shape: Tuple[int, int]
+        self, strings: List[List[bytes]], shape: Tuple[int, int], **kwargs
     ) -> Dict[str, Any]:
         (z_strings,) = strings
         z_hat = self.entropy_bottleneck.decompress(z_strings, shape)
