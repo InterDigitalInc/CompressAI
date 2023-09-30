@@ -169,4 +169,4 @@ class ChannelGroupsLatentCodec(LatentCodec):
         if k == 0:
             return side_params
         ch_ctx_params = self.channel_context[f"y{k}"](self.merge_y(*y_hat_[:k]))
-        return self.merge_params(side_params, ch_ctx_params)
+        return self.merge_params(ch_ctx_params, side_params)

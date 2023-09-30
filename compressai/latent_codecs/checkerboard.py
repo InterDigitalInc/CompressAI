@@ -130,7 +130,7 @@ class CheckerboardLatentCodec(LatentCodec):
             return self._forward_twopass(y, side_params)
         y_hat = self.quantize(y)
         y_ctx = self._mask_anchor(self.context_prediction(y_hat))
-        ctx_params = self.entropy_parameters(self.merge(side_params, y_ctx))
+        ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
         y_out = self.latent_codec["y"](y, ctx_params)
         return {
             "likelihoods": {
@@ -143,7 +143,7 @@ class CheckerboardLatentCodec(LatentCodec):
         """Do context prediction on STE-quantized y_hat instead."""
         y_hat_anchors = self._y_hat_anchors(y, side_params)
         y_ctx = self._mask_anchor(self.context_prediction(y_hat_anchors))
-        ctx_params = self.entropy_parameters(self.merge(side_params, y_ctx))
+        ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
         y_out = self.latent_codec["y"](y, ctx_params)
         # Reuse quantized y_hat that was used for non-anchor context prediction.
         y_hat = y_out["y_hat"]
@@ -159,7 +159,7 @@ class CheckerboardLatentCodec(LatentCodec):
     def _y_hat_anchors(self, y, side_params):
         y_ctx = self.context_prediction(y).detach()
         y_ctx[:] = 0
-        ctx_params = self.entropy_parameters(self.merge(side_params, y_ctx))
+        ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
         ctx_params = self.latent_codec["y"].entropy_parameters(ctx_params)
         ctx_params = self._mask_non_anchor(ctx_params)  # Probably not needed.
         _, means_hat = ctx_params.chunk(2, 1)
@@ -175,7 +175,7 @@ class CheckerboardLatentCodec(LatentCodec):
 
         for i in range(2):
             y_ctx_i = self.unembed(self.context_prediction(self.embed(y_hat_)))[i]
-            ctx_params_i = self.entropy_parameters(self.merge(side_params_[i], y_ctx_i))
+            ctx_params_i = self.entropy_parameters(self.merge(y_ctx_i, side_params_[i]))
             y_out = self.latent_codec["y"].compress(y_[i], ctx_params_i)
             y_hat_[i] = y_out["y_hat"]
             [y_strings_[i]] = y_out["strings"]
@@ -206,7 +206,7 @@ class CheckerboardLatentCodec(LatentCodec):
 
         for i in range(2):
             y_ctx_i = self.unembed(self.context_prediction(self.embed(y_hat_)))[i]
-            ctx_params_i = self.entropy_parameters(self.merge(side_params_[i], y_ctx_i))
+            ctx_params_i = self.entropy_parameters(self.merge(y_ctx_i, side_params_[i]))
             y_out = self.latent_codec["y"].decompress(
                 [y_strings_[i]], shape=(h, w // 2), ctx_params=ctx_params_i
             )
