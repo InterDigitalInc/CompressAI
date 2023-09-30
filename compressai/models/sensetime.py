@@ -27,6 +27,8 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import types
+
 import torch
 import torch.nn as nn
 
@@ -321,6 +323,206 @@ class Elic2022Official(SimpleVAECompressionModel):
                 ),
             },
         )
+
+    @classmethod
+    def from_state_dict(cls, state_dict):
+        """Return a new model instance from `state_dict`."""
+        N = state_dict["g_a.0.weight"].size(0)
+        net = cls(N)
+        net.load_state_dict(state_dict)
+        return net
+
+
+@register_model("elic2022-chandelier")
+class Elic2022Chandelier(SimpleVAECompressionModel):
+    """ELIC 2022; simplified context model using only first and most recent groups.
+
+    Context model from [He2022], with simplifications and parameters
+    from the [Chandelier2023] implementation.
+    Based on modified attention model architecture from [Cheng2020].
+
+    .. note::
+
+        This implementation contains some differences compared to the
+        original [He2022] paper. For instance, the implemented context
+        model only uses the first and the most recently decoded channel
+        groups to predict the current channel group. In contrast, the
+        original paper uses all previously decoded channel groups.
+        Also, the last layer of h_s is now a conv rather than a deconv.
+
+    [Chandelier2023]: `"ELiC-ReImplemetation"
+    <https://github.com/VincentChandelier/ELiC-ReImplemetation>`_, by
+    Vincent Chandelier, 2023.
+
+    [He2022]: `"ELIC: Efficient Learned Image Compression with
+    Unevenly Grouped Space-Channel Contextual Adaptive Coding"
+    <https://arxiv.org/abs/2203.10886>`_, by Dailan He, Ziming Yang,
+    Weikun Peng, Rui Ma, Hongwei Qin, and Yan Wang, CVPR 2022.
+
+    [Cheng2020]: `"Learned Image Compression with Discretized Gaussian
+    Mixture Likelihoods and Attention Modules"
+    <https://arxiv.org/abs/2001.01568>`_, by Zhengxue Cheng, Heming Sun,
+    Masaru Takeuchi, and Jiro Katto, CVPR 2020.
+
+    Args:
+        N (int): Number of main network channels
+        M (int): Number of latent space channels
+        groups (list[int]): Number of channels in each channel group
+    """
+
+    def __init__(self, N=192, M=320, groups=None, **kwargs):
+        super().__init__(**kwargs)
+
+        if groups is None:
+            groups = [16, 16, 32, 64, M - 128]
+
+        self.groups = list(groups)
+        assert sum(self.groups) == M
+
+        self.g_a = nn.Sequential(
+            conv(3, N, kernel_size=5, stride=2),
+            ResidualBottleneckBlock(N, N),
+            ResidualBottleneckBlock(N, N),
+            ResidualBottleneckBlock(N, N),
+            conv(N, N, kernel_size=5, stride=2),
+            ResidualBottleneckBlock(N, N),
+            ResidualBottleneckBlock(N, N),
+            ResidualBottleneckBlock(N, N),
+            AttentionBlock(N),
+            conv(N, N, kernel_size=5, stride=2),
+            ResidualBottleneckBlock(N, N),
+            ResidualBottleneckBlock(N, N),
+            ResidualBottleneckBlock(N, N),
+            conv(N, M, kernel_size=5, stride=2),
+            AttentionBlock(M),
+        )
+
+        self.g_s = nn.Sequential(
+            AttentionBlock(M),
+            deconv(M, N, kernel_size=5, stride=2),
+            ResidualBottleneckBlock(N, N),
+            ResidualBottleneckBlock(N, N),
+            ResidualBottleneckBlock(N, N),
+            deconv(N, N, kernel_size=5, stride=2),
+            AttentionBlock(N),
+            ResidualBottleneckBlock(N, N),
+            ResidualBottleneckBlock(N, N),
+            ResidualBottleneckBlock(N, N),
+            deconv(N, N, kernel_size=5, stride=2),
+            ResidualBottleneckBlock(N, N),
+            ResidualBottleneckBlock(N, N),
+            ResidualBottleneckBlock(N, N),
+            deconv(N, 3, kernel_size=5, stride=2),
+        )
+
+        h_a = nn.Sequential(
+            conv(M, N, kernel_size=3, stride=1),
+            nn.ReLU(inplace=True),
+            conv(N, N, kernel_size=5, stride=2),
+            nn.ReLU(inplace=True),
+            conv(N, N, kernel_size=5, stride=2),
+        )
+
+        h_s = nn.Sequential(
+            deconv(N, N, kernel_size=5, stride=2),
+            nn.ReLU(inplace=True),
+            deconv(N, N * 3 // 2, kernel_size=5, stride=2),
+            nn.ReLU(inplace=True),
+            conv(N * 3 // 2, M * 2, kernel_size=3, stride=1),
+        )
+
+        # In [He2022], this is labeled "g_ch^(k)".
+        channel_context = {
+            f"y{k}": nn.Sequential(
+                conv(
+                    # Input: first group, and most recently decoded group.
+                    self.groups[0] + (k > 1) * self.groups[k - 1],
+                    224,
+                    kernel_size=5,
+                    stride=1,
+                ),
+                nn.ReLU(inplace=True),
+                conv(224, 128, kernel_size=5, stride=1),
+                nn.ReLU(inplace=True),
+                conv(128, self.groups[k] * 2, kernel_size=5, stride=1),
+            )
+            for k in range(1, len(self.groups))
+        }
+
+        # In [He2022], this is labeled "g_sp^(k)".
+        spatial_context = [
+            CheckerboardMaskedConv2d(
+                self.groups[k],
+                self.groups[k] * 2,
+                kernel_size=5,
+                stride=1,
+                padding=2,
+            )
+            for k in range(len(self.groups))
+        ]
+
+        # In [He2022], this is labeled "Param Aggregation".
+        param_aggregation = [
+            nn.Sequential(
+                conv1x1(
+                    # Input: spatial context, channel context, and hyper params.
+                    self.groups[k] * 2 + (k > 0) * self.groups[k] * 2 + M * 2,
+                    M * 2,
+                ),
+                nn.ReLU(inplace=True),
+                conv1x1(M * 2, 512),
+                nn.ReLU(inplace=True),
+                conv1x1(512, self.groups[k] * 2),
+            )
+            for k in range(len(self.groups))
+        ]
+
+        # In [He2022], this is labeled the space-channel context model (SCCTX).
+        # The side params and channel context params are computed externally.
+        scctx_latent_codec = {
+            f"y{k}": CheckerboardLatentCodec(
+                latent_codec={
+                    "y": GaussianConditionalLatentCodec(quantizer="ste"),
+                },
+                context_prediction=spatial_context[k],
+                entropy_parameters=param_aggregation[k],
+            )
+            for k in range(len(self.groups))
+        }
+
+        # [He2022] uses a "hyperprior" architecture, which reconstructs y using z.
+        self.latent_codec = HyperpriorLatentCodec(
+            latent_codec={
+                # Channel groups with space-channel context model (SCCTX):
+                "y": ChannelGroupsLatentCodec(
+                    groups=self.groups,
+                    channel_context=channel_context,
+                    latent_codec=scctx_latent_codec,
+                ),
+                # Side information branch containing z:
+                "hyper": HyperLatentCodec(
+                    entropy_bottleneck=EntropyBottleneck(N), h_a=h_a, h_s=h_s
+                ),
+            },
+        )
+
+        self._monkey_patch()
+
+    def _monkey_patch(self):
+        """Monkey-patch to use only first group and most recent group."""
+
+        def merge_y(self: ChannelGroupsLatentCodec, *args):
+            if len(args) == 0:
+                return Tensor()
+            if len(args) == 1:
+                return args[0]
+            if len(args) < len(self.groups):
+                return torch.cat([args[0], args[-1]], dim=1)
+            return torch.cat(args, dim=1)
+
+        chan_groups_latent_codec = self.latent_codec["y"]
+        obj = chan_groups_latent_codec
+        obj.merge_y = types.MethodType(merge_y, obj)
 
     @classmethod
     def from_state_dict(cls, state_dict):
