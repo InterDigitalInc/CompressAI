@@ -105,11 +105,14 @@ class CheckerboardLatentCodec(LatentCodec):
         latent_codec: Optional[Mapping[str, LatentCodec]] = None,
         entropy_parameters: Optional[nn.Module] = None,
         context_prediction: Optional[nn.Module] = None,
+        anchor_parity="even",
         forward_method="twopass",
         **kwargs,
     ):
         super().__init__()
         self._kwargs = kwargs
+        self.anchor_parity = anchor_parity
+        self.non_anchor_parity = {"odd": "even", "even": "odd"}[anchor_parity]
         self.forward_method = forward_method
         self.entropy_parameters = entropy_parameters or nn.Identity()
         self.context_prediction = context_prediction or nn.Identity()
@@ -147,8 +150,7 @@ class CheckerboardLatentCodec(LatentCodec):
         y_out = self.latent_codec["y"](y, ctx_params)
         # Reuse quantized y_hat that was used for non-anchor context prediction.
         y_hat = y_out["y_hat"]
-        y_hat[..., 0::2, 0::2] = y_hat_anchors[..., 0::2, 0::2]
-        y_hat[..., 1::2, 1::2] = y_hat_anchors[..., 1::2, 1::2]
+        self._copy_anchors(y_hat, y_hat_anchors)
         return {
             "likelihoods": {
                 "y": y_out["likelihoods"]["y"],
@@ -229,10 +231,16 @@ class CheckerboardLatentCodec(LatentCodec):
         """
         n, c, h, w = y.shape
         y_ = y.new_zeros((2, n, c, h, w // 2))
-        y_[0, ..., 0::2, :] = y[..., 0::2, 0::2]
-        y_[0, ..., 1::2, :] = y[..., 1::2, 1::2]
-        y_[1, ..., 0::2, :] = y[..., 0::2, 1::2]
-        y_[1, ..., 1::2, :] = y[..., 1::2, 0::2]
+        if self.anchor_parity == "even":
+            y_[0, ..., 0::2, :] = y[..., 0::2, 0::2]
+            y_[0, ..., 1::2, :] = y[..., 1::2, 1::2]
+            y_[1, ..., 0::2, :] = y[..., 0::2, 1::2]
+            y_[1, ..., 1::2, :] = y[..., 1::2, 0::2]
+        else:
+            y_[0, ..., 0::2, :] = y[..., 0::2, 1::2]
+            y_[0, ..., 1::2, :] = y[..., 1::2, 0::2]
+            y_[1, ..., 0::2, :] = y[..., 0::2, 0::2]
+            y_[1, ..., 1::2, :] = y[..., 1::2, 1::2]
         return y_
 
     def embed(self, y_: Tensor) -> Tensor:
@@ -247,21 +255,44 @@ class CheckerboardLatentCodec(LatentCodec):
         num_chunks, n, c, h, w_half = y_.shape
         assert num_chunks == 2
         y = y_.new_zeros((n, c, h, w_half * 2))
-        y[..., 0::2, 0::2] = y_[0, ..., 0::2, :]
-        y[..., 1::2, 1::2] = y_[0, ..., 1::2, :]
-        y[..., 0::2, 1::2] = y_[1, ..., 0::2, :]
-        y[..., 1::2, 0::2] = y_[1, ..., 1::2, :]
+        if self.anchor_parity == "even":
+            y[..., 0::2, 0::2] = y_[0, ..., 0::2, :]
+            y[..., 1::2, 1::2] = y_[0, ..., 1::2, :]
+            y[..., 0::2, 1::2] = y_[1, ..., 0::2, :]
+            y[..., 1::2, 0::2] = y_[1, ..., 1::2, :]
+        else:
+            y[..., 0::2, 1::2] = y_[0, ..., 0::2, :]
+            y[..., 1::2, 0::2] = y_[0, ..., 1::2, :]
+            y[..., 0::2, 0::2] = y_[1, ..., 0::2, :]
+            y[..., 1::2, 1::2] = y_[1, ..., 1::2, :]
+        return y
+
+    def _copy(self, dest: Tensor, src: Tensor, parity: str) -> None:
+        """Copy pixels of the given parity."""
+        if parity == "even":
+            dest[..., 0::2, 0::2] = src[..., 0::2, 0::2]
+            dest[..., 1::2, 1::2] = src[..., 1::2, 1::2]
+        else:
+            dest[..., 0::2, 1::2] = src[..., 0::2, 1::2]
+            dest[..., 1::2, 0::2] = src[..., 1::2, 0::2]
+
+    def _copy_anchors(self, dest: Tensor, src: Tensor) -> None:
+        return self._copy(dest, src, parity=self.anchor_parity)
+
+    def _mask(self, y: Tensor, parity: str) -> Tensor:
+        if parity == "even":
+            y[..., 0::2, 0::2] = 0
+            y[..., 1::2, 1::2] = 0
+        else:
+            y[..., 0::2, 1::2] = 0
+            y[..., 1::2, 0::2] = 0
         return y
 
     def _mask_anchor(self, y: Tensor) -> Tensor:
-        y[..., 0::2, 0::2] = 0
-        y[..., 1::2, 1::2] = 0
-        return y
+        return self._mask(y, parity=self.anchor_parity)
 
     def _mask_non_anchor(self, y: Tensor) -> Tensor:
-        y[..., 0::2, 1::2] = 0
-        y[..., 1::2, 0::2] = 0
-        return y
+        return self._mask(y, parity=self.non_anchor_parity)
 
     def merge(self, *args):
         return torch.cat(args, dim=1)
