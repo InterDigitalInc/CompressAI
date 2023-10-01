@@ -150,13 +150,20 @@ class CheckerboardLatentCodec(LatentCodec):
 
     def _forward_twopass(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
         """Do context prediction on STE-quantized y_hat instead."""
-        y_hat_anchors = self._y_hat_anchors(y, side_params)
+        y_ctx = self._y_ctx_zero(y)
+        ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
+        ctx_params = self.latent_codec["y"].entropy_parameters(ctx_params)
+        ctx_params = self._mask_non_anchor(ctx_params)  # Probably not needed.
+        _, means_hat = ctx_params.chunk(2, 1)
+        y_hat_anchors = quantize_ste(y - means_hat) + means_hat
+
         y_ctx = self._mask_anchor(self.context_prediction(y_hat_anchors))
         ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
         y_out = self.latent_codec["y"](y, ctx_params)
         # Reuse quantized y_hat that was used for non-anchor context prediction.
         y_hat = y_out["y_hat"]
         self._copy_anchors(y_hat, y_hat_anchors)
+
         return {
             "likelihoods": {
                 "y": y_out["likelihoods"]["y"],
@@ -164,15 +171,11 @@ class CheckerboardLatentCodec(LatentCodec):
             "y_hat": y_hat,
         }
 
-    def _y_hat_anchors(self, y, side_params):
+    def _y_ctx_zero(self, y):
+        """Create a zero tensor of the required shape."""
         y_ctx = self.context_prediction(y).detach()
         y_ctx[:] = 0
-        ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
-        ctx_params = self.latent_codec["y"].entropy_parameters(ctx_params)
-        ctx_params = self._mask_non_anchor(ctx_params)  # Probably not needed.
-        _, means_hat = ctx_params.chunk(2, 1)
-        y_hat = quantize_ste(y - means_hat) + means_hat
-        return y_hat
+        return y_ctx
 
     def compress(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
         n, c, h, w = y.shape
