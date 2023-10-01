@@ -129,8 +129,14 @@ class CheckerboardLatentCodec(LatentCodec):
         return self.latent_codec[key]
 
     def forward(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
+        if self.forward_method == "onepass":
+            return self._forward_onepass(y, side_params)
         if self.forward_method == "twopass":
             return self._forward_twopass(y, side_params)
+        raise ValueError(f"Unknown forward method: {self.forward_method}")
+
+    def _forward_onepass(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
+        """Fast estimation with single pass of the context model."""
         y_hat = self.quantize(y)
         y_ctx = self._mask_anchor(self.context_prediction(y_hat))
         ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
