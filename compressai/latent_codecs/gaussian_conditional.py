@@ -85,6 +85,7 @@ class GaussianConditionalLatentCodec(LatentCodec):
         gaussian_conditional: Optional[GaussianConditional] = None,
         entropy_parameters: Optional[nn.Module] = None,
         quantizer: str = "noise",
+        chunks: Tuple[str] = ("scales", "means"),
         **kwargs,
     ):
         super().__init__()
@@ -93,10 +94,11 @@ class GaussianConditionalLatentCodec(LatentCodec):
             scale_table, **kwargs
         )
         self.entropy_parameters = entropy_parameters or nn.Identity()
+        self.chunks = tuple(chunks)
 
     def forward(self, y: Tensor, ctx_params: Tensor) -> Dict[str, Any]:
         gaussian_params = self.entropy_parameters(ctx_params)
-        scales_hat, means_hat = gaussian_params.chunk(2, 1)
+        scales_hat, means_hat = self._chunk(gaussian_params)
         y_hat, y_likelihoods = self.gaussian_conditional(y, scales_hat, means=means_hat)
         if self.quantizer == "ste":
             y_hat = quantize_ste(y - means_hat) + means_hat
@@ -104,7 +106,7 @@ class GaussianConditionalLatentCodec(LatentCodec):
 
     def compress(self, y: Tensor, ctx_params: Tensor) -> Dict[str, Any]:
         gaussian_params = self.entropy_parameters(ctx_params)
-        scales_hat, means_hat = gaussian_params.chunk(2, 1)
+        scales_hat, means_hat = self._chunk(gaussian_params)
         indexes = self.gaussian_conditional.build_indexes(scales_hat)
         y_strings = self.gaussian_conditional.compress(y, indexes, means_hat)
         y_hat = self.gaussian_conditional.decompress(
@@ -121,10 +123,22 @@ class GaussianConditionalLatentCodec(LatentCodec):
     ) -> Dict[str, Any]:
         (y_strings,) = strings
         gaussian_params = self.entropy_parameters(ctx_params)
-        scales_hat, means_hat = gaussian_params.chunk(2, 1)
+        scales_hat, means_hat = self._chunk(gaussian_params)
         indexes = self.gaussian_conditional.build_indexes(scales_hat)
         y_hat = self.gaussian_conditional.decompress(
             y_strings, indexes, means=means_hat
         )
         assert y_hat.shape[2:4] == shape
         return {"y_hat": y_hat}
+
+    def _chunk(self, params: Tensor) -> Tuple[Tensor, Tensor]:
+        scales, means = None, None
+        if self.chunks == ("scales",):
+            scales = params
+        if self.chunks == ("means",):
+            means = params
+        if self.chunks == ("scales", "means"):
+            scales, means = params.chunk(2, 1)
+        if self.chunks == ("means", "scales"):
+            means, scales = params.chunk(2, 1)
+        return scales, means
