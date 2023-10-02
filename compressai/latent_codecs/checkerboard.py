@@ -138,7 +138,7 @@ class CheckerboardLatentCodec(LatentCodec):
     def _forward_onepass(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
         """Fast estimation with single pass of the context model."""
         y_hat = self.quantize(y)
-        y_ctx = self._mask_anchor(self.context_prediction(y_hat))
+        y_ctx = self._keep_only(self.context_prediction(y_hat), "non_anchor")
         ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
         y_out = self.latent_codec["y"](y, ctx_params)
         return {
@@ -153,16 +153,19 @@ class CheckerboardLatentCodec(LatentCodec):
         y_ctx = self._y_ctx_zero(y)
         ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
         ctx_params = self.latent_codec["y"].entropy_parameters(ctx_params)
-        ctx_params = self._mask_non_anchor(ctx_params)  # Probably not needed.
+        ctx_params = self._keep_only(ctx_params, "anchor")  # Probably not needed.
         _, means_hat = ctx_params.chunk(2, 1)
         y_hat_anchors = quantize_ste(y - means_hat) + means_hat
+        y_hat_anchors = self._keep_only(y_hat_anchors, "anchor")
 
-        y_ctx = self._mask_anchor(self.context_prediction(y_hat_anchors))
+        y_ctx = self.context_prediction(y_hat_anchors)
+        y_ctx = self._keep_only(y_ctx, "non_anchor")  # Probably not needed.
         ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
         y_out = self.latent_codec["y"](y, ctx_params)
+
         # Reuse quantized y_hat that was used for non-anchor context prediction.
         y_hat = y_out["y_hat"]
-        self._copy_anchors(y_hat, y_hat_anchors)
+        self._copy(y_hat, y_hat_anchors, "anchor")  # Probably not needed.
 
         return {
             "likelihoods": {
@@ -276,8 +279,10 @@ class CheckerboardLatentCodec(LatentCodec):
             y[..., 1::2, 1::2] = y_[1, ..., 1::2, :]
         return y
 
-    def _copy(self, dest: Tensor, src: Tensor, parity: str) -> None:
-        """Copy pixels of the given parity."""
+    def _copy(self, dest: Tensor, src: Tensor, step: str) -> None:
+        """Copy pixels in the current step."""
+        assert step in ("anchor", "non_anchor")
+        parity = self.anchor_parity if step == "anchor" else self.non_anchor_parity
         if parity == "even":
             dest[..., 0::2, 0::2] = src[..., 0::2, 0::2]
             dest[..., 1::2, 1::2] = src[..., 1::2, 1::2]
@@ -285,23 +290,21 @@ class CheckerboardLatentCodec(LatentCodec):
             dest[..., 0::2, 1::2] = src[..., 0::2, 1::2]
             dest[..., 1::2, 0::2] = src[..., 1::2, 0::2]
 
-    def _copy_anchors(self, dest: Tensor, src: Tensor) -> None:
-        return self._copy(dest, src, parity=self.anchor_parity)
+    def _keep_only(self, y: Tensor, step: str) -> Tensor:
+        """Keep only pixels in the current step, and zero out the rest."""
+        parity = self.non_anchor_parity if step == "anchor" else self.anchor_parity
+        return self._mask(y, parity)
 
     def _mask(self, y: Tensor, parity: str) -> Tensor:
         if parity == "even":
             y[..., 0::2, 0::2] = 0
             y[..., 1::2, 1::2] = 0
-        else:
+        elif parity == "odd":
             y[..., 0::2, 1::2] = 0
             y[..., 1::2, 0::2] = 0
+        elif parity == "all":
+            y[:] = 0
         return y
-
-    def _mask_anchor(self, y: Tensor) -> Tensor:
-        return self._mask(y, parity=self.anchor_parity)
-
-    def _mask_non_anchor(self, y: Tensor) -> Tensor:
-        return self._mask(y, parity=self.non_anchor_parity)
 
     def merge(self, *args):
         return torch.cat(args, dim=1)
