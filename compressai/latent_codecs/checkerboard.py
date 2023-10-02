@@ -53,9 +53,21 @@ class CheckerboardLatentCodec(LatentCodec):
 
     Checkerboard context model introduced in [He2021].
 
+    - `forward_method="one_pass"` is fastest, but does not use
+      quantization based on the intermediate means.
+    - `forward_method="two_pass"` is slightly slower, but accurately
+      quantizes based on the intermediate means.
+      Uses the same operations as [Chandelier2023].
+    - `forward_method="two_pass_faster"` uses slightly fewer
+      redundant operations, but may not work in all cases.
+
     [He2021]: `"Checkerboard Context Model for Efficient Learned Image
     Compression" <https://arxiv.org/abs/2103.15306>`_, by Dailan He,
     Yaoyan Zheng, Baocheng Sun, Yan Wang, and Hongwei Qin, CVPR 2021.
+
+    [Chandelier2023]: `"ELiC-ReImplemetation"
+    <https://github.com/VincentChandelier/ELiC-ReImplemetation>`_, by
+    Vincent Chandelier, 2023.
 
     .. warning:: This implementation assumes that ``entropy_parameters``
        is a pointwise function, e.g., a composition of 1x1 convs and
@@ -133,6 +145,8 @@ class CheckerboardLatentCodec(LatentCodec):
             return self._forward_onepass(y, side_params)
         if self.forward_method == "twopass":
             return self._forward_twopass(y, side_params)
+        if self.forward_method == "twopass_faster":
+            return self._forward_twopass_faster(y, side_params)
         raise ValueError(f"Unknown forward method: {self.forward_method}")
 
     def _forward_onepass(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
@@ -149,6 +163,65 @@ class CheckerboardLatentCodec(LatentCodec):
         }
 
     def _forward_twopass(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
+        """Do context prediction on STE-quantized y_hat instead."""
+        B, C, H, W = y.shape
+        ctx_params = y.new_zeros((B, C * 2, H, W))
+
+        y_hat_anchors = self._forward_twopass_step(
+            y,
+            side_params,
+            self._y_ctx_zero(y),
+            ctx_params,
+            step="anchor",
+        )
+
+        y_hat_non_anchors = self._forward_twopass_step(
+            y,
+            side_params,
+            self.context_prediction(y_hat_anchors),
+            ctx_params,
+            step="non_anchor",
+        )
+
+        # NOTE: We could also use y_hat = y_out["y_hat"] if it uses the same quantizer.
+        y_hat = y_hat_anchors + y_hat_non_anchors
+        y_out = self.latent_codec["y"](y, ctx_params)
+
+        return {
+            "likelihoods": {
+                "y": y_out["likelihoods"]["y"],
+            },
+            "y_hat": y_hat,
+        }
+
+    def _forward_twopass_step(
+        self, y: Tensor, side_params: Tensor, y_ctx: Tensor, params: Tensor, step: str
+    ) -> Dict[str, Any]:
+        # NOTE: The _i variables only contain the current step's pixels.
+
+        # Estimate parameters.
+        params_i = self.entropy_parameters(self.merge(y_ctx, side_params))
+
+        # Save params for current step. This is later used for entropy estimation.
+        self._copy(params, params_i, step)
+
+        # Technically, latent_codec may also contain an "entropy_parameters" method.
+        # Usually, it is identity, though.
+        params_i = self.latent_codec["y"].entropy_parameters(params_i)
+
+        # Keep only elements needed for current step.
+        params_i = self._keep_only(params_i, step)
+
+        # NOTE: It's not necessary to mask out the non-step pixels, but it doesn't hurt.
+        y_i = self._keep_only(y.clone(), step)
+
+        # Determine y_hat for current step.
+        _, means_i = self.latent_codec["y"]._chunk(params_i)
+        y_hat_i = self._keep_only(quantize_ste(y_i - means_i) + means_i, step)
+
+        return y_hat_i
+
+    def _forward_twopass_faster(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
         """Do context prediction on STE-quantized y_hat instead."""
         y_ctx = self._y_ctx_zero(y)
         ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
