@@ -152,7 +152,10 @@ class Cheng2020AnchorCheckerboard(SimpleVAECompressionModel):
                     ),
                 ),
                 "hyper": HyperLatentCodec(
-                    entropy_bottleneck=EntropyBottleneck(N), h_a=h_a, h_s=h_s
+                    entropy_bottleneck=EntropyBottleneck(N),
+                    h_a=h_a,
+                    h_s=h_s,
+                    quantizer="ste",
                 ),
             },
         )
@@ -319,7 +322,10 @@ class Elic2022Official(SimpleVAECompressionModel):
                 ),
                 # Side information branch containing z:
                 "hyper": HyperLatentCodec(
-                    entropy_bottleneck=EntropyBottleneck(N), h_a=h_a, h_s=h_s
+                    entropy_bottleneck=EntropyBottleneck(N),
+                    h_a=h_a,
+                    h_s=h_s,
+                    quantizer="ste",
                 ),
             },
         )
@@ -503,7 +509,10 @@ class Elic2022Chandelier(SimpleVAECompressionModel):
                 ),
                 # Side information branch containing z:
                 "hyper": HyperLatentCodec(
-                    entropy_bottleneck=EntropyBottleneck(N), h_a=h_a, h_s=h_s
+                    entropy_bottleneck=EntropyBottleneck(N),
+                    h_a=h_a,
+                    h_s=h_s,
+                    quantizer="ste",
                 ),
             },
         )
