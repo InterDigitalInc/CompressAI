@@ -191,17 +191,17 @@ class CheckerboardLatentCodec(LatentCodec):
         y_hat_anchors = self._forward_twopass_step(
             y,
             side_params,
-            self._y_ctx_zero(y),
             ctx_params,
-            step="anchor",
+            self._y_ctx_zero(y),
+            "anchor",
         )
 
         y_hat_non_anchors = self._forward_twopass_step(
             y,
             side_params,
-            self.context_prediction(y_hat_anchors),
             ctx_params,
-            step="non_anchor",
+            self.context_prediction(y_hat_anchors),
+            "non_anchor",
         )
 
         y_hat = y_hat_anchors + y_hat_non_anchors
@@ -215,7 +215,7 @@ class CheckerboardLatentCodec(LatentCodec):
         }
 
     def _forward_twopass_step(
-        self, y: Tensor, side_params: Tensor, y_ctx: Tensor, params: Tensor, step: str
+        self, y: Tensor, side_params: Tensor, params: Tensor, y_ctx: Tensor, step: str
     ) -> Dict[str, Any]:
         # NOTE: The _i variables contain only the current step's pixels.
         assert step in ("anchor", "non_anchor")
@@ -225,9 +225,9 @@ class CheckerboardLatentCodec(LatentCodec):
         # Save params for current step. This is later used for entropy estimation.
         self._copy(params, params_i, step)
 
-        # Technically, latent_codec may also contain an "entropy_parameters" method.
-        # Usually, it is identity, though.
-        params_i = self.latent_codec["y"].entropy_parameters(params_i)
+        # Apply latent_codec's "entropy_parameters()", if it exists. Usually identity.
+        func = getattr(self.latent_codec["y"], "entropy_parameters", lambda x: x)
+        params_i = func(params_i)
 
         # Keep only elements needed for current step.
         # It's not necessary to mask the rest out just yet, but it doesn't hurt.
@@ -251,7 +251,8 @@ class CheckerboardLatentCodec(LatentCodec):
         """
         y_ctx = self._y_ctx_zero(y)
         ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
-        ctx_params = self.latent_codec["y"].entropy_parameters(ctx_params)
+        func = getattr(self.latent_codec["y"], "entropy_parameters", lambda x: x)
+        ctx_params = func(ctx_params)
         ctx_params = self._keep_only(ctx_params, "anchor")  # Probably unnecessary.
         _, means_hat = self.latent_codec["y"]._chunk(ctx_params)
         y_hat_anchors = quantize_ste(y - means_hat) + means_hat
@@ -316,6 +317,7 @@ class CheckerboardLatentCodec(LatentCodec):
         assert all(len(x) == n for x in y_strings_)
 
         c, h, w = shape
+        y_i_shape = (h, w // 2)
         y_hat_ = side_params.new_zeros((2, n, c, h, w // 2))
         side_params_ = self.unembed(side_params)
 
@@ -325,7 +327,7 @@ class CheckerboardLatentCodec(LatentCodec):
                 y_ctx_i = self._mask(y_ctx_i, "all")
             ctx_params_i = self.entropy_parameters(self.merge(y_ctx_i, side_params_[i]))
             y_out = self.latent_codec["y"].decompress(
-                [y_strings_[i]], shape=(h, w // 2), ctx_params=ctx_params_i
+                [y_strings_[i]], y_i_shape, ctx_params_i
             )
             y_hat_[i] = y_out["y_hat"]
 
