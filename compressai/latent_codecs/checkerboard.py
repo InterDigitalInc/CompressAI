@@ -161,8 +161,8 @@ class CheckerboardLatentCodec(LatentCodec):
         """
         y_hat = self.quantize(y)
         y_ctx = self._keep_only(self.context_prediction(y_hat), "non_anchor")
-        ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
-        y_out = self.latent_codec["y"](y, ctx_params)
+        params = self.entropy_parameters(self.merge(y_ctx, side_params))
+        y_out = self.latent_codec["y"](y, params)
         return {
             "likelihoods": {
                 "y": y_out["likelihoods"]["y"],
@@ -186,26 +186,18 @@ class CheckerboardLatentCodec(LatentCodec):
         """
         B, C, H, W = y.shape
 
-        ctx_params = y.new_zeros((B, C * 2, H, W))
+        params = y.new_zeros((B, C * 2, H, W))
 
         y_hat_anchors = self._forward_twopass_step(
-            y,
-            side_params,
-            ctx_params,
-            self._y_ctx_zero(y),
-            "anchor",
+            y, side_params, params, self._y_ctx_zero(y), "anchor"
         )
 
         y_hat_non_anchors = self._forward_twopass_step(
-            y,
-            side_params,
-            ctx_params,
-            self.context_prediction(y_hat_anchors),
-            "non_anchor",
+            y, side_params, params, self.context_prediction(y_hat_anchors), "non_anchor"
         )
 
         y_hat = y_hat_anchors + y_hat_non_anchors
-        y_out = self.latent_codec["y"](y, ctx_params)
+        y_out = self.latent_codec["y"](y, params)
 
         return {
             "likelihoods": {
@@ -250,18 +242,18 @@ class CheckerboardLatentCodec(LatentCodec):
         The speedup is very small, however.
         """
         y_ctx = self._y_ctx_zero(y)
-        ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
+        params = self.entropy_parameters(self.merge(y_ctx, side_params))
         func = getattr(self.latent_codec["y"], "entropy_parameters", lambda x: x)
-        ctx_params = func(ctx_params)
-        ctx_params = self._keep_only(ctx_params, "anchor")  # Probably unnecessary.
-        _, means_hat = self.latent_codec["y"]._chunk(ctx_params)
+        params = func(params)
+        params = self._keep_only(params, "anchor")  # Probably unnecessary.
+        _, means_hat = self.latent_codec["y"]._chunk(params)
         y_hat_anchors = quantize_ste(y - means_hat) + means_hat
         y_hat_anchors = self._keep_only(y_hat_anchors, "anchor")
 
         y_ctx = self.context_prediction(y_hat_anchors)
         y_ctx = self._keep_only(y_ctx, "non_anchor")  # Probably unnecessary.
-        ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
-        y_out = self.latent_codec["y"](y, ctx_params)
+        params = self.entropy_parameters(self.merge(y_ctx, side_params))
+        y_out = self.latent_codec["y"](y, params)
 
         # Reuse quantized y_hat that was used for non-anchor context prediction.
         y_hat = y_out["y_hat"]
@@ -291,8 +283,8 @@ class CheckerboardLatentCodec(LatentCodec):
             y_ctx_i = self.unembed(self.context_prediction(self.embed(y_hat_)))[i]
             if i == 0:
                 y_ctx_i = self._mask(y_ctx_i, "all")
-            ctx_params_i = self.entropy_parameters(self.merge(y_ctx_i, side_params_[i]))
-            y_out = self.latent_codec["y"].compress(y_[i], ctx_params_i)
+            params_i = self.entropy_parameters(self.merge(y_ctx_i, side_params_[i]))
+            y_out = self.latent_codec["y"].compress(y_[i], params_i)
             y_hat_[i] = y_out["y_hat"]
             [y_strings_[i]] = y_out["strings"]
 
@@ -325,9 +317,9 @@ class CheckerboardLatentCodec(LatentCodec):
             y_ctx_i = self.unembed(self.context_prediction(self.embed(y_hat_)))[i]
             if i == 0:
                 y_ctx_i = self._mask(y_ctx_i, "all")
-            ctx_params_i = self.entropy_parameters(self.merge(y_ctx_i, side_params_[i]))
+            params_i = self.entropy_parameters(self.merge(y_ctx_i, side_params_[i]))
             y_out = self.latent_codec["y"].decompress(
-                [y_strings_[i]], y_i_shape, ctx_params_i
+                [y_strings_[i]], y_i_shape, params_i
             )
             y_hat_[i] = y_out["y_hat"]
 
