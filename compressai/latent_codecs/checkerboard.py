@@ -154,7 +154,7 @@ class CheckerboardLatentCodec(LatentCodec):
         ctx_params = self.entropy_parameters(self.merge(y_ctx, side_params))
         ctx_params = self.latent_codec["y"].entropy_parameters(ctx_params)
         ctx_params = self._keep_only(ctx_params, "anchor")  # Probably not needed.
-        _, means_hat = ctx_params.chunk(2, 1)
+        _, means_hat = self.latent_codec["y"]._chunk(ctx_params)
         y_hat_anchors = quantize_ste(y - means_hat) + means_hat
         y_hat_anchors = self._keep_only(y_hat_anchors, "anchor")
 
