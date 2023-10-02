@@ -61,6 +61,7 @@ from .utils import conv, deconv
 __all__ = [
     "Cheng2020AnchorCheckerboard",
     "Elic2022Official",
+    "Elic2022Chandelier",
 ]
 
 
