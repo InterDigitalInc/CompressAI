@@ -53,6 +53,9 @@ class CheckerboardLatentCodec(LatentCodec):
 
     Checkerboard context model introduced in [He2021].
 
+    See :py:class:`~compressai.models.sensetime.Cheng2020AnchorCheckerboard`
+    for example usage.
+
     - `forward_method="one_pass"` is fastest, but does not use
       quantization based on the intermediate means.
     - `forward_method="two_pass"` is slightly slower, but accurately

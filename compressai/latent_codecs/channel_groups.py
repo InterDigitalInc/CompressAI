@@ -51,7 +51,7 @@ class ChannelGroupsLatentCodec(LatentCodec):
     Context model from [Minnen2020] and [He2022].
     Also known as a "channel-conditional" (CC) entropy model.
 
-    See :py:class:`~compressai.models.sensetime.Cheng2020AnchorElic`
+    See :py:class:`~compressai.models.sensetime.Elic2022Official`
     for example usage.
 
     [Minnen2020]: `"Channel-wise Autoregressive Entropy Models for
