@@ -551,26 +551,22 @@ class ResidualBottleneckBlock(nn.Module):
 
     def __init__(self, in_ch: int, out_ch: int):
         super().__init__()
-
         mid_ch = min(in_ch, out_ch) // 2
         self.conv1 = conv1x1(in_ch, mid_ch)
+        self.relu1 = nn.ReLU(inplace=True)
         self.conv2 = conv3x3(mid_ch, mid_ch)
+        self.relu2 = nn.ReLU(inplace=True)
         self.conv3 = conv1x1(mid_ch, out_ch)
-        self.relu = nn.ReLU(inplace=True)
-
-        if in_ch != out_ch:
-            self.skip = conv1x1(in_ch, out_ch)
-        else:
-            self.skip = None
+        self.skip = conv1x1(in_ch, out_ch) if in_ch != out_ch else nn.Identity()
 
     def forward(self, x: Tensor) -> Tensor:
-        identity = x if self.skip is None else self.skip(x)
+        identity = self.skip(x)
 
         out = x
         out = self.conv1(out)
-        out = self.relu(out)
+        out = self.relu1(out)
         out = self.conv2(out)
-        out = self.relu(out)
+        out = self.relu2(out)
         out = self.conv3(out)
 
         return out + identity
