@@ -482,7 +482,9 @@ class Elic2022Chandelier(SimpleVAECompressionModel):
         scctx_latent_codec = {
             f"y{k}": CheckerboardLatentCodec(
                 latent_codec={
-                    "y": GaussianConditionalLatentCodec(quantizer="ste"),
+                    "y": GaussianConditionalLatentCodec(
+                        quantizer="ste", chunks=("means", "scales")
+                    ),
                 },
                 context_prediction=spatial_context[k],
                 entropy_parameters=param_aggregation[k],
