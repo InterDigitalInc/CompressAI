@@ -224,7 +224,7 @@ class CheckerboardLatentCodec(LatentCodec):
         # Keep only elements needed for current step.
         # It's not necessary to mask the rest out just yet, but it doesn't hurt.
         params_i = self._keep_only(params_i, step)
-        y_i = self._keep_only(y.clone(), step)
+        y_i = self._keep_only(y, step)
 
         # Determine y_hat for current step, and mask out the other pixels.
         _, means_i = self.latent_codec["y"]._chunk(params_i)
@@ -387,12 +387,17 @@ class CheckerboardLatentCodec(LatentCodec):
             dest[..., 0::2, 1::2] = src[..., 0::2, 1::2]
             dest[..., 1::2, 0::2] = src[..., 1::2, 0::2]
 
-    def _keep_only(self, y: Tensor, step: str) -> Tensor:
+    def _keep_only(self, y: Tensor, step: str, inplace: bool = False) -> Tensor:
         """Keep only pixels in the current step, and zero out the rest."""
-        parity = self.non_anchor_parity if step == "anchor" else self.anchor_parity
-        return self._mask(y, parity)
+        return self._mask(
+            y,
+            parity=self.non_anchor_parity if step == "anchor" else self.anchor_parity,
+            inplace=inplace,
+        )
 
-    def _mask(self, y: Tensor, parity: str) -> Tensor:
+    def _mask(self, y: Tensor, parity: str, inplace: bool = False) -> Tensor:
+        if not inplace:
+            y = y.clone()
         if parity == "even":
             y[..., 0::2, 0::2] = 0
             y[..., 1::2, 1::2] = 0
