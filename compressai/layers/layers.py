@@ -79,7 +79,7 @@ class MaskedConv2d(nn.Conv2d):
 
     def forward(self, x: Tensor) -> Tensor:
         # TODO(begaintj): weight assigment is not supported by torchscript
-        self.weight.data *= self.mask
+        self.weight.data = self.weight.data * self.mask
         return super().forward(x)
 
 
