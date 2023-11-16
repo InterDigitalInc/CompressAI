@@ -32,3 +32,4 @@ from .google import *
 from .pointcloud import *
 from .sensetime import *
 from .waseda import *
+from .google_vbr import *
