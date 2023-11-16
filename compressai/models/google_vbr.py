@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from compressai.models.google import ScaleHyperprior, MeanScaleHyperprior, JointAutoregressiveHierarchicalPriors
-from compressai.entropy_models.entropy_models_vbr import EntropyBottleneckVbr
+from compressai.entropy_models import EntropyBottleneck, EntropyBottleneckVbr
 from compressai.ops import quantize_ste, LowerBound
 from .utils import update_registered_buffers
 from .base import get_scale_table
@@ -167,6 +167,8 @@ class ScaleHyperpriorVbr(ScaleHyperprior):
         N = state_dict["g_a.0.weight"].size(0)
         M = state_dict["g_a.6.weight"].size(0)
         net = cls(N, M, vr_entbttlnck)  # fatih: add vr_bottleneck here
+        if 'QuantOffset' in state_dict.keys():
+            del state_dict["QuantOffset"]
         net.load_state_dict(state_dict)
         return net
 
@@ -174,7 +176,18 @@ class ScaleHyperpriorVbr(ScaleHyperprior):
         if scale_table is None:
             scale_table = get_scale_table()
         updated = self.gaussian_conditional.update_scale_table(scale_table, force=force)
-        updated |= super().update(force=force, sc=scale)
+        # updated |= super().update(force=force, sc=scale)
+        if isinstance(self.entropy_bottleneck, EntropyBottleneckVbr): # fatih: modeified to support also Variable Quantization
+            sc = scale
+            if sc is None:
+                rv = self.entropy_bottleneck.update(force=force)
+            else:
+                z_qstep = self.gayn2zqstep(1.0 / sc.view(1))
+                z_qstep = self.lower_bound_zqstep(z_qstep)
+                rv = self.entropy_bottleneck.update_variable(force=force, qs=z_qstep)
+        elif isinstance(self.entropy_bottleneck, EntropyBottleneck):
+            rv = self.entropy_bottleneck.update(force=force)
+        updated |= rv
         return updated
 
     def compress(self, x, s, inputscale=0):
