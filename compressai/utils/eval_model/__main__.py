@@ -87,8 +87,8 @@ def compute_metrics(
     org: torch.Tensor, rec: torch.Tensor, max_val: int = 255
 ) -> Dict[str, Any]:
     metrics: Dict[str, Any] = {}
-    org = (org * max_val).clamp(0, max_val).round()
-    rec = (rec * max_val).clamp(0, max_val).round()
+    org = (org * max_val).clamp(0, max_val)
+    rec = (rec * max_val).clamp(0, max_val)
     metrics["psnr-rgb"] = psnr(org, rec).item()
     metrics["ms-ssim-rgb"] = ms_ssim(org, rec, data_range=max_val).item()
     return metrics
@@ -134,11 +134,11 @@ def inference(model, x, vbr_scale=None):
 
 
 @torch.no_grad()
-def inference_entropy_estimation(model, x):
+def inference_entropy_estimation(model, x, vbr_scale=None):
     x = x.unsqueeze(0)
 
     start = time.time()
-    out_net = model.forward(x)
+    out_net = model.forward(x) if vbr_scale is None else model.forward(x, inputscale=vbr_scale)
     elapsed_time = time.time() - start
 
     # input images are 8bit RGB for now
@@ -211,7 +211,7 @@ def eval_model(
                 x = x.half()
             rv = inference(model, x) if not is_vbr_model else inference(model, x, vbr_scale)
         else:
-            rv = inference_entropy_estimation(model, x)
+            rv = inference_entropy_estimation(model, x) if not is_vbr_model else inference_entropy_estimation(model, x, vbr_scale)
         for k, v in rv.items():
             metrics[k] += v
         if args["per_image"]:

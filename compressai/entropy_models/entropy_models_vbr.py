@@ -583,9 +583,9 @@ class EntropyBottleneckVbr(EntropyModelVbr):
                 likelihood, _, _ = self._likelihood(outputs)
             else:
                 if ste and training: # in this case, use also output with noise
-                    likelihood = self._likelihood_variable(outputs, qs)
+                    likelihood, _, _  = self._likelihood_variable(outputs, qs)
                 else: # noise case, i.e. output already obtained by adding noise or it is not training 
-                    likelihood = self._likelihood_variable(outputs, qs)
+                    likelihood, _, _  = self._likelihood_variable(outputs, qs)
             if self.use_likelihood_bound:
                 likelihood = self.likelihood_lower_bound(likelihood)
         else:

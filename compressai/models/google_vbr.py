@@ -44,7 +44,7 @@ class ScaleHyperpriorVbr(ScaleHyperprior):
             self.lower_bound_zqstep = LowerBound(0.5)  
 
 
-    def forward(self, x, noise=False, stage=3, s=1):
+    def forward(self, x, noise=False, stage=3, s=1, inputscale=0):
         # fatih: disables this 
         # gg = 1.0 * torch.tensor([0.10000, 0.13944, 0.19293, 0.26874, 0.37268, 0.51801, 0.71957, 1.00000])
         # self.Gain = torch.nn.Parameter(gg, requires_grad=False)
@@ -72,7 +72,10 @@ class ScaleHyperpriorVbr(ScaleHyperprior):
                 s = len(self.Gain) - 1
                 scale = self.Gain[s].detach()
         else:
-            scale = self.Gain[s].detach()
+            if inputscale == 0:
+                scale = self.Gain[s].detach()
+            else:
+                scale = inputscale
         
         rescale = 1.0 / scale.clone().detach() # fatih: should we use detach() here or not ?
 
