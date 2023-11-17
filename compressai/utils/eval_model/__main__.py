@@ -52,6 +52,7 @@ import compressai
 from compressai.ops import compute_padding
 from compressai.zoo import image_models as pretrained_models
 from compressai.zoo.image import model_architectures as architectures
+from compressai.zoo.image_vbr import model_architectures as architectures_vbr
 
 torch.backends.cudnn.deterministic = True
 torch.set_num_threads(1)
@@ -100,7 +101,7 @@ def read_image(filepath: str) -> torch.Tensor:
 
 
 @torch.no_grad()
-def inference(model, x):
+def inference(model, x, vbr_scale=None):
     x = x.unsqueeze(0)
 
     h, w = x.size(2), x.size(3)
@@ -109,11 +110,11 @@ def inference(model, x):
     x_padded = F.pad(x, pad, mode="constant", value=0)
 
     start = time.time()
-    out_enc = model.compress(x_padded)
+    out_enc = model.compress(x_padded) if vbr_scale is None else model.compress(x_padded, s=0, inputscale=vbr_scale)
     enc_time = time.time() - start
 
     start = time.time()
-    out_dec = model.decompress(out_enc["strings"], out_enc["shape"])
+    out_dec = model.decompress(out_enc["strings"], out_enc["shape"]) if vbr_scale is None else model.decompress(out_enc["strings"], out_enc["shape"],  s=0, inputscale=vbr_scale)
     dec_time = time.time() - start
 
     out_dec["x_hat"] = F.pad(out_dec["x_hat"], unpad)
@@ -171,11 +172,20 @@ def load_checkpoint(arch: str, no_update: bool, checkpoint_path: str) -> nn.Modu
     for key in ["network", "state_dict", "model_state_dict"]:
         if key in checkpoint:
             state_dict = checkpoint[key]
-
-    model_cls = architectures[arch]
-    net = model_cls.from_state_dict(state_dict)
-    if not no_update:
-        net.update(force=True)
+    
+    if not arch.endswith('-vbr'):
+        model_cls = architectures[arch]
+        net = model_cls.from_state_dict(state_dict)
+        if not no_update:
+            net.update(force=True)
+    else:
+        model_cls = architectures_vbr[arch]
+        if arch in ["bmshj2018-hyperprior-vbr"]:
+            net = model_cls.from_state_dict(state_dict, vr_entbttlnck=True)
+        else:
+            net = model_cls.from_state_dict(state_dict, vr_entbttlnck=False)
+        if not no_update:
+            net.update(force=True, scale=net.Gain[-1])
     return net.eval()
 
 
@@ -187,17 +197,19 @@ def eval_model(
     entropy_estimation: bool = False,
     trained_net: str = "",
     description: str = "",
+    vbr_scale = None,
     **args: Any,
 ) -> Dict[str, Any]:
     device = next(model.parameters()).device
     metrics = defaultdict(float)
+    is_vbr_model = args['architecture'].endswith("-vbr")
     for filepath in filepaths:
         x = read_image(filepath).to(device)
         if not entropy_estimation:
             if args["half"]:
                 model = model.half()
                 x = x.half()
-            rv = inference(model, x)
+            rv = inference(model, x) if not is_vbr_model else inference(model, x, vbr_scale)
         else:
             rv = inference_entropy_estimation(model, x)
         for k, v in rv.items():
@@ -292,6 +304,14 @@ def setup_args():
         action="store_true",
         help="store results for each image of the dataset, separately",
     )
+    # Options for variable bitrate (vbr) models
+    parent_parser.add_argument(
+        "--vbr_quantstep",
+        dest="vbr_quantstepsizes",
+        type=str,
+        default="10.0000,7.1715,5.1832,3.7211,2.6833,1.9305,1.3897,1.0000",
+        help="Quantization step sizes for variable bitrate (vbr) model. Floats [10.0 , 1.0] (example: 10.0,8.0,6.0,3.0,1.0)",
+    )
     parser = argparse.ArgumentParser(
         description="Evaluate a model on an image dataset.", add_help=True
     )
@@ -355,26 +375,49 @@ def main(argv):
         runs = sorted(args.qualities)
         opts = (args.architecture, args.metric)
         load_func = load_pretrained
-        log_fmt = "\rEvaluating {0} | {run:d}"
+        log_fmt = "\rEvaluating {0} | {run:d} "
     else:
         runs = args.checkpoint_paths
         opts = (args.architecture, args.no_update)
         load_func = load_checkpoint
-        log_fmt = "\rEvaluating {run:s}"
+        log_fmt = "\rEvaluating {run:s} "
+
+    is_vbr_model = args.architecture.endswith("-vbr")
+
+    if is_vbr_model:
+        assert len(args.checkpoint_paths) <= 1, "Use only one checkpoint for vbr model."
+        scales = [1.0/float(q) for q in args.vbr_quantstepsizes.split(",") if q]
+        runs = sorted(scales)
+        runs = torch.tensor(runs)
+        log_fmt = "\rEvaluating quant step {run:5.2f} "
+        model = load_func(*opts, args.checkpoint_paths[0])
+        # set some arch specific params for vbr
+        model.no_quantoffset = False
+        if args.architecture in ["JointAutoregressiveHierarchicalPriors-vbr", "Cheng2020Attention-vbr"]:
+            model.scl2ctx = True
+        if args.cuda and torch.cuda.is_available():
+            model = model.to("cuda")
+            runs = runs.to("cuda")
 
     results = defaultdict(list)
     for run in runs:
         if args.verbose:
-            sys.stderr.write(log_fmt.format(*opts, run=run))
+            sys.stderr.write(log_fmt.format(*opts, run=(run if not is_vbr_model else 1.0/run)))
             sys.stderr.flush()
-        model = load_func(*opts, run)
+        if not is_vbr_model:
+            model = load_func(*opts, run)
+        else:
+            # update bottleneck for every new quant_step if vbr bottleneck is used in the model
+            if args.architecture in ["bmshj2018-hyperprior-vbr"]: 
+                model.update(force=True, scale=run)
         if args.source == "pretrained":
             trained_net = f"{args.architecture}-{args.metric}-{run}-{description}"
         else:
-            cpt_name = Path(run).name[: -len(".tar.pth")]  # removesuffix() python3.9
+            run_ = run if not is_vbr_model else args.checkpoint_paths[0]
+            cpt_name = Path(run_).name[: -len(".tar.pth")]  # removesuffix() python3.9
             trained_net = f"{cpt_name}-{description}"
         print(f"Using trained model {trained_net}", file=sys.stderr)
-        if args.cuda and torch.cuda.is_available():
+        if args.cuda and torch.cuda.is_available() and not is_vbr_model:
             model = model.to("cuda")
         args_dict = vars(args)
         metrics = eval_model(
@@ -384,6 +427,7 @@ def main(argv):
             filepaths,
             trained_net=trained_net,
             description=description,
+            vbr_scale = None if not is_vbr_model else run,
             **args_dict,
         )
         for k, v in metrics.items():
