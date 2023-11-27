@@ -87,8 +87,8 @@ def compute_metrics(
     org: torch.Tensor, rec: torch.Tensor, max_val: int = 255
 ) -> Dict[str, Any]:
     metrics: Dict[str, Any] = {}
-    org = (org * max_val).clamp(0, max_val)
-    rec = (rec * max_val).clamp(0, max_val)
+    org = (org * max_val).clamp(0, max_val).round()
+    rec = (rec * max_val).clamp(0, max_val).round()
     metrics["psnr-rgb"] = psnr(org, rec).item()
     metrics["ms-ssim-rgb"] = ms_ssim(org, rec, data_range=max_val).item()
     return metrics
@@ -180,12 +180,14 @@ def load_checkpoint(arch: str, no_update: bool, checkpoint_path: str) -> nn.Modu
             net.update(force=True)
     else:
         model_cls = architectures_vbr[arch]
-        if arch in ["bmshj2018-hyperprior-vbr"]:
+        if arch in ["bmshj2018-hyperprior-vbr", "mbt2018-mean-vbr"]:
             net = model_cls.from_state_dict(state_dict, vr_entbttlnck=True)
+            if not no_update:
+                net.update(force=True, scale=net.Gain[-1])
         else:
-            net = model_cls.from_state_dict(state_dict, vr_entbttlnck=False)
-        if not no_update:
-            net.update(force=True, scale=net.Gain[-1])
+            net = model_cls.from_state_dict(state_dict)
+            if not no_update:
+                net.update(force=True)
     return net.eval()
 
 
@@ -393,7 +395,7 @@ def main(argv):
         model = load_func(*opts, args.checkpoint_paths[0])
         # set some arch specific params for vbr
         model.no_quantoffset = False
-        if args.architecture in ["JointAutoregressiveHierarchicalPriors-vbr", "Cheng2020Attention-vbr"]:
+        if args.architecture in ["mbt2018-vbr"]:
             model.scl2ctx = True
         if args.cuda and torch.cuda.is_available():
             model = model.to("cuda")
@@ -408,7 +410,7 @@ def main(argv):
             model = load_func(*opts, run)
         else:
             # update bottleneck for every new quant_step if vbr bottleneck is used in the model
-            if args.architecture in ["bmshj2018-hyperprior-vbr"]: 
+            if args.architecture in ["bmshj2018-hyperprior-vbr", "mbt2018-mean-vbr"]: 
                 model.update(force=True, scale=run)
         if args.source == "pretrained":
             trained_net = f"{args.architecture}-{args.metric}-{run}-{description}"
