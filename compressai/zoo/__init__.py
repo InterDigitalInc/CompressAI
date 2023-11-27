@@ -37,7 +37,9 @@ from .image import (
     mbt2018_mean,
 )
 from .image_vbr import (
-    bmshj2018_hyperprior_vbr
+    bmshj2018_hyperprior_vbr,
+    mbt2018_mean_vbr,
+    mbt2018_vbr
 )
 from .pretrained import load_pretrained as load_state_dict
 from .video import ssf2020
@@ -51,6 +53,8 @@ image_models = {
     "cheng2020-anchor": cheng2020_anchor,
     "cheng2020-attn": cheng2020_attn,
     "bmshj2018-hyperprior-vbr": bmshj2018_hyperprior_vbr,
+    "mbt2018-mean-vbr": mbt2018_mean_vbr,
+    "mbt2018-vbr": mbt2018_vbr,
 }
 
 # Not yet available.

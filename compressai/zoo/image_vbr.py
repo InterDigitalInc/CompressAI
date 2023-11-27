@@ -31,21 +31,43 @@ from torch.hub import load_state_dict_from_url
 
 from compressai.models import (
     ScaleHyperpriorVbr,
+    MeanScaleHyperpriorVbr,
+    JointAutoregressiveHierarchicalPriorsVbr
 )
 
 from .pretrained import load_pretrained
 
 __all__ = [
     "bmshj2018_hyperprior_vbr",
+    "mbt2018_mean_vbr",
+    "mbt2018_vbr",
 ]
 
 model_architectures = {
     "bmshj2018-hyperprior-vbr": ScaleHyperpriorVbr,
+    "mbt2018-mean-vbr": MeanScaleHyperpriorVbr,
+    "mbt2018-vbr": JointAutoregressiveHierarchicalPriorsVbr
 }
 
 root_url = "https://compressai.s3.amazonaws.com/models/v1"
 model_urls = {
     "bmshj2018-hyperprior-vbr": {
+        "mse": {
+            1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"
+        },
+        "ms-ssim": {
+            1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"
+        },
+    },
+    "mbt2018-mean-vbr": {
+        "mse": {
+            1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"
+        },
+        "ms-ssim": {
+            1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"
+        },
+    },
+    "mbt2018-vbr": {
         "mse": {
             1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"
         },
@@ -58,7 +80,13 @@ model_urls = {
 cfgs = {
     "bmshj2018-hyperprior-vbr": {
         1: (192, 320),
-    }
+    },
+    "mbt2018-mean-vbr": {
+        1: (192, 320),
+    },
+    "mbt2018-vbr": {
+        1: (192, 320),
+    },
 }
 
 
@@ -89,7 +117,6 @@ def _load_model(
     return model
 
 
-
 def bmshj2018_hyperprior_vbr(
     quality, metric="mse", pretrained=False, progress=True, **kwargs
 ):
@@ -109,4 +136,46 @@ def bmshj2018_hyperprior_vbr(
 
     return _load_model(
         "bmshj2018-hyperprior-vbr", metric, quality, pretrained, progress, **kwargs
+    )
+
+def mbt2018_mean_vbr(
+    quality, metric="mse", pretrained=False, progress=True, **kwargs
+):
+    r"""Bla bla...
+
+    Args:
+        quality (int): Quality levels (1: lowest, highest: 8)
+        metric (str): Optimized metric, choose from ('mse', no 'ms-ssim' yet)
+        pretrained (bool): If True, returns a pre-trained model
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    if metric not in ("mse"): # ("mse", "ms-ssim"): # we have only mse model
+        raise ValueError(f'Invalid metric "{metric}"')
+
+    if quality < 1 or quality > 8:
+        raise ValueError(f'Invalid quality "{quality}", should be 1')
+
+    return _load_model(
+        "mbt2018-mean-vbr", metric, quality, pretrained, progress, **kwargs
+    )
+
+def mbt2018_vbr(
+    quality, metric="mse", pretrained=False, progress=True, **kwargs
+):
+    r"""Bla bla...
+
+    Args:
+        quality (int): Quality levels (1: lowest, highest: 8)
+        metric (str): Optimized metric, choose from ('mse', no 'ms-ssim' yet)
+        pretrained (bool): If True, returns a pre-trained model
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    if metric not in ("mse"): # ("mse", "ms-ssim"): # we have only mse model
+        raise ValueError(f'Invalid metric "{metric}"')
+
+    if quality < 1 or quality > 8:
+        raise ValueError(f'Invalid quality "{quality}", should be 1')
+
+    return _load_model(
+        "mbt2018-vbr", metric, quality, pretrained, progress, **kwargs
     )
