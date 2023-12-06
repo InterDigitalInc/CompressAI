@@ -101,7 +101,7 @@ def read_image(filepath: str) -> torch.Tensor:
 
 
 @torch.no_grad()
-def inference(model, x, vbr_scale=None):
+def inference(model, x, vbr_stage=None, vbr_scale=None):
     x = x.unsqueeze(0)
 
     h, w = x.size(2), x.size(3)
@@ -110,11 +110,11 @@ def inference(model, x, vbr_scale=None):
     x_padded = F.pad(x, pad, mode="constant", value=0)
 
     start = time.time()
-    out_enc = model.compress(x_padded) if vbr_scale is None else model.compress(x_padded, s=0, inputscale=vbr_scale)
+    out_enc = model.compress(x_padded) if vbr_scale is None else model.compress(x_padded, stage=vbr_stage, s=0, inputscale=vbr_scale)
     enc_time = time.time() - start
 
     start = time.time()
-    out_dec = model.decompress(out_enc["strings"], out_enc["shape"]) if vbr_scale is None else model.decompress(out_enc["strings"], out_enc["shape"],  s=0, inputscale=vbr_scale)
+    out_dec = model.decompress(out_enc["strings"], out_enc["shape"]) if vbr_scale is None else model.decompress(out_enc["strings"], out_enc["shape"], stage=vbr_stage, s=0, inputscale=vbr_scale)
     dec_time = time.time() - start
 
     out_dec["x_hat"] = F.pad(out_dec["x_hat"], unpad)
@@ -134,11 +134,11 @@ def inference(model, x, vbr_scale=None):
 
 
 @torch.no_grad()
-def inference_entropy_estimation(model, x, vbr_scale=None):
+def inference_entropy_estimation(model, x, vbr_stage=None, vbr_scale=None):
     x = x.unsqueeze(0)
 
     start = time.time()
-    out_net = model.forward(x) if vbr_scale is None else model.forward(x, inputscale=vbr_scale)
+    out_net = model.forward(x) if vbr_scale is None else model.forward(x, stage=vbr_stage, inputscale=vbr_scale)
     elapsed_time = time.time() - start
 
     # input images are 8bit RGB for now
@@ -199,6 +199,7 @@ def eval_model(
     entropy_estimation: bool = False,
     trained_net: str = "",
     description: str = "",
+    vbr_stage = None,
     vbr_scale = None,
     **args: Any,
 ) -> Dict[str, Any]:
@@ -211,9 +212,9 @@ def eval_model(
             if args["half"]:
                 model = model.half()
                 x = x.half()
-            rv = inference(model, x) if not is_vbr_model else inference(model, x, vbr_scale)
+            rv = inference(model, x) if not is_vbr_model else inference(model, x, vbr_stage, vbr_scale)
         else:
-            rv = inference_entropy_estimation(model, x) if not is_vbr_model else inference_entropy_estimation(model, x, vbr_scale)
+            rv = inference_entropy_estimation(model, x) if not is_vbr_model else inference_entropy_estimation(model, x, vbr_stage, vbr_scale)
         for k, v in rv.items():
             metrics[k] += v
         if args["per_image"]:
@@ -314,6 +315,16 @@ def setup_args():
         default="10.0000,7.1715,5.1832,3.7211,2.6833,1.9305,1.3897,1.0000",
         help="Quantization step sizes for variable bitrate (vbr) model. Floats [10.0 , 1.0] (example: 10.0,8.0,6.0,3.0,1.0)",
     )
+    parent_parser.add_argument(
+        "--vbr_tr_stage",
+        type=int,
+        choices=[1,2],
+        default=2,
+        help="Stage in vbr model training. \
+            1: Model behaves/runs like a regular single-rate \
+            model without using any vbr tool (use for training/testing a model for single/highest lambda). \
+            2: Model behaves/runs like a vbr model using vbr tools. (use for post training stage=1 result.)",
+    )
     parser = argparse.ArgumentParser(
         description="Evaluate a model on an image dataset.", add_help=True
     )
@@ -410,7 +421,7 @@ def main(argv):
             model = load_func(*opts, run)
         else:
             # update bottleneck for every new quant_step if vbr bottleneck is used in the model
-            if args.architecture in ["bmshj2018-hyperprior-vbr", "mbt2018-mean-vbr"]: 
+            if args.architecture in ["bmshj2018-hyperprior-vbr", "mbt2018-mean-vbr"] and args.vbr_tr_stage == 2: 
                 model.update(force=True, scale=run)
         if args.source == "pretrained":
             trained_net = f"{args.architecture}-{args.metric}-{run}-{description}"
@@ -429,6 +440,7 @@ def main(argv):
             filepaths,
             trained_net=trained_net,
             description=description,
+            vbr_stage = None if not is_vbr_model else args.vbr_tr_stage,
             vbr_scale = None if not is_vbr_model else run,
             **args_dict,
         )
