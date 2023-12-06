@@ -47,60 +47,42 @@ class ScaleHyperpriorVbr(ScaleHyperprior):
                                              nn.Linear(Ndsz,    1), nn.Softplus())
             self.lower_bound_zqstep = LowerBound(0.5)  
 
-    def forward(self, x, noise=False, stage=3, s=1, inputscale=0):
-        s = max(0, min(s, len(self.Gain)-1)) # clip s to correct range
+    def _raise_stage_error(self, stage):
+        raise ValueError(f"Invalid stage (stage={stage}) parameter for this model.")
+    
+    def _get_scale(self, stage, s, inputscale):
+        s = max(0, min(s, len(self.Gain)-1))  # clip s to correct range
         if self.training:
             if stage > 1:
-                if s != (len(self.Gain) - 1):
-                    scale = torch.max(self.Gain[s], torch.tensor(1e-4)) + eps
-                else:
-                    s = len(self.Gain) - 1
-                    # scale = self.Gain[s].detach() # fatih: fix this gain to 1 
-                    scale = torch.max(self.Gain[s], torch.tensor(1e-4)) + eps
+                scale = self.Gain[s].detach() # fatih: don't train scale
+                # scale = torch.max(self.Gain[s], torch.tensor(1e-4)) + eps # fatih: train scale
             else:
-                s = len(self.Gain) - 1
                 scale = self.Gain[s].detach()
         else:
             if inputscale == 0:
                 scale = self.Gain[s].detach()
             else:
                 scale = inputscale
-        
-        rescale = 1.0 / scale.clone().detach() # fatih: should we use detach() here or not ?
+        return scale
 
-        if noise: # fatih: NOTE, modifications to support q_offsets in noise case are not well tested
+    def forward(self, x, stage : int = 2, s : int = 1, inputscale=0):
+        r""" stage: 1 -> non-vbr (old) code path; vbr modules not used; operates like corresponding google model. use for initial training.
+                    2 -> vbr code path; vbr modules now used. use for post training with e.g. MOO. """
+
+        scale = self._get_scale(stage, s, inputscale)
+        rescale = 1.0 / scale.clone().detach() 
+
+        if stage == 1:
             y = self.g_a(x)
             z = self.h_a(torch.abs(y))
             z_hat, z_likelihoods = self.entropy_bottleneck(z)
             scales_hat = self.h_s(z_hat)
-            if self.no_quantoffset:
-                # fatih: the two lines below (quant to get y_hat, entropy to get y_likelihoods) are the original codes, I will modify them with gaussian_conditional_variable
-                y_hat = self.gaussian_conditional.quantize(y * scale, "noise" if self.training else "dequantize") * rescale
-                _, y_likelihoods = self.gaussian_conditional(y * scale, scales_hat * scale)
-                # y_hat, y_likelihoods = self.gaussian_conditional.forward_variable(y, scales_hat, means=None, qs=scale) # no need to rescale (during training and validation ONLY), done in quantization
-            else:
-                # fatih: below is the code that performs quantization with quant offset. Two lines above are the original code without quant offset.
-                y_zm_sc = ((y - 0) * scale).detach()
-                signs = torch.sign(y_zm_sc)
-                q_abs = quantize_ste(torch.abs(y_zm_sc))
-                q_stdev = self.gaussian_conditional.lower_bound_scale(scales_hat * scale)
-
-                stdev_and_gain = torch.cat((q_stdev.unsqueeze(dim=4), scale.detach().expand(q_stdev.unsqueeze(dim=4).shape)), dim=4)
-                q_offsets = (-1) * (self.QuantABCD.forward( stdev_and_gain )).squeeze(dim=4)
-
-                q_offsets[q_abs < 0.0001] = 0   # must use zero offset for locations quantized to zero !
-                ###q_offsets[(y-0).detach().mean(dim=(2,3)).abs() > 2.0] = 0  # also use zero offset for channels with large mean since the zero mean assumption does not hold for these channels 
-                
-                q_offsets *= signs  # since we add offsets directly to non-abs of y_tilde
-
-                y_hat = self.gaussian_conditional.quantize(y * scale, "noise" if self.training else "dequantize") * rescale + q_offsets * rescale
-                _, y_likelihoods = self.gaussian_conditional(y * scale, scales_hat * scale)
-                # fatih: above is the code that performs quantization with quant offset
+            y_hat, y_likelihoods = self.gaussian_conditional(y, scales_hat)
             x_hat = self.g_s(y_hat)
-        else:  # STE
+
+        elif stage == 2:  # fatih: vbr code path with STE based quantization proxy
             y = self.g_a(x)
             z = self.h_a(torch.abs(y))
-            # fatih: variable rate entropy bottleneck ?
             if not self.vr_entbttlnck:
                 z_hat, z_likelihoods = self.entropy_bottleneck(z)
 
@@ -110,17 +92,14 @@ class ScaleHyperpriorVbr(ScaleHyperprior):
             else:
                 z_qstep = self.gayn2zqstep(1.0 / scale.clone().view(1))
                 z_qstep = self.lower_bound_zqstep(z_qstep)
-                z_hat, z_likelihoods = self.entropy_bottleneck(z, qs=z_qstep[0], training=None, ste=False) # ste=True) # this is EBVariableQuantization class, and should take care of ste quantization
+                z_hat, z_likelihoods = self.entropy_bottleneck(z, qs=z_qstep[0], training=None, ste=False) # ste=True) 
 
             scales_hat = self.h_s(z_hat)
             if self.no_quantoffset:
-                # fatih: the two lines below are the original codes, I will modify them with gaussian_conditional_variable
                 y_hat = quantize_ste(y * scale, "ste") * rescale
                 _, y_likelihoods = self.gaussian_conditional(y * scale, scales_hat * scale)
-                # y_hat, y_likelihoods = self.gaussian_conditional.forward_variable(y, scales_hat, means=None, qs=scale, qmode="ste")  # !!! STE 
             else:
-                # fatih: below is the code that performs quantization with quant offset. Two lines above are the original code without quant offset.
-                y_ch_means =  0  # y.mean(dim=(0,2,3), keepdim=True)
+                y_ch_means =  0  
                 y_zm = y - y_ch_means 
                 y_zm_sc = y_zm * scale 
                 signs = torch.sign(y_zm_sc).detach()
@@ -135,8 +114,10 @@ class ScaleHyperpriorVbr(ScaleHyperprior):
                 y_hat = signs * (q_abs + q_offsets)
                 y_hat = y_hat * rescale + y_ch_means
                 _, y_likelihoods = self.gaussian_conditional(y * scale, scales_hat * scale)
-                # fatih: above is the code that performs quantization with quant offset
             x_hat = self.g_s(y_hat)
+
+        else:
+            self._raise_stage_error(self, stage)
 
         return {
             "x_hat": x_hat,
@@ -182,7 +163,7 @@ class ScaleHyperpriorVbr(ScaleHyperprior):
         updated |= rv
         return updated
 
-    def compress(self, x, s, inputscale=0):
+    def compress(self, x, stage : int = 2, s : int = 1, inputscale=0):
         if inputscale != 0:
             scale = inputscale
         else:
@@ -192,21 +173,27 @@ class ScaleHyperpriorVbr(ScaleHyperprior):
         y = self.g_a(x)
         z = self.h_a(torch.abs(y))
 
-        if not self.vr_entbttlnck: 
+        if stage == 1 or (stage == 2 and not self.vr_entbttlnck): 
             z_strings = self.entropy_bottleneck.compress(z)
             z_hat = self.entropy_bottleneck.decompress(z_strings, z.size()[-2:])
-        else:  # fatih: support vr EntropyBottleneck
+        elif stage == 2:  # fatih: support vr EntropyBottleneck
             z_qstep = self.gayn2zqstep(1.0 / scale.view(1))
             z_qstep = self.lower_bound_zqstep(z_qstep)
             z_strings = self.entropy_bottleneck.compress(z, qs=z_qstep[0])
             z_hat = self.entropy_bottleneck.decompress(z_strings, z.size()[-2:], qs=z_qstep[0])
+        else:
+            self._raise_stage_error(self, stage)
 
         scales_hat = self.h_s(z_hat)
-        indexes = self.gaussian_conditional.build_indexes(scales_hat * scale)
-        y_strings = self.gaussian_conditional.compress(y * scale, indexes)
+        if stage ==1:
+            indexes = self.gaussian_conditional.build_indexes(scales_hat)
+            y_strings = self.gaussian_conditional.compress(y, indexes)
+        elif stage ==2:
+            indexes = self.gaussian_conditional.build_indexes(scales_hat * scale)
+            y_strings = self.gaussian_conditional.compress(y * scale, indexes)
         return {"strings": [y_strings, z_strings], "shape": z.size()[-2:]}
 
-    def decompress(self, strings, shape, s, inputscale):
+    def decompress(self, strings, shape, stage : int = 2, s : int = 1, inputscale=0):
         assert isinstance(strings, list) and len(strings) == 2
         if inputscale != 0:
             scale = inputscale
@@ -216,31 +203,38 @@ class ScaleHyperpriorVbr(ScaleHyperprior):
 
         rescale = torch.tensor(1.0) / scale
 
-        if not self.vr_entbttlnck: 
+        if stage == 1 or (stage == 2 and not self.vr_entbttlnck): 
             z_hat = self.entropy_bottleneck.decompress(strings[1], shape)
-        else:  # fatih: support vr EntropyBottleneck
+        elif stage == 2:   # fatih: support vr EntropyBottleneck
             z_qstep = self.gayn2zqstep(1.0 / scale.view(1))
             z_qstep = self.lower_bound_zqstep(z_qstep)
             z_hat = self.entropy_bottleneck.decompress(strings[1], shape, qs=z_qstep[0])
+        else:
+            self._raise_stage_error(self, stage)
 
         scales_hat = self.h_s(z_hat)
-        indexes = self.gaussian_conditional.build_indexes(scales_hat * scale)
-        if self.no_quantoffset:
-            y_hat = self.gaussian_conditional.decompress(strings[0], indexes) * rescale
-        else:
-            q_val = self.gaussian_conditional.decompress(strings[0], indexes)
-            q_abs, signs = q_val.abs(), torch.sign(q_val)
-            
-            q_stdev = self.gaussian_conditional.lower_bound_scale(scales_hat * scale)
 
-            stdev_and_gain = torch.cat((q_stdev.unsqueeze(dim=4), scale.detach().expand(q_stdev.unsqueeze(dim=4).shape)), dim=4)
-            q_offsets = (-1) * (self.QuantABCD.forward( stdev_and_gain )).squeeze(dim=4)
+        if stage == 1:
+            indexes = self.gaussian_conditional.build_indexes(scales_hat)
+            y_hat = self.gaussian_conditional.decompress(strings[0], indexes, z_hat.dtype)
+        elif stage == 2:
+            indexes = self.gaussian_conditional.build_indexes(scales_hat * scale)
+            if self.no_quantoffset:
+                y_hat = self.gaussian_conditional.decompress(strings[0], indexes) * rescale
+            else:
+                q_val = self.gaussian_conditional.decompress(strings[0], indexes)
+                q_abs, signs = q_val.abs(), torch.sign(q_val)
+                
+                q_stdev = self.gaussian_conditional.lower_bound_scale(scales_hat * scale)
 
-            q_offsets[q_abs< 0.0001] = 0  # must use zero offset for locations quantized to zero
+                stdev_and_gain = torch.cat((q_stdev.unsqueeze(dim=4), scale.detach().expand(q_stdev.unsqueeze(dim=4).shape)), dim=4)
+                q_offsets = (-1) * (self.QuantABCD.forward( stdev_and_gain )).squeeze(dim=4)
 
-            y_hat = signs * (q_abs + q_offsets)
-            y_ch_means =  0 
-            y_hat = y_hat * rescale + y_ch_means
+                q_offsets[q_abs< 0.0001] = 0  # must use zero offset for locations quantized to zero
+
+                y_hat = signs * (q_abs + q_offsets)
+                y_ch_means =  0 
+                y_hat = y_hat * rescale + y_ch_means
         x_hat = self.g_s(y_hat).clamp_(0, 1)
         return {"x_hat": x_hat}
     
@@ -254,61 +248,25 @@ class MeanScaleHyperpriorVbr(ScaleHyperpriorVbr, MeanScaleHyperprior):
     def __init__(self, N=192,  M=320, vr_entbttlnck=False, **kwargs):
         super().__init__(N, M, vr_entbttlnck=vr_entbttlnck, **kwargs)
 
-    def forward(self, x, noise=False, stage=3, s=1, inputscale=0):
-        # fatih: New logic below
-        s = max(0, min(s, len(self.Gain)-1)) # clip s to correct range
-        if self.training:
-            if stage > 1:
-                if s != (len(self.Gain) - 1):
-                    scale = torch.max(self.Gain[s], torch.tensor(1e-4)) + eps
-                else:
-                    s = len(self.Gain) - 1
-                    # scale = self.Gain[s].detach() # fatih: fix this gain to 1 
-                    scale = torch.max(self.Gain[s], torch.tensor(1e-4)) + eps
-            else:
-                s = len(self.Gain) - 1
-                scale = self.Gain[s].detach()
-        else:
-            if inputscale == 0:
-                scale = self.Gain[s].detach()
-            else:
-                scale = inputscale
-        
-        rescale = 1.0 / scale.clone().detach()  # fatih: should we use detach() here or not ?
+    def forward(self, x, stage : int = 2, s : int = 1, inputscale=0):
+        r""" stage: 1 -> non-vbr (old) code path; vbr modules not used; operates like corresponding google model. use for initial training.
+                    2 -> vbr code path; vbr modules now used. use for post training with e.g. MOO. """
 
-        if noise: # fatih: NOTE, modifications to support q_offsets in noise case are not well tested
+        scale = self._get_scale(stage, s, inputscale)
+        rescale = 1.0 / scale.clone().detach()
+
+        if stage == 1: # fatih: NOTE, modifications to support q_offsets in noise case are not well tested
             y = self.g_a(x)
             z = self.h_a(y)
             z_hat, z_likelihoods = self.entropy_bottleneck(z)
             gaussian_params = self.h_s(z_hat)
             scales_hat, means_hat = gaussian_params.chunk(2, 1)
-            if self.no_quantoffset:
-                # fatih: the two lines below (quant to get y_hat, entropy to get y_likelihoods) are the original codes, I will modify them with gaussian_conditional_variable
-                y_hat = self.gaussian_conditional.quantize(y * scale, "noise" if self.training else "dequantize", means=means_hat * scale) * rescale + means_hat
-                _, y_likelihoods = self.gaussian_conditional(y * scale, scales_hat * scale, means=means_hat * scale)
-                # y_hat, y_likelihoods = self.gaussian_conditional.forward_variable(y, scales_hat, means=None, qs=scale) # no need to rescale (during training and validation ONLY), done in quantization
-            else:
-                # fatih: below is the code that performs quantization with quant offset. Two lines above are the original code without quant offset.
-                y_zm_sc = ((y - means_hat) * scale).detach()
-                signs = torch.sign(y_zm_sc)
-                q_abs = quantize_ste(torch.abs(y_zm_sc))
-                q_stdev = self.gaussian_conditional.lower_bound_scale(scales_hat * scale)
-
-                stdev_and_gain = torch.cat((q_stdev.unsqueeze(dim=4), scale.detach().expand(q_stdev.unsqueeze(dim=4).shape)), dim=4)
-                q_offsets = (-1) * (self.QuantABCD.forward( stdev_and_gain )).squeeze(dim=4)
-
-                q_offsets[q_abs < 0.0001] = 0   # must use zero offset for locations quantized to zero !
-                
-                q_offsets *= signs  # since we add offsets directly to non-abs of y_tilde
-
-                y_hat = self.gaussian_conditional.quantize(y * scale, "noise" if self.training else "dequantize", means=means_hat * scale) * rescale + means_hat + q_offsets * rescale
-                _, y_likelihoods = self.gaussian_conditional(y * scale, scales_hat * scale, means=means_hat * scale)
-                # fatih: above is the code that performs quantization with quant offset
+            y_hat, y_likelihoods = self.gaussian_conditional(y, scales_hat, means=means_hat)
             x_hat = self.g_s(y_hat)
-        else:  # STE
+
+        elif stage == 2:  # fatih: vbr code path with STE based quantization proxy
             y = self.g_a(x)
             z = self.h_a(y)
-            # fatih: variable rate entropy bottleneck ?
             if not self.vr_entbttlnck:
                 z_hat, z_likelihoods = self.entropy_bottleneck(z)
 
@@ -318,17 +276,14 @@ class MeanScaleHyperpriorVbr(ScaleHyperpriorVbr, MeanScaleHyperprior):
             else:
                 z_qstep = self.gayn2zqstep(1.0 / scale.clone().view(1))
                 z_qstep = self.lower_bound_zqstep(z_qstep)
-                z_hat, z_likelihoods = self.entropy_bottleneck(z, qs=z_qstep[0], training=None, ste=False) # ste=True) # this is EBVariableQuantization class, and should take care of ste quantization
+                z_hat, z_likelihoods = self.entropy_bottleneck(z, qs=z_qstep[0], training=None, ste=False) 
 
             gaussian_params = self.h_s(z_hat)
             scales_hat, means_hat = gaussian_params.chunk(2, 1)
             if self.no_quantoffset:
-                # fatih: the two lines below are the original codes, I will modify them with gaussian_conditional_variable
                 y_hat = self.quantizer.quantize((y - means_hat) * scale, "ste") * rescale + means_hat 
                 _, y_likelihoods = self.gaussian_conditional(y * scale, scales_hat * scale, means=means_hat * scale)
-                # y_hat, y_likelihoods = self.gaussian_conditional.forward_variable(y, scales_hat, means=None, qs=scale, qmode="ste")  # !!! STE 
             else:
-                # fatih: below is the code that performs quantization with quant offset. Two lines above are the original code without quant offset.
                 y_zm = y - means_hat
                 y_zm_sc = y_zm * scale 
                 signs = torch.sign(y_zm_sc).detach()
@@ -343,41 +298,48 @@ class MeanScaleHyperpriorVbr(ScaleHyperpriorVbr, MeanScaleHyperprior):
                 y_hat = signs * (q_abs + q_offsets)
                 y_hat = y_hat * rescale + means_hat
                 _, y_likelihoods = self.gaussian_conditional(y * scale, scales_hat * scale, means=means_hat * scale)
-                # fatih: above is the code that performs quantization with quant offset
             x_hat = self.g_s(y_hat)
+
+        else:
+            self._raise_stage_error(self, stage)
 
         return {
             "x_hat": x_hat,
             "likelihoods": {"y": y_likelihoods, "z": z_likelihoods},
         }
 
-    def compress(self, x, s, inputscale=0):
+    def compress(self, x, stage : int = 2, s : int = 1, inputscale=0):
         if inputscale != 0:
             scale = inputscale
         else:
             assert s in range(0, self.levels), f"s should in range(0, {self.levels}), but get s:{s}"
             scale = torch.abs(self.Gain[s])
 
-        rescale = torch.tensor(1.0) / scale
         y = self.g_a(x)
         z = self.h_a(y)
 
-        if not self.vr_entbttlnck: 
+        if stage == 1 or (stage == 2 and not self.vr_entbttlnck): 
             z_strings = self.entropy_bottleneck.compress(z)
             z_hat = self.entropy_bottleneck.decompress(z_strings, z.size()[-2:])
-        else:  # fatih: support for variable rate EntropyBottleneck
+        elif stage == 2:  # fatih: support vr EntropyBottleneck
             z_qstep = self.gayn2zqstep(1.0 / scale.view(1))
             z_qstep = self.lower_bound_zqstep(z_qstep)
             z_strings = self.entropy_bottleneck.compress(z, qs=z_qstep[0])
             z_hat = self.entropy_bottleneck.decompress(z_strings, z.size()[-2:], qs=z_qstep[0])
+        else:
+            self._raise_stage_error(self, stage)
 
         gaussian_params = self.h_s(z_hat)
         scales_hat, means_hat = gaussian_params.chunk(2, 1)
-        indexes = self.gaussian_conditional.build_indexes(scales_hat * scale)
-        y_strings = self.gaussian_conditional.compress(y * scale, indexes, means=means_hat * scale)
+        if stage == 1:
+            indexes = self.gaussian_conditional.build_indexes(scales_hat)
+            y_strings = self.gaussian_conditional.compress(y, indexes, means=means_hat)
+        elif stage ==2:
+            indexes = self.gaussian_conditional.build_indexes(scales_hat * scale)
+            y_strings = self.gaussian_conditional.compress(y * scale, indexes, means=means_hat * scale)
         return {"strings": [y_strings, z_strings], "shape": z.size()[-2:]}
 
-    def decompress(self, strings, shape, s, inputscale):
+    def decompress(self, strings, shape, stage : int = 2, s : int = 1, inputscale=0):
         assert isinstance(strings, list) and len(strings) == 2
         if inputscale != 0:
             scale = inputscale
@@ -387,31 +349,38 @@ class MeanScaleHyperpriorVbr(ScaleHyperpriorVbr, MeanScaleHyperprior):
 
         rescale = torch.tensor(1.0) / scale
 
-        if not self.vr_entbttlnck: 
+        if stage == 1 or (stage == 2 and not self.vr_entbttlnck): 
             z_hat = self.entropy_bottleneck.decompress(strings[1], shape)
-        else: # fatih: support for variable rate EntropyBottleneck
+        elif stage == 2:   # fatih: support vr EntropyBottleneck
             z_qstep = self.gayn2zqstep(1.0 / scale.view(1))
             z_qstep = self.lower_bound_zqstep(z_qstep)
             z_hat = self.entropy_bottleneck.decompress(strings[1], shape, qs=z_qstep[0])
+        else:
+            self._raise_stage_error(self, stage)
 
         gaussian_params = self.h_s(z_hat)
         scales_hat, means_hat = gaussian_params.chunk(2, 1)
-        indexes = self.gaussian_conditional.build_indexes(scales_hat * scale)
-        if self.no_quantoffset:
-            y_hat = self.gaussian_conditional.decompress(strings[0], indexes, means=means_hat * scale) * rescale
-        else:
-            q_val = self.gaussian_conditional.decompress(strings[0], indexes)
-            q_abs, signs = q_val.abs(), torch.sign(q_val)
 
-            q_stdev = self.gaussian_conditional.lower_bound_scale(scales_hat * scale)
+        if stage == 1:
+            indexes = self.gaussian_conditional.build_indexes(scales_hat)
+            y_hat = self.gaussian_conditional.decompress(strings[0], indexes, means=means_hat)
+        elif stage == 2:
+            indexes = self.gaussian_conditional.build_indexes(scales_hat * scale)
+            if self.no_quantoffset:
+                y_hat = self.gaussian_conditional.decompress(strings[0], indexes, means=means_hat * scale) * rescale
+            else:
+                q_val = self.gaussian_conditional.decompress(strings[0], indexes)
+                q_abs, signs = q_val.abs(), torch.sign(q_val)
 
-            stdev_and_gain = torch.cat((q_stdev.unsqueeze(dim=4), scale.detach().expand(q_stdev.unsqueeze(dim=4).shape)), dim=4)
-            q_offsets = (-1) * (self.QuantABCD.forward( stdev_and_gain )).squeeze(dim=4)
+                q_stdev = self.gaussian_conditional.lower_bound_scale(scales_hat * scale)
 
-            q_offsets[q_abs< 0.0001] = 0  # must use zero offset for locations quantized to zero 
+                stdev_and_gain = torch.cat((q_stdev.unsqueeze(dim=4), scale.detach().expand(q_stdev.unsqueeze(dim=4).shape)), dim=4)
+                q_offsets = (-1) * (self.QuantABCD.forward( stdev_and_gain )).squeeze(dim=4)
 
-            y_hat = signs * (q_abs + q_offsets)
-            y_hat = y_hat * rescale + means_hat 
+                q_offsets[q_abs< 0.0001] = 0  # must use zero offset for locations quantized to zero 
+
+                y_hat = signs * (q_abs + q_offsets)
+                y_hat = y_hat * rescale + means_hat 
         x_hat = self.g_s(y_hat).clamp_(0, 1)
         return {"x_hat": x_hat}
 
@@ -433,76 +402,30 @@ class JointAutoregressiveHierarchicalPriorsVbr(ScaleHyperpriorVbr, JointAutoregr
         # have better entropy parameters for any quantization stepsize
         self.scale_to_context = nn.Linear(1, 2 * M)
 
-    
-    def forward(self, x, noise=False, stage=3, s=1, inputscale=0):
-        # # fatih: modifying the logic here
-        # if stage > 1:
-        #     if s != 0:
-        #         scale = torch.max(self.Gain[s], torch.tensor(1e-4)) + eps
-        #     else:
-        #         s = 0
-        #         scale = self.Gain[s].detach()
-        # else:
-        #     scale = self.Gain[0].detach()
-        # New logic below
-        s = max(0, min(s, len(self.Gain)-1)) # clip s to correct range
-        if self.training:
-            if stage > 1:
-                if s != (len(self.Gain) - 1):
-                    scale = torch.max(self.Gain[s], torch.tensor(1e-4)) + eps
-                else:
-                    s = len(self.Gain) - 1
-                    # scale = self.Gain[s].detach() # fatih: fix this gain to 1 
-                    scale = torch.max(self.Gain[s], torch.tensor(1e-4)) + eps
-            else:
-                s = len(self.Gain) - 1
-                scale = self.Gain[s].detach()
-        else:
-            if inputscale == 0:
-                scale = self.Gain[s].detach()
-            else:
-                scale = inputscale
+    def forward(self, x, stage : int = 2, s : int = 1, inputscale=0):
+        r""" stage: 1 -> non-vbr (old) code path; vbr modules not used; operates like corresponding google model. use for initial training.
+                    2 -> vbr code path; vbr modules now used. use for post training with e.g. MOO. """
 
-        rescale = 1.0 / scale.clone().detach()
+        scale = self._get_scale(stage, s, inputscale)
+        rescale = 1.0 / scale.clone().detach() 
 
-        if noise: # fatih: NOTE, modifications to support q_offsets in noise case are not well tested
+        if stage == 1:
             y = self.g_a(x)
             z = self.h_a(y)
             z_hat, z_likelihoods = self.entropy_bottleneck(z)
             params = self.h_s(z_hat)
-            if self.no_quantoffset:
-                y_hat = self.gaussian_conditional.quantize(y*scale, "noise" if self.training else "dequantize") * rescale
-                ctx_params = self.context_prediction(y_hat)
-                gaussian_params = self.entropy_parameters(
-                    torch.cat((params, ctx_params), dim=1)
-                )
-                scales_hat, means_hat = gaussian_params.chunk(2, 1)
-                _, y_likelihoods = self.gaussian_conditional(y*scale - means_hat*scale, scales_hat*scale)
-            else:
-                y_hat = self.gaussian_conditional.quantize(y*scale, "noise" if self.training else "dequantize") * rescale
-                ctx_params = self.context_prediction(y_hat)
-                gaussian_params = self.entropy_parameters(
-                    torch.cat((params, ctx_params), dim=1)
-                )
-                scales_hat, means_hat = gaussian_params.chunk(2, 1)
-
-                y_zm_sc = ((y - means_hat) * scale)
-                signs = torch.sign(y_zm_sc).detach()
-                q_abs = quantize_ste(torch.abs(y_zm_sc))
-                q_stdev = self.gaussian_conditional.lower_bound_scale(scales_hat * scale)
-
-                stdev_and_gain = torch.cat((q_stdev.unsqueeze(dim=4), scale.detach().expand(q_stdev.unsqueeze(dim=4).shape)), dim=4)
-                q_offsets = (-1) * (self.QuantABCD.forward( stdev_and_gain )).squeeze(dim=4)
-
-                q_offsets[q_abs < 0.0001] = 0   # must use zero offset for locations quantized to zero !
-                
-                q_offsets *= signs  # since we add offsets directly to non-abs of y_tilde
-
-                y_hat = self.gaussian_conditional.quantize(y * scale, "noise" if self.training else "dequantize", means=means_hat * scale) * rescale + means_hat + q_offsets * rescale
-                _, y_likelihoods = self.gaussian_conditional(y * scale - means_hat * scale, scales_hat * scale)
-
+            y_hat = self.gaussian_conditional.quantize(
+                y, "noise" if self.training else "dequantize"
+            )
+            ctx_params = self.context_prediction(y_hat)
+            gaussian_params = self.entropy_parameters(
+                torch.cat((params, ctx_params), dim=1)
+            )
+            scales_hat, means_hat = gaussian_params.chunk(2, 1)
+            _, y_likelihoods = self.gaussian_conditional(y, scales_hat, means=means_hat)
             x_hat = self.g_s(y_hat)
-        else:  # STE
+
+        elif stage == 2:  # fatih: vbr code path with STE based quantization proxy
             y = self.g_a(x)
             z = self.h_a(y)
             _, z_likelihoods = self.entropy_bottleneck(z)
@@ -512,43 +435,19 @@ class JointAutoregressiveHierarchicalPriorsVbr(ScaleHyperpriorVbr, JointAutoregr
             z_hat = quantize_ste(z_tmp) + z_offset
 
             params = self.h_s(z_hat)
-            # ste_recursive = False  # fatih: try to implement a non-recursive training/validation code with STE
             if self.ste_recursive:
                 kernel_size = 5  # context prediction kernel size
                 padding = (kernel_size - 1) // 2
                 y_hat = F.pad(y, (padding, padding, padding, padding))
                 # fatih: all modifications to perform quantization with quant offset are inside the _stequantization()
                 y_hat, y_likelihoods = self._stequantization(y_hat, params, y.size(2), y.size(3), kernel_size, padding, scale, rescale)
-                # y_hat, y_likelihoods = self._stequantization_v2(y_hat, params, y.size(2), y.size(3), kernel_size, padding, scale, rescale)
             else:
-                y_hat = self.gaussian_conditional.quantize((y*scale), "noise" if self.training else "dequantize") * rescale  # dont do .detach() on y*scale
-                ctx_params = self.context_prediction(y_hat)
-                gaussian_params = self.entropy_parameters(
-                    torch.cat((params, ctx_params), dim=1)
-                )
-                scales_hat, means_hat = gaussian_params.chunk(2, 1)
-
-                _, y_likelihoods = self.gaussian_conditional(y * scale, scales_hat * scale, means=means_hat * scale) # fatih: NOTE: likelihoods are found from reconstructions without quant_offset !
-
-                if self.no_quantoffset:
-                    y_hat = quantize_ste((y - means_hat) * scale) * rescale + means_hat
-                else:
-                    y_zm = y - means_hat  # means_hat  # means_hat.detach()  # fatih: do not detach() here, o.w. no gradient flow from mse-cost to means_hat etc
-                    y_zm_sc = y_zm * scale 
-                    signs = torch.sign(y_zm_sc).detach()
-                    q_abs = quantize_ste(torch.abs(y_zm_sc))
-
-                    # q_offsets = torch.broadcast_to(self.QuantOffset[s, :].view(1, -1, 1, 1), q_abs.shape).clone()
-                    q_stdev = self.gaussian_conditional.lower_bound_scale(scales_hat * scale)
-
-                    stdev_and_gain = torch.cat((q_stdev.unsqueeze(dim=4), scale.detach().expand(q_stdev.unsqueeze(dim=4).shape)), dim=4)
-                    q_offsets = (-1) * (self.QuantABCD.forward( stdev_and_gain )).squeeze(dim=4)
-                    q_offsets[q_abs < 0.0001] = 0   # must use zero offset for locations quantized to zero !
-
-                    y_hat = signs * (q_abs + q_offsets)
-                    y_hat = y_hat * rescale + means_hat 
+                raise ValueError(f"ste_recurseive=False is not supported.")
 
             x_hat = self.g_s(y_hat)
+
+        else:
+            self._raise_stage_error(self, stage)
 
         return {
             "x_hat": x_hat,
@@ -617,7 +516,7 @@ class JointAutoregressiveHierarchicalPriorsVbr(ScaleHyperpriorVbr, JointAutoregr
         net.load_state_dict(state_dict)
         return net
 
-    def compress(self, x, s, inputscale=0):
+    def compress(self, x, stage : int = 2, s : int = 1, inputscale=0):
         if next(self.parameters()).device != torch.device("cpu"):
             warnings.warn(
                 "Inference on GPU is not recommended for the autoregressive "
@@ -654,12 +553,13 @@ class JointAutoregressiveHierarchicalPriorsVbr(ScaleHyperpriorVbr, JointAutoregr
                 padding,
                 scale,
                 rescale,
+                stage
             )
             y_strings.append(string)
 
         return {"strings": [y_strings, z_strings], "shape": z.size()[-2:]}
 
-    def _compress_ar(self, y_hat, params, height, width, kernel_size, padding, scale, rescale,):
+    def _compress_ar(self, y_hat, params, height, width, kernel_size, padding, scale, rescale, stage):
         cdf = self.gaussian_conditional.quantized_cdf.tolist()
         cdf_lengths = self.gaussian_conditional.cdf_length.tolist()
         offsets = self.gaussian_conditional.offset.tolist()
@@ -669,7 +569,7 @@ class JointAutoregressiveHierarchicalPriorsVbr(ScaleHyperpriorVbr, JointAutoregr
         indexes_list = []
 
         # fatih: get ctx_scl to condition entropy model also on scale
-        if self.scl2ctx:
+        if self.scl2ctx and stage==2:
             ctx_scl = self.scale_to_context.forward(scale.view(1,1)).view(1,-1,1,1)
         # Warning, this is slow...
         # TODO: profile the calls to the bindings...
@@ -683,7 +583,7 @@ class JointAutoregressiveHierarchicalPriorsVbr(ScaleHyperpriorVbr, JointAutoregr
                     bias=self.context_prediction.bias,
                 )
                 # fatih: adjust ctx_p to be conditioned on also scale so that entropy params are also conditioned on scale ...
-                if self.scl2ctx:
+                if self.scl2ctx and stage==2:
                     ctx_p = ctx_p + ctx_scl
                 # 1x1 conv for the entropy parameters prediction network, so
                 # we only keep the elements in the "center"
@@ -695,23 +595,27 @@ class JointAutoregressiveHierarchicalPriorsVbr(ScaleHyperpriorVbr, JointAutoregr
                 indexes = self.gaussian_conditional.build_indexes(scales_hat * scale)
 
                 y_crop = y_crop[:, :, padding, padding]
-                if self.no_quantoffset or (self.no_quantoffset==False and self.ste_recursive==False):
-                    y_q = self.gaussian_conditional.quantize((y_crop - means_hat)* scale, "symbols")
-                    y_hat[:, :, h + padding, w + padding] = (y_q) * rescale + means_hat
-                else:
-                    y_zm = y_crop - means_hat.detach()
-                    y_zm_sc = y_zm * scale 
-                    signs = torch.sign(y_zm_sc).detach()
-                    q_abs = quantize_ste(torch.abs(y_zm_sc))
+                if stage == 1:
+                    y_q = self.gaussian_conditional.quantize(y_crop, "symbols", means_hat)
+                    y_hat[:, :, h + padding, w + padding] = y_q + means_hat
+                elif stage == 2:
+                    if self.no_quantoffset or (self.no_quantoffset==False and self.ste_recursive==False):
+                        y_q = self.gaussian_conditional.quantize((y_crop - means_hat)* scale, "symbols")
+                        y_hat[:, :, h + padding, w + padding] = (y_q) * rescale + means_hat
+                    else:
+                        y_zm = y_crop - means_hat.detach()
+                        y_zm_sc = y_zm * scale 
+                        signs = torch.sign(y_zm_sc).detach()
+                        q_abs = quantize_ste(torch.abs(y_zm_sc))
 
-                    q_stdev = self.gaussian_conditional.lower_bound_scale(scales_hat * scale)
+                        q_stdev = self.gaussian_conditional.lower_bound_scale(scales_hat * scale)
 
-                    stdev_and_gain = torch.cat((q_stdev.unsqueeze(dim=2), scale.detach().expand(q_stdev.unsqueeze(dim=2).shape)), dim=2)
-                    q_offsets = (-1) * (self.QuantABCD.forward( stdev_and_gain )).squeeze(dim=2)
-                    q_offsets[q_abs < 0.0001] = 0   # must use zero offset for locations quantized to zero 
+                        stdev_and_gain = torch.cat((q_stdev.unsqueeze(dim=2), scale.detach().expand(q_stdev.unsqueeze(dim=2).shape)), dim=2)
+                        q_offsets = (-1) * (self.QuantABCD.forward( stdev_and_gain )).squeeze(dim=2)
+                        q_offsets[q_abs < 0.0001] = 0   # must use zero offset for locations quantized to zero 
 
-                    y_q = (signs * (q_abs + 0)).int()  
-                    y_hat[:, :, h + padding, w + padding] = (signs * (q_abs + q_offsets)) * rescale + means_hat
+                        y_q = (signs * (q_abs + 0)).int()  
+                        y_hat[:, :, h + padding, w + padding] = (signs * (q_abs + q_offsets)) * rescale + means_hat
 
                 symbols_list.extend(y_q.squeeze().tolist())
                 indexes_list.extend(indexes.squeeze().tolist())
@@ -723,7 +627,7 @@ class JointAutoregressiveHierarchicalPriorsVbr(ScaleHyperpriorVbr, JointAutoregr
         string = encoder.flush()
         return string
 
-    def decompress(self, strings, shape, s, inputscale):
+    def decompress(self, strings, shape, stage : int = 2, s : int = 1, inputscale=0):
         assert isinstance(strings, list) and len(strings) == 2
 
         if next(self.parameters()).device != torch.device("cpu"):
@@ -769,6 +673,7 @@ class JointAutoregressiveHierarchicalPriorsVbr(ScaleHyperpriorVbr, JointAutoregr
                 padding,
                 scale,
                 rescale,
+                stage
             )
 
         y_hat = F.pad(y_hat, (-padding, -padding, -padding, -padding))
@@ -776,7 +681,7 @@ class JointAutoregressiveHierarchicalPriorsVbr(ScaleHyperpriorVbr, JointAutoregr
         return {"x_hat": x_hat}
 
     def _decompress_ar(
-            self, y_string, y_hat, params, height, width, kernel_size, padding, scale, rescale
+            self, y_string, y_hat, params, height, width, kernel_size, padding, scale, rescale, stage
     ):
         cdf = self.gaussian_conditional.quantized_cdf.tolist()
         cdf_lengths = self.gaussian_conditional.cdf_length.tolist()
@@ -785,10 +690,11 @@ class JointAutoregressiveHierarchicalPriorsVbr(ScaleHyperpriorVbr, JointAutoregr
         decoder = RansDecoder()
         decoder.set_stream(y_string)
 
-        if self.no_quantoffset==False and self.ste_recursive==False:
-            y_rec = torch.zeros_like(y_hat)
+        if stage==2:
+            if self.no_quantoffset==False and self.ste_recursive==False:
+                y_rec = torch.zeros_like(y_hat)
         # fatih: get ctx_scl to condition entropy model also on scale
-        if self.scl2ctx:
+        if self.scl2ctx and stage==2:
             ctx_scl = self.scale_to_context.forward(scale.view(1,1)).view(1,-1,1,1)
         # Warning: this is slow due to the auto-regressive nature of the
         # decoding... See more recent publication where they use an
@@ -804,7 +710,7 @@ class JointAutoregressiveHierarchicalPriorsVbr(ScaleHyperpriorVbr, JointAutoregr
                     bias=self.context_prediction.bias,
                 )
                 # fatih: adjust ctx_p to be conditioned on also scale so that entropy params are also conditioned on scale ...
-                if self.scl2ctx:
+                if self.scl2ctx and stage==2:
                     ctx_p = ctx_p + ctx_scl
                 # 1x1 conv for the entropy parameters prediction network, so
                 # we only keep the elements in the "center"
@@ -817,34 +723,42 @@ class JointAutoregressiveHierarchicalPriorsVbr(ScaleHyperpriorVbr, JointAutoregr
                     indexes.squeeze().tolist(), cdf, cdf_lengths, offsets
                 )
                 rv = torch.Tensor(rv).reshape(1, -1, 1, 1).to(scales_hat.device)  # fatih: move rv to gpu ?
-                if self.no_quantoffset:
-                    rv = self.gaussian_conditional.dequantize(rv)*rescale + means_hat
+                if stage==1:
+                    rv = self.gaussian_conditional.dequantize(rv, means_hat)
 
                     hp = h + padding
                     wp = w + padding
                     y_hat[:, :, hp: hp + 1, wp: wp + 1] = rv
-                else:
-                    q_val = self.gaussian_conditional.dequantize(rv)
-                    q_abs, signs = q_val.abs(), torch.sign(q_val)
+                elif stage==2:
+                    if self.no_quantoffset:
+                        rv = self.gaussian_conditional.dequantize(rv)*rescale + means_hat
 
-                    q_stdev = self.gaussian_conditional.lower_bound_scale(scales_hat * scale)
-
-                    stdev_and_gain = torch.cat((q_stdev.unsqueeze(dim=4), scale.detach().expand(q_stdev.unsqueeze(dim=4).shape)), dim=4)
-                    q_offsets = (-1) * (self.QuantABCD.forward( stdev_and_gain )).squeeze(dim=4)
-
-                    q_offsets[q_abs< 0.0001] = 0  # must use zero offset for locations quantized to zero 
-
-                    rv_out = (signs * (q_abs + q_offsets)) * rescale + means_hat
-
-                    hp = h + padding
-                    wp = w + padding
-                    if self.ste_recursive==False:
-                        y_hat[:, :, hp: hp + 1, wp: wp + 1] = self.gaussian_conditional.dequantize(rv)*rescale + means_hat # find also reco without quantoffset for likelihood
-                        y_rec[:, :, hp: hp + 1, wp: wp + 1] = rv_out
+                        hp = h + padding
+                        wp = w + padding
+                        y_hat[:, :, hp: hp + 1, wp: wp + 1] = rv
                     else:
-                        y_hat[:, :, hp: hp + 1, wp: wp + 1] = rv_out
+                        q_val = self.gaussian_conditional.dequantize(rv)
+                        q_abs, signs = q_val.abs(), torch.sign(q_val)
+
+                        q_stdev = self.gaussian_conditional.lower_bound_scale(scales_hat * scale)
+
+                        stdev_and_gain = torch.cat((q_stdev.unsqueeze(dim=4), scale.detach().expand(q_stdev.unsqueeze(dim=4).shape)), dim=4)
+                        q_offsets = (-1) * (self.QuantABCD.forward( stdev_and_gain )).squeeze(dim=4)
+
+                        q_offsets[q_abs< 0.0001] = 0  # must use zero offset for locations quantized to zero 
+
+                        rv_out = (signs * (q_abs + q_offsets)) * rescale + means_hat
+
+                        hp = h + padding
+                        wp = w + padding
+                        if self.ste_recursive==False:
+                            y_hat[:, :, hp: hp + 1, wp: wp + 1] = self.gaussian_conditional.dequantize(rv)*rescale + means_hat # find also reco without quantoffset for likelihood
+                            y_rec[:, :, hp: hp + 1, wp: wp + 1] = rv_out
+                        else:
+                            y_hat[:, :, hp: hp + 1, wp: wp + 1] = rv_out
 
         # fatih: reconstruction with quantoffset will be used for only image reconstruction and reconstruction without quantoffset for likelihood
-        if self.no_quantoffset==False and self.ste_recursive==False:
-            y_hat = y_rec
+        if stage==2:
+            if self.no_quantoffset==False and self.ste_recursive==False:
+                y_hat = y_rec
 
