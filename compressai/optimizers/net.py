@@ -27,10 +27,33 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .net import net_optimizer
-from .net_aux import net_aux_optimizer
+from __future__ import annotations
 
-__all__ = [
-    "net_optimizer",
-    "net_aux_optimizer",
-]
+from typing import Any, Dict, Mapping, cast
+
+import torch.nn as nn
+import torch.optim as optim
+
+from compressai.registry import OPTIMIZERS, register_optimizer
+
+
+@register_optimizer("net")
+def net_optimizer(
+    net: nn.Module, conf: Mapping[str, Any]
+) -> Dict[str, optim.Optimizer]:
+    """Returns optimizer for net loss."""
+    parameters = {
+        "net": {name for name, param in net.named_parameters() if param.requires_grad},
+    }
+
+    params_dict = dict(net.named_parameters())
+
+    def make_optimizer(key):
+        kwargs = dict(conf[key])
+        del kwargs["type"]
+        params = (params_dict[name] for name in sorted(parameters[key]))
+        return OPTIMIZERS[conf[key]["type"]](params, **kwargs)
+
+    optimizer = {key: make_optimizer(key) for key in ["net"]}
+
+    return cast(Dict[str, optim.Optimizer], optimizer)
