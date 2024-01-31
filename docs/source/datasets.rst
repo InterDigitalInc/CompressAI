@@ -32,3 +32,32 @@ Vimeo90kDataset
 .. autoclass:: Vimeo90kDataset
     :members:
 
+
+
+Point cloud datasets
+~~~~~~~~~~~~~~~~~~~~
+
+
+ModelNetDataset
+---------------
+.. autoclass:: ModelNetDataset
+    :members:
+
+
+S3disDataset
+------------
+.. autoclass:: S3disDataset
+    :members:
+
+
+SemanticKittiDataset
+--------------------
+.. autoclass:: SemanticKittiDataset
+    :members:
+
+
+ShapeNetCorePartDataset
+-----------------------
+.. autoclass:: ShapeNetCorePartDataset
+    :members:
+
