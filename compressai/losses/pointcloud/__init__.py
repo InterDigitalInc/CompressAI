@@ -27,11 +27,11 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import pointcloud
-from .pointcloud import *
-from .rate_distortion import RateDistortionLoss
+from .chamfer import ChamferPccRateDistortionLoss, chamfer_distance
+from .hrtzxf2022 import RateDistortionLoss_hrtzxf2022
 
 __all__ = [
-    *pointcloud.__all__,
-    "RateDistortionLoss",
+    "chamfer_distance",
+    "ChamferPccRateDistortionLoss",
+    "RateDistortionLoss_hrtzxf2022",
 ]
