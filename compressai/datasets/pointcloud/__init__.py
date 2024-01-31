@@ -27,18 +27,14 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import pointcloud
-from .image import ImageFolder
-from .pointcloud import *
-from .pregenerated import PreGeneratedMemmapDataset
-from .rawvideo import *
-from .video import VideoFolder
-from .vimeo90k import Vimeo90kDataset
+from .modelnet import ModelNetDataset
+from .s3dis import S3disDataset
+from .semantic_kitti import SemanticKittiDataset
+from .shapenet import ShapeNetCorePartDataset
 
 __all__ = [
-    *pointcloud.__all__,
-    "ImageFolder",
-    "PreGeneratedMemmapDataset",
-    "VideoFolder",
-    "Vimeo90kDataset",
+    "ModelNetDataset",
+    "S3disDataset",
+    "SemanticKittiDataset",
+    "ShapeNetCorePartDataset",
 ]
