@@ -63,6 +63,6 @@ Elic2022Chandelier
 .. currentmodule:: compressai.models.video
 
 ScaleSpaceFlow
-------------------
+--------------
 .. autoclass:: ScaleSpaceFlow
 
