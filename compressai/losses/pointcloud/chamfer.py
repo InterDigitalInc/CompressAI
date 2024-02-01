@@ -33,7 +33,11 @@ import torch
 import torch.nn as nn
 
 from einops import rearrange
-from pointops.functions import pointops
+
+try:
+    from pointops.functions import pointops
+except ImportError:
+    pass  # NOTE: Optional dependency.
 
 from compressai.layers.pointcloud.hrtzxf2022 import index_points
 from compressai.losses.utils import compute_rate_loss
