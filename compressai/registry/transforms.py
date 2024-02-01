@@ -27,35 +27,29 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .torch import (
-    CRITERIONS,
-    DATASETS,
-    MODELS,
-    MODULES,
-    OPTIMIZERS,
-    SCHEDULERS,
-    register_criterion,
-    register_dataset,
-    register_model,
-    register_module,
-    register_optimizer,
-    register_scheduler,
-)
-from .transforms import TRANSFORMS, register_transform
+from typing import Callable, Dict, Type, TypeVar
+
+import torchvision.transforms
+
+from compressai.typing import TTransform
 
 __all__ = [
-    "CRITERIONS",
-    "DATASETS",
-    "MODELS",
-    "MODULES",
-    "OPTIMIZERS",
-    "SCHEDULERS",
     "TRANSFORMS",
-    "register_criterion",
-    "register_dataset",
-    "register_model",
-    "register_module",
-    "register_optimizer",
-    "register_scheduler",
     "register_transform",
 ]
+
+TRANSFORMS: Dict[str, Callable[..., TTransform]] = {
+    **{k: v for k, v in torchvision.transforms.__dict__.items() if k[0].isupper()},
+}
+
+TTransform_b = TypeVar("TTransform_b", bound=TTransform)
+
+
+def register_transform(name: str):
+    """Decorator for registering a transform."""
+
+    def decorator(cls: Type[TTransform_b]) -> Type[TTransform_b]:
+        TRANSFORMS[name] = cls
+        return cls
+
+    return decorator

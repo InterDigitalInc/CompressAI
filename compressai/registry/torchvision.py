@@ -27,10 +27,9 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from typing import Callable, Dict
+from .transforms import TRANSFORMS, register_transform
 
-from torchvision import transforms
-
-TRANSFORMS: Dict[str, Callable[..., Callable]] = {
-    k: v for k, v in transforms.__dict__.items() if k[0].isupper()
-}
+__all__ = [
+    "TRANSFORMS",
+    "register_transform",
+]
