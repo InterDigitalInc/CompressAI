@@ -37,7 +37,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from einops import rearrange, repeat
-from pointops.functions import pointops
+
+try:
+    from pointops.functions import pointops
+except ImportError:
+    pass  # NOTE: Optional dependency.
 
 from .utils import index_points
 

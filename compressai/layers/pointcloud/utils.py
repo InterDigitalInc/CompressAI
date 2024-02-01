@@ -31,7 +31,10 @@ from math import ceil
 
 import torch
 
-from pointops.functions import pointops
+try:
+    from pointops.functions import pointops
+except ImportError:
+    pass  # NOTE: Optional dependency.
 
 
 def index_points(xyzs, idx):
