@@ -29,6 +29,7 @@
 
 from typing import Callable, Dict, Type, TypeVar
 
+import torch_geometric.transforms
 import torchvision.transforms
 
 from compressai.typing import TTransform
@@ -40,6 +41,7 @@ __all__ = [
 
 TRANSFORMS: Dict[str, Callable[..., TTransform]] = {
     **{k: v for k, v in torchvision.transforms.__dict__.items() if k[0].isupper()},
+    **{k: v for k, v in torch_geometric.transforms.__dict__.items() if k[0].isupper()},
 }
 
 TTransform_b = TypeVar("TTransform_b", bound=TTransform)
