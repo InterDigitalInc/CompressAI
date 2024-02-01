@@ -29,6 +29,7 @@ end-to-end compression research.
    entropy_models
    latent_codecs
    layers
+   losses
    models
    ops
    transforms
