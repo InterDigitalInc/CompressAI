@@ -49,10 +49,18 @@ image_models = {
     "cheng2020-attn": cheng2020_attn,
 }
 
+# Not yet available.
+pointcloud_models = {
+    "hrtzxf2022-pcc-rec": None,
+    "sfu2023-pcc-rec-pointnet": None,
+    "sfu2024-pcc-rec-pointnet2-ssg": None,
+}
+
 video_models = {
     "ssf2020": ssf2020,
 }
 
 models = {}
 models.update(image_models)
+models.update(pointcloud_models)
 models.update(video_models)
