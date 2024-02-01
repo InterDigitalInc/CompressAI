@@ -27,6 +27,25 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import point as point
-from .point import *
-from .transforms import *
+import torch
+
+from torch_geometric.data import Data
+from torch_geometric.data.datapipes import functional_transform
+from torch_geometric.transforms import BaseTransform
+
+from compressai.registry import register_transform
+
+
+@functional_transform("random_permutation")
+@register_transform("RandomPermutation")
+class RandomPermutation(BaseTransform):
+    r"""Randomly permutes points and associated attributes
+    (functional name: :obj:`random_permutation`).
+    """
+
+    def __init__(self, *, attrs=("pos",)):
+        self.attrs = attrs
+
+    def __call__(self, data: Data) -> Data:
+        perm = torch.randperm(data.pos.shape[0])
+        return Data(**{k: v[perm] if k in self.attrs else v for k, v in data.items()})
