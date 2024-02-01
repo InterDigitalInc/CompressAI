@@ -106,6 +106,10 @@ DEV_REQUIRES = TEST_REQUIRES + [
     "isort",
     "mypy",
 ]
+POINTCLOUD_REQUIRES = [
+    "pointops @ git+https://github.com/YodaEmbedding/pointops.git",
+    "pyntcloud",
+]
 
 
 def get_extra_requirements():
@@ -114,6 +118,7 @@ def get_extra_requirements():
         "dev": DEV_REQUIRES,
         "doc": ["sphinx", "sphinx-book-theme", "Jinja2<3.1"],
         "tutorials": ["jupyter", "ipywidgets"],
+        "pointcloud": POINTCLOUD_REQUIRES,
     }
     extras_require["all"] = {req for reqs in extras_require.values() for req in reqs}
     return extras_require
