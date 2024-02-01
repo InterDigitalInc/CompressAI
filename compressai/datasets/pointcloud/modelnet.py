@@ -36,7 +36,10 @@ from pathlib import Path
 
 import numpy as np
 
-from pyntcloud import PyntCloud
+try:
+    from pyntcloud import PyntCloud
+except ImportError:
+    pass  # NOTE: Optional dependency.
 
 from compressai.datasets.cache import CacheDataset
 from compressai.datasets.utils import download_url, hash_file
