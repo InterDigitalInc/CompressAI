@@ -1001,6 +1001,213 @@ document.write(`
             <span class="n">indexes</span> <span class="o">-=</span> <span class="p">(</span><span class="n">scales</span> <span class="o">&lt;=</span> <span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">indexes</span></div>
 
+
+
+<span class="k">class</span> <span class="nc">GaussianMixtureConditional</span><span class="p">(</span><span class="n">GaussianConditional</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">K</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">scale_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">scale_table</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="n">K</span>
+
+    <span class="k">def</span> <span class="nf">_likelihood</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">scales</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">means</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">Tensor</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">likelihood</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">):</span>
+            <span class="n">likelihood</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_likelihood</span><span class="p">(</span>
+                    <span class="n">inputs</span><span class="p">,</span>
+                    <span class="n">scales</span><span class="p">[:,</span> <span class="n">M</span> <span class="o">*</span> <span class="n">k</span> <span class="p">:</span> <span class="n">M</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
+                    <span class="n">means</span><span class="p">[:,</span> <span class="n">M</span> <span class="o">*</span> <span class="n">k</span> <span class="p">:</span> <span class="n">M</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
+                <span class="p">)</span>
+                <span class="o">*</span> <span class="n">weights</span><span class="p">[:,</span> <span class="n">M</span> <span class="o">*</span> <span class="n">k</span> <span class="p">:</span> <span class="n">M</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">likelihood</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">scales</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">means</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">training</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">training</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">training</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="p">,</span> <span class="s2">&quot;noise&quot;</span> <span class="k">if</span> <span class="n">training</span> <span class="k">else</span> <span class="s2">&quot;dequantize&quot;</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="n">likelihood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_likelihood</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_likelihood_bound</span><span class="p">:</span>
+            <span class="n">likelihood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood_lower_bound</span><span class="p">(</span><span class="n">likelihood</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">likelihood</span>
+
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_build_cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">abs_max</span><span class="p">):</span>
+        <span class="n">num_latents</span> <span class="o">=</span> <span class="n">scales</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">num_samples</span> <span class="o">=</span> <span class="n">abs_max</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">TINY</span> <span class="o">=</span> <span class="mf">1e-10</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">scales</span><span class="o">.</span><span class="n">device</span>
+
+        <span class="n">scales</span> <span class="o">=</span> <span class="n">scales</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="mf">0.11</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>
+        <span class="n">means</span> <span class="o">+=</span> <span class="n">abs_max</span>
+
+        <span class="n">scales_</span> <span class="o">=</span> <span class="n">scales</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
+        <span class="n">means_</span> <span class="o">=</span> <span class="n">means</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
+        <span class="n">weights_</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
+
+        <span class="n">samples</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">num_latents</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">pmf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">):</span>
+            <span class="n">pmf</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="mf">0.5</span>
+                <span class="o">*</span> <span class="p">(</span>
+                    <span class="mi">1</span>
+                    <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">erf</span><span class="p">(</span>
+                        <span class="p">(</span><span class="n">samples</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">-</span> <span class="n">means_</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">/</span> <span class="p">((</span><span class="n">scales_</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">TINY</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="o">-</span> <span class="mf">0.5</span>
+                <span class="o">*</span> <span class="p">(</span>
+                    <span class="mi">1</span>
+                    <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">erf</span><span class="p">(</span>
+                        <span class="p">(</span><span class="n">samples</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">-</span> <span class="n">means_</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">/</span> <span class="p">((</span><span class="n">scales_</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">TINY</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span> <span class="o">*</span> <span class="n">weights_</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+        <span class="n">cdf_limit</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">entropy_coder_precision</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">pmf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">pmf</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">cdf_limit</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">pmf_scaled</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">pmf</span> <span class="o">*</span> <span class="n">cdf_limit</span><span class="p">)</span>
+        <span class="n">pmf_sum</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pmf_scaled</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
+
+        <span class="n">cdf</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">pmf_scaled</span> <span class="o">*</span> <span class="n">cdf_limit</span> <span class="o">/</span> <span class="n">pmf_sum</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">(),</span>
+            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="s2">&quot;constant&quot;</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">pmf_quantized</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">cdf</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># We can&#39;t have zeros in PMF because rANS won&#39;t be able to encode it.</span>
+        <span class="c1"># Try to fix this by &quot;stealing&quot; probability from some unlikely symbols.</span>
+
+        <span class="n">pmf_zero_count</span> <span class="o">=</span> <span class="n">num_samples</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">pmf_quantized</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">pmf_first_stealable_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">min</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                <span class="n">pmf_quantized</span> <span class="o">&gt;</span> <span class="n">pmf_zero_count</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">),</span>
+                <span class="n">pmf_quantized</span><span class="p">,</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">cdf_limit</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">(),</span>
+            <span class="p">),</span>
+            <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">pmf_real_zero_indices</span> <span class="o">=</span> <span class="p">(</span><span class="n">pmf_quantized</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">pmf_quantized</span><span class="p">[</span><span class="n">pmf_real_zero_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pmf_real_zero_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">pmf_real_steal_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_latents</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">pmf_first_stealable_indices</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">pmf_quantized</span><span class="p">[</span>
+            <span class="n">pmf_real_steal_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pmf_real_steal_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">]</span> <span class="o">-=</span> <span class="n">pmf_zero_count</span>
+
+        <span class="n">cdf</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">pmf_quantized</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">(),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">cdf</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">cdf</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="n">cdf_limit</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cdf</span>
+
+    <span class="k">def</span> <span class="nf">reshape_entropy_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">nonzero</span><span class="p">):</span>
+        <span class="n">reshape_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">scales</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="n">scales</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">scales</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">scales</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">reshape_size</span><span class="p">)[:,</span> <span class="p">:,</span> <span class="n">nonzero</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">means</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">means</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">reshape_size</span><span class="p">)[:,</span> <span class="p">:,</span> <span class="n">nonzero</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">weights</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">reshape_size</span><span class="p">)[:,</span> <span class="p">:,</span> <span class="n">nonzero</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span>
+
+    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+        <span class="n">abs_max</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">max</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="n">abs_max</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">abs_max</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">abs_max</span>
+
+        <span class="n">y_quantized</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">zero_bitmap</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y_quantized</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
+        <span class="p">)</span>
+
+        <span class="n">nonzero</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">zero_bitmap</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">symbols</span> <span class="o">=</span> <span class="n">y_quantized</span><span class="p">[:,</span> <span class="n">nonzero</span><span class="p">]</span> <span class="o">+</span> <span class="n">abs_max</span>
+        <span class="n">cdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_cdf</span><span class="p">(</span>
+            <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">reshape_entropy_parameters</span><span class="p">(</span><span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">nonzero</span><span class="p">),</span> <span class="n">abs_max</span>
+        <span class="p">)</span>
+
+        <span class="n">num_latents</span> <span class="o">=</span> <span class="n">cdf</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_coder</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">encode_with_indexes</span><span class="p">(</span>
+            <span class="n">symbols</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_latents</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">cdf</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">cdf</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">num_latents</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">num_latents</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">rv</span><span class="p">,</span> <span class="n">abs_max</span><span class="p">,</span> <span class="n">zero_bitmap</span><span class="p">),</span> <span class="n">y_quantized</span>
+
+    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">abs_max</span><span class="p">,</span> <span class="n">zero_bitmap</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+        <span class="n">nonzero</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">zero_bitmap</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">cdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_cdf</span><span class="p">(</span>
+            <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">reshape_entropy_parameters</span><span class="p">(</span><span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">nonzero</span><span class="p">),</span> <span class="n">abs_max</span>
+        <span class="p">)</span>
+
+        <span class="n">num_latents</span> <span class="o">=</span> <span class="n">cdf</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_coder</span><span class="o">.</span><span class="n">_decoder</span><span class="o">.</span><span class="n">decode_with_indexes</span><span class="p">(</span>
+            <span class="n">strings</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_latents</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">cdf</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">cdf</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">num_latents</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">num_latents</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+        <span class="n">symbols</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">-</span> <span class="n">abs_max</span>
+        <span class="n">symbols</span> <span class="o">=</span> <span class="n">symbols</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">scales</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">scales</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">scales</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="n">scales</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">zero_bitmap</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">scales</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">scales</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">y_hat</span><span class="p">[:,</span> <span class="n">nonzero</span><span class="p">]</span> <span class="o">=</span> <span class="n">symbols</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">y_hat</span>
 </pre></div>
 
                 </article>
