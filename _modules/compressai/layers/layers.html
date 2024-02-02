@@ -314,6 +314,8 @@ document.write(`
 <span class="c1"># OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF</span>
 <span class="c1"># ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 
+<span class="kn">import</span> <span class="nn">math</span>
+
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -327,12 +329,15 @@ document.write(`
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;AttentionBlock&quot;</span><span class="p">,</span>
     <span class="s2">&quot;MaskedConv2d&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CheckerboardMaskedConv2d&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ResidualBlock&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ResidualBlockUpsample&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ResidualBlockWithStride&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;conv1x1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;conv3x3&quot;</span><span class="p">,</span>
     <span class="s2">&quot;subpel_conv3x3&quot;</span><span class="p">,</span>
     <span class="s2">&quot;QReLU&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sequential_channel_ramp&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
 
@@ -363,9 +368,35 @@ document.write(`
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="c1"># TODO(begaintj): weight assigment is not supported by torchscript</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
+
+
+<span class="k">class</span> <span class="nc">CheckerboardMaskedConv2d</span><span class="p">(</span><span class="n">MaskedConv2d</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Checkerboard masked 2D convolution; mask future &quot;unseen&quot; pixels.</span>
+
+<span class="sd">    Checkerboard mask variant used in</span>
+<span class="sd">    `&quot;Checkerboard Context Model for Efficient Learned Image Compression&quot;</span>
+<span class="sd">    &lt;https://arxiv.org/abs/2103.15306&gt;`_, by Dailan He, Yaoyan Zheng,</span>
+<span class="sd">    Baocheng Sun, Yan Wang, and Hongwei Qin, CVPR 2021.</span>
+
+<span class="sd">    Inherits the same arguments as a `nn.Conv2d`. Use `mask_type=&#39;A&#39;` for the</span>
+<span class="sd">    first layer (which also masks the &quot;current pixel&quot;), `mask_type=&#39;B&#39;` for the</span>
+<span class="sd">    following layers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">mask_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mask_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid &quot;mask_type&quot; value &quot;</span><span class="si">{</span><span class="n">mask_type</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">h</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">w</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask_type</span> <span class="o">==</span> <span class="s2">&quot;B&quot;</span>
 
 
 <span class="k">def</span> <span class="nf">conv3x3</span><span class="p">(</span><span class="n">in_ch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">out_ch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stride</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
@@ -599,6 +630,43 @@ document.write(`
 
         <span class="k">return</span> <span class="n">grad_input</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
 
+
+
+<span class="k">def</span> <span class="nf">sequential_channel_ramp</span><span class="p">(</span>
+    <span class="n">in_ch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">out_ch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">min_ch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">num_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">interp</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+    <span class="n">make_layer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">make_act</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">skip_last_act</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">layer_kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interleave layers of gradually ramping channels with nonlinearities.&quot;&quot;&quot;</span>
+    <span class="n">channels</span> <span class="o">=</span> <span class="n">ramp</span><span class="p">(</span><span class="n">in_ch</span><span class="p">,</span> <span class="n">out_ch</span><span class="p">,</span> <span class="n">num_layers</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">interp</span><span class="p">)</span><span class="o">.</span><span class="n">floor</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
+    <span class="n">channels</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">channels</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="n">min_ch</span><span class="p">)</span>
+    <span class="n">channels</span> <span class="o">=</span> <span class="n">channels</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">layers</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">module</span>
+        <span class="k">for</span> <span class="n">ch_in</span><span class="p">,</span> <span class="n">ch_out</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">channels</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">channels</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">make_layer</span><span class="p">(</span><span class="n">ch_in</span><span class="p">,</span> <span class="n">ch_out</span><span class="p">,</span> <span class="o">**</span><span class="n">layer_kwargs</span><span class="p">),</span>
+            <span class="n">make_act</span><span class="p">(),</span>
+        <span class="p">]</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="n">skip_last_act</span><span class="p">:</span>
+        <span class="n">layers</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">layers</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">ramp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;log&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">steps</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown ramp method: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 
                 </article>

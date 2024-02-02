@@ -368,6 +368,18 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Cheng2020Attention"><code class="docutils literal notranslate"><span class="pre">Cheng2020Attention</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cheng2020anchorcheckerboard">Cheng2020AnchorCheckerboard</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Cheng2020AnchorCheckerboard"><code class="docutils literal notranslate"><span class="pre">Cheng2020AnchorCheckerboard</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#elic2022official">Elic2022Official</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Elic2022Official"><code class="docutils literal notranslate"><span class="pre">Elic2022Official</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#elic2022chandelier">Elic2022Chandelier</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Elic2022Chandelier"><code class="docutils literal notranslate"><span class="pre">Elic2022Chandelier</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalespaceflow">ScaleSpaceFlow</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow</span></code></a></li>
 </ul>
@@ -727,6 +739,93 @@ and sub-pixel convolutions for up-sampling.</p>
 </dd></dl>
 
 </section>
+<section id="cheng2020anchorcheckerboard">
+<h2>Cheng2020AnchorCheckerboard<a class="headerlink" href="#cheng2020anchorcheckerboard" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.models.Cheng2020AnchorCheckerboard">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.models.</span></span><span class="sig-name descname"><span class="pre">Cheng2020AnchorCheckerboard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">192</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/sensetime.html#Cheng2020AnchorCheckerboard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.Cheng2020AnchorCheckerboard" title="Link to this definition">#</a></dt>
+<dd><p>Cheng2020 anchor model with checkerboard context model.</p>
+<p>Base transform model from [Cheng2020]. Context model from [He2021].</p>
+<p>[Cheng2020]: <a class="reference external" href="https://arxiv.org/abs/2001.01568">“Learned Image Compression with Discretized Gaussian
+Mixture Likelihoods and Attention Modules”</a>, by Zhengxue Cheng, Heming Sun,
+Masaru Takeuchi, and Jiro Katto, CVPR 2020.</p>
+<p>[He2021]: <a class="reference external" href="https://arxiv.org/abs/2103.15306">“Checkerboard Context Model for Efficient Learned Image
+Compression”</a>, by Dailan He,
+Yaoyan Zheng, Baocheng Sun, Yan Wang, and Hongwei Qin, CVPR 2021.</p>
+<p>Uses residual blocks with small convolutions (3x3 and 1x1), and sub-pixel
+convolutions for up-sampling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>N</strong> (<em>int</em>) – Number of channels</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="elic2022official">
+<h2>Elic2022Official<a class="headerlink" href="#elic2022official" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.models.Elic2022Official">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.models.</span></span><span class="sig-name descname"><span class="pre">Elic2022Official</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">192</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">320</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/sensetime.html#Elic2022Official"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.Elic2022Official" title="Link to this definition">#</a></dt>
+<dd><p>ELIC 2022; uneven channel groups with checkerboard spatial context.</p>
+<p>Context model from [He2022].
+Based on modified attention model architecture from [Cheng2020].</p>
+<p>[He2022]: <a class="reference external" href="https://arxiv.org/abs/2203.10886">“ELIC: Efficient Learned Image Compression with
+Unevenly Grouped Space-Channel Contextual Adaptive Coding”</a>, by Dailan He, Ziming Yang,
+Weikun Peng, Rui Ma, Hongwei Qin, and Yan Wang, CVPR 2022.</p>
+<p>[Cheng2020]: <a class="reference external" href="https://arxiv.org/abs/2001.01568">“Learned Image Compression with Discretized Gaussian
+Mixture Likelihoods and Attention Modules”</a>, by Zhengxue Cheng, Heming Sun,
+Masaru Takeuchi, and Jiro Katto, CVPR 2020.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>N</strong> (<em>int</em>) – Number of main network channels</p></li>
+<li><p><strong>M</strong> (<em>int</em>) – Number of latent space channels</p></li>
+<li><p><strong>groups</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – Number of channels in each channel group</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="elic2022chandelier">
+<h2>Elic2022Chandelier<a class="headerlink" href="#elic2022chandelier" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.models.Elic2022Chandelier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.models.</span></span><span class="sig-name descname"><span class="pre">Elic2022Chandelier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">192</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">320</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/sensetime.html#Elic2022Chandelier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.Elic2022Chandelier" title="Link to this definition">#</a></dt>
+<dd><p>ELIC 2022; simplified context model using only first and most recent groups.</p>
+<p>Context model from [He2022], with simplifications and parameters
+from the [Chandelier2023] implementation.
+Based on modified attention model architecture from [Cheng2020].</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This implementation contains some differences compared to the
+original [He2022] paper. For instance, the implemented context
+model only uses the first and the most recently decoded channel
+groups to predict the current channel group. In contrast, the
+original paper uses all previously decoded channel groups.
+Also, the last layer of h_s is now a conv rather than a deconv.</p>
+</div>
+<p>[Chandelier2023]: <a class="reference external" href="https://github.com/VincentChandelier/ELiC-ReImplemetation">“ELiC-ReImplemetation”</a>, by
+Vincent Chandelier, 2023.</p>
+<p>[He2022]: <a class="reference external" href="https://arxiv.org/abs/2203.10886">“ELIC: Efficient Learned Image Compression with
+Unevenly Grouped Space-Channel Contextual Adaptive Coding”</a>, by Dailan He, Ziming Yang,
+Weikun Peng, Rui Ma, Hongwei Qin, and Yan Wang, CVPR 2022.</p>
+<p>[Cheng2020]: <a class="reference external" href="https://arxiv.org/abs/2001.01568">“Learned Image Compression with Discretized Gaussian
+Mixture Likelihoods and Attention Modules”</a>, by Zhengxue Cheng, Heming Sun,
+Masaru Takeuchi, and Jiro Katto, CVPR 2020.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>N</strong> (<em>int</em>) – Number of main network channels</p></li>
+<li><p><strong>M</strong> (<em>int</em>) – Number of latent space channels</p></li>
+<li><p><strong>groups</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – Number of channels in each channel group</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="scalespaceflow">
 <h2>ScaleSpaceFlow<a class="headerlink" href="#scalespaceflow" title="Link to this heading">#</a></h2>
 <dl class="py class">
@@ -830,6 +929,18 @@ IEEE Conference on Computer Vision and Pattern Recognition (CVPR 2020).</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cheng2020attention">Cheng2020Attention</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Cheng2020Attention"><code class="docutils literal notranslate"><span class="pre">Cheng2020Attention</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cheng2020anchorcheckerboard">Cheng2020AnchorCheckerboard</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Cheng2020AnchorCheckerboard"><code class="docutils literal notranslate"><span class="pre">Cheng2020AnchorCheckerboard</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#elic2022official">Elic2022Official</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Elic2022Official"><code class="docutils literal notranslate"><span class="pre">Elic2022Official</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#elic2022chandelier">Elic2022Chandelier</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Elic2022Chandelier"><code class="docutils literal notranslate"><span class="pre">Elic2022Chandelier</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalespaceflow">ScaleSpaceFlow</a><ul class="nav section-nav flex-column">

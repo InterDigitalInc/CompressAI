@@ -399,6 +399,9 @@ document.write(`
             <span class="n">save_direct</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LatentCodec</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -441,6 +444,7 @@ document.write(`
         <span class="n">shape</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span>
         <span class="n">y_gain_inv</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">z_gain_inv</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="o">*</span><span class="n">y_strings_</span><span class="p">,</span> <span class="n">z_strings</span> <span class="o">=</span> <span class="n">strings</span>
         <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_strings</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">z_strings</span><span class="p">)</span> <span class="k">for</span> <span class="n">y_strings</span> <span class="ow">in</span> <span class="n">y_strings_</span><span class="p">)</span>

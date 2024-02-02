@@ -321,6 +321,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
 <span class="kn">from</span> <span class="nn">compressai.entropy_models</span> <span class="kn">import</span> <span class="n">EntropyBottleneck</span>
+<span class="kn">from</span> <span class="nn">compressai.ops</span> <span class="kn">import</span> <span class="n">quantize_ste</span>
 <span class="kn">from</span> <span class="nn">compressai.registry</span> <span class="kn">import</span> <span class="n">register_module</span>
 
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">LatentCodec</span>
@@ -362,6 +363,7 @@ document.write(`
         <span class="n">entropy_bottleneck</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EntropyBottleneck</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">h_a</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">h_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">quantizer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;noise&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -369,10 +371,14 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span> <span class="o">=</span> <span class="n">entropy_bottleneck</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span> <span class="o">=</span> <span class="n">h_a</span> <span class="ow">or</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span> <span class="o">=</span> <span class="n">h_s</span> <span class="ow">or</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quantizer</span> <span class="o">=</span> <span class="n">quantizer</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">z_hat</span><span class="p">,</span> <span class="n">z_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantizer</span> <span class="o">==</span> <span class="s2">&quot;ste&quot;</span><span class="p">:</span>
+            <span class="n">z_medians</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">_get_medians</span><span class="p">()</span>
+            <span class="n">z_hat</span> <span class="o">=</span> <span class="n">quantize_ste</span><span class="p">(</span><span class="n">z</span> <span class="o">-</span> <span class="n">z_medians</span><span class="p">)</span> <span class="o">+</span> <span class="n">z_medians</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;likelihoods&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">z_likelihoods</span><span class="p">},</span> <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">}</span>
 
@@ -385,7 +391,7 @@ document.write(`
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;strings&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">z_strings</span><span class="p">],</span> <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="n">shape</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]],</span> <span class="n">shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]],</span> <span class="n">shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="p">(</span><span class="n">z_strings</span><span class="p">,)</span> <span class="o">=</span> <span class="n">strings</span>
         <span class="n">z_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">z_strings</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span>
