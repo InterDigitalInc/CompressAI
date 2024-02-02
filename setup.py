@@ -108,7 +108,7 @@ DEV_REQUIRES = TEST_REQUIRES + [
 ]
 POINTCLOUD_REQUIRES = [
     "pointops @ git+https://github.com/YodaEmbedding/pointops.git",
-    "pyntcloud",
+    "pyntcloud @ git+https://github.com/YodaEmbedding/pyntcloud.git@12ee9f2208f4207844be80ac5fdbafaf9f0652fa",
 ]
 
 
