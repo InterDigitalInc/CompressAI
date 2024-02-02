@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="./" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Image compression &#8212; CompressAI</title>
   
@@ -19,27 +18,28 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=384b581d" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'zoo';</script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -55,7 +55,15 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
   
   <input type="checkbox"
           class="sidebar-toggle"
@@ -90,11 +98,14 @@
 </form></div>
   </div>
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
-    </nav>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -109,9 +120,11 @@
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
+
   
 
 <a class="navbar-brand logo" href="index.html">
+  
   
   
   
@@ -121,12 +134,23 @@
       
     
     
-    <img src="_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="_static/logo.png" class="logo__image only-light" alt="CompressAI - Home"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="CompressAI - Home"/>`);</script>
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
@@ -266,20 +290,22 @@
 </div>
 
 
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script>
 
+
 <script>
 document.write(`
   <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
 </script>
@@ -365,10 +391,10 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section id="image-compression">
-<h1>Image compression<a class="headerlink" href="#image-compression" title="Permalink to this heading">#</a></h1>
+<h1>Image compression<a class="headerlink" href="#image-compression" title="Link to this heading">#</a></h1>
 <p>This is the list of the pre-trained models for end-to-end image compression
 available in CompressAI.</p>
 <p>Currently, only models optimized w.r.t to the mean square error (<em>mse</em>) computed
@@ -390,7 +416,7 @@ documentation for more information on
 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html?highlight=train#torch.nn.Module.train">train</a>
 and <a class="reference external" href="https://pytorch.org/docs/stable/nn.html?highlight=eval#torch.nn.Module.eval">eval</a>.</p>
 <section id="training">
-<span id="zoo-training"></span><h2>Training<a class="headerlink" href="#training" title="Permalink to this heading">#</a></h2>
+<span id="zoo-training"></span><h2>Training<a class="headerlink" href="#training" title="Link to this heading">#</a></h2>
 <p>Unless specified otherwise, networks were trained for 4-5M steps on <em>256x256</em>
 image patches randomly extracted and cropped from the <a class="reference external" href="http://toflow.csail.mit.edu/">Vimeo90K</a> dataset <a class="reference internal" href="#xue2019video" id="id1"><span>[xue2019video]</span></a>.</p>
 <p>Models were trained with a batch size of 16 or 32, and an initial learning rate
@@ -491,7 +517,7 @@ quality parameters.</p>
 </section>
 <hr class="docutils" />
 <section id="models">
-<h2>Models<a class="headerlink" href="#models" title="Permalink to this heading">#</a></h2>
+<h2>Models<a class="headerlink" href="#models" title="Link to this heading">#</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>All the models are currently implemented using floating point
@@ -501,11 +527,11 @@ paper, <a class="reference external" href="https://openreview.net/forum?id=S1zz2
 solutions to implement cross-platform encoding and decoding.</p>
 </div>
 <section id="bmshj2018-factorized">
-<h3>bmshj2018_factorized<a class="headerlink" href="#bmshj2018-factorized" title="Permalink to this heading">#</a></h3>
+<h3>bmshj2018_factorized<a class="headerlink" href="#bmshj2018-factorized" title="Link to this heading">#</a></h3>
 <p>Original paper: <a class="reference internal" href="#bmshj2018" id="id2"><span>[bmshj2018]</span></a></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai.zoo.bmshj2018_factorized">
-<span class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></span><span class="sig-name descname"><span class="pre">bmshj2018_factorized</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#bmshj2018_factorized"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.bmshj2018_factorized" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></span><span class="sig-name descname"><span class="pre">bmshj2018_factorized</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#bmshj2018_factorized"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.bmshj2018_factorized" title="Link to this definition">#</a></dt>
 <dd><p>Factorized Prior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
 N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational Image Compression with a Scale Hyperprior”</a>, Int Conf. on Learning Representations
 (ICLR), 2018.</p>
@@ -523,11 +549,11 @@ N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.0143
 
 </section>
 <section id="bmshj2018-hyperprior">
-<h3>bmshj2018_hyperprior<a class="headerlink" href="#bmshj2018-hyperprior" title="Permalink to this heading">#</a></h3>
+<h3>bmshj2018_hyperprior<a class="headerlink" href="#bmshj2018-hyperprior" title="Link to this heading">#</a></h3>
 <p>Original paper: <a class="reference internal" href="#bmshj2018" id="id3"><span>[bmshj2018]</span></a></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai.zoo.bmshj2018_hyperprior">
-<span class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></span><span class="sig-name descname"><span class="pre">bmshj2018_hyperprior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#bmshj2018_hyperprior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.bmshj2018_hyperprior" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></span><span class="sig-name descname"><span class="pre">bmshj2018_hyperprior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#bmshj2018_hyperprior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.bmshj2018_hyperprior" title="Link to this definition">#</a></dt>
 <dd><p>Scale Hyperprior model from J. Balle, D. Minnen, S. Singh, S.J. Hwang,
 N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational Image Compression with a Scale Hyperprior”</a> Int. Conf. on Learning Representations
 (ICLR), 2018.</p>
@@ -545,11 +571,11 @@ N. Johnston: <a class="reference external" href="https://arxiv.org/abs/1802.0143
 
 </section>
 <section id="mbt2018-mean">
-<h3>mbt2018_mean<a class="headerlink" href="#mbt2018-mean" title="Permalink to this heading">#</a></h3>
+<h3>mbt2018_mean<a class="headerlink" href="#mbt2018-mean" title="Link to this heading">#</a></h3>
 <p>Original paper: <a class="reference internal" href="#id19" id="id5"><span>[mbt2018]</span></a></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai.zoo.mbt2018_mean">
-<span class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></span><span class="sig-name descname"><span class="pre">mbt2018_mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#mbt2018_mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.mbt2018_mean" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></span><span class="sig-name descname"><span class="pre">mbt2018_mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#mbt2018_mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.mbt2018_mean" title="Link to this definition">#</a></dt>
 <dd><p>Scale Hyperprior with non zero-mean Gaussian conditionals from D.
 Minnen, J. Balle, G.D. Toderici: <a class="reference external" href="https://arxiv.org/abs/1809.02736">“Joint Autoregressive and Hierarchical
 Priors for Learned Image Compression”</a>,
@@ -568,11 +594,11 @@ Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</p>
 
 </section>
 <section id="mbt2018">
-<h3>mbt2018<a class="headerlink" href="#mbt2018" title="Permalink to this heading">#</a></h3>
+<h3>mbt2018<a class="headerlink" href="#mbt2018" title="Link to this heading">#</a></h3>
 <p>Original paper: <a class="reference internal" href="#id19" id="id6"><span>[mbt2018]</span></a></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai.zoo.mbt2018">
-<span class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></span><span class="sig-name descname"><span class="pre">mbt2018</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#mbt2018"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.mbt2018" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></span><span class="sig-name descname"><span class="pre">mbt2018</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#mbt2018"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.mbt2018" title="Link to this definition">#</a></dt>
 <dd><p>Joint Autoregressive Hierarchical Priors model from D.
 Minnen, J. Balle, G.D. Toderici: <a class="reference external" href="https://arxiv.org/abs/1809.02736">“Joint Autoregressive and Hierarchical
 Priors for Learned Image Compression”</a>,
@@ -591,11 +617,11 @@ Adv. in Neural Information Processing Systems 31 (NeurIPS 2018).</p>
 
 </section>
 <section id="cheng2020-anchor">
-<h3>cheng2020_anchor<a class="headerlink" href="#cheng2020-anchor" title="Permalink to this heading">#</a></h3>
+<h3>cheng2020_anchor<a class="headerlink" href="#cheng2020-anchor" title="Link to this heading">#</a></h3>
 <p>Original paper: <a class="reference internal" href="#cheng2020" id="id8"><span>[cheng2020]</span></a></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai.zoo.cheng2020_anchor">
-<span class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></span><span class="sig-name descname"><span class="pre">cheng2020_anchor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#cheng2020_anchor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.cheng2020_anchor" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></span><span class="sig-name descname"><span class="pre">cheng2020_anchor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#cheng2020_anchor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.cheng2020_anchor" title="Link to this definition">#</a></dt>
 <dd><p>Anchor model variant from <a class="reference external" href="https://arxiv.org/abs/2001.01568">“Learned Image Compression with
 Discretized Gaussian Mixture Likelihoods and Attention Modules”</a>, by Zhengxue Cheng, Heming Sun, Masaru
 Takeuchi, Jiro Katto.</p>
@@ -613,11 +639,11 @@ Takeuchi, Jiro Katto.</p>
 
 </section>
 <section id="cheng2020-attn">
-<h3>cheng2020_attn<a class="headerlink" href="#cheng2020-attn" title="Permalink to this heading">#</a></h3>
+<h3>cheng2020_attn<a class="headerlink" href="#cheng2020-attn" title="Link to this heading">#</a></h3>
 <p>Original paper: <a class="reference internal" href="#cheng2020" id="id9"><span>[cheng2020]</span></a></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai.zoo.cheng2020_attn">
-<span class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></span><span class="sig-name descname"><span class="pre">cheng2020_attn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#cheng2020_attn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.cheng2020_attn" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></span><span class="sig-name descname"><span class="pre">cheng2020_attn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/image.html#cheng2020_attn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.cheng2020_attn" title="Link to this definition">#</a></dt>
 <dd><p>Self-attention model variant from <a class="reference external" href="https://arxiv.org/abs/2001.01568">“Learned Image Compression with
 Discretized Gaussian Mixture Likelihoods and Attention Modules”</a>, by Zhengxue Cheng, Heming Sun, Masaru
 Takeuchi, Jiro Katto.</p>
@@ -641,35 +667,35 @@ Takeuchi, Jiro Katto.</p>
 </section>
 <hr class="docutils" />
 <section id="performances">
-<h2>Performances<a class="headerlink" href="#performances" title="Permalink to this heading">#</a></h2>
+<h2>Performances<a class="headerlink" href="#performances" title="Link to this heading">#</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>See the <a class="reference external" href="https://arxiv.org/abs/2011.03029">CompressAI paper</a> on
 arXiv for more comparisons and evaluations.</p>
 </div>
 <section id="all-models">
-<h3>all models<a class="headerlink" href="#all-models" title="Permalink to this heading">#</a></h3>
+<h3>all models<a class="headerlink" href="#all-models" title="Link to this heading">#</a></h3>
 <img alt="_images/compressai.png" src="_images/compressai.png" />
 <img alt="_images/compressai-clic2020-mobile.png" src="_images/compressai-clic2020-mobile.png" />
 <img alt="_images/compressai-clic2020-pro.png" src="_images/compressai-clic2020-pro.png" />
 </section>
 <section id="id11">
-<h3>bmshj2018 factorized<a class="headerlink" href="#id11" title="Permalink to this heading">#</a></h3>
+<h3>bmshj2018 factorized<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
 <p>From: <a class="reference internal" href="#bmshj2018" id="id12"><span>[bmshj2018]</span></a>.</p>
 <img alt="_images/bmshj2018-factorized-mse.png" src="_images/bmshj2018-factorized-mse.png" />
 </section>
 <section id="id13">
-<h3>bmshj2018 hyperprior<a class="headerlink" href="#id13" title="Permalink to this heading">#</a></h3>
+<h3>bmshj2018 hyperprior<a class="headerlink" href="#id13" title="Link to this heading">#</a></h3>
 <p>From: <a class="reference internal" href="#bmshj2018" id="id14"><span>[bmshj2018]</span></a>.</p>
 <img alt="_images/bmshj2018-hyperprior-mse.png" src="_images/bmshj2018-hyperprior-mse.png" />
 </section>
 <section id="id15">
-<h3>mbt2018 mean<a class="headerlink" href="#id15" title="Permalink to this heading">#</a></h3>
+<h3>mbt2018 mean<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
 <p>From: <a class="reference internal" href="#id19" id="id16"><span>[mbt2018]</span></a>.</p>
 <img alt="_images/mbt2018-mean-mse.png" src="_images/mbt2018-mean-mse.png" />
 </section>
 <section id="id17">
-<h3>mbt2018<a class="headerlink" href="#id17" title="Permalink to this heading">#</a></h3>
+<h3>mbt2018<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
 <p>From: <a class="reference internal" href="#id19" id="id18"><span>[mbt2018]</span></a>.</p>
 <img alt="_images/mbt2018-mse.png" src="_images/mbt2018-mse.png" />
 <hr class="docutils" />
@@ -753,15 +779,15 @@ arXiv for more comparisons and evaluations.</p>
 </section>
 <hr class="docutils" />
 <section id="video-compression">
-<h1>Video compression<a class="headerlink" href="#video-compression" title="Permalink to this heading">#</a></h1>
+<h1>Video compression<a class="headerlink" href="#video-compression" title="Link to this heading">#</a></h1>
 <section id="id20">
-<h2>Models<a class="headerlink" href="#id20" title="Permalink to this heading">#</a></h2>
+<h2>Models<a class="headerlink" href="#id20" title="Link to this heading">#</a></h2>
 <section id="ssf2020">
-<h3>ssf2020<a class="headerlink" href="#ssf2020" title="Permalink to this heading">#</a></h3>
+<h3>ssf2020<a class="headerlink" href="#ssf2020" title="Link to this heading">#</a></h3>
 <p>Original paper: <a class="reference internal" href="#id22" id="id21"><span>[ssf2020]</span></a></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai.zoo.ssf2020">
-<span class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></span><span class="sig-name descname"><span class="pre">ssf2020</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/video.html#ssf2020"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.ssf2020" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.zoo.</span></span><span class="sig-name descname"><span class="pre">ssf2020</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/zoo/video.html#ssf2020"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.zoo.ssf2020" title="Link to this definition">#</a></dt>
 <dd><p>Google’s first end-to-end optimized video compression from E.
 Agustsson, D. Minnen, N. Johnston, J. Balle, S. J. Hwang, G. Toderici: <a class="reference external" href="https://openaccess.thecvf.com/content_CVPR_2020/html/Agustsson_Scale-Space_Flow_for_End-to-End_Optimized_Video_Compression_CVPR_2020_paper.html">“Scale-space flow for end-to-end
 optimized video compression”</a>,
@@ -810,11 +836,10 @@ IEEE Conference on Computer Vision and Pattern Recognition (CVPR 2020).</p>
 
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="transforms.html"
@@ -834,10 +859,7 @@ IEEE Conference on Computer Vision and Pattern Recognition (CVPR 2020).</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
@@ -845,6 +867,7 @@ IEEE Conference on Computer Vision and Pattern Recognition (CVPR 2020).</p>
             
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
   <div class="page-toc tocsection onthispage">
@@ -923,6 +946,7 @@ By InterDigital Communications, Inc.
   
   <div class="footer-item">
     
+
   <p class="copyright">
     
       © Copyright 2021, InterDigital Communications, Inc.
@@ -949,8 +973,8 @@ By InterDigital Communications, Inc.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
   <footer class="bd-footer">
   </footer>
