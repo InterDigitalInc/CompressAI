@@ -31,6 +31,10 @@ CompressAI provides the following predefined :py:class:`~LatentCodec` subclasses
      - Like :py:class:`~HyperLatentCodec`, but with trainable gain vectors for ``z``.
    * - :py:class:`~GainHyperpriorLatentCodec`
      - Like :py:class:`~HyperpriorLatentCodec`, but with trainable gain vectors for ``y``.
+   * - :py:class:`~ChannelGroupsLatentCodec`
+     - Encodes ``y`` in multiple chunked groups, each group conditioned on previously encoded groups.
+   * - :py:class:`~CheckerboardLatentCodec`
+     - Encodes ``y`` in two passes in checkerboard order.
 
 
 Diagrams for some of the above predefined latent codecs:
@@ -328,4 +332,14 @@ GainHyperLatentCodec
 GainHyperpriorLatentCodec
 -------------------------
 .. autoclass:: GainHyperpriorLatentCodec
+
+
+ChannelGroupsLatentCodec
+------------------------
+.. autoclass:: ChannelGroupsLatentCodec
+
+
+CheckerboardLatentCodec
+-----------------------
+.. autoclass:: CheckerboardLatentCodec
 

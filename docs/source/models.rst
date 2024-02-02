@@ -45,6 +45,21 @@ Cheng2020Attention
 .. autoclass:: Cheng2020Attention
 
 
+Cheng2020AnchorCheckerboard
+---------------------------
+.. autoclass:: Cheng2020AnchorCheckerboard
+
+
+Elic2022Official
+----------------
+.. autoclass:: Elic2022Official
+
+
+Elic2022Chandelier
+------------------
+.. autoclass:: Elic2022Chandelier
+
+
 .. currentmodule:: compressai.models.video
 
 ScaleSpaceFlow

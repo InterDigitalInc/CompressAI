@@ -28,6 +28,8 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from .base import LatentCodec
+from .channel_groups import ChannelGroupsLatentCodec
+from .checkerboard import CheckerboardLatentCodec
 from .entropy_bottleneck import EntropyBottleneckLatentCodec
 from .gain import GainHyperLatentCodec, GainHyperpriorLatentCodec
 from .gaussian_conditional import GaussianConditionalLatentCodec
@@ -37,6 +39,8 @@ from .rasterscan import RasterScanLatentCodec
 
 __all__ = [
     "LatentCodec",
+    "ChannelGroupsLatentCodec",
+    "CheckerboardLatentCodec",
     "EntropyBottleneckLatentCodec",
     "GainHyperLatentCodec",
     "GainHyperpriorLatentCodec",

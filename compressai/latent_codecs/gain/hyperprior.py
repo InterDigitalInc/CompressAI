@@ -110,6 +110,9 @@ class GainHyperpriorLatentCodec(LatentCodec):
             save_direct=True,
         )
 
+    def __getitem__(self, key: str) -> LatentCodec:
+        return self.latent_codec[key]
+
     def forward(
         self,
         y: Tensor,
@@ -152,6 +155,7 @@ class GainHyperpriorLatentCodec(LatentCodec):
         shape: Dict[str, Tuple[int, ...]],
         y_gain_inv: Tensor,
         z_gain_inv: Tensor,
+        **kwargs,
     ) -> Dict[str, Any]:
         *y_strings_, z_strings = strings
         assert all(len(y_strings) == len(z_strings) for y_strings in y_strings_)
