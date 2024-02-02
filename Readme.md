@@ -24,7 +24,7 @@ CompressAI currently provides:
 
 ## Installation
 
-CompressAI supports python 3.6+ and PyTorch 1.7+.
+CompressAI supports python 3.7+ and PyTorch 1.7+.
 
 **pip**:
 

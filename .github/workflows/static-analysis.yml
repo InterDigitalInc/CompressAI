@@ -8,15 +8,11 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - "3.6"
           - "3.7"
           - "3.8"
           - "3.9"
         include:
           - os: "ubuntu-latest"
-          # no Python 3.6 in ubuntu>20.04.
-          - os: "ubuntu-20.04"
-            python-version: "3.6"
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}

@@ -24,12 +24,12 @@ wheel:
     expire_in: 1 day
   parallel:
     matrix:
-      - PYTHON_VERSION: ['3.6', '3.7', '3.8', '3.9']
+      - PYTHON_VERSION: ['3.7', '3.8', '3.9']
   tags:
     - docker
 
 sdist:
-  image: python:3.6-buster
+  image: python:3.7-buster
   stage: build
   before_script:
     - pip install build
@@ -51,7 +51,7 @@ flake8:
 
 black:
   stage: static-analysis
-  image: python:3.6-buster
+  image: python:3.7-buster
   before_script:
     - python --version
     - pip install black
@@ -62,7 +62,7 @@ black:
 
 isort:
   stage: static-analysis
-  image: python:3.6-buster
+  image: python:3.7-buster
   before_script:
     - python --version
     - pip install .
