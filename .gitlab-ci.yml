@@ -79,7 +79,6 @@ test:
   before_script:
     - python --version
     - pip install -e .
-    - pip install -r requirements.txt
     - pip install pytest pytest-cov plotly
   script:
     - >
