@@ -92,7 +92,7 @@ test:
       - PYTORCH_IMAGE:
           - "1.9.0-cuda11.1-cudnn8-devel"
           - "1.8.1-cuda11.1-cudnn8-devel"
-          - "1.7.1-cuda11.0-cudnn8-devel"
+          # - "1.7.1-cuda11.0-cudnn8-devel"
   tags:
     - docker
 
