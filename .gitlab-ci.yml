@@ -24,7 +24,7 @@ wheel:
     expire_in: 1 day
   parallel:
     matrix:
-      - PYTHON_VERSION: ['3.7', '3.8', '3.9']
+      - PYTHON_VERSION: ['3.8', '3.9', '3.10']
   tags:
     - docker
 
@@ -51,7 +51,7 @@ flake8:
 
 black:
   stage: static-analysis
-  image: python:3.7-buster
+  image: python:3.8-buster
   before_script:
     - python --version
     - pip install black
@@ -62,7 +62,7 @@ black:
 
 isort:
   stage: static-analysis
-  image: python:3.7-buster
+  image: python:3.8-buster
   before_script:
     - python --version
     - pip install .
@@ -78,6 +78,7 @@ test:
   image: pytorch/pytorch:$PYTORCH_IMAGE
   before_script:
     - python --version
+    - pip install -U pip
     - pip install -e .
     - pip install pytest pytest-cov plotly
   script:
@@ -91,14 +92,15 @@ test:
     matrix:
       - PYTORCH_IMAGE:
           - "1.9.0-cuda11.1-cudnn8-devel"
-          - "1.8.1-cuda11.1-cudnn8-devel"
+          - "2.2.0-cuda11.8-cudnn8-devel"
+          # - "1.8.1-cuda11.1-cudnn8-devel"
           # - "1.7.1-cuda11.0-cudnn8-devel"
   tags:
     - docker
 
 doc:
   stage: doc
-  image: pytorch/pytorch:1.8.1-cuda11.1-cudnn8-devel
+  image: pytorch/pytorch:2.2.0-cuda11.8-cudnn8-devel
   before_script:
     - python --version
     - pip install -e .
