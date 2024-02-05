@@ -28,5 +28,5 @@ Functional transforms can be used to define custom transform classes.
 Point Cloud Transforms
 ----------------------
 
-.. automodule:: compressai.transforms.point
+.. automodule:: compressai.transforms.pointcloud
    :members:
