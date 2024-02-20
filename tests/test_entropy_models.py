@@ -36,6 +36,7 @@ from compressai.entropy_models import (
     EntropyBottleneck,
     EntropyModel,
     GaussianConditional,
+    GaussianMixtureConditional,
 )
 from compressai.zoo import bmshj2018_factorized, bmshj2018_hyperprior
 
@@ -400,6 +401,65 @@ class TestGaussianConditional:
         assert approx(net.gaussian_conditional._cdf_length, cdf_length)
         assert approx(net.gaussian_conditional._offset, offset)
         assert approx(net.gaussian_conditional._quantized_cdf, quantized_cdf)
+
+
+class TestGaussianMixtureConditional:
+    def test_forward_training(self):
+        K = 2
+        gaussian_mixture_conditional = GaussianMixtureConditional(K)
+        M = 128
+        x = torch.rand(1, M, 32, 32)
+        scales = torch.rand(1, 2 * M, 32, 32)
+        means = torch.rand(1, 2 * M, 32, 32)
+        weights = torch.rand(1, 2 * M, 32, 32)
+        y, y_likelihoods = gaussian_mixture_conditional(
+            inputs=x, scales=scales, means=means, weights=weights
+        )
+
+        assert isinstance(gaussian_mixture_conditional, EntropyModel)
+        assert y.shape == x.shape
+        assert y_likelihoods.shape == x.shape
+
+        assert ((y - x) <= 0.5).all()
+        assert ((y - x) >= -0.5).all()
+        assert (y != torch.round(x)).any()
+
+    def test_k_1(self):
+        gaussian_mixture_conditional = GaussianMixtureConditional(1)
+        gaussian_conditional = GaussianConditional(None)
+        M = 128
+        x = torch.rand(1, M, 32, 32)
+        scales = torch.rand(1, M, 32, 32)
+        means = torch.rand(1, M, 32, 32)
+        weights = torch.ones(1, M, 32, 32)
+        y_0, y_likelihoods_0 = gaussian_mixture_conditional(
+            inputs=x, scales=scales, means=means, weights=weights
+        )
+        y_1, y_likelihoods_1 = gaussian_conditional(
+            inputs=x, scales=scales, means=means
+        )
+
+        def approx(a, b):
+            return ((a - b).abs() <= 2).all()
+
+        assert approx(y_0, y_1)
+        assert approx(y_likelihoods_0, y_likelihoods_1)
+
+    def test_forward_inference(self):
+        K = 2
+        gaussian_mixture_conditional = GaussianMixtureConditional(K)
+        gaussian_mixture_conditional.eval()
+        M = 128
+        x = torch.rand(1, M, 32, 32)
+        scales = torch.rand(1, 2 * M, 32, 32)
+        means = torch.rand(1, 2 * M, 32, 32)
+        weights = torch.rand(1, 2 * M, 32, 32)
+        y, y_likelihoods = gaussian_mixture_conditional(x, scales, means, weights)
+
+        assert y.shape == x.shape
+        assert y_likelihoods.shape == x.shape
+
+        assert (y == torch.round(x)).all()
 
 
 @pytest.mark.parametrize(

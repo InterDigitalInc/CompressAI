@@ -880,10 +880,17 @@ class GaussianMixtureConditional(GaussianConditional):
 
         num_latents = cdf.size(0)
 
+        # rv = self.entropy_coder._encoder.encode_with_indexes(
+        #     symbols.reshape(-1).int().tolist(),
+        #     torch.arange(num_latents).int().tolist(),
+        #     cdf.cpu().to(torch.int32),
+        #     torch.tensor(cdf.size(1)).repeat(num_latents).int().tolist(),
+        #     torch.tensor(0).repeat(num_latents).int().tolist(),
+        # )
         rv = self.entropy_coder._encoder.encode_with_indexes(
             symbols.reshape(-1).int().tolist(),
             torch.arange(num_latents).int().tolist(),
-            cdf.cpu().to(torch.int32),
+            cdf.cpu().tolist(),
             torch.tensor(cdf.size(1)).repeat(num_latents).int().tolist(),
             torch.tensor(0).repeat(num_latents).int().tolist(),
         )
@@ -898,10 +905,17 @@ class GaussianMixtureConditional(GaussianConditional):
 
         num_latents = cdf.size(0)
 
+        # values = self.entropy_coder._decoder.decode_with_indexes(
+        #     strings,
+        #     torch.arange(num_latents).int().tolist(),
+        #     cdf.cpu().to(torch.int32),
+        #     torch.tensor(cdf.size(1)).repeat(num_latents).int().tolist(),
+        #     torch.tensor(0).repeat(num_latents).int().tolist(),
+        # )
         values = self.entropy_coder._decoder.decode_with_indexes(
             strings,
             torch.arange(num_latents).int().tolist(),
-            cdf.cpu().to(torch.int32),
+            cdf.cpu().tolist(),
             torch.tensor(cdf.size(1)).repeat(num_latents).int().tolist(),
             torch.tensor(0).repeat(num_latents).int().tolist(),
         )
