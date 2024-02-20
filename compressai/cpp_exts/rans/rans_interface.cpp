@@ -32,7 +32,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <torch/extension.h>
+// #include <torch/extension.h>
 
 #include <algorithm>
 #include <array>
@@ -66,25 +66,25 @@ void assert_cdfs(const std::vector<std::vector<int>> &cdfs,
   }
 }
 
-std::vector<std::vector<int32_t>> make_cdfs_vector_from_tensor(
-  const torch::Tensor &cdfs, const std::vector<int32_t> &cdfs_sizes) {
-  assert(cdfs.dim() == 2);
-  assert(cdfs.size(0) == cdfs_sizes.size());
-  assert(cdfs.dtype() == torch::kInt32);
+// std::vector<std::vector<int32_t>> make_cdfs_vector_from_tensor(
+//   const torch::Tensor &cdfs, const std::vector<int32_t> &cdfs_sizes) {
+//   assert(cdfs.dim() == 2);
+//   assert(cdfs.size(0) == cdfs_sizes.size());
+//   assert(cdfs.dtype() == torch::kInt32);
 
-  auto num_samples = cdfs.size(1);
-  auto *ptr = reinterpret_cast<int32_t*>(cdfs.data_ptr());
+//   auto num_samples = cdfs.size(1);
+//   auto *ptr = reinterpret_cast<int32_t*>(cdfs.data_ptr());
 
-  std::vector<std::vector<int32_t>> result;
+//   std::vector<std::vector<int32_t>> result;
 
-  for (auto cdf_size : cdfs_sizes) {
-    std::vector<int32_t> cdf_vec(ptr, ptr + cdf_size);
-    ptr += num_samples;
-    result.push_back(std::move(cdf_vec));
-  }
+//   for (auto cdf_size : cdfs_sizes) {
+//     std::vector<int32_t> cdf_vec(ptr, ptr + cdf_size);
+//     ptr += num_samples;
+//     result.push_back(std::move(cdf_vec));
+//   }
 
-  return result;
-}
+//   return result;
+// }
 
 /* Support only 16 bits word max */
 inline void Rans64EncPutBits(Rans64State *r, uint32_t **pptr, uint32_t val,
@@ -193,15 +193,15 @@ void BufferedRansEncoder::encode_with_indexes(
   }
 }
 
-void BufferedRansEncoder::encode_with_indexes(
-    const std::vector<int32_t> &symbols, const std::vector<int32_t> &indexes,
-    const torch::Tensor &cdfs,
-    const std::vector<int32_t> &cdfs_sizes,
-    const std::vector<int32_t> &offsets) {
-  return encode_with_indexes(symbols, indexes,
-                             make_cdfs_vector_from_tensor(cdfs, cdfs_sizes),
-                             cdfs_sizes, offsets);
-}
+// void BufferedRansEncoder::encode_with_indexes(
+//     const std::vector<int32_t> &symbols, const std::vector<int32_t> &indexes,
+//     const torch::Tensor &cdfs,
+//     const std::vector<int32_t> &cdfs_sizes,
+//     const std::vector<int32_t> &offsets) {
+//   return encode_with_indexes(symbols, indexes,
+//                              make_cdfs_vector_from_tensor(cdfs, cdfs_sizes),
+//                              cdfs_sizes, offsets);
+// }
 
 py::bytes BufferedRansEncoder::flush() {
   Rans64State rans;
@@ -243,16 +243,16 @@ RansEncoder::encode_with_indexes(const std::vector<int32_t> &symbols,
   return buffered_rans_enc.flush();
 }
 
-py::bytes
-RansEncoder::encode_with_indexes(const std::vector<int32_t> &symbols,
-                                 const std::vector<int32_t> &indexes,
-                                 const torch::Tensor &cdfs,
-                                 const std::vector<int32_t> &cdfs_sizes,
-                                 const std::vector<int32_t> &offsets) {
-  return encode_with_indexes(symbols, indexes,
-                             make_cdfs_vector_from_tensor(cdfs, cdfs_sizes),
-                             cdfs_sizes, offsets);
-}
+// py::bytes
+// RansEncoder::encode_with_indexes(const std::vector<int32_t> &symbols,
+//                                  const std::vector<int32_t> &indexes,
+//                                  const torch::Tensor &cdfs,
+//                                  const std::vector<int32_t> &cdfs_sizes,
+//                                  const std::vector<int32_t> &offsets) {
+//   return encode_with_indexes(symbols, indexes,
+//                              make_cdfs_vector_from_tensor(cdfs, cdfs_sizes),
+//                              cdfs_sizes, offsets);
+// }
 
 std::vector<int32_t>
 RansDecoder::decode_with_indexes(const std::string &encoded,
@@ -325,16 +325,16 @@ RansDecoder::decode_with_indexes(const std::string &encoded,
   return output;
 }
 
-std::vector<int32_t>
-RansDecoder::decode_with_indexes(const std::string &encoded,
-                                 const std::vector<int32_t> &indexes,
-                                 const torch::Tensor &cdfs,
-                                 const std::vector<int32_t> &cdfs_sizes,
-                                 const std::vector<int32_t> &offsets) {
-  return decode_with_indexes(encoded, indexes,
-                             make_cdfs_vector_from_tensor(cdfs, cdfs_sizes),
-                             cdfs_sizes, offsets);
-}
+// std::vector<int32_t>
+// RansDecoder::decode_with_indexes(const std::string &encoded,
+//                                  const std::vector<int32_t> &indexes,
+//                                  const torch::Tensor &cdfs,
+//                                  const std::vector<int32_t> &cdfs_sizes,
+//                                  const std::vector<int32_t> &offsets) {
+//   return decode_with_indexes(encoded, indexes,
+//                              make_cdfs_vector_from_tensor(cdfs, cdfs_sizes),
+//                              cdfs_sizes, offsets);
+// }
 
 void RansDecoder::set_stream(const std::string &encoded) {
   _stream = encoded;
@@ -411,14 +411,15 @@ RansDecoder::decode_stream(const std::vector<int32_t> &indexes,
   return output;
 }
 
-std::vector<int32_t>
-RansDecoder::decode_stream(const std::vector<int32_t> &indexes,
-                           const torch::Tensor &cdfs,
-                           const std::vector<int32_t> &cdfs_sizes,
-                           const std::vector<int32_t> &offsets) {
-  return decode_stream(indexes, make_cdfs_vector_from_tensor(cdfs, cdfs_sizes),
-                       cdfs_sizes, offsets);
-}
+// std::vector<int32_t>
+// RansDecoder::decode_stream(const std::vector<int32_t> &indexes,
+//                            const torch::Tensor &cdfs,
+//                            const std::vector<int32_t> &cdfs_sizes,
+//                            const std::vector<int32_t> &offsets) {
+//   return decode_stream(indexes, make_cdfs_vector_from_tensor(cdfs,
+//   cdfs_sizes),
+//                        cdfs_sizes, offsets);
+// }
 
 PYBIND11_MODULE(ans, m) {
   m.attr("__name__") = "compressai.ans";
@@ -429,74 +430,67 @@ PYBIND11_MODULE(ans, m) {
       .def(py::init<>())
       .def("encode_with_indexes",
            py::overload_cast<
-               const std::vector<int32_t> &,
-               const std::vector<int32_t> &,
+               const std::vector<int32_t> &, const std::vector<int32_t> &,
                const std::vector<std::vector<int32_t>> &,
-               const std::vector<int32_t> &,
-               const std::vector<int32_t> &
-               >(&BufferedRansEncoder::encode_with_indexes))
-      .def("encode_with_indexes",
-           py::overload_cast<
-               const std::vector<int32_t> &,
-               const std::vector<int32_t> &,
-               const torch::Tensor &,
-               const std::vector<int32_t> &,
-               const std::vector<int32_t> &
-               >(&BufferedRansEncoder::encode_with_indexes))
+               const std::vector<int32_t> &, const std::vector<int32_t> &>(
+               &BufferedRansEncoder::encode_with_indexes))
+      // .def("encode_with_indexes",
+      //      py::overload_cast<
+      //          const std::vector<int32_t> &,
+      //          const std::vector<int32_t> &,
+      //          const torch::Tensor &,
+      //          const std::vector<int32_t> &,
+      //          const std::vector<int32_t> &
+      //          >(&BufferedRansEncoder::encode_with_indexes))
       .def("flush", &BufferedRansEncoder::flush);
 
   py::class_<RansEncoder>(m, "RansEncoder")
       .def(py::init<>())
       .def("encode_with_indexes",
            py::overload_cast<
-               const std::vector<int32_t> &,
-               const std::vector<int32_t> &,
+               const std::vector<int32_t> &, const std::vector<int32_t> &,
                const std::vector<std::vector<int32_t>> &,
-               const std::vector<int32_t> &,
-               const std::vector<int32_t> &
-               >(&RansEncoder::encode_with_indexes))
-      .def("encode_with_indexes",
-           py::overload_cast<
-               const std::vector<int32_t> &,
-               const std::vector<int32_t> &,
-               const torch::Tensor &,
-               const std::vector<int32_t> &,
-               const std::vector<int32_t> &
-               >(&RansEncoder::encode_with_indexes));
+               const std::vector<int32_t> &, const std::vector<int32_t> &>(
+               &RansEncoder::encode_with_indexes));
+  // .def("encode_with_indexes",
+  //      py::overload_cast<
+  //          const std::vector<int32_t> &,
+  //          const std::vector<int32_t> &,
+  //          const torch::Tensor &,
+  //          const std::vector<int32_t> &,
+  //          const std::vector<int32_t> &
+  //          >(&RansEncoder::encode_with_indexes));
 
   py::class_<RansDecoder>(m, "RansDecoder")
       .def(py::init<>())
       .def("set_stream", &RansDecoder::set_stream)
       .def("decode_stream",
-           py::overload_cast<
-               const std::vector<int32_t> &,
-               const std::vector<std::vector<int32_t>> &,
-               const std::vector<int32_t> &,
-               const std::vector<int32_t> &
-               >(&RansDecoder::decode_stream))
-      .def("decode_stream",
-           py::overload_cast<
-               const std::vector<int32_t> &,
-               const torch::Tensor &,
-               const std::vector<int32_t> &,
-               const std::vector<int32_t> &
-               >(&RansDecoder::decode_stream))
+           py::overload_cast<const std::vector<int32_t> &,
+                             const std::vector<std::vector<int32_t>> &,
+                             const std::vector<int32_t> &,
+                             const std::vector<int32_t> &>(
+               &RansDecoder::decode_stream))
+      // .def("decode_stream",
+      //      py::overload_cast<
+      //          const std::vector<int32_t> &,
+      //          const torch::Tensor &,
+      //          const std::vector<int32_t> &,
+      //          const std::vector<int32_t> &
+      //          >(&RansDecoder::decode_stream))
       .def("decode_with_indexes",
-           py::overload_cast<
-               const std::string &,
-               const std::vector<int32_t> &,
-               const std::vector<std::vector<int32_t>> &,
-               const std::vector<int32_t> &,
-               const std::vector<int32_t> &
-               >(&RansDecoder::decode_with_indexes),
-           "Decode a string to a list of symbols")
-      .def("decode_with_indexes",
-           py::overload_cast<
-               const std::string &,
-               const std::vector<int32_t> &,
-               const torch::Tensor &,
-               const std::vector<int32_t> &,
-               const std::vector<int32_t> &
-               >(&RansDecoder::decode_with_indexes),
+           py::overload_cast<const std::string &, const std::vector<int32_t> &,
+                             const std::vector<std::vector<int32_t>> &,
+                             const std::vector<int32_t> &,
+                             const std::vector<int32_t> &>(
+               &RansDecoder::decode_with_indexes),
            "Decode a string to a list of symbols");
+  // .def("decode_with_indexes",
+  //      py::overload_cast<
+  //          const std::string &,
+  //          const std::vector<int32_t> &,
+  //          const torch::Tensor &,
+  //          const std::vector<int32_t> &,
+  //          const std::vector<int32_t> &
+  //          >(&RansDecoder::decode_with_indexes),
+  //      "Decode a string to a list of symbols");
 }
