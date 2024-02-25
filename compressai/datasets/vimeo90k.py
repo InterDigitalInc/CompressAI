@@ -29,6 +29,8 @@
 
 from pathlib import Path
 
+import torch
+
 from PIL import Image
 from torch.utils.data import Dataset
 
@@ -58,43 +60,74 @@ class Vimeo90kDataset(Dataset):
 
     Args:
         root (string): root directory of the dataset
-        transform (callable, optional): a function or transform that takes in a
-            PIL image and returns a transformed version
+        transform (callable, optional): a function for image/sequence transformation
+        transform_frame (callable, optional): a function for frame transformation
         split (string): split mode ('train' or 'valid')
         tuplet (int): order of dataset tuplet (e.g. 3 for "triplet" dataset)
+        mode (string): item grouping mode ('image' or 'video'). If 'image', each
+            item is a single frame. If 'video', each item is a sequence of frames.
     """
 
     TUPLET_PREFIX = {3: "tri", 7: "sep"}
     SPLIT_TO_LIST_SUFFIX = {"train": "trainlist", "valid": "testlist"}
 
-    def __init__(self, root, transform=None, split="train", tuplet=3):
+    def __init__(
+        self,
+        root,
+        transform=None,
+        transform_frame=None,
+        split="train",
+        tuplet=3,
+        mode="image",
+    ):
+        self.mode = mode
+        self.tuplet = tuplet
+
         list_path = Path(root) / self._list_filename(split, tuplet)
 
         with open(list_path) as f:
-            self.samples = [
-                f"{root}/sequences/{line.rstrip()}/im{idx}.png"
-                for line in f
-                if line.strip() != ""
-                for idx in range(1, tuplet + 1)
+            self.sequences = [
+                f"{root}/sequences/{line.rstrip()}" for line in f if line.strip() != ""
             ]
 
+        self.frames = [
+            f"{seq}/im{idx}.png"
+            for seq in self.sequences
+            for idx in range(1, tuplet + 1)
+        ]
+
         self.transform = transform
+        self.transform_frame = transform_frame  # Suggested: transforms.ToTensor()
 
     def __getitem__(self, index):
-        """
-        Args:
-            index (int): Index
-
-        Returns:
-            img: `PIL.Image.Image` or transformed `PIL.Image.Image`.
-        """
-        img = Image.open(self.samples[index]).convert("RGB")
+        if self.mode == "image":
+            item = self._get_frame(self.frames[index])
+        elif self.mode == "video":
+            item = torch.stack(
+                [
+                    self._get_frame(f"{self.sequences[index]}/im{idx}.png")
+                    for idx in range(1, self.tuplet + 1)
+                ]
+            )
+        else:
+            raise ValueError(f"Invalid mode {self.mode}. Must be 'image' or 'video'.")
         if self.transform:
-            return self.transform(img)
-        return img
+            item = self.transform(item)
+        return item
+
+    def _get_frame(self, filename):
+        frame = Image.open(filename).convert("RGB")
+        if self.transform_frame:
+            frame = self.transform_frame(frame)
+        return frame
 
     def __len__(self):
-        return len(self.samples)
+        if self.mode == "image":
+            return len(self.frames)
+        elif self.mode == "video":
+            return len(self.sequences)
+        else:
+            raise ValueError(f"Invalid mode {self.mode}. Must be 'image' or 'video'.")
 
     def _list_filename(self, split: str, tuplet: int) -> str:
         tuplet_prefix = self.TUPLET_PREFIX[tuplet]
