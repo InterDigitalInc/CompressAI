@@ -64,6 +64,9 @@ class Vimeo90kDataset(Dataset):
         tuplet (int): order of dataset tuplet (e.g. 3 for "triplet" dataset)
     """
 
+    TUPLET_PREFIX = {3: "tri", 7: "sep"}
+    SPLIT_TO_LIST_SUFFIX = {"train": "trainlist", "valid": "testlist"}
+
     def __init__(self, root, transform=None, split="train", tuplet=3):
         list_path = Path(root) / self._list_filename(split, tuplet)
 
@@ -94,6 +97,6 @@ class Vimeo90kDataset(Dataset):
         return len(self.samples)
 
     def _list_filename(self, split: str, tuplet: int) -> str:
-        tuplet_prefix = {3: "tri", 7: "sep"}[tuplet]
-        list_suffix = {"train": "trainlist", "valid": "testlist"}[split]
+        tuplet_prefix = self.TUPLET_PREFIX[tuplet]
+        list_suffix = self.SPLIT_TO_LIST_SUFFIX[split]
         return f"{tuplet_prefix}_{list_suffix}.txt"
