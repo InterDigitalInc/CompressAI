@@ -63,6 +63,23 @@ Elic2022Chandelier
 .. currentmodule:: compressai.models.video
 
 ScaleSpaceFlow
-------------------
+--------------
 .. autoclass:: ScaleSpaceFlow
+
+
+.. currentmodule:: compressai.models.pointcloud
+
+DensityPreservingReconstructionPccModel
+---------------------------------------
+.. autoclass:: DensityPreservingReconstructionPccModel
+
+
+PointNetReconstructionPccModel
+------------------------------
+.. autoclass:: PointNetReconstructionPccModel
+
+
+PointNet2SsgReconstructionPccModel
+----------------------------------
+.. autoclass:: PointNet2SsgReconstructionPccModel
 

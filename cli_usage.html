@@ -167,6 +167,7 @@
 <li class="toctree-l1"><a class="reference internal" href="entropy_models.html">compressai.entropy_models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="latent_codecs.html">compressai.latent_codecs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="losses.html">compressai.losses</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">compressai.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">compressai.transforms</a></li>
@@ -359,7 +360,7 @@ Collect codec metrics.
 positional arguments:
   {}          Select codec
 
-optional arguments:
+options:
   -h, --help  show this help message and exit
 </pre></div>
 </div>
@@ -375,7 +376,7 @@ positional arguments:
   {pretrained,checkpoint}
                         model source
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
 </pre></div>
 </div>
@@ -403,7 +404,7 @@ positional arguments:
   image                 image filepath
   target                target value to match
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -m {bpp,psnr-rgb,ms-ssim-rgb}, --metric {bpp,psnr-rgb,ms-ssim-rgb}
   --save                Save reconstructed image to disk
@@ -418,7 +419,7 @@ between codecs.</p>
                                        [--figsize ] [--axes   ] [--backend]
                                        [--show]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -f [ ...], --results-file [ ...]
   -m , --metric         Metric (default: psnr)
@@ -448,7 +449,7 @@ so that it can be loaded later via `load_state_dict_from_url`.
 positional arguments:
   filepath              Path to the checkpoint model to be exported.
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -n NAME, --name NAME  Exported model name.
   -d DIR, --dir DIR     Exported model directory.

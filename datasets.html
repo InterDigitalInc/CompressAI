@@ -168,6 +168,7 @@
 <li class="toctree-l1"><a class="reference internal" href="entropy_models.html">compressai.entropy_models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="latent_codecs.html">compressai.latent_codecs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="losses.html">compressai.losses</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">compressai.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">compressai.transforms</a></li>
@@ -331,12 +332,42 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imagefolder">ImageFolder</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.ImageFolder"><code class="docutils literal notranslate"><span class="pre">ImageFolder</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#image-video-datasets">Image/video datasets</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#imagefolder">ImageFolder</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.ImageFolder"><code class="docutils literal notranslate"><span class="pre">ImageFolder</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#videofolder">VideoFolder</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.VideoFolder"><code class="docutils literal notranslate"><span class="pre">VideoFolder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pregeneratedmemmapdataset">PreGeneratedMemmapDataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.PreGeneratedMemmapDataset"><code class="docutils literal notranslate"><span class="pre">PreGeneratedMemmapDataset</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#videofolder">VideoFolder</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.VideoFolder"><code class="docutils literal notranslate"><span class="pre">VideoFolder</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vimeo90kdataset">Vimeo90kDataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.Vimeo90kDataset"><code class="docutils literal notranslate"><span class="pre">Vimeo90kDataset</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#point-cloud-datasets">Point cloud datasets</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modelnetdataset">ModelNetDataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.ModelNetDataset"><code class="docutils literal notranslate"><span class="pre">ModelNetDataset</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#s3disdataset">S3disDataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.S3disDataset"><code class="docutils literal notranslate"><span class="pre">S3disDataset</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#semantickittidataset">SemanticKittiDataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.SemanticKittiDataset"><code class="docutils literal notranslate"><span class="pre">SemanticKittiDataset</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#shapenetcorepartdataset">ShapeNetCorePartDataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.ShapeNetCorePartDataset"><code class="docutils literal notranslate"><span class="pre">ShapeNetCorePartDataset</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -352,8 +383,10 @@ document.write(`
                   
   <section id="compressai-datasets">
 <h1>compressai.datasets<a class="headerlink" href="#compressai-datasets" title="Link to this heading">#</a></h1>
+<section id="image-video-datasets">
+<h2>Image/video datasets<a class="headerlink" href="#image-video-datasets" title="Link to this heading">#</a></h2>
 <section id="imagefolder">
-<h2>ImageFolder<a class="headerlink" href="#imagefolder" title="Link to this heading">#</a></h2>
+<h3>ImageFolder<a class="headerlink" href="#imagefolder" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.datasets.ImageFolder">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.datasets.</span></span><span class="sig-name descname"><span class="pre">ImageFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/datasets/image.html#ImageFolder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.datasets.ImageFolder" title="Link to this definition">#</a></dt>
@@ -381,8 +414,34 @@ PIL image and returns a transformed version</p></li>
 </dd></dl>
 
 </section>
+<section id="pregeneratedmemmapdataset">
+<h3>PreGeneratedMemmapDataset<a class="headerlink" href="#pregeneratedmemmapdataset" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.datasets.PreGeneratedMemmapDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.datasets.</span></span><span class="sig-name descname"><span class="pre">PreGeneratedMemmapDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(256,</span> <span class="pre">256)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/datasets/pregenerated.html#PreGeneratedMemmapDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.datasets.PreGeneratedMemmapDataset" title="Link to this definition">#</a></dt>
+<dd><p>A data loader for memory-mapped numpy arrays.</p>
+<p>This allows for fast training where the images patches have already been
+extracted and shuffled. The numpy array in expected to have the following
+size: <cite>NxHxWx3</cite>, with <cite>N</cite> the number of samples, <cite>H</cite> and <cite>W</cite> the images
+dimensions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<em>string</em>) – root directory where the numpy arrays are located.</p></li>
+<li><p><strong>image_size</strong> (<em>int</em><em>, </em><em>int</em>) – size of the images in the array.</p></li>
+<li><p><strong>patch_size</strong> (<em>int</em>) – size of the patches to be randomly cropped for training.</p></li>
+<li><p><strong>split</strong> (<em>string</em>) – split mode (‘train’ or ‘val’).</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – batch size.</p></li>
+<li><p><strong>num_workers</strong> (<em>int</em>) – number of CPU thread workers.</p></li>
+<li><p><strong>pin_memory</strong> (<em>bool</em>) – pin memory.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="videofolder">
-<h2>VideoFolder<a class="headerlink" href="#videofolder" title="Link to this heading">#</a></h2>
+<h3>VideoFolder<a class="headerlink" href="#videofolder" title="Link to this heading">#</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.datasets.VideoFolder">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.datasets.</span></span><span class="sig-name descname"><span class="pre">VideoFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rnd_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rnd_temp_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/datasets/video.html#VideoFolder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.datasets.VideoFolder" title="Link to this definition">#</a></dt>
@@ -420,6 +479,223 @@ PIL image and returns a transformed version</p></li>
 </dl>
 </dd></dl>
 
+</section>
+<section id="vimeo90kdataset">
+<h3>Vimeo90kDataset<a class="headerlink" href="#vimeo90kdataset" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.datasets.Vimeo90kDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.datasets.</span></span><span class="sig-name descname"><span class="pre">Vimeo90kDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuplet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/datasets/vimeo90k.html#Vimeo90kDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.datasets.Vimeo90kDataset" title="Link to this definition">#</a></dt>
+<dd><p>Load a Vimeo-90K structured dataset.</p>
+<p>Vimeo-90K dataset from
+Tianfan Xue, Baian Chen, Jiajun Wu, Donglai Wei, William T. Freeman:
+<a class="reference external" href="https://arxiv.org/abs/1711.09078">“Video Enhancement with Task-Oriented Flow”</a>,
+International Journal of Computer Vision (IJCV), 2019.</p>
+<p>Training and testing image samples are respectively stored in
+separate directories:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">rootdir</span><span class="o">/</span>
+    <span class="o">-</span> <span class="n">sequence</span><span class="o">/</span>
+        <span class="o">-</span> <span class="mi">00001</span><span class="o">/</span><span class="mi">001</span><span class="o">/</span><span class="n">im1</span><span class="o">.</span><span class="n">png</span>
+        <span class="o">-</span> <span class="mi">00001</span><span class="o">/</span><span class="mi">001</span><span class="o">/</span><span class="n">im2</span><span class="o">.</span><span class="n">png</span>
+        <span class="o">-</span> <span class="mi">00001</span><span class="o">/</span><span class="mi">001</span><span class="o">/</span><span class="n">im3</span><span class="o">.</span><span class="n">png</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<em>string</em>) – root directory of the dataset</p></li>
+<li><p><strong>transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – a function or transform that takes in a
+PIL image and returns a transformed version</p></li>
+<li><p><strong>split</strong> (<em>string</em>) – split mode (‘train’ or ‘valid’)</p></li>
+<li><p><strong>tuplet</strong> (<em>int</em>) – order of dataset tuplet (e.g. 3 for “triplet” dataset)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="point-cloud-datasets">
+<h2>Point cloud datasets<a class="headerlink" href="#point-cloud-datasets" title="Link to this heading">#</a></h2>
+<section id="modelnetdataset">
+<h3>ModelNetDataset<a class="headerlink" href="#modelnetdataset" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.datasets.ModelNetDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.datasets.</span></span><span class="sig-name descname"><span class="pre">ModelNetDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'40'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/datasets/pointcloud/modelnet.html#ModelNetDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.datasets.ModelNetDataset" title="Link to this definition">#</a></dt>
+<dd><p>ModelNet dataset.</p>
+<p>This dataset of 3D CAD models of objects was introduced by
+<a class="reference internal" href="#wu2015" id="id1"><span>[Wu2015]</span></a>, consisting of 10 or 40 classes, with 4899 and 12311
+aligned items, respectively.
+Each 3D model is represented in the OFF file format by a triangle
+mesh (i.e. faces) and has a single label (e.g. airplane).
+To convert the triangle meshes to point clouds, one may use a mesh
+sampling method (e.g. <code class="docutils literal notranslate"><span class="pre">SamplePoints</span></code>).</p>
+<p>See also: <a class="reference internal" href="#paperswithcode-modelnet" id="id2"><span>[PapersWithCode_ModelNet]</span></a>.</p>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="wu2015" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Wu2015</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://arxiv.org/abs/1406.5670">“3D ShapeNets: A deep representation for volumetric
+shapes,”</a>, by Zhirong Wu,
+Shuran Song, Aditya Khosla, Fisher Yu, Linguang Zhang,
+Xiaoou Tang, and Jianxiong Xiao, CVPR 2015.</p>
+</div>
+<div class="citation" id="paperswithcode-modelnet" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">PapersWithCode_ModelNet</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://paperswithcode.com/dataset/modelnet">PapersWithCode: ModelNet</a></p>
+</div>
+</div>
+</dd></dl>
+
+</section>
+<section id="s3disdataset">
+<h3>S3disDataset<a class="headerlink" href="#s3disdataset" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.datasets.S3disDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.datasets.</span></span><span class="sig-name descname"><span class="pre">S3disDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">areas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">2,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">6)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/datasets/pointcloud/s3dis.html#S3disDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.datasets.S3disDataset" title="Link to this definition">#</a></dt>
+<dd><p>S3DIS dataset.</p>
+<p>The Stanford 3D Indoor Scene Dataset (S3DIS) dataset, introduced by
+<a class="reference internal" href="#armeni2012" id="id4"><span>[Armeni2012]</span></a>, contains 3D point clouds of 6 large-scale indoor areas.
+There are multiple rooms (e.g. office, lounge, hallway, etc) per area.
+See the <a class="reference internal" href="#projectpage-s3dis" id="id5"><span>[ProjectPage_S3DIS]</span></a> for a visualization.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">semantic_index</span></code> is a number between 0 and 12 (inclusive),
+which can be used as the semantic label for each point.</p>
+<p>See also: <a class="reference internal" href="#paperswithcode-s3dis" id="id6"><span>[PapersWithCode_S3DIS]</span></a>.</p>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="armeni2012" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">Armeni2012</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://openaccess.thecvf.com/content_cvpr_2016/html/Armeni_3D_Semantic_Parsing_CVPR_2016_paper.html">“3D Semantic Parsing of Large-Scale Indoor Spaces,”</a>,
+by Iro Armeni, Ozan Sener, Amir R. Zamir, Helen Jiang,
+Ioannis Brilakis, Martin Fischer, and Silvio Savarese,
+CVPR 2012.</p>
+</div>
+<div class="citation" id="projectpage-s3dis" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">ProjectPage_S3DIS</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="http://buildingparser.stanford.edu/dataset.html">Project page</a></p>
+</div>
+<div class="citation" id="paperswithcode-s3dis" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">PapersWithCode_S3DIS</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://paperswithcode.com/dataset/s3dis">PapersWithCode: S3DIS</a></p>
+</div>
+</div>
+</dd></dl>
+
+</section>
+<section id="semantickittidataset">
+<h3>SemanticKittiDataset<a class="headerlink" href="#semantickittidataset" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.datasets.SemanticKittiDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.datasets.</span></span><span class="sig-name descname"><span class="pre">SemanticKittiDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequences</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">1,</span> <span class="pre">2,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6,</span> <span class="pre">7,</span> <span class="pre">9,</span> <span class="pre">10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/datasets/pointcloud/semantic_kitti.html#SemanticKittiDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.datasets.SemanticKittiDataset" title="Link to this definition">#</a></dt>
+<dd><p>SemanticKITTI dataset.</p>
+<p>The KITTI dataset, introduced by <a class="reference internal" href="#geiger2012" id="id8"><span>[Geiger2012]</span></a>, contains 3D point
+clouds sequences (i.e. video) of LiDAR sensor data from the
+perspective of a driving vehicle.
+The SemanticKITTI dataset, introduced by <a class="reference internal" href="#behley2019" id="id9"><span>[Behley2019]</span></a> and
+<a class="reference internal" href="#behley2021" id="id10"><span>[Behley2021]</span></a>, provides semantic annotation of all 22 sequences from
+the odometry task <a class="reference internal" href="#odometry-kitti" id="id11"><span>[Odometry_KITTI]</span></a> of KITTI.
+See the <a class="reference internal" href="#projectpage-semantickitti" id="id12"><span>[ProjectPage_SemanticKITTI]</span></a> for a visualization.
+Note that the test set is unlabelled, and must be evaluated on the
+server, as mentioned at <a class="reference internal" href="#projectpagetasks-semantickitti" id="id13"><span>[ProjectPageTasks_SemanticKITTI]</span></a>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">semantic_index</span></code> is a number between 0 and 33 (inclusive),
+which can be used as the semantic label for each point.</p>
+<p>See also: <a class="reference internal" href="#paperswithcode-semantickitti" id="id14"><span>[PapersWithCode_SemanticKITTI]</span></a>.</p>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="geiger2012" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">Geiger2012</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://www.cvlibs.net/publications/Geiger2012CVPR.pdf">“Are we ready for Autonomous Driving? The KITTI
+Vision Benchmark Suite,”</a>,
+by Andreas Geiger, Philip Lenz, and Raquel Urtasun,
+CVPR 2012.</p>
+</div>
+<div class="citation" id="behley2019" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">Behley2019</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://arxiv.org/abs/1904.01416">“SemanticKITTI: A Dataset for Semantic Scene
+Understanding of LiDAR Sequences,”</a>,
+by Jens Behley, Martin Garbade, Andres Milioto, Jan Quenzel,
+Sven Behnke, Cyrill Stachniss, and Juergen Gall, ICCV 2019.</p>
+</div>
+<div class="citation" id="behley2021" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">Behley2021</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://journals.sagepub.com/doi/10.1177/02783649211006735">“Towards 3D LiDAR-based semantic scene
+understanding of 3D point cloud sequences: The SemanticKITTI
+Dataset,”</a>,
+by Jens Behley, Martin Garbade, Andres Milioto, Jan Quenzel,
+Sven Behnke, Jürgen Gall, and Cyrill Stachniss, IJRR 2021.</p>
+</div>
+<div class="citation" id="projectpage-semantickitti" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">ProjectPage_SemanticKITTI</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="http://www.semantic-kitti.org/">Project page (SemanticKITTI)</a></p>
+</div>
+<div class="citation" id="projectpagetasks-semantickitti" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id13">ProjectPageTasks_SemanticKITTI</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="http://www.semantic-kitti.org/tasks.html">Project page: Tasks
+(SemanticKITTI)</a></p>
+</div>
+<div class="citation" id="odometry-kitti" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">Odometry_KITTI</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://www.cvlibs.net/datasets/kitti/eval_odometry.php">“Visual Odometry / SLAM Evaluation 2012”</a></p>
+</div>
+<div class="citation" id="paperswithcode-semantickitti" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id14">PapersWithCode_SemanticKITTI</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://paperswithcode.com/dataset/semantickitti">PapersWithCode: SemanticKITTI</a></p>
+</div>
+</div>
+</dd></dl>
+
+</section>
+<section id="shapenetcorepartdataset">
+<h3>ShapeNetCorePartDataset<a class="headerlink" href="#shapenetcorepartdataset" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.datasets.ShapeNetCorePartDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.datasets.</span></span><span class="sig-name descname"><span class="pre">ShapeNetCorePartDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'shapenetcore_partanno_segmentation_benchmark_v0_normal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/datasets/pointcloud/shapenet.html#ShapeNetCorePartDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.datasets.ShapeNetCorePartDataset" title="Link to this definition">#</a></dt>
+<dd><p>ShapeNet-Part dataset.</p>
+<p>The ShapeNet dataset of 3D CAD models of objects was introduced by
+<a class="reference internal" href="#yi2016" id="id16"><span>[Yi2016]</span></a>, consisting of over 3000000 models.
+The ShapeNetCore (v2) dataset is a “clean” subset of ShapeNet,
+consisting of 51127 aligned items from 55 object categories.
+The ShapeNet-Part dataset is a further subset of this dataset,
+consisting of 16881 items from 16 object categories.
+See page 2 of <a class="reference internal" href="#yi2017" id="id17"><span>[Yi2017]</span></a> for additional description.</p>
+<p>Object categories are labeled with two to six segmentation parts
+each, as shown in the image below.
+(Purple represents a “miscellaneous” part.)</p>
+<img alt="https://cs.stanford.edu/~ericyi/project_page/part_annotation/figures/categoriesNumbers.png" src="https://cs.stanford.edu/~ericyi/project_page/part_annotation/figures/categoriesNumbers.png" />
+<p><a class="reference internal" href="#projectpage-shapenetpart" id="id18"><span>[ProjectPage_ShapeNetPart]</span></a> also releases a processed version of
+ShapeNet-Part containing point cloud and normals with
+expert-verified segmentations, which we use here.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">semantic_index</span></code> is a number between 0 and 49 (inclusive),
+which can be used as the semantic label for each point.</p>
+<p>See also: <a class="reference internal" href="#paperswithcode-shapenetpart" id="id19"><span>[PapersWithCode_ShapeNetPart]</span></a> (benchmarks).</p>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="yi2016" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id16">Yi2016</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://dl.acm.org/doi/10.1145/2980179.2980238">“A scalable active framework for region annotation
+in 3D shape collections,”</a>,
+by Li Yi, Vladimir G. Kim, Duygu Ceylan, I-Chao Shen,
+Mengyan Yan, Hao Su, Cewu Lu, Qixing Huang, Alla Sheffer,
+and Leonidas Guibas, ACM Transactions on Graphics, 2016.</p>
+</div>
+<div class="citation" id="yi2017" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id17">Yi2017</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://arxiv.org/pdf/1710.06104.pdf">“Large-scale 3D shape reconstruction and
+segmentation from ShapeNet Core55,”</a>,
+by Li Yi et al. (total 50 authors), ICCV 2017.</p>
+</div>
+<div class="citation" id="projectpage-shapenetpart" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id18">ProjectPage_ShapeNetPart</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://cs.stanford.edu/~ericyi/project_page/part_annotation/">Project page (ShapeNet-Part)</a></p>
+</div>
+<div class="citation" id="paperswithcode-shapenetpart" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id19">PapersWithCode_ShapeNetPart</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://paperswithcode.com/sota/3d-part-segmentation-on-shapenet-part">PapersWithCode: ShapeNet-Part Benchmark
+(3D Part Segmentation)</a></p>
+</div>
+</div>
+</dd></dl>
+
+</section>
 </section>
 </section>
 
@@ -468,12 +744,42 @@ PIL image and returns a transformed version</p></li>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imagefolder">ImageFolder</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.ImageFolder"><code class="docutils literal notranslate"><span class="pre">ImageFolder</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#image-video-datasets">Image/video datasets</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#imagefolder">ImageFolder</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.ImageFolder"><code class="docutils literal notranslate"><span class="pre">ImageFolder</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#videofolder">VideoFolder</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.VideoFolder"><code class="docutils literal notranslate"><span class="pre">VideoFolder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pregeneratedmemmapdataset">PreGeneratedMemmapDataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.PreGeneratedMemmapDataset"><code class="docutils literal notranslate"><span class="pre">PreGeneratedMemmapDataset</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#videofolder">VideoFolder</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.VideoFolder"><code class="docutils literal notranslate"><span class="pre">VideoFolder</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vimeo90kdataset">Vimeo90kDataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.Vimeo90kDataset"><code class="docutils literal notranslate"><span class="pre">Vimeo90kDataset</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#point-cloud-datasets">Point cloud datasets</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modelnetdataset">ModelNetDataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.ModelNetDataset"><code class="docutils literal notranslate"><span class="pre">ModelNetDataset</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#s3disdataset">S3disDataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.S3disDataset"><code class="docutils literal notranslate"><span class="pre">S3disDataset</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#semantickittidataset">SemanticKittiDataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.SemanticKittiDataset"><code class="docutils literal notranslate"><span class="pre">SemanticKittiDataset</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#shapenetcorepartdataset">ShapeNetCorePartDataset</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.datasets.ShapeNetCorePartDataset"><code class="docutils literal notranslate"><span class="pre">ShapeNetCorePartDataset</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

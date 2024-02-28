@@ -1,0 +1,815 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>compressai.models.pointcloud.hrtzxf2022 &#8212; CompressAI</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/compressai/models/pointcloud/hrtzxf2022';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/logo.png" class="logo__image only-light" alt="CompressAI - Home"/>
+    <script>document.write(`<img src="../../../../_static/logo.png" class="logo__image only-dark" alt="CompressAI - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/tutorial_train.html">Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/tutorial_custom.html">Custom model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Library API</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../compressai.html">compressai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ans.html">compressai.ans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../datasets.html">compressai.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../latent_codecs.html">compressai.latent_codecs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../losses.html">compressai.losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">compressai.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ops.html">compressai.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../transforms.html">compressai.transforms</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Model Zoo</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../zoo.html">Image compression</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Utils</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli_usage.html">Command line usage</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference external" href="https://github.com/InterDigitalInc/CompressAI/">Github repository</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/InterDigitalInc/CompressAI" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for compressai.models.pointcloud.hrtzxf2022</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2021-2022, InterDigital Communications, Inc</span>
+<span class="c1"># All rights reserved.</span>
+
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted (subject to the limitations in the disclaimer</span>
+<span class="c1"># below) provided that the following conditions are met:</span>
+
+<span class="c1"># * Redistributions of source code must retain the above copyright notice,</span>
+<span class="c1">#   this list of conditions and the following disclaimer.</span>
+<span class="c1"># * Redistributions in binary form must reproduce the above copyright notice,</span>
+<span class="c1">#   this list of conditions and the following disclaimer in the documentation</span>
+<span class="c1">#   and/or other materials provided with the distribution.</span>
+<span class="c1"># * Neither the name of InterDigital Communications, Inc nor the names of its</span>
+<span class="c1">#   contributors may be used to endorse or promote products derived from this</span>
+<span class="c1">#   software without specific prior written permission.</span>
+
+<span class="c1"># NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY&#39;S PATENT RIGHTS ARE GRANTED BY</span>
+<span class="c1"># THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND</span>
+<span class="c1"># CONTRIBUTORS &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT</span>
+<span class="c1"># NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A</span>
+<span class="c1"># PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR</span>
+<span class="c1"># CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,</span>
+<span class="c1"># EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,</span>
+<span class="c1"># PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;</span>
+<span class="c1"># OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,</span>
+<span class="c1"># WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR</span>
+<span class="c1"># OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF</span>
+<span class="c1"># ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+
+<span class="c1"># Code adapted from https://github.com/yunhe20/D-PCC</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+<span class="kn">from</span> <span class="nn">compressai.entropy_models</span> <span class="kn">import</span> <span class="n">EntropyBottleneck</span>
+<span class="kn">from</span> <span class="nn">compressai.latent_codecs</span> <span class="kn">import</span> <span class="n">EntropyBottleneckLatentCodec</span>
+<span class="kn">from</span> <span class="nn">compressai.layers.pointcloud.hrtzxf2022</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DownsampleLayer</span><span class="p">,</span>
+    <span class="n">EdgeConv</span><span class="p">,</span>
+    <span class="n">RefineLayer</span><span class="p">,</span>
+    <span class="n">UpsampleLayer</span><span class="p">,</span>
+    <span class="n">UpsampleNumLayer</span><span class="p">,</span>
+    <span class="n">nearby_distance_sum</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compressai.layers.pointcloud.utils</span> <span class="kn">import</span> <span class="n">select_xyzs_and_feats</span>
+<span class="kn">from</span> <span class="nn">compressai.models</span> <span class="kn">import</span> <span class="n">CompressionModel</span>
+<span class="kn">from</span> <span class="nn">compressai.registry</span> <span class="kn">import</span> <span class="n">register_model</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;DensityPreservingReconstructionPccModel&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="DensityPreservingReconstructionPccModel">
+<a class="viewcode-back" href="../../../../models.html#compressai.models.pointcloud.DensityPreservingReconstructionPccModel">[docs]</a>
+<span class="nd">@register_model</span><span class="p">(</span><span class="s2">&quot;hrtzxf2022-pcc-rec&quot;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">DensityPreservingReconstructionPccModel</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Density-preserving deep point cloud compression.</span>
+
+<span class="sd">    Model introduced by [He2022pcc]_.</span>
+
+<span class="sd">    References:</span>
+
+<span class="sd">        .. [He2022pcc] `&quot;Density-preserving Deep Point Cloud Compression&quot;</span>
+<span class="sd">            &lt;https://arxiv.org/abs/2204.12684&gt;`_, by Yun He, Xinlin Ren,</span>
+<span class="sd">            Danhang Tang, Yinda Zhang, Xiangyang Xue, and Yanwei Fu,</span>
+<span class="sd">            CVPR 2022.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">downsample_rate</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="n">candidate_upsample_rate</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+        <span class="n">in_dim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">feat_dim</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">hidden_dim</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">k</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">ngroups</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">sub_point_conv_mode</span><span class="o">=</span><span class="s2">&quot;mlp&quot;</span><span class="p">,</span>
+        <span class="n">compress_normal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">latent_xyzs_codec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">compress_normal</span> <span class="o">=</span> <span class="n">compress_normal</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre_conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">GroupNorm</span><span class="p">(</span><span class="n">ngroups</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">feat_dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">Encoder</span><span class="p">(</span>
+            <span class="n">downsample_rate</span><span class="p">,</span>
+            <span class="n">feat_dim</span><span class="p">,</span>
+            <span class="n">hidden_dim</span><span class="p">,</span>
+            <span class="n">k</span><span class="p">,</span>
+            <span class="n">ngroups</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span>
+            <span class="n">downsample_rate</span><span class="p">,</span>
+            <span class="n">candidate_upsample_rate</span><span class="p">,</span>
+            <span class="n">feat_dim</span><span class="p">,</span>
+            <span class="n">hidden_dim</span><span class="p">,</span>
+            <span class="n">k</span><span class="p">,</span>
+            <span class="n">sub_point_conv_mode</span><span class="p">,</span>
+            <span class="n">compress_normal</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleDict</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;feat&quot;</span><span class="p">:</span> <span class="n">EntropyBottleneckLatentCodec</span><span class="p">(</span><span class="n">channels</span><span class="o">=</span><span class="n">feat_dim</span><span class="p">),</span>
+                <span class="s2">&quot;xyz&quot;</span><span class="p">:</span> <span class="n">XyzsLatentCodec</span><span class="p">(</span>
+                    <span class="n">feat_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">latent_xyzs_codec</span> <span class="ow">or</span> <span class="p">{})</span>
+                <span class="p">),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_prepare_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">input_data</span> <span class="o">=</span> <span class="p">[</span><span class="nb">input</span><span class="p">[</span><span class="s2">&quot;pos&quot;</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress_normal</span><span class="p">:</span>
+            <span class="n">input_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="s2">&quot;normal&quot;</span><span class="p">])</span>
+        <span class="n">input_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+
+        <span class="n">xyzs</span> <span class="o">=</span> <span class="n">input_data</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+        <span class="n">gt_normals</span> <span class="o">=</span> <span class="n">input_data</span><span class="p">[:,</span> <span class="mi">3</span> <span class="p">:</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress_normal</span><span class="p">]</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+        <span class="n">feats</span> <span class="o">=</span> <span class="n">input_data</span>
+
+        <span class="k">return</span> <span class="n">xyzs</span><span class="p">,</span> <span class="n">gt_normals</span><span class="p">,</span> <span class="n">feats</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="c1"># xyzs: (b, 3, n)</span>
+
+        <span class="n">xyzs</span><span class="p">,</span> <span class="n">gt_normals</span><span class="p">,</span> <span class="n">feats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_input</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+
+        <span class="n">feats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_conv</span><span class="p">(</span><span class="n">feats</span><span class="p">)</span>
+
+        <span class="n">gt_xyzs_</span><span class="p">,</span> <span class="n">gt_dnums_</span><span class="p">,</span> <span class="n">gt_mdis_</span><span class="p">,</span> <span class="n">latent_xyzs</span><span class="p">,</span> <span class="n">latent_feats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span>
+            <span class="n">xyzs</span><span class="p">,</span> <span class="n">feats</span>
+        <span class="p">)</span>
+
+        <span class="n">gt_latent_xyzs</span> <span class="o">=</span> <span class="n">latent_xyzs</span>
+
+        <span class="c1"># NOTE: Temporarily reshape to (b, c, m, 1) for compatibility.</span>
+        <span class="n">latent_feats</span> <span class="o">=</span> <span class="n">latent_feats</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">latent_feats_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;feat&quot;</span><span class="p">](</span><span class="n">latent_feats</span><span class="p">)</span>
+        <span class="n">latent_feats_hat</span> <span class="o">=</span> <span class="n">latent_feats_out</span><span class="p">[</span><span class="s2">&quot;y_hat&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">latent_xyzs_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;xyz&quot;</span><span class="p">](</span><span class="n">latent_xyzs</span><span class="p">)</span>
+        <span class="n">latent_xyzs_hat</span> <span class="o">=</span> <span class="n">latent_xyzs_out</span><span class="p">[</span><span class="s2">&quot;y_hat&quot;</span><span class="p">]</span>
+
+        <span class="n">xyzs_hat_</span><span class="p">,</span> <span class="n">unums_hat_</span><span class="p">,</span> <span class="n">mdis_hat_</span><span class="p">,</span> <span class="n">feats_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span>
+            <span class="n">latent_xyzs_hat</span><span class="p">,</span> <span class="n">latent_feats_hat</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Permute final xyzs_hat back to (b, n, c)</span>
+        <span class="n">xyzs_hat</span> <span class="o">=</span> <span class="n">xyzs_hat_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;x_hat&quot;</span><span class="p">:</span> <span class="n">xyzs_hat</span><span class="p">,</span>
+            <span class="s2">&quot;xyz_hat_&quot;</span><span class="p">:</span> <span class="n">xyzs_hat_</span><span class="p">,</span>
+            <span class="s2">&quot;latent_xyz_hat&quot;</span><span class="p">:</span> <span class="n">latent_xyzs_hat</span><span class="p">,</span>
+            <span class="s2">&quot;feat_hat&quot;</span><span class="p">:</span> <span class="n">feats_hat</span><span class="p">,</span>
+            <span class="s2">&quot;upsample_num_hat_&quot;</span><span class="p">:</span> <span class="n">unums_hat_</span><span class="p">,</span>
+            <span class="s2">&quot;mean_distance_hat_&quot;</span><span class="p">:</span> <span class="n">mdis_hat_</span><span class="p">,</span>
+            <span class="s2">&quot;gt_xyz_&quot;</span><span class="p">:</span> <span class="n">gt_xyzs_</span><span class="p">,</span>
+            <span class="s2">&quot;gt_latent_xyz&quot;</span><span class="p">:</span> <span class="n">gt_latent_xyzs</span><span class="p">,</span>
+            <span class="s2">&quot;gt_normal&quot;</span><span class="p">:</span> <span class="n">gt_normals</span><span class="p">,</span>
+            <span class="s2">&quot;gt_downsample_num_&quot;</span><span class="p">:</span> <span class="n">gt_dnums_</span><span class="p">,</span>
+            <span class="s2">&quot;gt_mean_distance_&quot;</span><span class="p">:</span> <span class="n">gt_mdis_</span><span class="p">,</span>
+            <span class="s2">&quot;likelihoods&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;latent_feat&quot;</span><span class="p">:</span> <span class="n">latent_feats_out</span><span class="p">[</span><span class="s2">&quot;likelihoods&quot;</span><span class="p">][</span><span class="s2">&quot;y&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;latent_xyz&quot;</span><span class="p">:</span> <span class="n">latent_xyzs_out</span><span class="p">[</span><span class="s2">&quot;likelihoods&quot;</span><span class="p">][</span><span class="s2">&quot;y&quot;</span><span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">xyzs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">feats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_input</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+
+        <span class="n">feats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_conv</span><span class="p">(</span><span class="n">feats</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">latent_xyzs</span><span class="p">,</span> <span class="n">latent_feats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">xyzs</span><span class="p">,</span> <span class="n">feats</span><span class="p">)</span>
+
+        <span class="n">latent_feats</span> <span class="o">=</span> <span class="n">latent_feats</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">latent_feats_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;feat&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">latent_feats</span><span class="p">)</span>
+
+        <span class="n">latent_xyzs</span> <span class="o">=</span> <span class="n">latent_xyzs</span>
+        <span class="n">latent_xyzs_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;xyz&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">latent_xyzs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;strings&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">latent_feats_out</span><span class="p">[</span><span class="s2">&quot;strings&quot;</span><span class="p">],</span>
+                <span class="n">latent_xyzs_out</span><span class="p">[</span><span class="s2">&quot;strings&quot;</span><span class="p">],</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">latent_feats_out</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">],</span>
+                <span class="n">latent_xyzs_out</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">],</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strings</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+
+        <span class="n">latent_feats_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;feat&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">strings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">latent_feats_hat</span> <span class="o">=</span> <span class="n">latent_feats_out</span><span class="p">[</span><span class="s2">&quot;y_hat&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">latent_xyzs_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;xyz&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">strings</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">latent_xyzs_hat</span> <span class="o">=</span> <span class="n">latent_xyzs_out</span><span class="p">[</span><span class="s2">&quot;y_hat&quot;</span><span class="p">]</span>
+
+        <span class="n">xyzs_hat_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">feats_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">latent_xyzs_hat</span><span class="p">,</span> <span class="n">latent_feats_hat</span><span class="p">)</span>
+
+        <span class="c1"># Permute final xyzs_hat back to (b, n, c)</span>
+        <span class="n">xyzs_hat</span> <span class="o">=</span> <span class="n">xyzs_hat_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;x_hat&quot;</span><span class="p">:</span> <span class="n">xyzs_hat</span><span class="p">,</span>
+            <span class="s2">&quot;feat_hat&quot;</span><span class="p">:</span> <span class="n">feats_hat</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+
+<span class="k">class</span> <span class="nc">XyzsLatentCodec</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;learned&quot;</span><span class="p">,</span> <span class="n">conv_mode</span><span class="o">=</span><span class="s2">&quot;mlp&quot;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;learned&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">conv_mode</span> <span class="o">==</span> <span class="s2">&quot;edge_conv&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span> <span class="o">=</span> <span class="n">EdgeConv</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">synthesis</span> <span class="o">=</span> <span class="n">EdgeConv</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">conv_mode</span> <span class="o">==</span> <span class="s2">&quot;mlp&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+                    <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="n">nn</span><span class="o">.</span><span class="n">GroupNorm</span><span class="p">(</span><span class="n">ngroups</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">),</span>
+                    <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                    <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">synthesis</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+                    <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="n">nn</span><span class="o">.</span><span class="n">GroupNorm</span><span class="p">(</span><span class="n">ngroups</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">),</span>
+                    <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                    <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown conv_mode: </span><span class="si">{</span><span class="n">conv_mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span> <span class="o">=</span> <span class="n">EntropyBottleneck</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">placeholder</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latent_xyzs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;learned&quot;</span><span class="p">:</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="p">(</span><span class="n">latent_xyzs</span><span class="p">)</span>
+            <span class="n">z_hat</span><span class="p">,</span> <span class="n">z_likelihoods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+            <span class="n">latent_xyzs_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">synthesis</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;float16&quot;</span><span class="p">:</span>
+            <span class="n">z_likelihoods</span> <span class="o">=</span> <span class="n">latent_xyzs</span><span class="o">.</span><span class="n">new_full</span><span class="p">(</span><span class="n">latent_xyzs</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="mi">2</span><span class="o">**-</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">latent_xyzs_hat</span> <span class="o">=</span> <span class="n">latent_xyzs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown mode: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;likelihoods&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">z_likelihoods</span><span class="p">},</span> <span class="s2">&quot;y_hat&quot;</span><span class="p">:</span> <span class="n">latent_xyzs_hat</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latent_xyzs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;learned&quot;</span><span class="p">:</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="p">(</span><span class="n">latent_xyzs</span><span class="p">)</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+            <span class="n">z_strings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+            <span class="n">z_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">z_strings</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span>
+            <span class="n">latent_xyzs_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">synthesis</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;float16&quot;</span><span class="p">:</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">latent_xyzs</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+            <span class="n">z_hat</span> <span class="o">=</span> <span class="n">latent_xyzs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">)</span>
+            <span class="n">z_strings</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;&gt;f2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">z_hat</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+            <span class="p">]</span>
+            <span class="n">latent_xyzs_hat</span> <span class="o">=</span> <span class="n">z_hat</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown mode: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;strings&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">z_strings</span><span class="p">],</span> <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="n">shape</span><span class="p">,</span> <span class="s2">&quot;y_hat&quot;</span><span class="p">:</span> <span class="n">latent_xyzs_hat</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        <span class="p">[</span><span class="n">z_strings</span><span class="p">]</span> <span class="o">=</span> <span class="n">strings</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;learned&quot;</span><span class="p">:</span>
+            <span class="n">z_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">z_strings</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span>
+            <span class="n">latent_xyzs_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">synthesis</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;float16&quot;</span><span class="p">:</span>
+            <span class="n">z_hat</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;&gt;f2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">z_strings</span><span class="p">]</span>
+            <span class="n">z_hat</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">z_hat</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">placeholder</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">latent_xyzs_hat</span> <span class="o">=</span> <span class="n">z_hat</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown mode: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;y_hat&quot;</span><span class="p">:</span> <span class="n">latent_xyzs_hat</span><span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">Encoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">downsample_rate</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">downsample_layers</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">DownsampleLayer</span><span class="p">(</span><span class="n">downsample_rate</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">ngroups</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">downsample_rate</span><span class="p">))</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">downsample_layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span><span class="n">downsample_layers</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyzs</span><span class="p">,</span> <span class="n">feats</span><span class="p">):</span>
+        <span class="c1"># xyzs: (b, 3, n)</span>
+        <span class="c1"># feats: (b, c, n)</span>
+
+        <span class="n">gt_xyzs_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">gt_dnums_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">gt_mdis_</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">downsample_layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">downsample_layers</span><span class="p">:</span>
+            <span class="n">gt_xyzs_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyzs</span><span class="p">)</span>
+            <span class="n">xyzs</span><span class="p">,</span> <span class="n">feats</span><span class="p">,</span> <span class="n">downsample_num</span><span class="p">,</span> <span class="n">mean_distance</span> <span class="o">=</span> <span class="n">downsample_layer</span><span class="p">(</span><span class="n">xyzs</span><span class="p">,</span> <span class="n">feats</span><span class="p">)</span>
+            <span class="n">gt_dnums_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">downsample_num</span><span class="p">)</span>
+            <span class="n">gt_mdis_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mean_distance</span><span class="p">)</span>
+
+        <span class="n">latent_xyzs</span> <span class="o">=</span> <span class="n">xyzs</span>
+        <span class="n">latent_feats</span> <span class="o">=</span> <span class="n">feats</span>
+
+        <span class="k">return</span> <span class="n">gt_xyzs_</span><span class="p">,</span> <span class="n">gt_dnums_</span><span class="p">,</span> <span class="n">gt_mdis_</span><span class="p">,</span> <span class="n">latent_xyzs</span><span class="p">,</span> <span class="n">latent_feats</span>
+
+
+<span class="k">class</span> <span class="nc">Decoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">downsample_rate</span><span class="p">,</span>
+        <span class="n">candidate_upsample_rate</span><span class="p">,</span>
+        <span class="n">dim</span><span class="p">,</span>
+        <span class="n">hidden_dim</span><span class="p">,</span>
+        <span class="n">k</span><span class="p">,</span>
+        <span class="n">sub_point_conv_mode</span><span class="p">,</span>
+        <span class="n">compress_normal</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compress_normal</span> <span class="o">=</span> <span class="n">compress_normal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">downsample_rate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">downsample_rate</span> <span class="o">=</span> <span class="n">downsample_rate</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">upsample_layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">UpsampleLayer</span><span class="p">(</span>
+                    <span class="n">dim</span><span class="p">,</span>
+                    <span class="n">hidden_dim</span><span class="p">,</span>
+                    <span class="n">k</span><span class="p">,</span>
+                    <span class="n">sub_point_conv_mode</span><span class="p">,</span>
+                    <span class="n">candidate_upsample_rate</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">upsample_num_layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">UpsampleNumLayer</span><span class="p">(</span>
+                    <span class="n">dim</span><span class="p">,</span>
+                    <span class="n">hidden_dim</span><span class="p">,</span>
+                    <span class="n">candidate_upsample_rate</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">refine_layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">RefineLayer</span><span class="p">(</span>
+                    <span class="n">dim</span><span class="p">,</span>
+                    <span class="n">hidden_dim</span><span class="p">,</span>
+                    <span class="n">k</span><span class="p">,</span>
+                    <span class="n">sub_point_conv_mode</span><span class="p">,</span>
+                    <span class="n">compress_normal</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyzs</span><span class="p">,</span> <span class="n">feats</span><span class="p">):</span>
+        <span class="c1"># xyzs: (b, 3, n)</span>
+        <span class="c1"># feats: (b, c, n)</span>
+
+        <span class="n">latent_xyzs</span> <span class="o">=</span> <span class="n">xyzs</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+
+        <span class="n">xyzs_hat_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unums_hat_</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">upsample_nn</span><span class="p">,</span> <span class="n">upsample_num_nn</span><span class="p">,</span> <span class="n">refine_nn</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upsample_layers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">upsample_num_layers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">refine_layers</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="c1"># candidate_xyzs: (b, 3, n u)</span>
+            <span class="c1"># candidate_feats: (b, c, n u)</span>
+            <span class="c1"># upsample_num: (b, n)</span>
+            <span class="c1"># xyzs: (b, 3, m)  [after upsample and select]</span>
+            <span class="c1"># feats: (b, c, m) [after upsample and select]</span>
+
+            <span class="c1"># For each point within the current set of &quot;n&quot; points,</span>
+            <span class="c1"># upsample a fixed number &quot;u&quot; of candidate points.</span>
+            <span class="c1"># The resulting candidate points have the shape (n, u).</span>
+            <span class="n">candidate_xyzs</span><span class="p">,</span> <span class="n">candidate_feats</span> <span class="o">=</span> <span class="n">upsample_nn</span><span class="p">(</span><span class="n">xyzs</span><span class="p">,</span> <span class="n">feats</span><span class="p">)</span>
+
+            <span class="c1"># Determine local point cloud density near each upsampled group:</span>
+            <span class="n">upsample_num</span> <span class="o">=</span> <span class="n">upsample_num_nn</span><span class="p">(</span><span class="n">feats</span><span class="p">)</span>
+
+            <span class="c1"># Subsample each point group to match the desired local density.</span>
+            <span class="c1"># That is, from the i-th point group, select upsample_num[..., i] points.</span>
+            <span class="c1"># Then, collect all the points so the resulting point set has shape (m_i,).</span>
+            <span class="c1">#</span>
+            <span class="c1"># If the batch size is &gt;1, then the &quot;m_i&quot;s may be different.</span>
+            <span class="c1"># In that case, resample each point set within the batch</span>
+            <span class="c1"># until they all have the same shape (m,).</span>
+            <span class="c1"># This can be done by either selecting a subset or</span>
+            <span class="c1"># duplicating points as necessary.</span>
+            <span class="c1">#</span>
+            <span class="c1"># Since one of the goals is to reduce local point cloud</span>
+            <span class="c1"># density in certain regions, we are happy with throwing</span>
+            <span class="c1"># away distinct points, and then duplicating the remaining</span>
+            <span class="c1"># points until they can fit within the desired tensor shape.</span>
+
+            <span class="c1"># Select subset of points to match predicted local point cloud densities:</span>
+            <span class="n">xyzs</span><span class="p">,</span> <span class="n">feats</span> <span class="o">=</span> <span class="n">select_xyzs_and_feats</span><span class="p">(</span>
+                <span class="n">candidate_xyzs</span><span class="p">,</span>
+                <span class="n">candidate_feats</span><span class="p">,</span>
+                <span class="n">upsample_num</span><span class="p">,</span>
+                <span class="n">upsample_rate</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">downsample_rate</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">-</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Refine upsampled points.</span>
+            <span class="n">xyzs</span><span class="p">,</span> <span class="n">feats</span> <span class="o">=</span> <span class="n">refine_nn</span><span class="p">(</span><span class="n">xyzs</span><span class="p">,</span> <span class="n">feats</span><span class="p">)</span>
+
+            <span class="n">xyzs_hat_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyzs</span><span class="p">)</span>
+            <span class="n">unums_hat_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">upsample_num</span><span class="p">)</span>
+
+        <span class="c1"># Compute mean distance between centroids and the upsampled points.</span>
+        <span class="n">mdis_hat_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pred_mdis</span><span class="p">([</span><span class="n">latent_xyzs</span><span class="p">,</span> <span class="o">*</span><span class="n">xyzs_hat_</span><span class="p">],</span> <span class="n">unums_hat_</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">xyzs_hat_</span><span class="p">,</span> <span class="n">unums_hat_</span><span class="p">,</span> <span class="n">mdis_hat_</span><span class="p">,</span> <span class="n">feats</span>
+
+    <span class="k">def</span> <span class="nf">get_pred_mdis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyzs_hat_</span><span class="p">,</span> <span class="n">unums_hat_</span><span class="p">):</span>
+        <span class="n">mdis_hat_</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">prev_xyzs</span><span class="p">,</span> <span class="n">curr_xyzs</span><span class="p">,</span> <span class="n">curr_unums</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">xyzs_hat_</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">xyzs_hat_</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">unums_hat_</span>
+        <span class="p">):</span>
+            <span class="c1"># Compute mean distance for each point in &quot;prev&quot; to upsampled &quot;curr&quot;.</span>
+            <span class="n">distance</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">nearby_distance_sum</span><span class="p">(</span><span class="n">prev_xyzs</span><span class="p">,</span> <span class="n">curr_xyzs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">curr_mdis</span> <span class="o">=</span> <span class="n">distance</span> <span class="o">/</span> <span class="n">curr_unums</span>
+            <span class="n">mdis_hat_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_mdis</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mdis_hat_</span>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By InterDigital Communications, Inc.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2021, InterDigital Communications, Inc.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

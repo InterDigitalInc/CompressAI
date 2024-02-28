@@ -168,6 +168,7 @@
 <li class="toctree-l1"><a class="reference internal" href="entropy_models.html">compressai.entropy_models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="latent_codecs.html">compressai.latent_codecs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="losses.html">compressai.losses</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">compressai.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">compressai.transforms</a></li>
@@ -345,6 +346,16 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.yuv_444_to_420"><code class="docutils literal notranslate"><span class="pre">yuv_444_to_420()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compressai.transforms.point">Point Cloud Transforms</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.GeneratePositionNormals"><code class="docutils literal notranslate"><span class="pre">GeneratePositionNormals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.NormalizeScaleV2"><code class="docutils literal notranslate"><span class="pre">NormalizeScaleV2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.RandomPermutation"><code class="docutils literal notranslate"><span class="pre">RandomPermutation</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.RandomRotateFull"><code class="docutils literal notranslate"><span class="pre">RandomRotateFull</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.RandomSample"><code class="docutils literal notranslate"><span class="pre">RandomSample</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.SamplePointsV2"><code class="docutils literal notranslate"><span class="pre">SamplePointsV2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.ToDict"><code class="docutils literal notranslate"><span class="pre">ToDict</span></code></a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -512,6 +523,73 @@ of 3 (Nx1xHxW) tensors.</p></li>
 </dd></dl>
 
 </section>
+<section id="module-compressai.transforms.point">
+<span id="point-cloud-transforms"></span><h2>Point Cloud Transforms<a class="headerlink" href="#module-compressai.transforms.point" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.transforms.point.GeneratePositionNormals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">GeneratePositionNormals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'any'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/generate_position_normals.html#GeneratePositionNormals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.GeneratePositionNormals" title="Link to this definition">#</a></dt>
+<dd><p>Generates normals from node positions
+(functional name: <code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_position_normals</span></code>).</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.transforms.point.NormalizeScaleV2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">NormalizeScaleV2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linf'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/normalize_scale_v2.html#NormalizeScaleV2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.NormalizeScaleV2" title="Link to this definition">#</a></dt>
+<dd><p>Centers and normalizes node positions
+(functional name: <code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_scale_v2</span></code>).</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.transforms.point.RandomPermutation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">RandomPermutation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('pos',)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/random_permutation.html#RandomPermutation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.RandomPermutation" title="Link to this definition">#</a></dt>
+<dd><p>Randomly permutes points and associated attributes
+(functional name: <code class="xref py py-obj docutils literal notranslate"><span class="pre">random_permutation</span></code>).</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.transforms.point.RandomRotateFull">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">RandomRotateFull</span></span><a class="reference internal" href="_modules/compressai/transforms/point/random_rotate_full.html#RandomRotateFull"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.RandomRotateFull" title="Link to this definition">#</a></dt>
+<dd><p>Randomly rotates node positions around the origin
+(functional name: <code class="xref py py-obj docutils literal notranslate"><span class="pre">random_rotate_full</span></code>).</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.transforms.point.RandomSample">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">RandomSample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('pos',)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_duplicates_by</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/random_sample.html#RandomSample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.RandomSample" title="Link to this definition">#</a></dt>
+<dd><p>Randomly samples points and associated attributes
+(functional name: <code class="xref py py-obj docutils literal notranslate"><span class="pre">random_sample</span></code>).</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.transforms.point.SamplePointsV2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">SamplePointsV2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_faces</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_normals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/sample_points_v2.html#SamplePointsV2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.SamplePointsV2" title="Link to this definition">#</a></dt>
+<dd><p>Uniformly samples a fixed number of points on the mesh faces according
+to their face area (functional name: <code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_points</span></code>).</p>
+<p>Adapted from PyTorch Geometric under MIT license at
+<a class="github reference external" href="https://github.com/pyg-team/pytorch_geometric/blob/master/LICENSE">pyg-team/pytorch_geometric</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num</strong> (<em>int</em>) – The number of points to sample.</p></li>
+<li><p><strong>remove_faces</strong> (<em>bool</em><em>, </em><em>optional</em>) – If set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>, the face tensor
+will not be removed. (default: <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>include_normals</strong> (<em>bool</em><em>, </em><em>optional</em>) – If set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, then compute
+normals for each sampled point. (default: <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Initial random seed.</p></li>
+<li><p><strong>static_seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Reset random seed to this every call.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.transforms.point.ToDict">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">ToDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wrapper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dict'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/to_dict.html#ToDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.ToDict" title="Link to this definition">#</a></dt>
+<dd><p>Convert <code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping[str,</span> <span class="pre">Any]</span></code>
+(functional name: <code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code>).</p>
+</dd></dl>
+
+</section>
 </section>
 
 
@@ -571,6 +649,16 @@ of 3 (Nx1xHxW) tensors.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.ycbcr2rgb"><code class="docutils literal notranslate"><span class="pre">ycbcr2rgb()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.yuv_420_to_444"><code class="docutils literal notranslate"><span class="pre">yuv_420_to_444()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.yuv_444_to_420"><code class="docutils literal notranslate"><span class="pre">yuv_444_to_420()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compressai.transforms.point">Point Cloud Transforms</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.GeneratePositionNormals"><code class="docutils literal notranslate"><span class="pre">GeneratePositionNormals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.NormalizeScaleV2"><code class="docutils literal notranslate"><span class="pre">NormalizeScaleV2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.RandomPermutation"><code class="docutils literal notranslate"><span class="pre">RandomPermutation</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.RandomRotateFull"><code class="docutils literal notranslate"><span class="pre">RandomRotateFull</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.RandomSample"><code class="docutils literal notranslate"><span class="pre">RandomSample</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.SamplePointsV2"><code class="docutils literal notranslate"><span class="pre">SamplePointsV2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.ToDict"><code class="docutils literal notranslate"><span class="pre">ToDict</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -167,6 +167,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../entropy_models.html">compressai.entropy_models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../latent_codecs.html">compressai.latent_codecs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../losses.html">compressai.losses</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">compressai.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ops.html">compressai.ops</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">compressai.transforms</a></li>
@@ -316,7 +317,7 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">math</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
@@ -334,11 +335,72 @@ document.write(`
     <span class="s2">&quot;ResidualBlockUpsample&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ResidualBlockWithStride&quot;</span><span class="p">,</span>
     <span class="s2">&quot;conv1x1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SpectralConv2d&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SpectralConvTranspose2d&quot;</span><span class="p">,</span>
     <span class="s2">&quot;conv3x3&quot;</span><span class="p">,</span>
     <span class="s2">&quot;subpel_conv3x3&quot;</span><span class="p">,</span>
     <span class="s2">&quot;QReLU&quot;</span><span class="p">,</span>
     <span class="s2">&quot;sequential_channel_ramp&quot;</span><span class="p">,</span>
 <span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">_SpectralConvNdMixin</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight_transformed</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_to_transform_domain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">))</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span>  <span class="c1"># Unregister weight, and fallback to property.</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_from_transform_domain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight_transformed</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_to_transform_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfftn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s2">&quot;ortho&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_from_transform_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfftn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s2">&quot;ortho&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">SpectralConv2d</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">,</span> <span class="n">_SpectralConvNdMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Spectral 2D convolution.</span>
+
+<span class="sd">    Introduced in [Balle2018efficient].</span>
+<span class="sd">    Reparameterizes the weights to be derived from weights stored in the</span>
+<span class="sd">    frequency domain.</span>
+<span class="sd">    In the original paper, this is referred to as &quot;spectral Adam&quot; or</span>
+<span class="sd">    &quot;Sadam&quot; due to its effect on the Adam optimizer update rule.</span>
+<span class="sd">    The motivation behind representing the weights in the frequency</span>
+<span class="sd">    domain is that optimizer updates/steps may now affect all</span>
+<span class="sd">    frequencies to an equal amount.</span>
+<span class="sd">    This improves the gradient conditioning, thus leading to faster</span>
+<span class="sd">    convergence and increased stability at larger learning rates.</span>
+
+<span class="sd">    For comparison, see the TensorFlow Compression implementations of</span>
+<span class="sd">    `SignalConv2D</span>
+<span class="sd">    &lt;https://github.com/tensorflow/compression/blob/v2.14.0/tensorflow_compression/python/layers/signal_conv.py#L61&gt;`_</span>
+<span class="sd">    and</span>
+<span class="sd">    `RDFTParameter</span>
+<span class="sd">    &lt;https://github.com/tensorflow/compression/blob/v2.14.0/tensorflow_compression/python/layers/parameters.py#L71&gt;`_.</span>
+
+<span class="sd">    [Balle2018efficient]: `&quot;Efficient Nonlinear Transforms for Lossy</span>
+<span class="sd">    Image Compression&quot; &lt;https://arxiv.org/abs/1802.00847&gt;`_,</span>
+<span class="sd">    by Johannes Ballé, PCS 2018.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">_SpectralConvNdMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">SpectralConvTranspose2d</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">,</span> <span class="n">_SpectralConvNdMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Spectral 2D transposed convolution.</span>
+
+<span class="sd">    Transposed version of :class:`SpectralConv2d`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">_SpectralConvNdMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="MaskedConv2d">

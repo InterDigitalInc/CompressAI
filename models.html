@@ -44,7 +44,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="compressai.ops" href="ops.html" />
-    <link rel="prev" title="compressai.layers" href="layers.html" />
+    <link rel="prev" title="compressai.losses" href="losses.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -168,6 +168,7 @@
 <li class="toctree-l1"><a class="reference internal" href="entropy_models.html">compressai.entropy_models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="latent_codecs.html">compressai.latent_codecs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="losses.html">compressai.losses</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">compressai.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ops.html">compressai.ops</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">compressai.transforms</a></li>
@@ -384,6 +385,18 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#densitypreservingreconstructionpccmodel">DensityPreservingReconstructionPccModel</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.pointcloud.DensityPreservingReconstructionPccModel"><code class="docutils literal notranslate"><span class="pre">DensityPreservingReconstructionPccModel</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pointnetreconstructionpccmodel">PointNetReconstructionPccModel</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.pointcloud.PointNetReconstructionPccModel"><code class="docutils literal notranslate"><span class="pre">PointNetReconstructionPccModel</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pointnet2ssgreconstructionpccmodel">PointNet2SsgReconstructionPccModel</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.pointcloud.PointNet2SsgReconstructionPccModel"><code class="docutils literal notranslate"><span class="pre">PointNet2SsgReconstructionPccModel</span></code></a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -483,7 +496,7 @@ exists in <code class="xref py py-attr docutils literal notranslate"><span class
 
 <dl class="py method">
 <dt class="sig sig-object py" id="compressai.models.CompressionModel.update">
-<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale_table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/base.html#CompressionModel.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.CompressionModel.update" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale_table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_quantiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/base.html#CompressionModel.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.CompressionModel.update" title="Link to this definition">#</a></dt>
 <dd><p>Updates EntropyBottleneck and GaussianConditional CDFs.</p>
 <p>Needs to be called once after training to be able to later perform the
 evaluation with an actual entropy coder.</p>
@@ -494,6 +507,7 @@ evaluation with an actual entropy coder.</p>
 for initializing the Gaussian distributions
 (default: 64 logarithmically spaced scales from 0.11 to 256)</p></li>
 <li><p><strong>force</strong> (<em>bool</em>) – overwrite previous values (default: False)</p></li>
+<li><p><strong>update_quantiles</strong> (<em>bool</em>) – fast update quantiles (default: False)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -847,6 +861,85 @@ IEEE Conference on Computer Vision and Pattern Recognition (CVPR 2020).</p>
 </dd></dl>
 
 </section>
+<section id="densitypreservingreconstructionpccmodel">
+<h2>DensityPreservingReconstructionPccModel<a class="headerlink" href="#densitypreservingreconstructionpccmodel" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.models.pointcloud.DensityPreservingReconstructionPccModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.models.pointcloud.</span></span><span class="sig-name descname"><span class="pre">DensityPreservingReconstructionPccModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">downsample_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.3333333333333333,</span> <span class="pre">0.3333333333333333,</span> <span class="pre">0.3333333333333333)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidate_upsample_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(8,</span> <span class="pre">8,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feat_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngroups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_point_conv_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mlp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress_normal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_xyzs_codec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/pointcloud/hrtzxf2022.html#DensityPreservingReconstructionPccModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.pointcloud.DensityPreservingReconstructionPccModel" title="Link to this definition">#</a></dt>
+<dd><p>Density-preserving deep point cloud compression.</p>
+<p>Model introduced by <a class="reference internal" href="#he2022pcc" id="id8"><span>[He2022pcc]</span></a>.</p>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="he2022pcc" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">He2022pcc</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://arxiv.org/abs/2204.12684">“Density-preserving Deep Point Cloud Compression”</a>, by Yun He, Xinlin Ren,
+Danhang Tang, Yinda Zhang, Xiangyang Xue, and Yanwei Fu,
+CVPR 2022.</p>
+</div>
+</div>
+</dd></dl>
+
+</section>
+<section id="pointnetreconstructionpccmodel">
+<h2>PointNetReconstructionPccModel<a class="headerlink" href="#pointnetreconstructionpccmodel" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.models.pointcloud.PointNetReconstructionPccModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.models.pointcloud.</span></span><span class="sig-name descname"><span class="pre">PointNetReconstructionPccModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'g_a':</span> <span class="pre">[3,</span> <span class="pre">64,</span> <span class="pre">64,</span> <span class="pre">64,</span> <span class="pre">128,</span> <span class="pre">1024],</span> <span class="pre">'g_s':</span> <span class="pre">[1024,</span> <span class="pre">256,</span> <span class="pre">512,</span> <span class="pre">3072]}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'g_a':</span> <span class="pre">[1,</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">1]}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/pointcloud/sfu_pointnet.html#PointNetReconstructionPccModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.pointcloud.PointNetReconstructionPccModel" title="Link to this definition">#</a></dt>
+<dd><p>PointNet-based PCC reconstruction model.</p>
+<p>Model based on PointNet <a class="reference internal" href="#qi2017pointnet" id="id9"><span>[Qi2017PointNet]</span></a>, modified for compression
+by <a class="reference internal" href="#yan2019" id="id10"><span>[Yan2019]</span></a>, with layer configurations and other modifications as
+used in <a class="reference internal" href="#ulhaq2023" id="id11"><span>[Ulhaq2023]</span></a>.</p>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="qi2017pointnet" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">Qi2017PointNet</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://arxiv.org/abs/1612.00593">“PointNet: Deep Learning on Point Sets for
+3D Classification and Segmentation”</a>, by Charles R. Qi,
+Hao Su, Kaichun Mo, and Leonidas J. Guibas, CVPR 2017.</p>
+</div>
+<div class="citation" id="yan2019" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">Yan2019</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://arxiv.org/abs/1905.03691">“Deep AutoEncoder-based Lossy Geometry Compression
+for Point Clouds”</a>,
+by Wei Yan, Yiting Shao, Shan Liu, Thomas H Li, Zhu Li,
+and Ge Li, 2019.</p>
+</div>
+<div class="citation" id="ulhaq2023" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">Ulhaq2023</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://arxiv.org/abs/2308.05959">“Learned Point Cloud Compression for
+Classification”</a>,
+by Mateen Ulhaq and Ivan V. Bajić, MMSP 2023.</p>
+</div>
+</div>
+</dd></dl>
+
+</section>
+<section id="pointnet2ssgreconstructionpccmodel">
+<h2>PointNet2SsgReconstructionPccModel<a class="headerlink" href="#pointnet2ssgreconstructionpccmodel" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.models.pointcloud.PointNet2SsgReconstructionPccModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.models.pointcloud.</span></span><span class="sig-name descname"><span class="pre">PointNet2SsgReconstructionPccModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">128,</span> <span class="pre">192,</span> <span class="pre">256)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1024,</span> <span class="pre">256,</span> <span class="pre">64,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">4,</span> <span class="pre">4,</span> <span class="pre">64)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">0.2,</span> <span class="pre">0.4,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(3,</span> <span class="pre">64,</span> <span class="pre">32,</span> <span class="pre">16,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">64,</span> <span class="pre">64)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normal_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/pointcloud/sfu_pointnet2.html#PointNet2SsgReconstructionPccModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.pointcloud.PointNet2SsgReconstructionPccModel" title="Link to this definition">#</a></dt>
+<dd><p>PointNet++-based PCC reconstruction model.</p>
+<p>Model based on PointNet++ <a class="reference internal" href="#qi2017pointnetplusplus" id="id12"><span>[Qi2017PointNetPlusPlus]</span></a>, and modified
+for compression by <a class="reference internal" href="#ulhaq2024" id="id13"><span>[Ulhaq2024]</span></a>.
+Uses single-scale grouping (SSG) for point set abstraction.</p>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="qi2017pointnetplusplus" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">Qi2017PointNetPlusPlus</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://arxiv.org/abs/1706.02413">“PointNet++: Deep Hierarchical
+Feature Learning on Point Sets in a Metric Space”</a>, by Charles R. Qi,
+Li Yi, Hao Su, and Leonidas J. Guibas, NIPS 2017.</p>
+</div>
+<div class="citation" id="ulhaq2024" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id13">Ulhaq2024</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="TODO">“Scalable Human-Machine Point Cloud Compression”</a>,
+by Mateen Ulhaq and Ivan V. Bajić, PCS 2024.</p>
+</div>
+</div>
+</dd></dl>
+
+</section>
 </section>
 
 
@@ -861,12 +954,12 @@ IEEE Conference on Computer Vision and Pattern Recognition (CVPR 2020).</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="layers.html"
+       href="losses.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">compressai.layers</p>
+        <p class="prev-next-title">compressai.losses</p>
       </div>
     </a>
     <a class="right-next"
@@ -945,6 +1038,18 @@ IEEE Conference on Computer Vision and Pattern Recognition (CVPR 2020).</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalespaceflow">ScaleSpaceFlow</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#densitypreservingreconstructionpccmodel">DensityPreservingReconstructionPccModel</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.pointcloud.DensityPreservingReconstructionPccModel"><code class="docutils literal notranslate"><span class="pre">DensityPreservingReconstructionPccModel</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pointnetreconstructionpccmodel">PointNetReconstructionPccModel</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.pointcloud.PointNetReconstructionPccModel"><code class="docutils literal notranslate"><span class="pre">PointNetReconstructionPccModel</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pointnet2ssgreconstructionpccmodel">PointNet2SsgReconstructionPccModel</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.pointcloud.PointNet2SsgReconstructionPccModel"><code class="docutils literal notranslate"><span class="pre">PointNet2SsgReconstructionPccModel</span></code></a></li>
 </ul>
 </li>
 </ul>

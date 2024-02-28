@@ -1,0 +1,626 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>compressai.datasets.pointcloud.semantic_kitti &#8212; CompressAI</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/compressai/datasets/pointcloud/semantic_kitti';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/logo.png" class="logo__image only-light" alt="CompressAI - Home"/>
+    <script>document.write(`<img src="../../../../_static/logo.png" class="logo__image only-dark" alt="CompressAI - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/tutorial_train.html">Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/tutorial_custom.html">Custom model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Library API</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../compressai.html">compressai</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ans.html">compressai.ans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../datasets.html">compressai.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../entropy_models.html">compressai.entropy_models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../latent_codecs.html">compressai.latent_codecs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../losses.html">compressai.losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">compressai.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ops.html">compressai.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../transforms.html">compressai.transforms</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Model Zoo</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../zoo.html">Image compression</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Utils</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli_usage.html">Command line usage</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference external" href="https://github.com/InterDigitalInc/CompressAI/">Github repository</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/InterDigitalInc/CompressAI" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for compressai.datasets.pointcloud.semantic_kitti</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2021-2022, InterDigital Communications, Inc</span>
+<span class="c1"># All rights reserved.</span>
+
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted (subject to the limitations in the disclaimer</span>
+<span class="c1"># below) provided that the following conditions are met:</span>
+
+<span class="c1"># * Redistributions of source code must retain the above copyright notice,</span>
+<span class="c1">#   this list of conditions and the following disclaimer.</span>
+<span class="c1"># * Redistributions in binary form must reproduce the above copyright notice,</span>
+<span class="c1">#   this list of conditions and the following disclaimer in the documentation</span>
+<span class="c1">#   and/or other materials provided with the distribution.</span>
+<span class="c1"># * Neither the name of InterDigital Communications, Inc nor the names of its</span>
+<span class="c1">#   contributors may be used to endorse or promote products derived from this</span>
+<span class="c1">#   software without specific prior written permission.</span>
+
+<span class="c1"># NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY&#39;S PATENT RIGHTS ARE GRANTED BY</span>
+<span class="c1"># THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND</span>
+<span class="c1"># CONTRIBUTORS &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT</span>
+<span class="c1"># NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A</span>
+<span class="c1"># PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR</span>
+<span class="c1"># CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,</span>
+<span class="c1"># EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,</span>
+<span class="c1"># PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;</span>
+<span class="c1"># OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,</span>
+<span class="c1"># WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR</span>
+<span class="c1"># OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF</span>
+<span class="c1"># ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">compressai.datasets.cache</span> <span class="kn">import</span> <span class="n">CacheDataset</span>
+<span class="kn">from</span> <span class="nn">compressai.datasets.utils</span> <span class="kn">import</span> <span class="n">download_url</span><span class="p">,</span> <span class="n">hash_file</span>
+<span class="kn">from</span> <span class="nn">compressai.registry</span> <span class="kn">import</span> <span class="n">register_dataset</span>
+
+
+<div class="viewcode-block" id="SemanticKittiDataset">
+<a class="viewcode-back" href="../../../../datasets.html#compressai.datasets.SemanticKittiDataset">[docs]</a>
+<span class="nd">@register_dataset</span><span class="p">(</span><span class="s2">&quot;SemanticKittiDataset&quot;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">SemanticKittiDataset</span><span class="p">(</span><span class="n">CacheDataset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;SemanticKITTI dataset.</span>
+
+<span class="sd">    The KITTI dataset, introduced by [Geiger2012]_, contains 3D point</span>
+<span class="sd">    clouds sequences (i.e. video) of LiDAR sensor data from the</span>
+<span class="sd">    perspective of a driving vehicle.</span>
+<span class="sd">    The SemanticKITTI dataset, introduced by [Behley2019]_ and</span>
+<span class="sd">    [Behley2021]_, provides semantic annotation of all 22 sequences from</span>
+<span class="sd">    the odometry task [Odometry_KITTI]_ of KITTI.</span>
+<span class="sd">    See the [ProjectPage_SemanticKITTI]_ for a visualization.</span>
+<span class="sd">    Note that the test set is unlabelled, and must be evaluated on the</span>
+<span class="sd">    server, as mentioned at [ProjectPageTasks_SemanticKITTI]_.</span>
+
+<span class="sd">    The ``semantic_index`` is a number between 0 and 33 (inclusive),</span>
+<span class="sd">    which can be used as the semantic label for each point.</span>
+
+<span class="sd">    See also: [PapersWithCode_SemanticKITTI]_.</span>
+
+<span class="sd">    References:</span>
+
+<span class="sd">        .. [Geiger2012] `&quot;Are we ready for Autonomous Driving? The KITTI</span>
+<span class="sd">            Vision Benchmark Suite,&quot;</span>
+<span class="sd">            &lt;https://www.cvlibs.net/publications/Geiger2012CVPR.pdf&gt;`_,</span>
+<span class="sd">            by Andreas Geiger, Philip Lenz, and Raquel Urtasun,</span>
+<span class="sd">            CVPR 2012.</span>
+
+<span class="sd">        .. [Behley2019] `&quot;SemanticKITTI: A Dataset for Semantic Scene</span>
+<span class="sd">            Understanding of LiDAR Sequences,&quot;</span>
+<span class="sd">            &lt;https://arxiv.org/abs/1904.01416&gt;`_,</span>
+<span class="sd">            by Jens Behley, Martin Garbade, Andres Milioto, Jan Quenzel,</span>
+<span class="sd">            Sven Behnke, Cyrill Stachniss, and Juergen Gall, ICCV 2019.</span>
+
+<span class="sd">        .. [Behley2021] `&quot;Towards 3D LiDAR-based semantic scene</span>
+<span class="sd">            understanding of 3D point cloud sequences: The SemanticKITTI</span>
+<span class="sd">            Dataset,&quot;</span>
+<span class="sd">            &lt;https://journals.sagepub.com/doi/10.1177/02783649211006735&gt;`_,</span>
+<span class="sd">            by Jens Behley, Martin Garbade, Andres Milioto, Jan Quenzel,</span>
+<span class="sd">            Sven Behnke, Jürgen Gall, and Cyrill Stachniss, IJRR 2021.</span>
+
+<span class="sd">        .. [ProjectPage_SemanticKITTI] `Project page (SemanticKITTI)</span>
+<span class="sd">            &lt;http://www.semantic-kitti.org/&gt;`_</span>
+
+<span class="sd">        .. [ProjectPageTasks_SemanticKITTI] `Project page: Tasks</span>
+<span class="sd">            (SemanticKITTI)</span>
+<span class="sd">            &lt;http://www.semantic-kitti.org/tasks.html&gt;`_</span>
+
+<span class="sd">        .. [Odometry_KITTI] `&quot;Visual Odometry / SLAM Evaluation 2012&quot;</span>
+<span class="sd">            &lt;https://www.cvlibs.net/datasets/kitti/eval_odometry.php&gt;`_</span>
+
+<span class="sd">        .. [PapersWithCode_SemanticKITTI] `PapersWithCode: SemanticKITTI</span>
+<span class="sd">            &lt;https://paperswithcode.com/dataset/semantickitti&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">URLS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;https://s3.eu-central-1.amazonaws.com/avg-kitti/data_odometry_calib.zip&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;https://s3.eu-central-1.amazonaws.com/avg-kitti/data_odometry_velodyne.zip&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;http://www.semantic-kitti.org/assets/data_odometry_labels.zip&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;http://www.semantic-kitti.org/assets/data_odometry_voxels_all.zip&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;http://www.semantic-kitti.org/assets/data_odometry_voxels.zip&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="n">HASHES</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;fa45d2bbff828776e6df689b161415fb7cd719345454b6d3567c2ff81fa4d075&quot;</span><span class="p">,</span>  <span class="c1"># data_odometry_calib.zip</span>
+        <span class="s2">&quot;062a45667bec6874ac27f733bd6809919f077265e7ac0bb25ac885798fa85ab5&quot;</span><span class="p">,</span>  <span class="c1"># data_odometry_velodyne.zip</span>
+        <span class="s2">&quot;408ec524636a393bae0288a0b2f48bf5418a1af988e82dee8496f89ddb7e6dda&quot;</span><span class="p">,</span>  <span class="c1"># data_odometry_labels.zip</span>
+        <span class="s2">&quot;10f333faa63426a519a573fbf0b4e3b56513511af30583473fa6a5782e037f3a&quot;</span><span class="p">,</span>  <span class="c1"># data_odometry_voxels_all.zip</span>
+        <span class="s2">&quot;d92c253e88e5e30c0a0b88f028510760e1db83b7e262d75c5931bf9b8d6dd51b&quot;</span><span class="p">,</span>  <span class="c1"># data_odometry_voxels.zip</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Suggested splits:</span>
+    <span class="n">SEQUENCES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="s2">&quot;valid&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">8</span><span class="p">,),</span>
+        <span class="s2">&quot;infer&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">8</span><span class="p">,),</span>
+        <span class="s2">&quot;test&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span>  <span class="c1"># Unlabelled.</span>
+    <span class="p">}</span>
+
+    <span class="c1"># fmt: off</span>
+    <span class="n">NUM_SAMPLES_PER_SEQUENCE</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mi">4541</span><span class="p">,</span> <span class="mi">1101</span><span class="p">,</span> <span class="mi">4661</span><span class="p">,</span> <span class="mi">801</span><span class="p">,</span> <span class="mi">271</span><span class="p">,</span> <span class="mi">2761</span><span class="p">,</span> <span class="mi">1101</span><span class="p">,</span> <span class="mi">1101</span><span class="p">,</span> <span class="mi">4071</span><span class="p">,</span> <span class="mi">1591</span><span class="p">,</span> <span class="mi">1201</span><span class="p">,</span>
+        <span class="mi">921</span><span class="p">,</span> <span class="mi">1061</span><span class="p">,</span> <span class="mi">3281</span><span class="p">,</span> <span class="mi">631</span><span class="p">,</span> <span class="mi">1901</span><span class="p">,</span> <span class="mi">1731</span><span class="p">,</span> <span class="mi">491</span><span class="p">,</span> <span class="mi">1801</span><span class="p">,</span> <span class="mi">4981</span><span class="p">,</span> <span class="mi">831</span><span class="p">,</span> <span class="mi">2721</span>
+    <span class="p">]</span>
+    <span class="c1"># fmt: on</span>
+
+    <span class="n">RAW_SEMANTIC_INDEX_TO_LABEL</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;unlabeled&quot;</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;outlier&quot;</span><span class="p">,</span>
+        <span class="mi">10</span><span class="p">:</span> <span class="s2">&quot;car&quot;</span><span class="p">,</span>
+        <span class="mi">11</span><span class="p">:</span> <span class="s2">&quot;bicycle&quot;</span><span class="p">,</span>
+        <span class="mi">13</span><span class="p">:</span> <span class="s2">&quot;bus&quot;</span><span class="p">,</span>
+        <span class="mi">15</span><span class="p">:</span> <span class="s2">&quot;motorcycle&quot;</span><span class="p">,</span>
+        <span class="mi">16</span><span class="p">:</span> <span class="s2">&quot;on-rails&quot;</span><span class="p">,</span>
+        <span class="mi">18</span><span class="p">:</span> <span class="s2">&quot;truck&quot;</span><span class="p">,</span>
+        <span class="mi">20</span><span class="p">:</span> <span class="s2">&quot;other-vehicle&quot;</span><span class="p">,</span>
+        <span class="mi">30</span><span class="p">:</span> <span class="s2">&quot;person&quot;</span><span class="p">,</span>
+        <span class="mi">31</span><span class="p">:</span> <span class="s2">&quot;bicyclist&quot;</span><span class="p">,</span>
+        <span class="mi">32</span><span class="p">:</span> <span class="s2">&quot;motorcyclist&quot;</span><span class="p">,</span>
+        <span class="mi">40</span><span class="p">:</span> <span class="s2">&quot;road&quot;</span><span class="p">,</span>
+        <span class="mi">44</span><span class="p">:</span> <span class="s2">&quot;parking&quot;</span><span class="p">,</span>
+        <span class="mi">48</span><span class="p">:</span> <span class="s2">&quot;sidewalk&quot;</span><span class="p">,</span>
+        <span class="mi">49</span><span class="p">:</span> <span class="s2">&quot;other-ground&quot;</span><span class="p">,</span>
+        <span class="mi">50</span><span class="p">:</span> <span class="s2">&quot;building&quot;</span><span class="p">,</span>
+        <span class="mi">51</span><span class="p">:</span> <span class="s2">&quot;fence&quot;</span><span class="p">,</span>
+        <span class="mi">52</span><span class="p">:</span> <span class="s2">&quot;other-structure&quot;</span><span class="p">,</span>
+        <span class="mi">60</span><span class="p">:</span> <span class="s2">&quot;lane-marking&quot;</span><span class="p">,</span>
+        <span class="mi">70</span><span class="p">:</span> <span class="s2">&quot;vegetation&quot;</span><span class="p">,</span>
+        <span class="mi">71</span><span class="p">:</span> <span class="s2">&quot;trunk&quot;</span><span class="p">,</span>
+        <span class="mi">72</span><span class="p">:</span> <span class="s2">&quot;terrain&quot;</span><span class="p">,</span>
+        <span class="mi">80</span><span class="p">:</span> <span class="s2">&quot;pole&quot;</span><span class="p">,</span>
+        <span class="mi">81</span><span class="p">:</span> <span class="s2">&quot;traffic-sign&quot;</span><span class="p">,</span>
+        <span class="mi">99</span><span class="p">:</span> <span class="s2">&quot;other-object&quot;</span><span class="p">,</span>
+        <span class="mi">252</span><span class="p">:</span> <span class="s2">&quot;moving-car&quot;</span><span class="p">,</span>
+        <span class="mi">253</span><span class="p">:</span> <span class="s2">&quot;moving-bicyclist&quot;</span><span class="p">,</span>
+        <span class="mi">254</span><span class="p">:</span> <span class="s2">&quot;moving-person&quot;</span><span class="p">,</span>
+        <span class="mi">255</span><span class="p">:</span> <span class="s2">&quot;moving-motorcyclist&quot;</span><span class="p">,</span>
+        <span class="mi">256</span><span class="p">:</span> <span class="s2">&quot;moving-on-rails&quot;</span><span class="p">,</span>
+        <span class="mi">257</span><span class="p">:</span> <span class="s2">&quot;moving-bus&quot;</span><span class="p">,</span>
+        <span class="mi">258</span><span class="p">:</span> <span class="s2">&quot;moving-truck&quot;</span><span class="p">,</span>
+        <span class="mi">259</span><span class="p">:</span> <span class="s2">&quot;moving-other-vehicle&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">RAW_SEMANTIC_INDEX_TO_SEMANTIC_INDEX</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">idx</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">RAW_SEMANTIC_INDEX_TO_LABEL</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cache_root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
+        <span class="n">split_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sequences</span><span class="o">=</span><span class="n">SEQUENCES</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">],</span>
+        <span class="n">pre_transform</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">transform</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">cache_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">cache_root</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">_cache&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="k">if</span> <span class="n">root</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cache_root</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="o">=</span> <span class="n">split</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">split_name</span> <span class="o">=</span> <span class="n">split</span> <span class="k">if</span> <span class="n">split_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">split_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span> <span class="o">=</span> <span class="n">sequences</span>
+
+        <span class="k">if</span> <span class="n">download</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">cache_root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_name</span><span class="p">,</span>
+            <span class="n">pre_transform</span><span class="o">=</span><span class="n">pre_transform</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_cache</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">force</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">return</span>
+        <span class="n">tmpdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;tmp&quot;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">expected_hash</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">HASHES</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">URLS</span><span class="p">):</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="n">download_url</span><span class="p">(</span>
+                <span class="n">url</span><span class="p">,</span> <span class="n">tmpdir</span><span class="p">,</span> <span class="n">check_certificate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">force</span>
+            <span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">unpack_archive</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">tmpdir</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">expected_hash</span> <span class="o">==</span> <span class="n">hash_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;sha256&quot;</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">tmpdir</span> <span class="o">/</span> <span class="s2">&quot;dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">x</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**/</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">02</span><span class="si">}</span><span class="s2">/velodyne/*.bin&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_load_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="n">path_prefix</span><span class="p">,</span> <span class="n">sequence_index</span><span class="p">,</span> <span class="n">file_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_prefix</span><span class="si">}{</span><span class="n">sequence_index</span><span class="si">}</span><span class="s2">/velodyne/</span><span class="si">{</span><span class="n">file_index</span><span class="si">}</span><span class="s2">.bin&quot;</span>
+        <span class="n">point_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">label_data</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_prefix</span><span class="si">}{</span><span class="n">sequence_index</span><span class="si">}</span><span class="s2">/labels/</span><span class="si">{</span><span class="n">file_index</span><span class="si">}</span><span class="s2">.label&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;&lt;u2&quot;</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;file_index&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">file_index</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+            <span class="s2">&quot;sequence_index&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sequence_index</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+            <span class="s2">&quot;raw_semantic_index&quot;</span><span class="p">:</span> <span class="n">label_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="s2">&quot;semantic_index&quot;</span><span class="p">:</span> <span class="n">np_remap</span><span class="p">(</span>
+                <span class="n">label_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">RAW_SEMANTIC_INDEX_TO_SEMANTIC_INDEX</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;instance_index&quot;</span><span class="p">:</span> <span class="n">label_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;pos&quot;</span><span class="p">:</span> <span class="n">point_data</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">],</span>
+            <span class="s2">&quot;remission&quot;</span><span class="p">:</span> <span class="n">point_data</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_parse_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">r</span><span class="s2">&quot;^(?P&lt;path_prefix&gt;.*?/?)&quot;</span>
+            <span class="sa">r</span><span class="s2">&quot;(?P&lt;sequence_index&gt;\d+)/&quot;</span>
+            <span class="sa">r</span><span class="s2">&quot;velodyne/&quot;</span>
+            <span class="sa">r</span><span class="s2">&quot;(?P&lt;file_index&gt;\d</span><span class="si">{6}</span><span class="s2">)\.\w+$&quot;</span>
+        <span class="p">)</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not parse path: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">path_prefix</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;path_prefix&quot;</span><span class="p">)</span>
+        <span class="n">sequence_index</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;sequence_index&quot;</span><span class="p">)</span>
+        <span class="n">file_index</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;file_index&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">path_prefix</span><span class="p">,</span> <span class="n">sequence_index</span><span class="p">,</span> <span class="n">file_index</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">np_remap</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="n">values</span><span class="p">,</span> <span class="n">inverse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">values</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="n">inverse</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By InterDigital Communications, Inc.
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2021, InterDigital Communications, Inc.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

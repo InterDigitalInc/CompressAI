@@ -167,6 +167,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../entropy_models.html">compressai.entropy_models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../latent_codecs.html">compressai.latent_codecs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../layers.html">compressai.layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../losses.html">compressai.losses</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">compressai.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ops.html">compressai.ops</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">compressai.transforms</a></li>
@@ -408,7 +409,7 @@ document.write(`
 
 <div class="viewcode-block" id="CompressionModel.update">
 <a class="viewcode-back" href="../../../models.html#compressai.models.CompressionModel.update">[docs]</a>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_table</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_table</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">update_quantiles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates EntropyBottleneck and GaussianConditional CDFs.</span>
 
 <span class="sd">        Needs to be called once after training to be able to later perform the</span>
@@ -419,6 +420,7 @@ document.write(`
 <span class="sd">                for initializing the Gaussian distributions</span>
 <span class="sd">                (default: 64 logarithmically spaced scales from 0.11 to 256)</span>
 <span class="sd">            force (bool): overwrite previous values (default: False)</span>
+<span class="sd">            update_quantiles (bool): fast update quantiles (default: False)</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            updated (bool): True if at least one of the modules was updated.</span>
@@ -428,7 +430,7 @@ document.write(`
         <span class="n">updated</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">named_modules</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">EntropyBottleneck</span><span class="p">):</span>
-                <span class="n">updated</span> <span class="o">|=</span> <span class="n">module</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
+                <span class="n">updated</span> <span class="o">|=</span> <span class="n">module</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">update_quantiles</span><span class="o">=</span><span class="n">update_quantiles</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">GaussianConditional</span><span class="p">):</span>
                 <span class="n">updated</span> <span class="o">|=</span> <span class="n">module</span><span class="o">.</span><span class="n">update_scale_table</span><span class="p">(</span><span class="n">scale_table</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">updated</span></div>
