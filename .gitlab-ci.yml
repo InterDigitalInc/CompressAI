@@ -24,12 +24,12 @@ wheel:
     expire_in: 1 day
   parallel:
     matrix:
-      - PYTHON_VERSION: ['3.8', '3.9', '3.10']
+      - PYTHON_VERSION: ['3.7', '3.8', '3.9', '3.10']
   tags:
     - docker
 
 sdist:
-  image: python:3.7-buster
+  image: python:3.10-buster
   stage: build
   before_script:
     - pip install build
@@ -40,7 +40,7 @@ sdist:
 
 flake8:
   stage: static-analysis
-  image: pytorch/pytorch:1.8.1-cuda11.1-cudnn8-devel
+  image: pytorch/pytorch:2.2.0-cuda11.8-cudnn8-devel
   before_script:
     - python --version
     - pip install flake8 flake8-bugbear flake8-comprehensions
@@ -51,7 +51,7 @@ flake8:
 
 black:
   stage: static-analysis
-  image: python:3.8-buster
+  image: python:3.10-buster
   before_script:
     - python --version
     - pip install black
@@ -62,7 +62,7 @@ black:
 
 isort:
   stage: static-analysis
-  image: python:3.8-buster
+  image: python:3.10-buster
   before_script:
     - python --version
     - pip install .
@@ -91,10 +91,9 @@ test:
   parallel:
     matrix:
       - PYTORCH_IMAGE:
+          - "1.8.1-cuda11.1-cudnn8-devel"
           - "1.9.0-cuda11.1-cudnn8-devel"
           - "2.2.0-cuda11.8-cudnn8-devel"
-          # - "1.8.1-cuda11.1-cudnn8-devel"
-          # - "1.7.1-cuda11.0-cudnn8-devel"
   tags:
     - docker
 
