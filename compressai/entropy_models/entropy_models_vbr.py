@@ -42,8 +42,8 @@ from torch import Tensor
 from compressai._CXX import pmf_to_quantized_cdf as _pmf_to_quantized_cdf
 from compressai.ops import LowerBound
 
-from compressai.entropy_models import _EntropyCoder, default_entropy_coder
-from compressai.entropy_models import pmf_to_quantized_cdf, _forward
+from .entropy_models import _EntropyCoder, default_entropy_coder
+from .entropy_models import pmf_to_quantized_cdf, _forward
 
 
 class EntropyModelVbr(nn.Module):

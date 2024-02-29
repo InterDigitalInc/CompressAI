@@ -33,10 +33,13 @@ from .entropy_models import (
     GaussianConditional,
     GaussianMixtureConditional,
 )
+from .entropy_models_vbr import EntropyBottleneckVbr, EntropyModelVbr
 
 __all__ = [
     "EntropyModel",
     "EntropyBottleneck",
     "GaussianConditional",
     "GaussianMixtureConditional",
+    "EntropyModelVbr",
+    "EntropyBottleneckVbr",
 ]
