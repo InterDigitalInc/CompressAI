@@ -30,9 +30,9 @@
 from torch.hub import load_state_dict_from_url
 
 from compressai.models import (
-    ScaleHyperpriorVbr,
+    JointAutoregressiveHierarchicalPriorsVbr,
     MeanScaleHyperpriorVbr,
-    JointAutoregressiveHierarchicalPriorsVbr
+    ScaleHyperpriorVbr,
 )
 
 from .pretrained import load_pretrained
@@ -46,35 +46,23 @@ __all__ = [
 model_architectures = {
     "bmshj2018-hyperprior-vbr": ScaleHyperpriorVbr,
     "mbt2018-mean-vbr": MeanScaleHyperpriorVbr,
-    "mbt2018-vbr": JointAutoregressiveHierarchicalPriorsVbr
+    "mbt2018-vbr": JointAutoregressiveHierarchicalPriorsVbr,
 }
 
 root_url = "https://compressai.s3.amazonaws.com/models/v1"
 model_urls = {
     "bmshj2018-hyperprior-vbr": {
-        "mse": {
-            1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"
-        },
-        "ms-ssim": {
-            1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"
-        },
+        "mse": {1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"},
+        "ms-ssim": {1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"},
     },
     "mbt2018-mean-vbr": {
-        "mse": {
-            1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"
-        },
-        "ms-ssim": {
-            1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"
-        },
+        "mse": {1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"},
+        "ms-ssim": {1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"},
     },
     "mbt2018-vbr": {
-        "mse": {
-            1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"
-        },
-        "ms-ssim": {
-            1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"
-        },
-    }
+        "mse": {1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"},
+        "ms-ssim": {1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"},
+    },
 }
 
 cfgs = {
@@ -128,7 +116,7 @@ def bmshj2018_hyperprior_vbr(
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    if metric not in ("mse"): # ("mse", "ms-ssim"): # we have only mse model
+    if metric not in ("mse"):  # ("mse", "ms-ssim"): # we have only mse model
         raise ValueError(f'Invalid metric "{metric}"')
 
     if quality < 1 or quality > 8:
@@ -138,9 +126,8 @@ def bmshj2018_hyperprior_vbr(
         "bmshj2018-hyperprior-vbr", metric, quality, pretrained, progress, **kwargs
     )
 
-def mbt2018_mean_vbr(
-    quality, metric="mse", pretrained=False, progress=True, **kwargs
-):
+
+def mbt2018_mean_vbr(quality, metric="mse", pretrained=False, progress=True, **kwargs):
     r"""Bla bla...
 
     Args:
@@ -149,7 +136,7 @@ def mbt2018_mean_vbr(
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    if metric not in ("mse"): # ("mse", "ms-ssim"): # we have only mse model
+    if metric not in ("mse"):  # ("mse", "ms-ssim"): # we have only mse model
         raise ValueError(f'Invalid metric "{metric}"')
 
     if quality < 1 or quality > 8:
@@ -159,9 +146,8 @@ def mbt2018_mean_vbr(
         "mbt2018-mean-vbr", metric, quality, pretrained, progress, **kwargs
     )
 
-def mbt2018_vbr(
-    quality, metric="mse", pretrained=False, progress=True, **kwargs
-):
+
+def mbt2018_vbr(quality, metric="mse", pretrained=False, progress=True, **kwargs):
     r"""Bla bla...
 
     Args:
@@ -170,12 +156,10 @@ def mbt2018_vbr(
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    if metric not in ("mse"): # ("mse", "ms-ssim"): # we have only mse model
+    if metric not in ("mse"):  # ("mse", "ms-ssim"): # we have only mse model
         raise ValueError(f'Invalid metric "{metric}"')
 
     if quality < 1 or quality > 8:
         raise ValueError(f'Invalid quality "{quality}", should be 1')
 
-    return _load_model(
-        "mbt2018-vbr", metric, quality, pretrained, progress, **kwargs
-    )
+    return _load_model("mbt2018-vbr", metric, quality, pretrained, progress, **kwargs)

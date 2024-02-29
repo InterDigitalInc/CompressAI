@@ -29,21 +29,23 @@
 
 import warnings
 
-from typing import Any, Callable, List, Optional, Tuple, Union
+from typing import Any, Callable, Optional, Tuple
 
 import numpy as np
-import scipy.stats
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 from torch import Tensor
 
-from compressai._CXX import pmf_to_quantized_cdf as _pmf_to_quantized_cdf
 from compressai.ops import LowerBound
 
-from .entropy_models import _EntropyCoder, default_entropy_coder
-from .entropy_models import pmf_to_quantized_cdf, _forward
+from .entropy_models import (
+    _EntropyCoder,
+    _forward,
+    default_entropy_coder,
+    pmf_to_quantized_cdf,
+)
 
 
 class EntropyModelVbr(nn.Module):
@@ -128,10 +130,13 @@ class EntropyModelVbr(nn.Module):
         assert mode == "symbols", mode
         outputs = outputs.int()
         return outputs
-    
-    def quantize_variable(
-        self, inputs: Tensor, mode: str, means: Optional[Tensor] = None, 
-        qs: Optional[Tensor] = None
+
+    def quantize_variable(  # noqa: C901
+        self,
+        inputs: Tensor,
+        mode: str,
+        means: Optional[Tensor] = None,
+        qs: Optional[Tensor] = None,
     ) -> Tensor:
         if mode not in ("noise", "ste", "dequantize", "symbols"):
             raise ValueError(f'Invalid quantization mode: "{mode}"')
@@ -151,12 +156,13 @@ class EntropyModelVbr(nn.Module):
         if means is not None:
             outputs -= means
 
-        # fatih: add ste mode
         if mode == "ste":
             if qs is None:
                 outputs_ste = torch.round(outputs) - outputs.detach() + outputs
             else:
-                outputs_ste = torch.round(outputs / qs) * qs - outputs.detach() + outputs
+                outputs_ste = (
+                    torch.round(outputs / qs) * qs - outputs.detach() + outputs
+                )
             if means is not None:
                 outputs_ste += means
             return outputs_ste
@@ -175,10 +181,9 @@ class EntropyModelVbr(nn.Module):
             outputs = outputs.int()
         else:
             outputs = torch.round(outputs / qs).int()
-            # Note: this outputs must be mulitplied by qs and mean must be added 
+            # Note: outputs must be mulitplied by qs and mean must be added
             # before it is fed to g_s() to reconstruct an image
         return outputs
-
 
     def _quantize(
         self, inputs: Tensor, mode: str, means: Optional[Tensor] = None
@@ -196,11 +201,13 @@ class EntropyModelVbr(nn.Module):
         else:
             outputs = inputs.type(dtype)
         return outputs
-    
+
     @staticmethod
     def dequantize_variable(
-        inputs: Tensor, means: Optional[Tensor] = None, dtype: torch.dtype = torch.float, 
-        qs: Optional[Tensor] = None
+        inputs: Tensor,
+        means: Optional[Tensor] = None,
+        dtype: torch.dtype = torch.float,
+        qs: Optional[Tensor] = None,
     ) -> Tensor:
         if means is not None:
             outputs = inputs.type_as(means)
@@ -210,7 +217,7 @@ class EntropyModelVbr(nn.Module):
                 outputs = outputs * qs + means
         else:
             if qs is None:
-                outputs = inputs.type(dtype)       # .float()
+                outputs = inputs.type(dtype)  # .float()
             else:
                 outputs = inputs.type(dtype) * qs  # .float() * qs
         return outputs
@@ -259,7 +266,7 @@ class EntropyModelVbr(nn.Module):
             inputs (torch.Tensor): input tensors
             indexes (torch.IntTensor): tensors CDF indexes
             means (torch.Tensor, optional): optional tensor means
-            qs (torch.Tensor, optional): optional quantization step size 
+            qs (torch.Tensor, optional): optional quantization step size
         """
         if qs is None:
             symbols = self.quantize(inputs, "symbols", means)
@@ -296,7 +303,7 @@ class EntropyModelVbr(nn.Module):
         indexes: torch.IntTensor,
         dtype: torch.dtype = torch.float,
         means: torch.Tensor = None,
-        qs = None
+        qs=None,
     ):
         """
         Decompress char strings to tensors.
@@ -306,7 +313,7 @@ class EntropyModelVbr(nn.Module):
             indexes (torch.IntTensor): tensors CDF indexes
             dtype (torch.dtype): type of dequantized output
             means (torch.Tensor, optional): optional tensor means
-            qs (torch.Tensor, optional): optional quantization step size 
+            qs (torch.Tensor, optional): optional quantization step size
         """
 
         if not isinstance(strings, (tuple, list)):
@@ -450,7 +457,7 @@ class EntropyBottleneckVbr(EntropyModelVbr):
         self._cdf_length = pmf_length + 2
         return True
 
-    def update_variable(self, force: bool = False, qs = 1.0) -> bool:
+    def update_variable(self, force: bool = False, qs=1.0) -> bool:
         # Check if we need to update the bottleneck parameters, the offsets are
         # only computed and stored when the conditonal model is update()'d.
         if self._offset.numel() > 0 and not force:
@@ -477,7 +484,9 @@ class EntropyBottleneckVbr(EntropyModelVbr):
 
         samples = samples[None, :] + pmf_start[:, None, None]
 
-        pmf, lower, upper = self._likelihood_variable(samples, stop_gradient=True, qs=qs)
+        pmf, lower, upper = self._likelihood_variable(
+            samples, stop_gradient=True, qs=qs
+        )
         pmf = pmf[:, 0, :]
         tail_mass = torch.sigmoid(lower[:, 0, :1]) + torch.sigmoid(-upper[:, 0, -1:])
 
@@ -521,7 +530,7 @@ class EntropyBottleneckVbr(EntropyModelVbr):
         upper = self._logits_cumulative(inputs + half, stop_gradient=stop_gradient)
         likelihood = torch.sigmoid(upper) - torch.sigmoid(lower)
         return likelihood, lower, upper
-    
+
     @torch.jit.unused
     def _likelihood_variable(
         self, inputs: Tensor, stop_gradient: bool = False, qs: Optional[Tensor] = None
@@ -539,8 +548,11 @@ class EntropyBottleneckVbr(EntropyModelVbr):
         return likelihood, lower, upper
 
     def forward(
-        self, x: Tensor, training: Optional[bool] = None, 
-        qs: Optional[Tensor] = None, ste: Optional[bool] = False
+        self,
+        x: Tensor,
+        training: Optional[bool] = None,
+        qs: Optional[Tensor] = None,
+        ste: Optional[bool] = False,
     ) -> Tuple[Tensor, Tensor]:
         if training is None:
             training = self.training
@@ -569,23 +581,24 @@ class EntropyBottleneckVbr(EntropyModelVbr):
                 values, "noise" if training else "dequantize", self._get_medians()
             )
         else:
-            if ste == False:
+            if ste is False:
                 outputs = self.quantize_variable(
-                    values, "noise" if training else "dequantize", self._get_medians(), qs
+                    values,
+                    "noise" if training else "dequantize",
+                    self._get_medians(),
+                    qs,
                 )
             else:
-                outputs = self.quantize_variable(
-                    values, "ste", self._get_medians(), qs
-                ) 
+                outputs = self.quantize_variable(values, "ste", self._get_medians(), qs)
 
         if not torch.jit.is_scripting():
             if qs is None:
                 likelihood, _, _ = self._likelihood(outputs)
             else:
-                if ste and training: # in this case, use also output with noise
-                    likelihood, _, _  = self._likelihood_variable(outputs, qs)
-                else: # noise case, i.e. output already obtained by adding noise or it is not training 
-                    likelihood, _, _  = self._likelihood_variable(outputs, qs)
+                if ste and training:  # in this case, use also output with noise
+                    likelihood, _, _ = self._likelihood_variable(outputs, qs)
+                else:  # noise case, i.e. output already obtained by adding noise or it is not training
+                    likelihood, _, _ = self._likelihood_variable(outputs, qs)
             if self.use_likelihood_bound:
                 likelihood = self.likelihood_lower_bound(likelihood)
         else:

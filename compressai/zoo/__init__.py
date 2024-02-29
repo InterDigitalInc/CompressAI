@@ -36,11 +36,7 @@ from .image import (
     mbt2018,
     mbt2018_mean,
 )
-from .image_vbr import (
-    bmshj2018_hyperprior_vbr,
-    mbt2018_mean_vbr,
-    mbt2018_vbr
-)
+from .image_vbr import bmshj2018_hyperprior_vbr, mbt2018_mean_vbr, mbt2018_vbr
 from .pretrained import load_pretrained as load_state_dict
 from .video import ssf2020
 
