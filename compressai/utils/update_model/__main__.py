@@ -68,7 +68,7 @@ def sha256_file(filepath: Path, len_hash_prefix: int = 8) -> str:
     return digest[:len_hash_prefix]
 
 
-def load_checkpoint(filepath: Path) -> Dict[str, torch.Tensor]:
+def load_checkpoint(filepath: Path, arch: str) -> Dict[str, torch.Tensor]:
     checkpoint = torch.load(filepath, map_location="cpu")
 
     if "network" in checkpoint:
@@ -77,8 +77,10 @@ def load_checkpoint(filepath: Path) -> Dict[str, torch.Tensor]:
         state_dict = checkpoint["state_dict"]
     else:
         state_dict = checkpoint
-
-    state_dict = load_state_dict(state_dict)
+    if arch in ["bmshj2018-hyperprior-vbr", "mbt2018-mean-vbr"]:
+        state_dict = load_state_dict(state_dict, vr_entbttlnck=True)
+    else:
+        state_dict = load_state_dict(state_dict)
     return state_dict
 
 
@@ -128,7 +130,7 @@ def main(argv):
     if not filepath.is_file():
         raise RuntimeError(f'"{filepath}" is not a valid file.')
 
-    state_dict = load_checkpoint(filepath)
+    state_dict = load_checkpoint(filepath, args.architecture)
 
     model_cls_or_entrypoint = models[args.architecture]
     if not isinstance(model_cls_or_entrypoint, type):
