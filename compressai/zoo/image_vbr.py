@@ -52,66 +52,59 @@ model_architectures = {
 root_url = "https://compressai.s3.amazonaws.com/models/v1"
 model_urls = {
     "bmshj2018-hyperprior-vbr": {
-        "mse": {1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"},
-        "ms-ssim": {1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"},
+        "mse": f"{root_url}/bmshj2018-hyperprior-vbr-mse-.pth.tar",
+        # "ms-ssim": f"{root_url}/bmshj2018-hyperprior-vbr-ssim-HASH.pth.tar",
     },
     "mbt2018-mean-vbr": {
-        "mse": {1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"},
-        "ms-ssim": {1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"},
+        "mse": f"{root_url}/bmshj2018-hyperprior-vbr-mse-.pth.tar",
+        # "ms-ssim": f"{root_url}/bmshj2018-hyperprior-vbr-mse-HASH.pth.tar",
     },
     "mbt2018-vbr": {
-        "mse": {1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"},
-        "ms-ssim": {1: f"{root_url}/bmshj2018-hyperprior-blabla.pth.tar"},
+        "mse": f"{root_url}/bmshj2018-hyperprior-vbr-mse-.pth.tar",
+        # "ms-ssim": f"{root_url}/bmshj2018-hyperprior-vbr-mse-HASH.pth.tar",
     },
 }
 
 cfgs = {
-    "bmshj2018-hyperprior-vbr": {
-        1: (192, 320),
-    },
-    "mbt2018-mean-vbr": {
-        1: (192, 320),
-    },
-    "mbt2018-vbr": {
-        1: (192, 320),
-    },
+    "bmshj2018-hyperprior-vbr": (192, 320),
+    "mbt2018-mean-vbr": (192, 320),
+    "mbt2018-vbr": (192, 320)
 }
 
 
 def _load_model(
-    architecture, metric, quality, pretrained=False, progress=True, **kwargs
+    architecture, metric, pretrained=False, progress=True, **kwargs
 ):
     if architecture not in model_architectures:
         raise ValueError(f'Invalid architecture name "{architecture}"')
 
-    if quality not in cfgs[architecture]:
-        raise ValueError(f'Invalid quality value "{quality}"')
 
     if pretrained:
         if (
             architecture not in model_urls
             or metric not in model_urls[architecture]
-            or quality not in model_urls[architecture][metric]
         ):
             raise RuntimeError("Pre-trained model not yet available")
 
-        url = model_urls[architecture][metric][quality]
+        url = model_urls[architecture][metric]
         state_dict = load_state_dict_from_url(url, progress=progress)
         state_dict = load_pretrained(state_dict)
         model = model_architectures[architecture].from_state_dict(state_dict)
         return model
 
-    model = model_architectures[architecture](*cfgs[architecture][quality], **kwargs)
+    model = model_architectures[architecture](*cfgs[architecture], **kwargs)
     return model
 
 
 def bmshj2018_hyperprior_vbr(
-    quality, metric="mse", pretrained=False, progress=True, **kwargs
+    metric="mse", pretrained=False, progress=True, **kwargs
 ):
-    r"""Bla bla...
+    r"""Variable bitrate (vbr) version of bmshj2018-hyperprior (see compressai/models/google.py) with variable bitrate components detailed in:
+    Fatih Kamisli, Fabien Racape and Hyomin Choi
+    `"Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets`"
+    <https://arxiv.org/abs/2402.18930>`_, Data Compression Conference (DCC), 2024.
 
     Args:
-        quality (int): Quality levels (1: lowest, highest: 8)
         metric (str): Optimized metric, choose from ('mse', no 'ms-ssim' yet)
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
@@ -119,19 +112,19 @@ def bmshj2018_hyperprior_vbr(
     if metric not in ("mse"):  # ("mse", "ms-ssim"): # we have only mse model
         raise ValueError(f'Invalid metric "{metric}"')
 
-    if quality < 1 or quality > 8:
-        raise ValueError(f'Invalid quality "{quality}", should be 1')
 
     return _load_model(
-        "bmshj2018-hyperprior-vbr", metric, quality, pretrained, progress, **kwargs
+        "bmshj2018-hyperprior-vbr", pretrained, progress, **kwargs
     )
 
 
-def mbt2018_mean_vbr(quality, metric="mse", pretrained=False, progress=True, **kwargs):
-    r"""Bla bla...
+def mbt2018_mean_vbr(metric="mse", pretrained=False, progress=True, **kwargs):
+    r"""Variable bitrate (vbr) version of bmshj2018 (see compressai/models/google.py) with variable bitrate components detailed in:
+    Fatih Kamisli, Fabien Racape and Hyomin Choi
+    `"Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets`"
+    <https://arxiv.org/abs/2402.18930>`_, Data Compression Conference (DCC), 2024.
 
     Args:
-        quality (int): Quality levels (1: lowest, highest: 8)
         metric (str): Optimized metric, choose from ('mse', no 'ms-ssim' yet)
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
@@ -139,19 +132,18 @@ def mbt2018_mean_vbr(quality, metric="mse", pretrained=False, progress=True, **k
     if metric not in ("mse"):  # ("mse", "ms-ssim"): # we have only mse model
         raise ValueError(f'Invalid metric "{metric}"')
 
-    if quality < 1 or quality > 8:
-        raise ValueError(f'Invalid quality "{quality}", should be 1')
-
     return _load_model(
-        "mbt2018-mean-vbr", metric, quality, pretrained, progress, **kwargs
+        "mbt2018-mean-vbr", metric, pretrained, progress, **kwargs
     )
 
 
-def mbt2018_vbr(quality, metric="mse", pretrained=False, progress=True, **kwargs):
-    r"""Bla bla...
+def mbt2018_vbr( metric="mse", pretrained=False, progress=True, **kwargs):
+    r"""Variable bitrate (vbr) version of mbt2018 (see compressai/models/google.py) with variable bitrate components detailed in:
+    Fatih Kamisli, Fabien Racape and Hyomin Choi
+    `"Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets`"
+    <https://arxiv.org/abs/2402.18930>`_, Data Compression Conference (DCC), 2024.
 
     Args:
-        quality (int): Quality levels (1: lowest, highest: 8)
         metric (str): Optimized metric, choose from ('mse', no 'ms-ssim' yet)
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
@@ -159,7 +151,4 @@ def mbt2018_vbr(quality, metric="mse", pretrained=False, progress=True, **kwargs
     if metric not in ("mse"):  # ("mse", "ms-ssim"): # we have only mse model
         raise ValueError(f'Invalid metric "{metric}"')
 
-    if quality < 1 or quality > 8:
-        raise ValueError(f'Invalid quality "{quality}", should be 1')
-
-    return _load_model("mbt2018-vbr", metric, quality, pretrained, progress, **kwargs)
+    return _load_model("mbt2018-vbr", metric, pretrained, progress, **kwargs)

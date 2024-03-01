@@ -173,6 +173,17 @@ models and datasets, and cite this project as:
 }
 ```
 
+For any work related to the variable bitrate models, please cite
+```
+@article{kamisli2024dcc_vbrlic,
+	title={Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets},
+	author={Kamisli, Fatih and Racap{\'e}, Fabien and Choi, Hyomin},
+	year={2024},
+	booktitle={2024 Data Compression Conference (DCC)},
+	eprint={2402.18930},
+}
+```
+
 ## Related links
  * Tensorflow compression library by _Ballé et al._: https://github.com/tensorflow/compression
  * Range Asymmetric Numeral System code from _Fabian 'ryg' Giesen_: https://github.com/rygorous/ryg_rans
