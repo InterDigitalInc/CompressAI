@@ -68,22 +68,16 @@ model_urls = {
 cfgs = {
     "bmshj2018-hyperprior-vbr": (192, 320),
     "mbt2018-mean-vbr": (192, 320),
-    "mbt2018-vbr": (192, 320)
+    "mbt2018-vbr": (192, 320),
 }
 
 
-def _load_model(
-    architecture, metric, pretrained=False, progress=True, **kwargs
-):
+def _load_model(architecture, metric, pretrained=False, progress=True, **kwargs):
     if architecture not in model_architectures:
         raise ValueError(f'Invalid architecture name "{architecture}"')
 
-
     if pretrained:
-        if (
-            architecture not in model_urls
-            or metric not in model_urls[architecture]
-        ):
+        if architecture not in model_urls or metric not in model_urls[architecture]:
             raise RuntimeError("Pre-trained model not yet available")
 
         url = model_urls[architecture][metric]
@@ -96,9 +90,7 @@ def _load_model(
     return model
 
 
-def bmshj2018_hyperprior_vbr(
-    metric="mse", pretrained=False, progress=True, **kwargs
-):
+def bmshj2018_hyperprior_vbr(metric="mse", pretrained=False, progress=True, **kwargs):
     r"""Variable bitrate (vbr) version of bmshj2018-hyperprior (see compressai/models/google.py) with variable bitrate components detailed in:
     Fatih Kamisli, Fabien Racape and Hyomin Choi
     `"Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets`"
@@ -112,10 +104,7 @@ def bmshj2018_hyperprior_vbr(
     if metric not in ("mse"):  # ("mse", "ms-ssim"): # we have only mse model
         raise ValueError(f'Invalid metric "{metric}"')
 
-
-    return _load_model(
-        "bmshj2018-hyperprior-vbr", pretrained, progress, **kwargs
-    )
+    return _load_model("bmshj2018-hyperprior-vbr", pretrained, progress, **kwargs)
 
 
 def mbt2018_mean_vbr(metric="mse", pretrained=False, progress=True, **kwargs):
@@ -132,12 +121,10 @@ def mbt2018_mean_vbr(metric="mse", pretrained=False, progress=True, **kwargs):
     if metric not in ("mse"):  # ("mse", "ms-ssim"): # we have only mse model
         raise ValueError(f'Invalid metric "{metric}"')
 
-    return _load_model(
-        "mbt2018-mean-vbr", metric, pretrained, progress, **kwargs
-    )
+    return _load_model("mbt2018-mean-vbr", metric, pretrained, progress, **kwargs)
 
 
-def mbt2018_vbr( metric="mse", pretrained=False, progress=True, **kwargs):
+def mbt2018_vbr(metric="mse", pretrained=False, progress=True, **kwargs):
     r"""Variable bitrate (vbr) version of mbt2018 (see compressai/models/google.py) with variable bitrate components detailed in:
     Fatih Kamisli, Fabien Racape and Hyomin Choi
     `"Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets`"

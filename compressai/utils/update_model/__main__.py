@@ -50,7 +50,8 @@ from compressai.models.google import (
 )
 from compressai.models.video.google import ScaleSpaceFlow
 from compressai.zoo import load_state_dict
-from compressai.zoo.image import model_architectures as zoo_models
+from compressai.zoo.image import model_architectures as image_architectures
+from compressai.zoo.image_vbr import model_architectures as image_architectures_vbr
 
 
 def sha256_file(filepath: Path, len_hash_prefix: int = 8) -> str:
@@ -93,7 +94,8 @@ models = {
     "scale-hyperprior": ScaleHyperprior,
     "ssf2020": ScaleSpaceFlow,
 }
-models.update(zoo_models)
+models.update(image_architectures)
+models.update(image_architectures_vbr)
 
 
 def setup_args():

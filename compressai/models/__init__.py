@@ -29,7 +29,7 @@
 
 from .base import *
 from .google import *
-from .google_vbr import *
+from .vbr import *
 from .pointcloud import *
 from .sensetime import *
 from .waseda import *
