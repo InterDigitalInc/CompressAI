@@ -22,7 +22,11 @@ eps = 1e-9
 
 @register_model("bmshj2018-hyperprior-vbr")
 class ScaleHyperpriorVbr(ScaleHyperprior):
-    r"""Variable bitrate (vbr) version a la DCC24"""
+    r"""Variable bitrate (vbr) version of bmshj2018-hyperprior (see compressai/models/google.py) with variable bitrate components detailed in:
+    Fatih Kamisli, Fabien Racape and Hyomin Choi
+    `"Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets`"
+    <https://arxiv.org/abs/2402.18930>`_, Data Compression Conference (DCC), 2024.
+    """
 
     def __init__(self, N, M, vr_entbttlnck=False, **kwargs):
         super().__init__(N=N, M=M, **kwargs)
@@ -299,7 +303,11 @@ class ScaleHyperpriorVbr(ScaleHyperprior):
 @register_model("mbt2018-mean-vbr")
 # class MeanScaleHyperpriorVbr(ScaleHyperpriorVbr):
 class MeanScaleHyperpriorVbr(ScaleHyperpriorVbr, MeanScaleHyperprior):
-    r"""Variable bitrate (vbr) version a la DCC24"""
+    r"""Variable bitrate (vbr) version of mbt2018-mean (see compressai/models/google.py) with variable bitrate components detailed in:
+    Fatih Kamisli, Fabien Racape and Hyomin Choi
+    `"Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets`"
+    <https://arxiv.org/abs/2402.18930>`_, Data Compression Conference (DCC), 2024.
+    """
 
     def __init__(self, N=192, M=320, vr_entbttlnck=False, **kwargs):
         super().__init__(N, M, vr_entbttlnck=vr_entbttlnck, **kwargs)
@@ -498,7 +506,11 @@ class MeanScaleHyperpriorVbr(ScaleHyperpriorVbr, MeanScaleHyperprior):
 class JointAutoregressiveHierarchicalPriorsVbr(
     ScaleHyperpriorVbr, JointAutoregressiveHierarchicalPriors
 ):
-    r"""Variable bitrate (vbr) version a la DCC24"""
+    r"""Variable bitrate (vbr) version of mbt2018 (see compressai/models/google.py) with variable bitrate components detailed in:
+    Fatih Kamisli, Fabien Racape and Hyomin Choi
+    `"Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets`"
+    <https://arxiv.org/abs/2402.18930>`_, Data Compression Conference (DCC), 2024.
+    """
 
     def __init__(self, N=192, M=320, **kwargs):
         super().__init__(N, M, vr_entbttlnck=False, **kwargs)
