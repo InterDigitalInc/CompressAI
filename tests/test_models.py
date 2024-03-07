@@ -43,12 +43,12 @@ from compressai.models.google import (
     ScaleHyperprior,
     get_scale_table,
 )
-from compressai.models.vbr import ScaleHyperpriorVbr
 from compressai.models.utils import (
     _update_registered_buffer,
     find_named_module,
     update_registered_buffers,
 )
+from compressai.models.vbr import ScaleHyperpriorVbr
 from compressai.models.video.google import ScaleSpaceFlow
 
 
