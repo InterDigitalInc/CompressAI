@@ -43,6 +43,7 @@ from compressai.models.google import (
     ScaleHyperprior,
     get_scale_table,
 )
+from compressai.models.vbr import ScaleHyperpriorVbr
 from compressai.models.utils import (
     _update_registered_buffer,
     find_named_module,
@@ -128,6 +129,37 @@ class TestModels:
             filepath = tmpdir.join("model.pth.rar").strpath
             torch.save(model.state_dict(), filepath)
             loaded = ScaleHyperprior.from_state_dict(torch.load(filepath))
+            assert model.N == loaded.N and model.M == loaded.M
+
+    def test_scale_hyperprior_vbr(self, tmpdir):
+        model = ScaleHyperpriorVbr(128, 192, vr_entbttlnck=True)
+        x = torch.rand(1, 3, 64, 64)
+        out = model(x)
+
+        assert "x_hat" in out
+        assert "likelihoods" in out
+        assert "y" in out["likelihoods"]
+        assert "z" in out["likelihoods"]
+
+        assert out["x_hat"].shape == x.shape
+
+        y_likelihoods_shape = out["likelihoods"]["y"].shape
+        assert y_likelihoods_shape[0] == x.shape[0]
+        assert y_likelihoods_shape[1] == 192
+        assert y_likelihoods_shape[2] == x.shape[2] / 2**4
+        assert y_likelihoods_shape[3] == x.shape[3] / 2**4
+
+        z_likelihoods_shape = out["likelihoods"]["z"].shape
+        assert z_likelihoods_shape[0] == x.shape[0]
+        assert z_likelihoods_shape[1] == 128
+        assert z_likelihoods_shape[2] == x.shape[2] / 2**6
+        assert z_likelihoods_shape[3] == x.shape[3] / 2**6
+
+        for sz in [(128, 128), (128, 192), (192, 128)]:
+            model = ScaleHyperpriorVbr(*sz)
+            filepath = tmpdir.join("model.pth.rar").strpath
+            torch.save(model.state_dict(), filepath)
+            loaded = ScaleHyperpriorVbr.from_state_dict(torch.load(filepath))
             assert model.N == loaded.N and model.M == loaded.M
 
     def test_mean_scale_hyperprior(self):
