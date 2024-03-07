@@ -12,3 +12,8 @@ EntropyBottleneck
 GaussianConditional
 -------------------
 .. autoclass:: GaussianConditional
+
+
+EntropyBottleneckVbr
+--------------------
+.. autoclass:: EntropyBottleneckVbr

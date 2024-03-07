@@ -60,6 +60,21 @@ Elic2022Chandelier
 .. autoclass:: Elic2022Chandelier
 
 
+ScaleHyperpriorVbr
+------------------
+.. autoclass:: ScaleHyperpriorVbr
+
+
+MeanScaleHyperpriorVbr
+----------------------
+.. autoclass:: MeanScaleHyperpriorVbr
+
+
+JointAutoregressiveHierarchicalPriorsVbr
+----------------------------------------
+.. autoclass:: JointAutoregressiveHierarchicalPriorsVbr
+
+
 .. currentmodule:: compressai.models.video
 
 ScaleSpaceFlow

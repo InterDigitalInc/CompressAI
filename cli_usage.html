@@ -440,7 +440,7 @@ options:
 CDFs related buffers required for entropy coding.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>usage: python -m compressai.utils.update_model [-h] [-n NAME] [-d DIR]
                                                [--no-update]
-                                               [-a {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018_factorized_relu,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}]
+                                               [-a {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018_factorized_relu,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn,bmshj2018-hyperprior-vbr,mbt2018-mean-vbr,mbt2018-vbr}]
                                                filepath
 
 Export a trained model to a new checkpoint with updated CDFs and a hash prefix
@@ -454,7 +454,7 @@ options:
   -n NAME, --name NAME  Exported model name.
   -d DIR, --dir DIR     Exported model directory.
   --no-update           Do not update the model CDFs parameters.
-  -a {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018_factorized_relu,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}, --architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018_factorized_relu,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn}
+  -a {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018_factorized_relu,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn,bmshj2018-hyperprior-vbr,mbt2018-mean-vbr,mbt2018-vbr}, --architecture {factorized-prior,jarhp,mean-scale-hyperprior,scale-hyperprior,ssf2020,bmshj2018-factorized,bmshj2018_factorized_relu,bmshj2018-hyperprior,mbt2018-mean,mbt2018,cheng2020-anchor,cheng2020-attn,bmshj2018-hyperprior-vbr,mbt2018-mean-vbr,mbt2018-vbr}
                         Set model architecture (default: scale-hyperprior).
 </pre></div>
 </div>

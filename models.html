@@ -381,6 +381,18 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Elic2022Chandelier"><code class="docutils literal notranslate"><span class="pre">Elic2022Chandelier</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalehyperpriorvbr">ScaleHyperpriorVbr</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.ScaleHyperpriorVbr"><code class="docutils literal notranslate"><span class="pre">ScaleHyperpriorVbr</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#meanscalehyperpriorvbr">MeanScaleHyperpriorVbr</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.MeanScaleHyperpriorVbr"><code class="docutils literal notranslate"><span class="pre">MeanScaleHyperpriorVbr</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#jointautoregressivehierarchicalpriorsvbr">JointAutoregressiveHierarchicalPriorsVbr</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.JointAutoregressiveHierarchicalPriorsVbr"><code class="docutils literal notranslate"><span class="pre">JointAutoregressiveHierarchicalPriorsVbr</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalespaceflow">ScaleSpaceFlow</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.video.ScaleSpaceFlow"><code class="docutils literal notranslate"><span class="pre">ScaleSpaceFlow</span></code></a></li>
 </ul>
@@ -840,6 +852,42 @@ Masaru Takeuchi, and Jiro Katto, CVPR 2020.</p>
 </dd></dl>
 
 </section>
+<section id="scalehyperpriorvbr">
+<h2>ScaleHyperpriorVbr<a class="headerlink" href="#scalehyperpriorvbr" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.models.ScaleHyperpriorVbr">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.models.</span></span><span class="sig-name descname"><span class="pre">ScaleHyperpriorVbr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vr_entbttlnck</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/vbr.html#ScaleHyperpriorVbr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.ScaleHyperpriorVbr" title="Link to this definition">#</a></dt>
+<dd><p>Variable bitrate (vbr) version of bmshj2018-hyperprior (see compressai/models/google.py) with variable bitrate components detailed in:
+Fatih Kamisli, Fabien Racape and Hyomin Choi
+<cite>“Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets</cite>”
+&lt;<a class="reference external" href="https://arxiv.org/abs/2402.18930">https://arxiv.org/abs/2402.18930</a>&gt;`_, Data Compression Conference (DCC), 2024.</p>
+</dd></dl>
+
+</section>
+<section id="meanscalehyperpriorvbr">
+<h2>MeanScaleHyperpriorVbr<a class="headerlink" href="#meanscalehyperpriorvbr" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.models.MeanScaleHyperpriorVbr">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.models.</span></span><span class="sig-name descname"><span class="pre">MeanScaleHyperpriorVbr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">192</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">320</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vr_entbttlnck</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/vbr.html#MeanScaleHyperpriorVbr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.MeanScaleHyperpriorVbr" title="Link to this definition">#</a></dt>
+<dd><p>Variable bitrate (vbr) version of mbt2018-mean (see compressai/models/google.py) with variable bitrate components detailed in:
+Fatih Kamisli, Fabien Racape and Hyomin Choi
+<cite>“Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets</cite>”
+&lt;<a class="reference external" href="https://arxiv.org/abs/2402.18930">https://arxiv.org/abs/2402.18930</a>&gt;`_, Data Compression Conference (DCC), 2024.</p>
+</dd></dl>
+
+</section>
+<section id="jointautoregressivehierarchicalpriorsvbr">
+<h2>JointAutoregressiveHierarchicalPriorsVbr<a class="headerlink" href="#jointautoregressivehierarchicalpriorsvbr" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai.models.JointAutoregressiveHierarchicalPriorsVbr">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.models.</span></span><span class="sig-name descname"><span class="pre">JointAutoregressiveHierarchicalPriorsVbr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">192</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">320</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/models/vbr.html#JointAutoregressiveHierarchicalPriorsVbr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.models.JointAutoregressiveHierarchicalPriorsVbr" title="Link to this definition">#</a></dt>
+<dd><p>Variable bitrate (vbr) version of mbt2018 (see compressai/models/google.py) with variable bitrate components detailed in:
+Fatih Kamisli, Fabien Racape and Hyomin Choi
+<cite>“Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets</cite>”
+&lt;<a class="reference external" href="https://arxiv.org/abs/2402.18930">https://arxiv.org/abs/2402.18930</a>&gt;`_, Data Compression Conference (DCC), 2024.</p>
+</dd></dl>
+
+</section>
 <section id="scalespaceflow">
 <h2>ScaleSpaceFlow<a class="headerlink" href="#scalespaceflow" title="Link to this heading">#</a></h2>
 <dl class="py class">
@@ -1034,6 +1082,18 @@ by Mateen Ulhaq and Ivan V. Bajić, PCS 2024.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#elic2022chandelier">Elic2022Chandelier</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.Elic2022Chandelier"><code class="docutils literal notranslate"><span class="pre">Elic2022Chandelier</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalehyperpriorvbr">ScaleHyperpriorVbr</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.ScaleHyperpriorVbr"><code class="docutils literal notranslate"><span class="pre">ScaleHyperpriorVbr</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#meanscalehyperpriorvbr">MeanScaleHyperpriorVbr</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.MeanScaleHyperpriorVbr"><code class="docutils literal notranslate"><span class="pre">MeanScaleHyperpriorVbr</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#jointautoregressivehierarchicalpriorsvbr">JointAutoregressiveHierarchicalPriorsVbr</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.models.JointAutoregressiveHierarchicalPriorsVbr"><code class="docutils literal notranslate"><span class="pre">JointAutoregressiveHierarchicalPriorsVbr</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalespaceflow">ScaleSpaceFlow</a><ul class="nav section-nav flex-column">
