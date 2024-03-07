@@ -70,6 +70,8 @@ IMG_EXTENSIONS = (
     ".webp",
 )
 
+architectures.update(architectures_vbr)
+
 
 def collect_images(rootpath: str) -> List[str]:
     image_files = []
@@ -191,21 +193,16 @@ def load_checkpoint(arch: str, no_update: bool, checkpoint_path: str) -> nn.Modu
         if key in checkpoint:
             state_dict = checkpoint[key]
 
-    if not arch.endswith("-vbr"):
-        model_cls = architectures[arch]
+    model_cls = architectures[arch]
+    if arch in ["bmshj2018-hyperprior-vbr", "mbt2018-mean-vbr"]:
+        net = model_cls.from_state_dict(state_dict, vr_entbttlnck=True)
+        if not no_update:
+            net.update(force=True, scale=net.Gain[-1])
+    else:
         net = model_cls.from_state_dict(state_dict)
         if not no_update:
             net.update(force=True)
-    else:
-        model_cls = architectures_vbr[arch]
-        if arch in ["bmshj2018-hyperprior-vbr", "mbt2018-mean-vbr"]:
-            net = model_cls.from_state_dict(state_dict, vr_entbttlnck=True)
-            if not no_update:
-                net.update(force=True, scale=net.Gain[-1])
-        else:
-            net = model_cls.from_state_dict(state_dict)
-            if not no_update:
-                net.update(force=True)
+
     return net.eval()
 
 
@@ -405,6 +402,8 @@ def main(argv):  # noqa: C901
 
     compressai.set_entropy_coder(args.entropy_coder)
 
+    is_vbr_model = args.architecture.endswith("-vbr")
+
     # create output directory
     if args.output_directory:
         Path(args.output_directory).mkdir(parents=True, exist_ok=True)
@@ -413,23 +412,28 @@ def main(argv):  # noqa: C901
         args.qualities = [int(q) for q in args.qualities.split(",") if q]
         runs = sorted(args.qualities)
         opts = (args.architecture, args.metric)
+        if is_vbr_model:
+            opts += (0,)
         load_func = load_pretrained
         log_fmt = "\rEvaluating {0} | {run:d} "
     else:
         runs = args.checkpoint_paths
         opts = (args.architecture, args.no_update)
+        if is_vbr_model:
+            opts += (args.checkpoint_paths[0],)
         load_func = load_checkpoint
         log_fmt = "\rEvaluating {run:s} "
 
-    is_vbr_model = args.architecture.endswith("-vbr")
-
     if is_vbr_model:
-        assert len(args.checkpoint_paths) <= 1, "Use only one checkpoint for vbr model."
+        if args.source == "checkpoint":
+            assert (
+                len(args.checkpoint_paths) <= 1
+            ), "Use only one checkpoint for vbr model."
         scales = [1.0 / float(q) for q in args.vbr_quantstepsizes.split(",") if q]
         runs = sorted(scales)
         runs = torch.tensor(runs)
         log_fmt = "\rEvaluating quant step {run:5.2f} "
-        model = load_func(*opts, args.checkpoint_paths[0])
+        model = load_func(*opts)
         # set some arch specific params for vbr
         model.no_quantoffset = False
         if args.architecture in ["mbt2018-vbr"]:

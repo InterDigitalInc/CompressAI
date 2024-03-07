@@ -77,10 +77,10 @@ def load_checkpoint(filepath: Path, arch: str) -> Dict[str, torch.Tensor]:
         state_dict = checkpoint["state_dict"]
     else:
         state_dict = checkpoint
-    if arch in ["bmshj2018-hyperprior-vbr", "mbt2018-mean-vbr"]:
-        state_dict = load_state_dict(state_dict, vr_entbttlnck=True)
-    else:
-        state_dict = load_state_dict(state_dict)
+    # if arch in ["bmshj2018-hyperprior-vbr", "mbt2018-mean-vbr"]:
+    #     state_dict = load_state_dict(state_dict, vr_entbttlnck=True)
+    # else:
+    state_dict = load_state_dict(state_dict)
     return state_dict
 
 
@@ -137,7 +137,10 @@ def main(argv):
         model_cls = model_cls_or_entrypoint()
     else:
         model_cls = model_cls_or_entrypoint
-    net = model_cls.from_state_dict(state_dict)
+    if args.architecture in ["bmshj2018-hyperprior-vbr", "mbt2018-mean-vbr"]:
+        net = model_cls.from_state_dict(state_dict, vr_entbttlnck=True)
+    else:
+        net = model_cls.from_state_dict(state_dict)
 
     if not args.no_update:
         net.update(force=True)

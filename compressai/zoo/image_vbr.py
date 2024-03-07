@@ -52,16 +52,16 @@ model_architectures = {
 root_url = "https://compressai.s3.amazonaws.com/models/v1"
 model_urls = {
     "bmshj2018-hyperprior-vbr": {
-        "mse": f"{root_url}/bmshj2018-hyperprior-vbr-mse-.pth.tar",
-        # "ms-ssim": f"{root_url}/bmshj2018-hyperprior-vbr-ssim-HASH.pth.tar",
+        "mse": f"{root_url}/bmshj2018-hyperprior-mse-vbr-cddd26be.pth.tar",
+        # "ms-ssim": f"{root_url}/bmshj2018-hyperprior-ms-ssim-vbr-HASH.pth.tar",
     },
     "mbt2018-mean-vbr": {
-        "mse": f"{root_url}/bmshj2018-hyperprior-vbr-mse-.pth.tar",
-        # "ms-ssim": f"{root_url}/bmshj2018-hyperprior-vbr-mse-HASH.pth.tar",
+        "mse": f"{root_url}/mbt2018-mean-mse-vbr-45d095e9.pth.tar",
+        # "ms-ssim": f"{root_url}/mbt2018-mean-ms-ssim-vbr-HASH.pth.tar",
     },
     "mbt2018-vbr": {
-        "mse": f"{root_url}/bmshj2018-hyperprior-vbr-mse-.pth.tar",
-        # "ms-ssim": f"{root_url}/bmshj2018-hyperprior-vbr-mse-HASH.pth.tar",
+        "mse": f"{root_url}/mbt2018-mse-vbr-53f56fca.pth.tar",
+        # "ms-ssim": f"{root_url}/mbt2018-ms-ssim-vbr-HASH.pth.tar",
     },
 }
 
@@ -90,7 +90,9 @@ def _load_model(architecture, metric, pretrained=False, progress=True, **kwargs)
     return model
 
 
-def bmshj2018_hyperprior_vbr(metric="mse", pretrained=False, progress=True, **kwargs):
+def bmshj2018_hyperprior_vbr(
+    quality=0, metric="mse", pretrained=False, progress=True, **kwargs
+):
     r"""Variable bitrate (vbr) version of bmshj2018-hyperprior (see compressai/models/google.py) with variable bitrate components detailed in:
     Fatih Kamisli, Fabien Racape and Hyomin Choi
     `"Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets`"
@@ -101,13 +103,18 @@ def bmshj2018_hyperprior_vbr(metric="mse", pretrained=False, progress=True, **kw
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
+    # keep quality here for now for consistency with image models.
+    # could be used to indicate which lambda or quality was used to train the base model.
+    del quality
     if metric not in ("mse"):  # ("mse", "ms-ssim"): # we have only mse model
         raise ValueError(f'Invalid metric "{metric}"')
 
     return _load_model("bmshj2018-hyperprior-vbr", pretrained, progress, **kwargs)
 
 
-def mbt2018_mean_vbr(metric="mse", pretrained=False, progress=True, **kwargs):
+def mbt2018_mean_vbr(
+    quality=0, metric="mse", pretrained=False, progress=True, **kwargs
+):
     r"""Variable bitrate (vbr) version of bmshj2018 (see compressai/models/google.py) with variable bitrate components detailed in:
     Fatih Kamisli, Fabien Racape and Hyomin Choi
     `"Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets`"
@@ -118,13 +125,16 @@ def mbt2018_mean_vbr(metric="mse", pretrained=False, progress=True, **kwargs):
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
+    # keep quality here for now for consistency with image models.
+    # could be used to indicate which lambda or quality was used to train the base model.
+    del quality
     if metric not in ("mse"):  # ("mse", "ms-ssim"): # we have only mse model
         raise ValueError(f'Invalid metric "{metric}"')
 
     return _load_model("mbt2018-mean-vbr", metric, pretrained, progress, **kwargs)
 
 
-def mbt2018_vbr(metric="mse", pretrained=False, progress=True, **kwargs):
+def mbt2018_vbr(quality=0, metric="mse", pretrained=False, progress=True, **kwargs):
     r"""Variable bitrate (vbr) version of mbt2018 (see compressai/models/google.py) with variable bitrate components detailed in:
     Fatih Kamisli, Fabien Racape and Hyomin Choi
     `"Variable-Rate Learned Image Compression with Multi-Objective Optimization and Quantization-Reconstruction Offsets`"
@@ -135,6 +145,9 @@ def mbt2018_vbr(metric="mse", pretrained=False, progress=True, **kwargs):
         pretrained (bool): If True, returns a pre-trained model
         progress (bool): If True, displays a progress bar of the download to stderr
     """
+    # keep quality here for now for consistency with image models.
+    # could be used to indicate which lambda or quality was used to train the base model.
+    del quality
     if metric not in ("mse"):  # ("mse", "ms-ssim"): # we have only mse model
         raise ValueError(f'Invalid metric "{metric}"')
 
