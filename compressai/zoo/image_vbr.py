@@ -83,7 +83,12 @@ def _load_model(architecture, metric, pretrained=False, progress=True, **kwargs)
         url = model_urls[architecture][metric]
         state_dict = load_state_dict_from_url(url, progress=progress)
         state_dict = load_pretrained(state_dict)
-        model = model_architectures[architecture].from_state_dict(state_dict)
+        vr_entbttlnck = False
+        if architecture in ["bmshj2018-hyperprior-vbr", "mbt2018-mean-vbr"]:
+            vr_entbttlnck = True
+        model = model_architectures[architecture].from_state_dict(
+            state_dict, vr_entbttlnck
+        )
         return model
 
     model = model_architectures[architecture](*cfgs[architecture], **kwargs)
@@ -109,7 +114,9 @@ def bmshj2018_hyperprior_vbr(
     if metric not in ("mse"):  # ("mse", "ms-ssim"): # we have only mse model
         raise ValueError(f'Invalid metric "{metric}"')
 
-    return _load_model("bmshj2018-hyperprior-vbr", pretrained, progress, **kwargs)
+    return _load_model(
+        "bmshj2018-hyperprior-vbr", metric, pretrained, progress, **kwargs
+    )
 
 
 def mbt2018_mean_vbr(
