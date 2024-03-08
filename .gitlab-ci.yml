@@ -12,6 +12,7 @@ stages:
   - doc
 
 wheel:
+  cache: []
   image: python:$PYTHON_VERSION-buster
   stage: build
   before_script:
@@ -29,6 +30,7 @@ wheel:
     - docker
 
 sdist:
+  cache: []
   image: python:3.10-buster
   stage: build
   before_script:
@@ -39,6 +41,7 @@ sdist:
     - docker
 
 flake8:
+  cache: []
   stage: static-analysis
   image: pytorch/pytorch:2.2.0-cuda11.8-cudnn8-devel
   before_script:
@@ -61,6 +64,7 @@ black:
     - docker
 
 isort:
+  cache: []
   stage: static-analysis
   image: python:3.10-buster
   before_script:

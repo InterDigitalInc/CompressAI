@@ -9,7 +9,7 @@ jobs:
   sdist:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     - name: Set up Python 3.8
       uses: actions/setup-python@v4
       with:
@@ -38,9 +38,9 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9, 3.10]
+        python-version: ['3.7', '3.8', '3.9', '3.10']
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
@@ -70,9 +70,9 @@ jobs:
     container: quay.io/pypa/manylinux2014_x86_64
     strategy:
       matrix:
-        python-version: [cp36-cp36m, cp37-cp37m, cp38-cp38, cp39-cp39]
+        python-version: ['cp37-cp37m', 'cp38-cp38', 'cp39-cp39', 'cp310-cp310']
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     - name: Install dependencies
       run: /opt/python/${{ matrix.python-version }}/bin/python -m pip install build twine
     - name: Build wheel
