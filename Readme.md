@@ -1,6 +1,5 @@
-![ID-CompressAI-logo](assets/ID-compressAI-logo-750x140.png)
-
-# CompressAI
+<!-- ![ID-CompressAI-logo](assets/ID-compressAI-logo-750x140.svg =750x140) -->
+<a href="url"><img src="docs/source/_static/logo.svg" align="center"></a>
 
 [![License](https://img.shields.io/github/license/InterDigitalInc/CompressAI?color=blue)](https://github.com/InterDigitalInc/CompressAI/blob/master/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/compressai?color=brightgreen)](https://pypi.org/project/compressai/)

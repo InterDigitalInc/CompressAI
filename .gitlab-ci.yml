@@ -53,6 +53,7 @@ flake8:
     - docker
 
 black:
+  cache: []
   stage: static-analysis
   image: python:3.10-buster
   before_script:
@@ -69,7 +70,6 @@ isort:
   image: python:3.10-buster
   before_script:
     - python --version
-    - pip install .
     - pip install isort
   script:
     - make check-isort
@@ -102,6 +102,7 @@ test:
     - docker
 
 doc:
+  cache: []
   stage: doc
   image: pytorch/pytorch:2.2.0-cuda11.8-cudnn8-devel
   before_script:
