@@ -29,7 +29,7 @@
 
 import warnings
 
-from typing import Any, Callable, List, Optional, Tuple, Union
+from typing import Any, Callable, List, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats
@@ -360,20 +360,24 @@ class EntropyBottleneck(EntropyModel):
         scale = self.init_scale ** (1 / (len(self.filters) + 1))
         channels = self.channels
 
+        self.matrices = nn.ParameterList()
+        self.biases = nn.ParameterList()
+        self.factors = nn.ParameterList()
+
         for i in range(len(self.filters) + 1):
             init = np.log(np.expm1(1 / scale / filters[i + 1]))
             matrix = torch.Tensor(channels, filters[i + 1], filters[i])
             matrix.data.fill_(init)
-            self.register_parameter(f"_matrix{i:d}", nn.Parameter(matrix))
+            self.matrices.append(nn.Parameter(matrix))
 
             bias = torch.Tensor(channels, filters[i + 1], 1)
             nn.init.uniform_(bias, -0.5, 0.5)
-            self.register_parameter(f"_bias{i:d}", nn.Parameter(bias))
+            self.biases.append(nn.Parameter(bias))
 
             if i < len(self.filters):
                 factor = torch.Tensor(channels, filters[i + 1], 1)
                 nn.init.zeros_(factor)
-                self.register_parameter(f"_factor{i:d}", nn.Parameter(factor))
+                self.factors.append(nn.Parameter(factor))
 
         self.quantiles = nn.Parameter(torch.Tensor(channels, 1, 3))
         init = torch.Tensor([-self.init_scale, 0, self.init_scale])
@@ -433,24 +437,23 @@ class EntropyBottleneck(EntropyModel):
         # TorchScript not yet working (nn.Mmodule indexing not supported)
         logits = inputs
         for i in range(len(self.filters) + 1):
-            matrix = getattr(self, f"_matrix{i:d}")
+            matrix = self.matrices[i]
             if stop_gradient:
                 matrix = matrix.detach()
             logits = torch.matmul(F.softplus(matrix), logits)
 
-            bias = getattr(self, f"_bias{i:d}")
+            bias = self.biases[i]
             if stop_gradient:
                 bias = bias.detach()
-            logits += bias
+            logits = logits + bias
 
             if i < len(self.filters):
-                factor = getattr(self, f"_factor{i:d}")
+                factor = self.factors[i]
                 if stop_gradient:
                     factor = factor.detach()
-                logits += torch.tanh(factor) * torch.tanh(logits)
+                logits = logits + torch.tanh(factor) * torch.tanh(logits)
         return logits
 
-    @torch.jit.unused
     def _likelihood(
         self, inputs: Tensor, stop_gradient: bool = False
     ) -> Tuple[Tensor, Tensor, Tensor]:
@@ -468,16 +471,19 @@ class EntropyBottleneck(EntropyModel):
 
         if not torch.jit.is_scripting():
             # x from B x C x ... to C x B x ...
-            perm = np.arange(len(x.shape))
-            perm[0], perm[1] = perm[1], perm[0]
-            # Compute inverse permutation
-            inv_perm = np.arange(len(x.shape))[np.argsort(perm)]
+            perm = torch.cat(
+                (
+                    torch.tensor([1, 0], dtype=torch.long, device=x.device),
+                    torch.arange(2, x.ndim, dtype=torch.long, device=x.device),
+                )
+            )
+            inv_perm = perm
         else:
             raise NotImplementedError()
             # TorchScript in 2D for static inference
             # Convert to (channels, ... , batch) format
             # perm = (1, 2, 3, 0)
-            # inv_perm = (3, 0, 1, 2)
+            # inv_perm = (3, 0, 1, 2):
 
         x = x.permute(*perm).contiguous()
         shape = x.size()

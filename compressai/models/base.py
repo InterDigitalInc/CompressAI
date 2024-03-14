@@ -39,7 +39,7 @@ from torch import Tensor
 
 from compressai.entropy_models import EntropyBottleneck, GaussianConditional
 from compressai.latent_codecs import LatentCodec
-from compressai.models.utils import update_registered_buffers
+from compressai.models.utils import update_registered_buffers, remap_old_keys
 
 __all__ = [
     "CompressionModel",
@@ -103,6 +103,7 @@ class CompressionModel(nn.Module):
                     ["_quantized_cdf", "_offset", "_cdf_length"],
                     state_dict,
                 )
+                state_dict = remap_old_keys(name, state_dict)
 
             if isinstance(module, GaussianConditional):
                 update_registered_buffers(
