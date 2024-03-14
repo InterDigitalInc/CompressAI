@@ -27,9 +27,13 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from collections import OrderedDict
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+KEY_MAP = {"_bias": "biases", "_matrix": "matrices", "_factor": "factors"}
 
 
 def find_named_module(module, query):
@@ -123,6 +127,24 @@ def update_registered_buffers(
             policy,
             dtype,
         )
+
+
+def remap_old_keys(module_name, state_dict):
+    def remap_subkey(s: str) -> str:
+        for k, v in KEY_MAP.items():
+            if s.startswith(k):
+                return ".".join((v, s.split(k)[1]))
+
+        return s
+
+    new_state_dict = OrderedDict()
+    for k, v in state_dict.items():
+        if k.startswith(module_name):
+            k = ".".join((module_name, remap_subkey(k.split(f"{module_name}.")[1])))
+
+        new_state_dict[k] = v
+
+    return new_state_dict
 
 
 def conv(in_channels, out_channels, kernel_size=5, stride=2):
