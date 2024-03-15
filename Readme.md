@@ -76,7 +76,7 @@ To encode/decode images with the provided pre-trained models, run the
 python3 examples/codec.py --help
 ```
 
-An examplary training script with a rate-distortion loss is provided in
+An exemplary training script with a rate-distortion loss is provided in
 `examples/train.py`. You can replace the model used in the training script
 with your own model implemented within CompressAI, and then run the script for a
 simple training pipeline:
