@@ -32,6 +32,8 @@ import copy
 import pytest
 import torch
 
+from packaging import version
+
 from compressai.entropy_models import (
     EntropyBottleneck,
     EntropyModel,
@@ -242,6 +244,10 @@ class TestEntropyBottleneck:
     #     assert torch.allclose(y0[0], y1[0])
     #     assert torch.all(y1[1] == 0)  # not yet supported
 
+    @pytest.mark.skipif(
+        version.parse(torch.__version__) < version.parse("2.0.0"),
+        reason="torch.compile only available for torch>=2.0",
+    )
     def test_compiling(self):
         entropy_bottleneck = EntropyBottleneck(128)
         x0 = torch.rand(1, 128, 32, 32)
