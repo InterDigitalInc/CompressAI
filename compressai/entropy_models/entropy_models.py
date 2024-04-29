@@ -483,7 +483,7 @@ class EntropyBottleneck(EntropyModel):
             # TorchScript in 2D for static inference
             # Convert to (channels, ... , batch) format
             # perm = (1, 2, 3, 0)
-            # inv_perm = (3, 0, 1, 2):
+            # inv_perm = (3, 0, 1, 2)
 
         x = x.permute(*perm).contiguous()
         shape = x.size()
