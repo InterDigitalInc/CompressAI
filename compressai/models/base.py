@@ -39,7 +39,7 @@ from torch import Tensor
 
 from compressai.entropy_models import EntropyBottleneck, GaussianConditional
 from compressai.latent_codecs import LatentCodec
-from compressai.models.utils import update_registered_buffers, remap_old_keys
+from compressai.models.utils import remap_old_keys, update_registered_buffers
 
 __all__ = [
     "CompressionModel",
