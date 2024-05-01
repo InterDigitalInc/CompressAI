@@ -140,7 +140,7 @@ setup(
         "pandas",
         "scipy",
         "matplotlib",
-        "torch>=1.7.1",
+        "torch>=1.7.1, <2.3",
         "torch-geometric>=2.3.0",
         "typing-extensions>=4.0.0",
         "torchvision",
