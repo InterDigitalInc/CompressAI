@@ -16,7 +16,7 @@ wheel:
   image: python:$PYTHON_VERSION-buster
   stage: build
   before_script:
-    - pip install build
+    - python -m pip install build
   script:
     - python -m build --wheel .
   artifacts:
@@ -25,7 +25,7 @@ wheel:
     expire_in: 1 day
   parallel:
     matrix:
-      - PYTHON_VERSION: ['3.7', '3.8', '3.9', '3.10']
+      - PYTHON_VERSION: ['3.8', '3.9', '3.10']
   tags:
     - docker
 
@@ -34,7 +34,7 @@ sdist:
   image: python:3.10-buster
   stage: build
   before_script:
-    - pip install build
+    - python -m pip install build
   script:
     - python -m build --sdist .
   tags:
@@ -46,7 +46,7 @@ flake8:
   image: pytorch/pytorch:2.2.0-cuda11.8-cudnn8-devel
   before_script:
     - python --version
-    - pip install flake8 flake8-bugbear flake8-comprehensions
+    - python -m pip install flake8 flake8-bugbear flake8-comprehensions
   script:
     - flake8 compressai tests examples docs
   tags:
@@ -58,7 +58,7 @@ black:
   image: python:3.10-buster
   before_script:
     - python --version
-    - pip install black
+    - python -m pip install black
   script:
     - make check-black
   tags:
@@ -70,7 +70,8 @@ isort:
   image: python:3.10-buster
   before_script:
     - python --version
-    - pip install isort
+    - python -m pip install .
+    - python -m pip install isort
   script:
     - make check-isort
   tags:
@@ -82,9 +83,9 @@ test:
   image: pytorch/pytorch:$PYTORCH_IMAGE
   before_script:
     - python --version
-    - pip install -U pip
-    - pip install -e .
-    - pip install pytest pytest-cov plotly
+    - python -m pip install -U pip
+    - python -m pip install -e .
+    - python -m pip install pytest pytest-cov plotly
   script:
     - >
       if [ "$CI_COMMIT_BRANCH" == "master" ]; then
@@ -96,7 +97,6 @@ test:
     matrix:
       - PYTORCH_IMAGE:
           - "1.8.1-cuda11.1-cudnn8-devel"
-          - "1.9.0-cuda11.1-cudnn8-devel"
           - "2.2.0-cuda11.8-cudnn8-devel"
   tags:
     - docker
@@ -107,9 +107,9 @@ doc:
   image: pytorch/pytorch:2.2.0-cuda11.8-cudnn8-devel
   before_script:
     - python --version
-    - pip install -e .
+    - python -m pip install -e .
     - cd docs
-    - pip install -r requirements.txt
+    - python -m pip install -r requirements.txt
   script:
     - make html
   tags:

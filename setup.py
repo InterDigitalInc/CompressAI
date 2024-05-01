@@ -133,7 +133,7 @@ setup(
     author_email="compressai@interdigital.com",
     packages=find_packages(exclude=("tests",)),
     zip_safe=False,
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     install_requires=[
         "einops",
         "numpy>=1.21.0",
@@ -154,7 +154,6 @@ setup(
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: BSD License",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",

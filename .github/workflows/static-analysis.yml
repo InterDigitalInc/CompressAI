@@ -19,6 +19,8 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Python dependencies
-      run: pip install -e .[dev]
+      run: |
+        python3 -m pip install -U pip
+        python3 -m pip install .[dev]
     - name: Run static analysis checks
       run: make static-analysis

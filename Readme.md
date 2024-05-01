@@ -23,7 +23,7 @@ CompressAI currently provides:
 
 ## Installation
 
-CompressAI supports python 3.7+ and PyTorch 1.7+.
+CompressAI supports python 3.8+ and PyTorch 1.7+.
 
 **pip**:
 
@@ -108,7 +108,7 @@ To evaluate provided pre-trained models:
 python3 -m compressai.utils.eval_model pretrained /path/to/images/folder/ -a $ARCH -q $QUALITY_LEVELS...
 ```
 
-To plot results from bench/eval_model simulations (requires matplotlib by default): 
+To plot results from bench/eval_model simulations (requires matplotlib by default):
 
 ```bash
 python3 -m compressai.utils.plot --help
