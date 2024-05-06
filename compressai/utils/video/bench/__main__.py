@@ -91,7 +91,7 @@ def func(codec, i, filepath, qp, outputdir, inputdir, cuda, force, dry_run):
             output = {
                 "source": filepath.stem,
                 "name": codec.name_config(),
-                "description": codec.description(),
+                "description": codec.description,
                 "results": metrics,
             }
             with sequence_metrics_path.open("wb") as f:
@@ -351,7 +351,7 @@ def main(args: Any = None) -> None:
 
     output = {
         "name": codec_class.name_config(),
-        "description": codec_class.description(),
+        "description": codec_class.description,
         "results": results,
     }
 
