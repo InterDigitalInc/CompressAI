@@ -269,8 +269,7 @@ class CheckerboardLatentCodec(LatentCodec):
     @torch.no_grad()
     def _y_ctx_zero(self, y: Tensor) -> Tensor:
         """Create a zero tensor with correct shape for y_ctx."""
-        y_ctx_meta = self.context_prediction(y.to("meta"))
-        return y.new_zeros(y_ctx_meta.shape)
+        return self._mask(self.context_prediction(y).detach(), "all")
 
     def compress(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
         n, c, h, w = y.shape
