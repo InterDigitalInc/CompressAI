@@ -95,7 +95,7 @@ class RasterScanLatentCodec(LatentCodec):
         **kwargs,
     ):
         super().__init__()
-        self.gaussian_conditional = gaussian_conditional or GaussianConditional()
+        self.gaussian_conditional = gaussian_conditional or GaussianConditional(None)
         self.entropy_parameters = entropy_parameters or nn.Identity()
         self.context_prediction = context_prediction or MaskedConv2d()
         self.kernel_size = _reduce_seq(self.context_prediction.kernel_size)
