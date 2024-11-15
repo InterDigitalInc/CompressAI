@@ -98,7 +98,7 @@ class RasterScanLatentCodec(LatentCodec):
         self.gaussian_conditional = gaussian_conditional or GaussianConditional(None)
         self.entropy_parameters = entropy_parameters or nn.Identity()
         self.context_prediction = context_prediction or MaskedConv2d()
-        self.kernel_size = _reduce_seq(self.context_prediction.kernel_size)
+        self.kernel_size = _to_single(self.context_prediction.kernel_size)
         self.padding = (self.kernel_size - 1) // 2
 
     def forward(self, y: Tensor, params: Tensor) -> Dict[str, Any]:
@@ -113,8 +113,11 @@ class RasterScanLatentCodec(LatentCodec):
 
     def compress(self, y: Tensor, ctx_params: Tensor) -> Dict[str, Any]:
         n, _, y_height, y_width = y.shape
-        ds = [
-            self._compress_single(
+        ds = []
+        for i in range(n):
+            encoder = BufferedRansEncoder()
+            y_hat = raster_scan_compress_single_stream(
+                encoder=encoder,
                 y=y[i : i + 1, :, :, :],
                 params=ctx_params[i : i + 1, :, :, :],
                 gaussian_conditional=self.gaussian_conditional,
@@ -126,15 +129,9 @@ class RasterScanLatentCodec(LatentCodec):
                 kernel_size=self.kernel_size,
                 merge=self.merge,
             )
-            for i in range(n)
-        ]
+            y_strings = encoder.flush()
+            ds.append({"strings": [y_strings], "y_hat": y_hat.squeeze(0)})
         return {**default_collate(ds), "shape": y.shape[2:4]}
-
-    def _compress_single(self, **kwargs):
-        encoder = BufferedRansEncoder()
-        y_hat = raster_scan_compress_single_stream(encoder=encoder, **kwargs)
-        y_strings = encoder.flush()
-        return {"strings": [y_strings], "y_hat": y_hat.squeeze(0)}
 
     def decompress(
         self,
@@ -145,9 +142,12 @@ class RasterScanLatentCodec(LatentCodec):
     ) -> Dict[str, Any]:
         (y_strings,) = strings
         y_height, y_width = shape
-        ds = [
-            self._decompress_single(
-                y_string=y_strings[i],
+        ds = []
+        for i in range(len(y_strings)):
+            decoder = RansDecoder()
+            decoder.set_stream(y_strings[i])
+            y_hat = raster_scan_decompress_single_stream(
+                decoder=decoder,
                 params=ctx_params[i : i + 1, :, :, :],
                 gaussian_conditional=self.gaussian_conditional,
                 entropy_parameters=self.entropy_parameters,
@@ -159,15 +159,8 @@ class RasterScanLatentCodec(LatentCodec):
                 device=ctx_params.device,
                 merge=self.merge,
             )
-            for i in range(len(y_strings))
-        ]
+            ds.append({"y_hat": y_hat.squeeze(0)})
         return default_collate(ds)
-
-    def _decompress_single(self, y_string, **kwargs):
-        decoder = RansDecoder()
-        decoder.set_stream(y_string)
-        y_hat = raster_scan_decompress_single_stream(decoder=decoder, **kwargs)
-        return {"y_hat": y_hat.squeeze(0)}
 
     @staticmethod
     def merge(*args):
@@ -312,12 +305,16 @@ def _pad_2d(x: Tensor, padding: int) -> Tensor:
     return F.pad(x, (padding, padding, padding, padding))
 
 
-def _reduce_seq(xs):
+def _to_single(xs):
     assert all(x == xs[0] for x in xs)
     return xs[0]
 
 
 def default_collate(batch: List[Dict[K, V]]) -> Dict[K, List[V]]:
+    """Combines a list of dictionaries into a single dictionary.
+
+    Workaround to ``torch.utils.data.default_collate`` bug in PyTorch 2.0.0.
+    """
     if not isinstance(batch, list) or any(not isinstance(d, dict) for d in batch):
         raise NotImplementedError
 

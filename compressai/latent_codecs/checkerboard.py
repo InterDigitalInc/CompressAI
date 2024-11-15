@@ -208,7 +208,7 @@ class CheckerboardLatentCodec(LatentCodec):
 
     def _forward_twopass_step(
         self, y: Tensor, side_params: Tensor, params: Tensor, y_ctx: Tensor, step: str
-    ) -> Dict[str, Any]:
+    ) -> Tensor:
         # NOTE: The _i variables contain only the current step's pixels.
         assert step in ("anchor", "non_anchor")
 
