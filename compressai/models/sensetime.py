@@ -256,16 +256,12 @@ class Elic2022Official(SimpleVAECompressionModel):
 
         # In [He2022], this is labeled "g_ch^(k)".
         channel_context = {
-            f"y{k}": sequential_channel_ramp(
-                sum(self.groups[:k]),
-                self.groups[k] * 2,
-                min_ch=N,
-                num_layers=3,
-                make_layer=nn.Conv2d,
-                make_act=lambda: nn.ReLU(inplace=True),
-                kernel_size=5,
-                stride=1,
-                padding=2,
+            f"y{k}": nn.Sequential(
+                conv(sum(self.groups[:k]), 224, kernel_size=5, stride=1),
+                nn.ReLU(inplace=True),
+                conv(224, 128, kernel_size=5, stride=1),
+                nn.ReLU(inplace=True),
+                conv(128, self.groups[k] * 2, kernel_size=5, stride=1),
             )
             for k in range(1, len(self.groups))
         }
@@ -290,6 +286,7 @@ class Elic2022Official(SimpleVAECompressionModel):
                 self.groups[k] * 2,
                 min_ch=N * 2,
                 num_layers=3,
+                interp="linear",
                 make_layer=nn.Conv2d,
                 make_act=lambda: nn.ReLU(inplace=True),
                 kernel_size=1,
