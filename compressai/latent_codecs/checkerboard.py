@@ -217,10 +217,6 @@ class CheckerboardLatentCodec(LatentCodec):
         # Save params for current step. This is later used for entropy estimation.
         self._copy(params, params_i, step)
 
-        # Apply latent_codec's "entropy_parameters()", if it exists. Usually identity.
-        func = getattr(self.latent_codec["y"], "entropy_parameters", lambda x: x)
-        params_i = func(params_i)
-
         # Keep only elements needed for current step.
         # It's not necessary to mask the rest out just yet, but it doesn't hurt.
         params_i = self._keep_only(params_i, step)
@@ -243,8 +239,6 @@ class CheckerboardLatentCodec(LatentCodec):
         """
         y_ctx = self._y_ctx_zero(y)
         params = self.entropy_parameters(self.merge(y_ctx, side_params))
-        func = getattr(self.latent_codec["y"], "entropy_parameters", lambda x: x)
-        params = func(params)
         params = self._keep_only(params, "anchor")  # Probably unnecessary.
         _, means_hat = self.latent_codec["y"]._chunk(params)
         y_hat_anchors = quantize_ste(y - means_hat) + means_hat
