@@ -263,7 +263,7 @@ class CheckerboardLatentCodec(LatentCodec):
     @torch.no_grad()
     def _y_ctx_zero(self, y: Tensor) -> Tensor:
         """Create a zero tensor with correct shape for y_ctx."""
-        return self._mask(self.context_prediction(y).detach(), "all")
+        return self._mask_all(self.context_prediction(y).detach())
 
     def compress(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
         n, c, h, w = y.shape
@@ -275,7 +275,7 @@ class CheckerboardLatentCodec(LatentCodec):
         for i in range(2):
             y_ctx_i = self.unembed(self.context_prediction(self.embed(y_hat_)))[i]
             if i == 0:
-                y_ctx_i = self._mask(y_ctx_i, "all")
+                y_ctx_i = self._mask_all(y_ctx_i)
             params_i = self.entropy_parameters(self.merge(y_ctx_i, side_params_[i]))
             y_out = self.latent_codec["y"].compress(y_[i], params_i)
             y_hat_[i] = y_out["y_hat"]
@@ -309,7 +309,7 @@ class CheckerboardLatentCodec(LatentCodec):
         for i in range(2):
             y_ctx_i = self.unembed(self.context_prediction(self.embed(y_hat_)))[i]
             if i == 0:
-                y_ctx_i = self._mask(y_ctx_i, "all")
+                y_ctx_i = self._mask_all(y_ctx_i)
             params_i = self.entropy_parameters(self.merge(y_ctx_i, side_params_[i]))
             y_out = self.latent_codec["y"].decompress(
                 [y_strings_[i]], y_i_shape, params_i
@@ -380,25 +380,21 @@ class CheckerboardLatentCodec(LatentCodec):
             dest[..., 0::2, 1::2] = src[..., 0::2, 1::2]
             dest[..., 1::2, 0::2] = src[..., 1::2, 0::2]
 
-    def _keep_only(self, y: Tensor, step: str, inplace: bool = False) -> Tensor:
+    def _keep_only(self, y: Tensor, step: str) -> Tensor:
         """Keep only pixels in the current step, and zero out the rest."""
-        return self._mask(
-            y,
-            parity=self.non_anchor_parity if step == "anchor" else self.anchor_parity,
-            inplace=inplace,
-        )
-
-    def _mask(self, y: Tensor, parity: str, inplace: bool = False) -> Tensor:
-        if not inplace:
-            y = y.clone()
+        y = y.clone()
+        parity = self.anchor_parity if step == "anchor" else self.non_anchor_parity
         if parity == "even":
-            y[..., 0::2, 0::2] = 0
-            y[..., 1::2, 1::2] = 0
-        elif parity == "odd":
             y[..., 0::2, 1::2] = 0
             y[..., 1::2, 0::2] = 0
-        elif parity == "all":
-            y[:] = 0
+        elif parity == "odd":
+            y[..., 0::2, 0::2] = 0
+            y[..., 1::2, 1::2] = 0
+        return y
+
+    def _mask_all(self, y: Tensor) -> Tensor:
+        y = y.clone()
+        y[:] = 0
         return y
 
     def merge(self, *args):
