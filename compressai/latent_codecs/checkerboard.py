@@ -188,14 +188,36 @@ class CheckerboardLatentCodec(LatentCodec):
 
         params = y.new_zeros((B, C * 2, H, W))
 
-        y_hat_anchors = self._forward_twopass_step(
-            y, side_params, params, self._y_ctx_zero(y), "anchor"
-        )
+        y_hat_ = []
 
-        y_hat_non_anchors = self._forward_twopass_step(
-            y, side_params, params, self.context_prediction(y_hat_anchors), "non_anchor"
-        )
+        # NOTE: The _i variables contain only the current step's pixels.
+        # i=0: step=anchor
+        # i=1: step=non_anchor
 
+        for step in ("anchor", "non_anchor"):
+            if step == "anchor":
+                y_ctx = self._y_ctx_zero(y)
+            else:  # step == "non_anchor"
+                y_hat_anchors = y_hat_[0]
+                y_ctx = self.context_prediction(y_hat_anchors)
+
+            params_i = self.entropy_parameters(self.merge(y_ctx, side_params))
+
+            # Save params for current step. This is later used for entropy estimation.
+            self._copy(params, params_i, step)
+
+            # Keep only elements needed for current step.
+            # It's not necessary to mask the rest out just yet, but it doesn't hurt.
+            params_i = self._keep_only(params_i, step)
+            y_i = self._keep_only(y, step)
+
+            # Determine y_hat for current step, and mask out the other pixels.
+            _, means_i = self.latent_codec["y"]._chunk(params_i)
+            y_hat_i = self._keep_only(quantize_ste(y_i - means_i) + means_i, step)
+
+            y_hat_.append(y_hat_i)
+
+        [y_hat_anchors, y_hat_non_anchors] = y_hat_
         y_hat = y_hat_anchors + y_hat_non_anchors
         y_out = self.latent_codec["y"](y, params)
 
@@ -205,28 +227,6 @@ class CheckerboardLatentCodec(LatentCodec):
             },
             "y_hat": y_hat,
         }
-
-    def _forward_twopass_step(
-        self, y: Tensor, side_params: Tensor, params: Tensor, y_ctx: Tensor, step: str
-    ) -> Tensor:
-        # NOTE: The _i variables contain only the current step's pixels.
-        assert step in ("anchor", "non_anchor")
-
-        params_i = self.entropy_parameters(self.merge(y_ctx, side_params))
-
-        # Save params for current step. This is later used for entropy estimation.
-        self._copy(params, params_i, step)
-
-        # Keep only elements needed for current step.
-        # It's not necessary to mask the rest out just yet, but it doesn't hurt.
-        params_i = self._keep_only(params_i, step)
-        y_i = self._keep_only(y, step)
-
-        # Determine y_hat for current step, and mask out the other pixels.
-        _, means_i = self.latent_codec["y"]._chunk(params_i)
-        y_hat_i = self._keep_only(quantize_ste(y_i - means_i) + means_i, step)
-
-        return y_hat_i
 
     def _forward_twopass_faster(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
         """Runs the entropy parameters network in two passes.
