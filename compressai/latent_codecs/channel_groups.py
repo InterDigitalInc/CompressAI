@@ -28,7 +28,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from itertools import accumulate
-from typing import Any, Dict, List, Mapping, Optional, Tuple
+from typing import Any, Dict, List, Mapping, Tuple
 
 import torch
 import torch.nn as nn
@@ -70,8 +70,8 @@ class ChannelGroupsLatentCodec(LatentCodec):
 
     def __init__(
         self,
-        latent_codec: Optional[Mapping[str, LatentCodec]] = None,
-        channel_context: Optional[Mapping[str, nn.Module]] = None,
+        latent_codec: Mapping[str, LatentCodec],
+        channel_context: Mapping[str, nn.Module],
         *,
         groups: List[int],
         **kwargs,

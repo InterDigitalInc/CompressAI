@@ -27,7 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 import torch.nn as nn
 
@@ -66,22 +66,17 @@ class GainHyperLatentCodec(LatentCodec):
 
     """
 
-    entropy_bottleneck: EntropyBottleneck
-    h_a: nn.Module
-    h_s: nn.Module
-
     def __init__(
         self,
-        entropy_bottleneck: Optional[EntropyBottleneck] = None,
-        h_a: Optional[nn.Module] = None,
-        h_s: Optional[nn.Module] = None,
+        entropy_bottleneck: EntropyBottleneck,
+        h_a: nn.Module,
+        h_s: nn.Module,
         **kwargs,
     ):
         super().__init__()
-        assert entropy_bottleneck is not None
         self.entropy_bottleneck = entropy_bottleneck
-        self.h_a = h_a or nn.Identity()
-        self.h_s = h_s or nn.Identity()
+        self.h_a = h_a
+        self.h_s = h_s
 
     def forward(self, y: Tensor, gain: Tensor, gain_inv: Tensor) -> Dict[str, Any]:
         z = self.h_a(y)

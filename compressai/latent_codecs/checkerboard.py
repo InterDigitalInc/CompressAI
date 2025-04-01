@@ -27,7 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from typing import Any, Dict, List, Mapping, Optional, Tuple
+from typing import Any, Dict, List, Mapping, Tuple
 
 import torch
 import torch.nn as nn
@@ -40,7 +40,6 @@ from compressai.ops import quantize_ste
 from compressai.registry import register_module
 
 from .base import LatentCodec
-from .gaussian_conditional import GaussianConditionalLatentCodec
 
 __all__ = [
     "CheckerboardLatentCodec",
@@ -109,16 +108,11 @@ class CheckerboardLatentCodec(LatentCodec):
         □   empty
     """
 
-    latent_codec: Mapping[str, LatentCodec]
-
-    entropy_parameters: nn.Module
-    context_prediction: CheckerboardMaskedConv2d
-
     def __init__(
         self,
-        latent_codec: Optional[Mapping[str, LatentCodec]] = None,
-        entropy_parameters: Optional[nn.Module] = None,
-        context_prediction: Optional[nn.Module] = None,
+        latent_codec: Mapping[str, LatentCodec],
+        entropy_parameters: nn.Module,
+        context_prediction: CheckerboardMaskedConv2d,
         anchor_parity="even",
         forward_method="twopass",
         **kwargs,
@@ -128,16 +122,10 @@ class CheckerboardLatentCodec(LatentCodec):
         self.anchor_parity = anchor_parity
         self.non_anchor_parity = {"odd": "even", "even": "odd"}[anchor_parity]
         self.forward_method = forward_method
-        self.entropy_parameters = entropy_parameters or nn.Identity()
-        self.context_prediction = context_prediction or nn.Identity()
-        self._set_group_defaults(
-            "latent_codec",
-            latent_codec,
-            defaults={
-                "y": lambda: GaussianConditionalLatentCodec(quantizer="ste"),
-            },
-            save_direct=True,
-        )
+        self.entropy_parameters = entropy_parameters
+        self.context_prediction = context_prediction
+        self.y = latent_codec["y"]
+        self.latent_codec = latent_codec
 
     def __getitem__(self, key: str) -> LatentCodec:
         return self.latent_codec[key]

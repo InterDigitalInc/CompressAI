@@ -27,15 +27,13 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from typing import Any, Dict, List, Mapping, Optional, Tuple
+from typing import Any, Dict, List, Mapping, Tuple
 
 from torch import Tensor
 
 from compressai.registry import register_module
 
 from ..base import LatentCodec
-from ..gaussian_conditional import GaussianConditionalLatentCodec
-from .hyper import GainHyperLatentCodec
 
 __all__ = [
     "GainHyperpriorLatentCodec",
@@ -94,21 +92,11 @@ class GainHyperpriorLatentCodec(LatentCodec):
      - entropy bottleneck ``hyper`` (default) and autoregressive ``y``
     """
 
-    latent_codec: Mapping[str, LatentCodec]
-
-    def __init__(
-        self, latent_codec: Optional[Mapping[str, LatentCodec]] = None, **kwargs
-    ):
+    def __init__(self, latent_codec: Mapping[str, LatentCodec], **kwargs):
         super().__init__()
-        self._set_group_defaults(
-            "latent_codec",
-            latent_codec,
-            defaults={
-                "y": GaussianConditionalLatentCodec,
-                "hyper": GainHyperLatentCodec,
-            },
-            save_direct=True,
-        )
+        self.y = latent_codec["y"]
+        self.hyper = latent_codec["hyper"]
+        self.latent_codec = latent_codec
 
     def __getitem__(self, key: str) -> LatentCodec:
         return self.latent_codec[key]

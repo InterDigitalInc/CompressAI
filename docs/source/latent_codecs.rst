@@ -231,6 +231,7 @@ Using :py:class:`~compressai.models.base.SimpleVAECompressionModel`, some Google
                     ),
                     # Encode y using autoregression in raster-scan order:
                     "y": RasterScanLatentCodec(
+                        gaussian_conditional=GaussianConditional(None),
                         entropy_parameters=nn.Sequential(...),
                         context_prediction=MaskedConv2d(
                             M, M * 2, kernel_size=5, padding=2, stride=1
@@ -249,7 +250,7 @@ Latent codecs should inherit from the abstract base class :py:class:`~LatentCode
 
 .. code-block:: python
 
-    class LatentCodec(nn.Module, _SetDefaultMixin):
+    class LatentCodec(nn.Module):
         def forward(self, y: Tensor, *args, **kwargs) -> Dict[str, Any]:
             raise NotImplementedError
 

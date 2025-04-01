@@ -38,45 +38,7 @@ __all__ = [
 ]
 
 
-class _SetDefaultMixin:
-    """Convenience functions for initializing classes with defaults."""
-
-    def _setdefault(self, k, v, f):
-        """Initialize attribute ``k`` with value ``v`` or ``f()``."""
-        v = v or f()
-        setattr(self, k, v)
-
-    # TODO instead of save_direct, override load_state_dict() and state_dict()
-    def _set_group_defaults(self, group_key, group_dict, defaults, save_direct=False):
-        """Initialize attribute ``group_key`` with items from
-        ``group_dict``, using defaults for missing keys.
-        Ensures ``nn.Module`` attributes are properly registered.
-
-        Args:
-            - group_key:
-                Name of attribute.
-            - group_dict:
-                Dict of items to initialize ``group_key`` with.
-            - defaults:
-                Dict of defaults for items not in ``group_dict``.
-            - save_direct:
-                If ``True``, save items directly as attributes of ``self``.
-                If ``False``, save items in a ``nn.ModuleDict``.
-        """
-        group_dict = group_dict if group_dict is not None else {}
-        for k, f in defaults.items():
-            if k in group_dict:
-                continue
-            group_dict[k] = f()
-        if save_direct:
-            for k, v in group_dict.items():
-                setattr(self, k, v)
-        else:
-            group_dict = nn.ModuleDict(group_dict)
-        setattr(self, group_key, group_dict)
-
-
-class LatentCodec(nn.Module, _SetDefaultMixin):
+class LatentCodec(nn.Module):
     def forward(self, y: Tensor, *args, **kwargs) -> Dict[str, Any]:
         raise NotImplementedError
 
