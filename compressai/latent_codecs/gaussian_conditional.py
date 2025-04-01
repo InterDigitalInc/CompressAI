@@ -85,7 +85,7 @@ class GaussianConditionalLatentCodec(LatentCodec):
         gaussian_conditional: Optional[GaussianConditional] = None,
         entropy_parameters: Optional[nn.Module] = None,
         quantizer: str = "noise",
-        chunks: Tuple[str] = ("scales", "means"),
+        chunks: Tuple[str, ...] = ("scales", "means"),
         **kwargs,
     ):
         super().__init__()

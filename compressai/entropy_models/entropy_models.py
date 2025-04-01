@@ -232,13 +232,18 @@ class EntropyModel(nn.Module):
         if len(self._cdf_length.size()) != 1:
             raise ValueError(f"Invalid offsets size {self._cdf_length.size()}")
 
-    def compress(self, inputs, indexes, means=None):
+    def compress(
+        self,
+        inputs: torch.Tensor,
+        indexes: torch.Tensor,
+        means: Optional[torch.Tensor] = None,
+    ):
         """
         Compress input tensors to char strings.
 
         Args:
             inputs (torch.Tensor): input tensors
-            indexes (torch.IntTensor): tensors CDF indexes
+            indexes (torch.Tensor): tensors CDF indexes
             means (torch.Tensor, optional): optional tensor means
         """
         symbols = self.quantize(inputs, "symbols", means)
@@ -269,17 +274,17 @@ class EntropyModel(nn.Module):
 
     def decompress(
         self,
-        strings: str,
-        indexes: torch.IntTensor,
+        strings: List[bytes],
+        indexes: torch.Tensor,
         dtype: torch.dtype = torch.float,
-        means: torch.Tensor = None,
+        means: Optional[torch.Tensor] = None,
     ):
         """
         Decompress char strings to tensors.
 
         Args:
-            strings (str): compressed tensors
-            indexes (torch.IntTensor): tensors CDF indexes
+            strings (list[bytes]): compressed tensors
+            indexes (torch.Tensor): tensors CDF indexes
             dtype (torch.dtype): type of dequantized output
             means (torch.Tensor, optional): optional tensor means
         """
