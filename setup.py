@@ -136,11 +136,11 @@ setup(
     python_requires=">=3.8",
     install_requires=[
         "einops",
-        "numpy>=1.21.0",
+        "numpy>=1.21.0, <2",
         "pandas",
         "scipy",
         "matplotlib",
-        "torch>=1.7.1, <2.3",
+        "torch>=1.13.1",
         "torch-geometric>=2.3.0",
         "typing-extensions>=4.0.0",
         "torchvision",

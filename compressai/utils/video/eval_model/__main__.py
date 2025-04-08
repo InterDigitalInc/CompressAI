@@ -43,8 +43,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from pytorch_msssim import ms_ssim
-from torch import Tensor
-from torch.cuda import amp
+from torch import Tensor, amp
 from torch.utils.model_zoo import tqdm
 
 import compressai
@@ -370,7 +369,9 @@ def run_inference(
         if sequence_metrics_path.is_file():
             continue
 
-        with amp.autocast(enabled=args["half"]):
+        with amp.autocast(
+            device_type=next(net.parameters()).device.type, enabled=args["half"]
+        ):
             with torch.no_grad():
                 if entropy_estimation:
                     metrics = eval_model_entropy_estimation(net, filepath)

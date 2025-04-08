@@ -35,7 +35,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from torch.cuda import amp
+from torch import amp
 
 from compressai.entropy_models import EntropyBottleneck, GaussianConditional
 from compressai.layers import QReLU
@@ -350,7 +350,6 @@ class ScaleSpaceFlow(CompressionModel):
             volume.append(interp.unsqueeze(2))
         return torch.cat(volume, dim=2)
 
-    @amp.autocast(enabled=False)
     def warp_volume(self, volume, flow, scale_field, padding_mode: str = "border"):
         """3D volume warping."""
         if volume.ndimension() != 5:
@@ -360,14 +359,18 @@ class ScaleSpaceFlow(CompressionModel):
 
         N, C, _, H, W = volume.size()
 
-        grid = meshgrid2d(N, C, H, W, volume.device)
-        update_grid = grid + flow.permute(0, 2, 3, 1).float()
-        update_scale = scale_field.permute(0, 2, 3, 1).float()
-        volume_grid = torch.cat((update_grid, update_scale), dim=-1).unsqueeze(1)
+        with amp.autocast(device_type=volume.device.type, enabled=False):
+            grid = meshgrid2d(N, C, H, W, volume.device)
+            update_grid = grid + flow.permute(0, 2, 3, 1).float()
+            update_scale = scale_field.permute(0, 2, 3, 1).float()
+            volume_grid = torch.cat((update_grid, update_scale), dim=-1).unsqueeze(1)
 
-        out = F.grid_sample(
-            volume.float(), volume_grid, padding_mode=padding_mode, align_corners=False
-        )
+            out = F.grid_sample(
+                volume.float(),
+                volume_grid,
+                padding_mode=padding_mode,
+                align_corners=False,
+            )
         return out.squeeze(2)
 
     def forward_prediction(self, x_ref, motion_info):

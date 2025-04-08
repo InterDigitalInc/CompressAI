@@ -273,6 +273,7 @@ class TestEntropyBottleneck:
 
     def test_update(self):
         # get a pretrained model
+
         net = bmshj2018_factorized(quality=1, pretrained=True).eval()
         assert not net.update()
         assert not net.update(force=False)

@@ -96,7 +96,7 @@ test:
   parallel:
     matrix:
       - PYTORCH_IMAGE:
-          - "1.8.1-cuda11.1-cudnn8-devel"
+          - "1.13.1-cuda11.6-cudnn8-devel"
           - "2.2.0-cuda11.8-cudnn8-devel"
   tags:
     - docker
