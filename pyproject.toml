@@ -1,6 +1,86 @@
 [build-system]
-requires = ["setuptools>=42", "wheel", "pybind11>=2.12", "torch"]
+requires = [
+  "setuptools>=42",
+  "wheel",
+  "pybind11>=2.6.0",
+  "tomli; python_version < '3.11'",
+]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "compressai"
+version = "1.2.6.dev0"
+description = "A PyTorch library and evaluation platform for end-to-end compression research"
+authors = [
+    { name = "InterDigital AI Lab", email = "compressai@interdigital.com" },
+]
+license = { text = "BSD 3-Clause Clear License" }
+readme = "Readme.md"
+requires-python = ">=3.8"
+urls = { Homepage = "https://github.com/InterDigitalInc/CompressAI" }
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: BSD License",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+  "einops",
+  "matplotlib",
+  "numpy>=1.21.0",
+  "pandas",
+  "pytorch-msssim",
+  "scipy",
+  "tomli>=2.2.1",
+  "torch-geometric>=2.3.0",
+  "torch>=1.7.1,<2.3",
+  "torchvision",
+  "tqdm",
+  "typing-extensions>=4.0.0",
+]
+
+[project.optional-dependencies]
+test = [
+  "plotly",
+  "pytest",
+  "pytest-cov",
+]
+dev = [
+  "black",
+  "flake8",
+  "flake8-bugbear",
+  "flake8-comprehensions",
+  "isort",
+  "mypy",
+  "plotly",
+  "pytest",
+  "pytest-cov",
+]
+doc = [
+  "Jinja2<3.1",
+  "sphinx==4.3.0",
+  "sphinx-book-theme==1.0.1",
+]
+tutorials = [
+  "ipywidgets",
+  "jupyter",
+]
+pointcloud = [
+  "pointops-yoda",
+  "pyntcloud-yoda",
+]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+zip-safe = false
+
+[tool.setuptools.packages.find]
+exclude = ["tests"]
 
 [tool.black]
 line-length = 88

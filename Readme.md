@@ -50,7 +50,6 @@ pip install -U pip && pip install -e .
 For a custom installation, you can also run one of the following commands:
 * `pip install -e '.[dev]'`: install the packages required for development (testing, linting, docs)
 * `pip install -e '.[tutorials]'`: install the packages required for the tutorials (notebooks)
-* `pip install -e '.[all]'`: install all the optional packages
 
 > **Note**: Docker images will be released in the future. Conda environments are not
 officially supported.
