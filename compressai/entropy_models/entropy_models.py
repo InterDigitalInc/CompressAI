@@ -847,9 +847,9 @@ class GaussianMixtureConditional(GaussianConditional):
             ),
             dim=1,
         ).transpose(0, 1)
-        pmf_quantized[
-            pmf_real_steal_indices[0], pmf_real_steal_indices[1]
-        ] -= pmf_zero_count
+        pmf_quantized[pmf_real_steal_indices[0], pmf_real_steal_indices[1]] -= (
+            pmf_zero_count
+        )
 
         cdf = F.pad(torch.cumsum(pmf_quantized, 1).int(), (1, 0), "constant", 0)
         cdf = F.pad(cdf, (0, 1), "constant", cdf_limit + 1)

@@ -29,6 +29,7 @@
 """
 Evaluate an end-to-end compression model on an image dataset.
 """
+
 import argparse
 import json
 import math

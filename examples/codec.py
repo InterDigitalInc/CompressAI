@@ -215,7 +215,8 @@ def convert_yuv420_rgb(
     # yuv420 [0, 2**bitdepth-1] to rgb 444 [0, 1] only for now
     frame = to_tensors(frame, device=str(device), max_value=max_val)
     frame = yuv_420_to_444(
-        tuple(c.unsqueeze(0).unsqueeze(0) for c in frame), mode="bicubic"  # type: ignore
+        tuple(c.unsqueeze(0).unsqueeze(0) for c in frame),  # type: ignore
+        mode="bicubic",
     )
     return ycbcr2rgb(frame)  # type: ignore
 

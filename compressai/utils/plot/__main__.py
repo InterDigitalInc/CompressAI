@@ -30,6 +30,7 @@
 Simple plotting utility to display Rate-Distortion curves (RD) comparison
 between codecs.
 """
+
 import argparse
 import json
 import sys

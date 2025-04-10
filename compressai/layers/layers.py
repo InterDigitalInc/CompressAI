@@ -376,7 +376,7 @@ class QReLU(Function):
         grad_input = grad_output.clone()
         grad_sub = (
             torch.exp(
-                (-ctx.alpha**ctx.beta)
+                (-(ctx.alpha**ctx.beta))
                 * torch.abs(2.0 * input / ctx.max_value - 1) ** ctx.beta
             )
             * grad_output.clone()

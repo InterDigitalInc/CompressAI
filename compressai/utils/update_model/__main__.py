@@ -33,6 +33,7 @@ Update the CDFs parameters of a trained model.
 To be called on a model checkpoint after training. This will update the internal
 CDFs related buffers required for entropy coding.
 """
+
 import argparse
 import hashlib
 import sys

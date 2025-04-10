@@ -30,6 +30,7 @@
 Collect performance metrics of published traditional or end-to-end image
 codecs.
 """
+
 import argparse
 import json
 import multiprocessing as mp
