@@ -598,14 +598,17 @@ dependencies = [
     { name = "matplotlib" },
     { name = "numpy" },
     { name = "pandas" },
+    { name = "pybind11" },
     { name = "pytorch-msssim" },
     { name = "scipy" },
+    { name = "setuptools" },
     { name = "tomli" },
     { name = "torch" },
     { name = "torch-geometric" },
     { name = "torchvision" },
     { name = "tqdm" },
     { name = "typing-extensions" },
+    { name = "wheel" },
 ]
 
 [package.optional-dependencies]
@@ -685,6 +688,7 @@ requires-dist = [
     { name = "plotly", marker = "extra == 'dev'" },
     { name = "plotly", marker = "extra == 'test'" },
     { name = "pointops-yoda", marker = "extra == 'pointcloud'" },
+    { name = "pybind11", specifier = ">=2.6.0" },
     { name = "pyntcloud-yoda", marker = "extra == 'pointcloud'" },
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'test'" },
@@ -692,6 +696,7 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'test'" },
     { name = "pytorch-msssim" },
     { name = "scipy" },
+    { name = "setuptools", specifier = ">=68" },
     { name = "sphinx", marker = "extra == 'doc'", specifier = "==4.3.0" },
     { name = "sphinx-book-theme", marker = "extra == 'doc'", specifier = "==1.0.1" },
     { name = "tomli", specifier = ">=2.2.1" },
@@ -700,6 +705,7 @@ requires-dist = [
     { name = "torchvision" },
     { name = "tqdm" },
     { name = "typing-extensions", specifier = ">=4.0.0" },
+    { name = "wheel", specifier = ">=0.32.0" },
 ]
 provides-extras = ["test", "dev", "doc", "tutorials", "pointcloud"]
 
@@ -2843,6 +2849,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pybind11"
+version = "2.6.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/9a/36/3a9de7b56e0b01689d9ca4658701d12941069940f8a1431597a48dbc53fa/pybind11-2.6.0.tar.gz", hash = "sha256:4107de1fd612bf52953fd64dab7f94f11d2ab3548e1b761cbf8ebc87a2480912", size = 170702 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/92/a5/796ccb611a92cbdf1f6eaa9b2ec9458d5784a7b909efdf8e8afaa3861783/pybind11-2.6.0-py2.py3-none-any.whl", hash = "sha256:4ddeee54adf844ce44801c32a61e1863dd79283a5ce7afbb96e05fe61fa1fd7d", size = 187422 },
+]
+
+[[package]]
 name = "pycodestyle"
 version = "2.9.1"
 source = { registry = "https://pypi.org/simple" }
@@ -3865,6 +3880,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e6/30/fba0d96b4b5fbf5948ed3f4681f7da2f9f64512e1d303f94b4cc174c24a5/websocket_client-1.8.0.tar.gz", hash = "sha256:3239df9f44da632f96012472805d40a23281a991027ce11d2f45a6f24ac4c3da", size = 54648 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/5a/84/44687a29792a70e111c5c477230a72c4b957d88d16141199bf9acb7537a3/websocket_client-1.8.0-py3-none-any.whl", hash = "sha256:17b44cc997f5c498e809b22cdf2d9c7a9e71c02c8cc2b6c56e7c2d1239bfa526", size = 58826 },
+]
+
+[[package]]
+name = "wheel"
+version = "0.32.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/68/f0/545cbeae75f248c4ad7c2d062672cd7e046dd325a81b74fc02c62450d133/wheel-0.32.0.tar.gz", hash = "sha256:a26bc27230baaec9039972b7cb43db94b17c13e4d66a9ff6a4d46a0344c55c9a", size = 17612 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b3/bb/42354ce8c08f66ae0cd0f4a841f40ed41d709ac9c28f292bfeb383236a4a/wheel-0.32.0-py2.py3-none-any.whl", hash = "sha256:3970f4130b7f8bf8167ca09215c8cc2f49a87c3d46506adfc60cb08c47ab0949", size = 21430 },
 ]
 
 [[package]]

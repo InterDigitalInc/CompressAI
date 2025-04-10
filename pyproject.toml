@@ -34,14 +34,17 @@ dependencies = [
   "matplotlib",
   "numpy>=1.21.0,<2.0",
   "pandas",
+  "pybind11>=2.6.0", # For --no-build-isolation.
   "pytorch-msssim",
   "scipy",
+  "setuptools>=68", # For --no-build-isolation.
   "tomli>=2.2.1",
   "torch-geometric>=2.3.0",
   "torch>=1.13.1",
   "torchvision",
   "tqdm",
   "typing-extensions>=4.0.0",
+  "wheel>=0.32.0", # For --no-build-isolation.
 ]
 
 [project.optional-dependencies]
