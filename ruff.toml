@@ -1,0 +1,12 @@
+extend-exclude = [
+    "*.ipynb",
+]
+
+[lint.isort]
+lines-between-types = 1
+known-third-party = [
+    "PIL",
+    "pytorch_msssim",
+    "torchvision",
+    "torch",
+]
