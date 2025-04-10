@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-  "setuptools>=42",
+  "setuptools>=68",
   "wheel",
   "pybind11>=2.6.0",
   "tomli; python_version < '3.11'",
