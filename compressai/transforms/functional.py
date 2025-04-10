@@ -15,7 +15,7 @@ def _check_input_tensor(tensor: Tensor) -> None:
     if (
         not isinstance(tensor, Tensor)
         or not tensor.is_floating_point()
-        or not len(tensor.size()) in (3, 4)
+        or len(tensor.size()) not in (3, 4)
         or not tensor.size(-3) == 3
     ):
         raise ValueError(
