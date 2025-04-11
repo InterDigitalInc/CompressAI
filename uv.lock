@@ -629,7 +629,6 @@ doc = [
     { name = "sphinx-book-theme" },
 ]
 pointcloud = [
-    { name = "pointops-yoda" },
     { name = "pyntcloud-yoda" },
 ]
 test = [
@@ -687,7 +686,6 @@ requires-dist = [
     { name = "pandas" },
     { name = "plotly", marker = "extra == 'dev'" },
     { name = "plotly", marker = "extra == 'test'" },
-    { name = "pointops-yoda", marker = "extra == 'pointcloud'" },
     { name = "pybind11", specifier = ">=2.6.0" },
     { name = "pyntcloud-yoda", marker = "extra == 'pointcloud'" },
     { name = "pytest", marker = "extra == 'dev'" },
@@ -2678,16 +2676,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/96/2d/02d4312c973c6050a
 wheels = [
     { url = "https://files.pythonhosted.org/packages/88/5f/e351af9a41f866ac3f1fac4ca0613908d9a41741cfcf2228f4ad853b697d/pluggy-1.5.0-py3-none-any.whl", hash = "sha256:44e1ad92c8ca002de6377e165f3e0f1be63266ab4d554740532335b9d75ea669", size = 20556 },
 ]
-
-[[package]]
-name = "pointops-yoda"
-version = "0.0.0.post2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "numpy" },
-    { name = "torch" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/53/72/88a7649f12c101e6ad8f0c2d71618fc9bf1f27917a61497b7a7e9e49ecfe/pointops-yoda-0.0.0.post2.tar.gz", hash = "sha256:7857a616ece8fe78f71d1ef155c6a83142ef779fe02825e1ae4f05ee392d6218", size = 20212 }
 
 [[package]]
 name = "prometheus-client"
