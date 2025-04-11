@@ -52,28 +52,31 @@ flake8:
   tags:
     - docker
 
-black:
+ruff-format:
   cache: []
   stage: static-analysis
   image: python:3.10-buster
   before_script:
     - python --version
-    - python -m pip install black
+    - python -m pip install tomli
+    - RUFF_VERSION=$(python -c 'import tomli; config = tomli.load(open("uv.lock", "rb")); ruff_config = next(x for x in config["package"] if x["name"] == "ruff"); print(ruff_config["version"])')
+    - python -m pip install "ruff==$RUFF_VERSION"
   script:
-    - make check-black
+    - make check-ruff-format
   tags:
     - docker
 
-isort:
+ruff-organize-imports:
   cache: []
   stage: static-analysis
   image: python:3.10-buster
   before_script:
     - python --version
-    - python -m pip install .
-    - python -m pip install isort
+    - python -m pip install tomli
+    - RUFF_VERSION=$(python -c 'import tomli; config = tomli.load(open("uv.lock", "rb")); ruff_config = next(x for x in config["package"] if x["name"] == "ruff"); print(ruff_config["version"])')
+    - python -m pip install "ruff==$RUFF_VERSION"
   script:
-    - make check-isort
+    - make check-ruff-organize-imports
   tags:
     - docker
 

@@ -15,15 +15,15 @@ help: ## Show this message
 
 
 # Check style and linting
-.PHONY: check-black check-isort check-flake8 check-mypy static-analysis
+.PHONY: check-ruff-format check-ruff-organize-imports check-flake8 check-mypy static-analysis
 
-check-black: ## Run black checks
-	@echo "--> Running black checks"
-	@black --check --verbose --diff $(src_dirs)
+check-ruff-format: ## Run ruff format checks
+	@echo "--> Running ruff format checks"
+	@ruff format --check $(src_dirs)
 
-check-isort: ## Run isort checks
-	@echo "--> Running isort checks"
-	@isort --check-only $(src_dirs)
+check-ruff-organize-imports: ## Run ruff organize imports checks
+	@echo "--> Running ruff organize imports checks"
+	@ruff check --ignore ALL --select I $(src_dirs)
 
 check-flake8: ## Run flake8 checks
 	@echo "--> Running flake8 checks"
@@ -33,17 +33,17 @@ check-mypy: ## Run mypy checks
 	@echo "--> Running mypy checks"
 	@mypy
 
-static-analysis: check-black check-isort check-flake8 # check-mypy ## Run all static checks
+static-analysis: check-ruff-format check-ruff-organize-imports check-flake8 # check-mypy ## Run all static checks
 
 
 # Apply styling
 .PHONY: style
 
 style: ## Apply style formating
-	@echo "--> Running black"
-	@black $(src_dirs)
-	@echo "--> Running isort"
-	@isort $(src_dirs)
+	@echo "--> Running ruff format"
+	@ruff format $(src_dirs)
+	@echo "--> Running ruff check --ignore ALL --select I"
+	@ruff check --ignore ALL --select I $(src_dirs)
 
 
 # Run tests

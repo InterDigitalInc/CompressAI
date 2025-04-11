@@ -7,8 +7,7 @@ to start a public discussion or contact us directly.
 ## Coding style
 
 We try to follow PEP 8 recommendations. Automatic formatting is performed via
-[black](https://github.com/google/yapf://github.com/psf/black) and
-[isort](https://github.com/timothycrosley/isort/).
+[ruff](https://docs.astral.sh/ruff/).
 
 ## Testing
 
