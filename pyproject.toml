@@ -63,6 +63,7 @@ dev = [
   "plotly",
   "pytest",
   "pytest-cov",
+  "ruff==0.8.6",
 ]
 doc = [
   "Jinja2<3.1",
