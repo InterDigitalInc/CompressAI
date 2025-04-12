@@ -3,6 +3,8 @@
 *.sh
 *.tar.gz
 .DS_Store
+.venv*/
+.venv/
 builds
 compressai/version.py
 tags
