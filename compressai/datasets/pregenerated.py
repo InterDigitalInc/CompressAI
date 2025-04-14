@@ -31,6 +31,7 @@ from pathlib import Path
 from typing import Tuple, Union
 
 import numpy as np
+import torch
 
 from PIL import Image
 from torch.utils.data import Dataset
@@ -57,20 +58,27 @@ class PreGeneratedMemmapDataset(Dataset):
         batch_size (int): batch size.
         num_workers (int): number of CPU thread workers.
         pin_memory (bool): pin memory.
+        mode (string): item grouping mode ('image' or 'video'). If 'image', each
+            item is a single frame. If 'video', each item is a sequence of frames.
+        frames_per_sample (int): number of frames per sample (only for 'video' mode).
     """
 
     def __init__(
         self,
         root: str,
         transform=None,
+        transform_frame=None,
         split: str = "train",
         image_size: _size_2_t = (256, 256),
+        mode: str = "image",
+        frames_per_sample: int = 1,
     ):
         if not Path(root).is_dir():
             raise RuntimeError(f"Invalid path {root}")
 
         self.split = split
         self.transform = transform
+        self.mode = mode
 
         self.shuffle = False
 
@@ -84,14 +92,44 @@ class PreGeneratedMemmapDataset(Dataset):
         data: np.ndarray = np.memmap(path, mode="r", dtype="uint8")
         assert data.size > 0
         image_size = _coerce_size_2_t(image_size)
-        self.data = data.reshape((-1, image_size[0], image_size[1], 3))
+
+        if self.mode == "image":
+            shape = (-1, image_size[0], image_size[1], 3)
+        elif self.mode == "video":
+            shape = (-1, frames_per_sample, image_size[0], image_size[1], 3)
+        else:
+            raise ValueError(f"Invalid mode {self.mode}. Must be 'image' or 'video'.")
+
+        self.data = data.reshape(shape)
+
+        self.transform = transform
+        self.transform_frame = transform_frame  # Suggested: transforms.ToTensor()
 
     def __getitem__(self, index):
-        sample = self.data[index]
-        sample = Image.fromarray(sample)
+        item = self.data[index]
+
+        if self.mode == "image":
+            item = Image.fromarray(item)
+        elif self.mode == "video":
+            item = [Image.fromarray(frame) for frame in item]
+
+        if self.mode == "image":
+            if self.transform_frame:
+                item = self.transform_frame(item)
+        elif self.mode == "video":
+            if self.transform_frame:
+                item = [self.transform_frame(frame) for frame in item]
+            if isinstance(item[0], torch.Tensor):
+                item = torch.stack(item)
+            elif isinstance(item[0], np.ndarray):
+                item = np.stack(item)
+            else:
+                raise ValueError("Expected items to be tensors or numpy arrays.")
+
         if self.transform:
-            return self.transform(sample)
-        return sample
+            item = self.transform(item)
+
+        return item
 
     def __len__(self):
         return self.data.shape[0]
