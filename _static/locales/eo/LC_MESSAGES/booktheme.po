@@ -8,68 +8,68 @@ msgstr ""
 "Language: eo\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Theme by the"
-msgstr "Temo de la"
-
-msgid "Open an issue"
-msgstr "Malfermu numeron"
-
-msgid "Contents"
-msgstr "Enhavo"
-
-msgid "Download notebook file"
-msgstr "Elŝutu kajeran dosieron"
-
-msgid "Sphinx Book Theme"
-msgstr "Sfinksa Libro-Temo"
-
-msgid "Fullscreen mode"
-msgstr "Plenekrana reĝimo"
-
-msgid "Edit this page"
-msgstr "Redaktu ĉi tiun paĝon"
+msgid "By the"
+msgstr "Per la"
 
 msgid "By"
 msgstr "De"
 
+msgid "Contents"
+msgstr "Enhavo"
+
 msgid "Copyright"
 msgstr "Kopirajto"
 
-msgid "Source repository"
-msgstr "Fonto-deponejo"
-
-msgid "previous page"
-msgstr "antaŭa paĝo"
-
-msgid "next page"
-msgstr "sekva paĝo"
-
-msgid "Toggle navigation"
-msgstr "Ŝalti navigadon"
-
-msgid "repository"
-msgstr "deponejo"
-
-msgid "suggest edit"
-msgstr "sugesti redaktadon"
-
-msgid "open issue"
-msgstr "malferma numero"
-
-msgid "Launch"
-msgstr "Lanĉo"
-
-msgid "Print to PDF"
-msgstr "Presi al PDF"
-
-msgid "By the"
-msgstr "Per la"
-
-msgid "Last updated on"
-msgstr "Laste ĝisdatigita la"
+msgid "Download notebook file"
+msgstr "Elŝutu kajeran dosieron"
 
 msgid "Download source file"
 msgstr "Elŝutu fontodosieron"
 
 msgid "Download this page"
 msgstr "Elŝutu ĉi tiun paĝon"
+
+msgid "Edit this page"
+msgstr "Redaktu ĉi tiun paĝon"
+
+msgid "Fullscreen mode"
+msgstr "Plenekrana reĝimo"
+
+msgid "Last updated on"
+msgstr "Laste ĝisdatigita la"
+
+msgid "Launch"
+msgstr "Lanĉo"
+
+msgid "Open an issue"
+msgstr "Malfermu numeron"
+
+msgid "Print to PDF"
+msgstr "Presi al PDF"
+
+msgid "Source repository"
+msgstr "Fonto-deponejo"
+
+msgid "Sphinx Book Theme"
+msgstr "Sfinksa Libro-Temo"
+
+msgid "Theme by the"
+msgstr "Temo de la"
+
+msgid "Toggle navigation"
+msgstr "Ŝalti navigadon"
+
+msgid "next page"
+msgstr "sekva paĝo"
+
+msgid "open issue"
+msgstr "malferma numero"
+
+msgid "previous page"
+msgstr "antaŭa paĝo"
+
+msgid "repository"
+msgstr "deponejo"
+
+msgid "suggest edit"
+msgstr "sugesti redaktadon"

@@ -8,68 +8,68 @@ msgstr ""
 "Language: ru\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Theme by the"
-msgstr "Тема от"
+msgid "By the"
+msgstr "Посредством"
 
-msgid "Open an issue"
-msgstr "Открыть вопрос"
+msgid "By"
+msgstr "Автор:"
 
 msgid "Contents"
 msgstr "Содержание"
 
-msgid "Download notebook file"
-msgstr "Скачать файл записной книжки"
-
-msgid "Sphinx Book Theme"
-msgstr "Тема книги Сфинкс"
-
-msgid "Fullscreen mode"
-msgstr "Полноэкранный режим"
-
-msgid "Edit this page"
-msgstr "Редактировать эту страницу"
-
-msgid "By"
-msgstr "По"
-
 msgid "Copyright"
 msgstr "авторское право"
 
-msgid "Source repository"
-msgstr "Исходный репозиторий"
-
-msgid "previous page"
-msgstr "Предыдущая страница"
-
-msgid "next page"
-msgstr "Следующая страница"
-
-msgid "Toggle navigation"
-msgstr "Переключить навигацию"
-
-msgid "repository"
-msgstr "хранилище"
-
-msgid "suggest edit"
-msgstr "предложить редактировать"
-
-msgid "open issue"
-msgstr "открытый вопрос"
-
-msgid "Launch"
-msgstr "Запуск"
-
-msgid "Print to PDF"
-msgstr "Распечатать в PDF"
-
-msgid "By the"
-msgstr "Посредством"
-
-msgid "Last updated on"
-msgstr "Последнее обновление"
+msgid "Download notebook file"
+msgstr "Скачать файл записной книжки"
 
 msgid "Download source file"
 msgstr "Скачать исходный файл"
 
 msgid "Download this page"
 msgstr "Загрузите эту страницу"
+
+msgid "Edit this page"
+msgstr "Редактировать эту страницу"
+
+msgid "Fullscreen mode"
+msgstr "Полноэкранный режим"
+
+msgid "Last updated on"
+msgstr "Последнее обновление"
+
+msgid "Launch"
+msgstr "Запуск"
+
+msgid "Open an issue"
+msgstr "Открыть вопрос"
+
+msgid "Print to PDF"
+msgstr "Распечатать в PDF"
+
+msgid "Source repository"
+msgstr "Исходный репозиторий"
+
+msgid "Sphinx Book Theme"
+msgstr "Тема книги Сфинкс"
+
+msgid "Theme by the"
+msgstr "Тема от"
+
+msgid "Toggle navigation"
+msgstr "Переключить навигацию"
+
+msgid "next page"
+msgstr "Следующая страница"
+
+msgid "open issue"
+msgstr "открытый вопрос"
+
+msgid "previous page"
+msgstr "Предыдущая страница"
+
+msgid "repository"
+msgstr "хранилище"
+
+msgid "suggest edit"
+msgstr "предложить редактировать"

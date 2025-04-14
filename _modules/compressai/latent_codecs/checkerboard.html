@@ -13,32 +13,32 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../../../_static/documentation_options.js?v=9eb32ce0"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/compressai/latent_codecs/checkerboard';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -51,27 +51,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -93,8 +89,13 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
     </header>
   
 
@@ -120,6 +121,8 @@
         <div class="sidebar-primary-item">
 
   
+    
+  
 
 <a class="navbar-brand logo" href="../../../index.html">
   
@@ -141,7 +144,7 @@
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -199,7 +202,7 @@
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
 
@@ -208,14 +211,14 @@
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</label></div>
+</button></div>
       
     </div>
   
@@ -244,10 +247,10 @@
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script>
@@ -255,7 +258,7 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
@@ -315,20 +318,19 @@ document.write(`
 <span class="c1"># OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF</span>
 <span class="c1"># ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
 
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
 
-<span class="kn">from</span> <span class="nn">compressai.entropy_models</span> <span class="kn">import</span> <span class="n">EntropyModel</span>
-<span class="kn">from</span> <span class="nn">compressai.layers</span> <span class="kn">import</span> <span class="n">CheckerboardMaskedConv2d</span>
-<span class="kn">from</span> <span class="nn">compressai.ops</span> <span class="kn">import</span> <span class="n">quantize_ste</span>
-<span class="kn">from</span> <span class="nn">compressai.registry</span> <span class="kn">import</span> <span class="n">register_module</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compressai.entropy_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">EntropyModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compressai.layers</span><span class="w"> </span><span class="kn">import</span> <span class="n">CheckerboardMaskedConv2d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compressai.ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">quantize_ste</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compressai.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_module</span>
 
-<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">LatentCodec</span>
-<span class="kn">from</span> <span class="nn">.gaussian_conditional</span> <span class="kn">import</span> <span class="n">GaussianConditionalLatentCodec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">LatentCodec</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;CheckerboardLatentCodec&quot;</span><span class="p">,</span>
@@ -338,7 +340,7 @@ document.write(`
 <div class="viewcode-block" id="CheckerboardLatentCodec">
 <a class="viewcode-back" href="../../../latent_codecs.html#compressai.latent_codecs.CheckerboardLatentCodec">[docs]</a>
 <span class="nd">@register_module</span><span class="p">(</span><span class="s2">&quot;CheckerboardLatentCodec&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">CheckerboardLatentCodec</span><span class="p">(</span><span class="n">LatentCodec</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CheckerboardLatentCodec</span><span class="p">(</span><span class="n">LatentCodec</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reconstructs latent using 2-pass context model with checkerboard anchors.</span>
 
 <span class="sd">    Checkerboard context model introduced in [He2021].</span>
@@ -399,16 +401,11 @@ document.write(`
 <span class="sd">        □   empty</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">latent_codec</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LatentCodec</span><span class="p">]</span>
-
-    <span class="n">entropy_parameters</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span>
-    <span class="n">context_prediction</span><span class="p">:</span> <span class="n">CheckerboardMaskedConv2d</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">latent_codec</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LatentCodec</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">entropy_parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">context_prediction</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">latent_codec</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LatentCodec</span><span class="p">],</span>
+        <span class="n">entropy_parameters</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+        <span class="n">context_prediction</span><span class="p">:</span> <span class="n">CheckerboardMaskedConv2d</span><span class="p">,</span>
         <span class="n">anchor_parity</span><span class="o">=</span><span class="s2">&quot;even&quot;</span><span class="p">,</span>
         <span class="n">forward_method</span><span class="o">=</span><span class="s2">&quot;twopass&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
@@ -418,21 +415,15 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">anchor_parity</span> <span class="o">=</span> <span class="n">anchor_parity</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">non_anchor_parity</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;odd&quot;</span><span class="p">:</span> <span class="s2">&quot;even&quot;</span><span class="p">,</span> <span class="s2">&quot;even&quot;</span><span class="p">:</span> <span class="s2">&quot;odd&quot;</span><span class="p">}[</span><span class="n">anchor_parity</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">forward_method</span> <span class="o">=</span> <span class="n">forward_method</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span> <span class="o">=</span> <span class="n">entropy_parameters</span> <span class="ow">or</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span> <span class="o">=</span> <span class="n">context_prediction</span> <span class="ow">or</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_group_defaults</span><span class="p">(</span>
-            <span class="s2">&quot;latent_codec&quot;</span><span class="p">,</span>
-            <span class="n">latent_codec</span><span class="p">,</span>
-            <span class="n">defaults</span><span class="o">=</span><span class="p">{</span>
-                <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">GaussianConditionalLatentCodec</span><span class="p">(</span><span class="n">quantizer</span><span class="o">=</span><span class="s2">&quot;ste&quot;</span><span class="p">),</span>
-            <span class="p">},</span>
-            <span class="n">save_direct</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span> <span class="o">=</span> <span class="n">entropy_parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span> <span class="o">=</span> <span class="n">context_prediction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span> <span class="o">=</span> <span class="n">latent_codec</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LatentCodec</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LatentCodec</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">side_params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">side_params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward_method</span> <span class="o">==</span> <span class="s2">&quot;onepass&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_onepass</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">side_params</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward_method</span> <span class="o">==</span> <span class="s2">&quot;twopass&quot;</span><span class="p">:</span>
@@ -441,7 +432,7 @@ document.write(`
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_twopass_faster</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">side_params</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown forward method: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">forward_method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_forward_onepass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">side_params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_onepass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">side_params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fast estimation with single pass of the entropy parameters network.</span>
 
 <span class="sd">        It is faster than the twopass method (only one pass required!),</span>
@@ -460,7 +451,7 @@ document.write(`
             <span class="s2">&quot;y_hat&quot;</span><span class="p">:</span> <span class="n">y_hat</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">_forward_twopass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">side_params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_twopass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">side_params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs the entropy parameters network in two passes.</span>
 
 <span class="sd">        The first pass gets ``y_hat`` and ``means_hat`` for the anchors.</span>
@@ -478,14 +469,36 @@ document.write(`
 
         <span class="n">params</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">((</span><span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">))</span>
 
-        <span class="n">y_hat_anchors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_twopass_step</span><span class="p">(</span>
-            <span class="n">y</span><span class="p">,</span> <span class="n">side_params</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_ctx_zero</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="s2">&quot;anchor&quot;</span>
-        <span class="p">)</span>
+        <span class="n">y_hat_</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="n">y_hat_non_anchors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_twopass_step</span><span class="p">(</span>
-            <span class="n">y</span><span class="p">,</span> <span class="n">side_params</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span><span class="p">(</span><span class="n">y_hat_anchors</span><span class="p">),</span> <span class="s2">&quot;non_anchor&quot;</span>
-        <span class="p">)</span>
+        <span class="c1"># NOTE: The _i variables contain only the current step&#39;s pixels.</span>
+        <span class="c1"># i=0: step=anchor</span>
+        <span class="c1"># i=1: step=non_anchor</span>
 
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;anchor&quot;</span><span class="p">,</span> <span class="s2">&quot;non_anchor&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="s2">&quot;anchor&quot;</span><span class="p">:</span>
+                <span class="n">y_ctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_ctx_zero</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># step == &quot;non_anchor&quot;</span>
+                <span class="n">y_hat_anchors</span> <span class="o">=</span> <span class="n">y_hat_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">y_ctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span><span class="p">(</span><span class="n">y_hat_anchors</span><span class="p">)</span>
+
+            <span class="n">params_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">y_ctx</span><span class="p">,</span> <span class="n">side_params</span><span class="p">))</span>
+
+            <span class="c1"># Save params for current step. This is later used for entropy estimation.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_copy</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">params_i</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+
+            <span class="c1"># Keep only elements needed for current step.</span>
+            <span class="c1"># It&#39;s not necessary to mask the rest out just yet, but it doesn&#39;t hurt.</span>
+            <span class="n">params_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_only</span><span class="p">(</span><span class="n">params_i</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+            <span class="n">y_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_only</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+
+            <span class="c1"># Determine y_hat for current step, and mask out the other pixels.</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">means_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">_chunk</span><span class="p">(</span><span class="n">params_i</span><span class="p">)</span>
+            <span class="n">y_hat_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_only</span><span class="p">(</span><span class="n">quantize_ste</span><span class="p">(</span><span class="n">y_i</span> <span class="o">-</span> <span class="n">means_i</span><span class="p">)</span> <span class="o">+</span> <span class="n">means_i</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+
+            <span class="n">y_hat_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_hat_i</span><span class="p">)</span>
+
+        <span class="p">[</span><span class="n">y_hat_anchors</span><span class="p">,</span> <span class="n">y_hat_non_anchors</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_hat_</span>
         <span class="n">y_hat</span> <span class="o">=</span> <span class="n">y_hat_anchors</span> <span class="o">+</span> <span class="n">y_hat_non_anchors</span>
         <span class="n">y_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">](</span><span class="n">y</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
 
@@ -496,33 +509,7 @@ document.write(`
             <span class="s2">&quot;y_hat&quot;</span><span class="p">:</span> <span class="n">y_hat</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">_forward_twopass_step</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">side_params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">y_ctx</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-        <span class="c1"># NOTE: The _i variables contain only the current step&#39;s pixels.</span>
-        <span class="k">assert</span> <span class="n">step</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;anchor&quot;</span><span class="p">,</span> <span class="s2">&quot;non_anchor&quot;</span><span class="p">)</span>
-
-        <span class="n">params_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">y_ctx</span><span class="p">,</span> <span class="n">side_params</span><span class="p">))</span>
-
-        <span class="c1"># Save params for current step. This is later used for entropy estimation.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_copy</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">params_i</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
-
-        <span class="c1"># Apply latent_codec&#39;s &quot;entropy_parameters()&quot;, if it exists. Usually identity.</span>
-        <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;entropy_parameters&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>
-        <span class="n">params_i</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">params_i</span><span class="p">)</span>
-
-        <span class="c1"># Keep only elements needed for current step.</span>
-        <span class="c1"># It&#39;s not necessary to mask the rest out just yet, but it doesn&#39;t hurt.</span>
-        <span class="n">params_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_only</span><span class="p">(</span><span class="n">params_i</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
-        <span class="n">y_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_only</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
-
-        <span class="c1"># Determine y_hat for current step, and mask out the other pixels.</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">means_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">_chunk</span><span class="p">(</span><span class="n">params_i</span><span class="p">)</span>
-        <span class="n">y_hat_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_only</span><span class="p">(</span><span class="n">quantize_ste</span><span class="p">(</span><span class="n">y_i</span> <span class="o">-</span> <span class="n">means_i</span><span class="p">)</span> <span class="o">+</span> <span class="n">means_i</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">y_hat_i</span>
-
-    <span class="k">def</span> <span class="nf">_forward_twopass_faster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">side_params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_twopass_faster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">side_params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs the entropy parameters network in two passes.</span>
 
 <span class="sd">        This version was written based on the paper description.</span>
@@ -533,8 +520,6 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y_ctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_ctx_zero</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">y_ctx</span><span class="p">,</span> <span class="n">side_params</span><span class="p">))</span>
-        <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;entropy_parameters&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_only</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s2">&quot;anchor&quot;</span><span class="p">)</span>  <span class="c1"># Probably unnecessary.</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">means_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">_chunk</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="n">y_hat_anchors</span> <span class="o">=</span> <span class="n">quantize_ste</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">means_hat</span><span class="p">)</span> <span class="o">+</span> <span class="n">means_hat</span>
@@ -557,12 +542,11 @@ document.write(`
         <span class="p">}</span>
 
     <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">_y_ctx_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_y_ctx_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a zero tensor with correct shape for y_ctx.&quot;&quot;&quot;</span>
-        <span class="n">y_ctx_meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="n">y_ctx_meta</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">side_params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">side_params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="n">n</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">y_hat_</span> <span class="o">=</span> <span class="n">side_params</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
         <span class="n">side_params_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unembed</span><span class="p">(</span><span class="n">side_params</span><span class="p">)</span>
@@ -572,7 +556,7 @@ document.write(`
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
             <span class="n">y_ctx_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unembed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">y_hat_</span><span class="p">)))[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">y_ctx_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask</span><span class="p">(</span><span class="n">y_ctx_i</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">)</span>
+                <span class="n">y_ctx_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_all</span><span class="p">(</span><span class="n">y_ctx_i</span><span class="p">)</span>
             <span class="n">params_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">y_ctx_i</span><span class="p">,</span> <span class="n">side_params_</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
             <span class="n">y_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">y_</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">params_i</span><span class="p">)</span>
             <span class="n">y_hat_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_out</span><span class="p">[</span><span class="s2">&quot;y_hat&quot;</span><span class="p">]</span>
@@ -586,7 +570,7 @@ document.write(`
             <span class="s2">&quot;y_hat&quot;</span><span class="p">:</span> <span class="n">y_hat</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decompress</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">strings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]],</span>
         <span class="n">shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
@@ -606,7 +590,7 @@ document.write(`
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
             <span class="n">y_ctx_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unembed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">y_hat_</span><span class="p">)))[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">y_ctx_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask</span><span class="p">(</span><span class="n">y_ctx_i</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">)</span>
+                <span class="n">y_ctx_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_all</span><span class="p">(</span><span class="n">y_ctx_i</span><span class="p">)</span>
             <span class="n">params_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">y_ctx_i</span><span class="p">,</span> <span class="n">side_params_</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
             <span class="n">y_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span>
                 <span class="p">[</span><span class="n">y_strings_</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">y_i_shape</span><span class="p">,</span> <span class="n">params_i</span>
@@ -619,7 +603,7 @@ document.write(`
             <span class="s2">&quot;y_hat&quot;</span><span class="p">:</span> <span class="n">y_hat</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">unembed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unembed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Separate single tensor into two even/odd checkerboard chunks.</span>
 
 <span class="sd">        .. code-block:: none</span>
@@ -642,7 +626,7 @@ document.write(`
             <span class="n">y_</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">y_</span>
 
-    <span class="k">def</span> <span class="nf">embed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">embed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine two even/odd checkerboard chunks into single tensor.</span>
 
 <span class="sd">        .. code-block:: none</span>
@@ -666,7 +650,7 @@ document.write(`
             <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span>
         <span class="k">return</span> <span class="n">y</span>
 
-    <span class="k">def</span> <span class="nf">_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Copy pixels in the current step.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">step</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;anchor&quot;</span><span class="p">,</span> <span class="s2">&quot;non_anchor&quot;</span><span class="p">)</span>
         <span class="n">parity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">anchor_parity</span> <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="s2">&quot;anchor&quot;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_anchor_parity</span>
@@ -677,31 +661,27 @@ document.write(`
             <span class="n">dest</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">src</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
             <span class="n">dest</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">src</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_keep_only</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_keep_only</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Keep only pixels in the current step, and zero out the rest.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask</span><span class="p">(</span>
-            <span class="n">y</span><span class="p">,</span>
-            <span class="n">parity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">non_anchor_parity</span> <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="s2">&quot;anchor&quot;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">anchor_parity</span><span class="p">,</span>
-            <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">parity</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+        <span class="n">parity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">anchor_parity</span> <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="s2">&quot;anchor&quot;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_anchor_parity</span>
         <span class="k">if</span> <span class="n">parity</span> <span class="o">==</span> <span class="s2">&quot;even&quot;</span><span class="p">:</span>
-            <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">elif</span> <span class="n">parity</span> <span class="o">==</span> <span class="s2">&quot;odd&quot;</span><span class="p">:</span>
             <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">elif</span> <span class="n">parity</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
-            <span class="n">y</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">parity</span> <span class="o">==</span> <span class="s2">&quot;odd&quot;</span><span class="p">:</span>
+            <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">y</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">y</span>
 
-    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+        <span class="n">y</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">y</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">quantize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">quantize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;noise&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span> <span class="k">else</span> <span class="s2">&quot;dequantize&quot;</span>
         <span class="n">y_hat</span> <span class="o">=</span> <span class="n">EntropyModel</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">y_hat</span></div>
@@ -715,7 +695,7 @@ document.write(`
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
 </div>
@@ -724,8 +704,6 @@ document.write(`
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"></div>
               
             
           </div>
@@ -770,8 +748,8 @@ By InterDigital Communications, Inc.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>

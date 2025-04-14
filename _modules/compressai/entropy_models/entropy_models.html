@@ -13,32 +13,32 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../../../_static/documentation_options.js?v=9eb32ce0"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/compressai/entropy_models/entropy_models';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -51,27 +51,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -93,8 +89,13 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
     </header>
   
 
@@ -120,6 +121,8 @@
         <div class="sidebar-primary-item">
 
   
+    
+  
 
 <a class="navbar-brand logo" href="../../../index.html">
   
@@ -141,7 +144,7 @@
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -199,7 +202,7 @@
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
 
@@ -208,14 +211,14 @@
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</label></div>
+</button></div>
       
     </div>
   
@@ -244,10 +247,10 @@
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script>
@@ -255,7 +258,7 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
@@ -315,30 +318,30 @@ document.write(`
 <span class="c1"># OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF</span>
 <span class="c1"># ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.stats</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.stats</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
 
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
 
-<span class="kn">from</span> <span class="nn">compressai._CXX</span> <span class="kn">import</span> <span class="n">pmf_to_quantized_cdf</span> <span class="k">as</span> <span class="n">_pmf_to_quantized_cdf</span>
-<span class="kn">from</span> <span class="nn">compressai.ops</span> <span class="kn">import</span> <span class="n">LowerBound</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compressai._CXX</span><span class="w"> </span><span class="kn">import</span> <span class="n">pmf_to_quantized_cdf</span> <span class="k">as</span> <span class="n">_pmf_to_quantized_cdf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compressai.ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">LowerBound</span>
 
 
-<span class="k">class</span> <span class="nc">_EntropyCoder</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_EntropyCoder</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Proxy class to an actual entropy coder class.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid method type &quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">method</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
 
-        <span class="kn">from</span> <span class="nn">compressai</span> <span class="kn">import</span> <span class="n">available_entropy_coders</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">compressai</span><span class="w"> </span><span class="kn">import</span> <span class="n">available_entropy_coders</span>
 
         <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">available_entropy_coders</span><span class="p">():</span>
             <span class="n">methods</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_entropy_coders</span><span class="p">())</span>
@@ -347,12 +350,12 @@ document.write(`
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;ans&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">compressai</span> <span class="kn">import</span> <span class="n">ans</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">compressai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ans</span>
 
             <span class="n">encoder</span> <span class="o">=</span> <span class="n">ans</span><span class="o">.</span><span class="n">RansEncoder</span><span class="p">()</span>
             <span class="n">decoder</span> <span class="o">=</span> <span class="n">ans</span><span class="o">.</span><span class="n">RansDecoder</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;rangecoder&quot;</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">range_coder</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">range_coder</span>
 
             <span class="n">encoder</span> <span class="o">=</span> <span class="n">range_coder</span><span class="o">.</span><span class="n">RangeEncoder</span><span class="p">()</span>
             <span class="n">decoder</span> <span class="o">=</span> <span class="n">range_coder</span><span class="o">.</span><span class="n">RangeDecoder</span><span class="p">()</span>
@@ -361,30 +364,30 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span> <span class="o">=</span> <span class="n">encoder</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_decoder</span> <span class="o">=</span> <span class="n">decoder</span>
 
-    <span class="k">def</span> <span class="nf">encode_with_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">encode_with_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">encode_with_indexes</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">decode_with_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decode_with_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decoder</span><span class="o">.</span><span class="n">decode_with_indexes</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">default_entropy_coder</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">compressai</span> <span class="kn">import</span> <span class="n">get_entropy_coder</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">default_entropy_coder</span><span class="p">():</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">compressai</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_entropy_coder</span>
 
     <span class="k">return</span> <span class="n">get_entropy_coder</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">pmf_to_quantized_cdf</span><span class="p">(</span><span class="n">pmf</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pmf_to_quantized_cdf</span><span class="p">(</span><span class="n">pmf</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="n">cdf</span> <span class="o">=</span> <span class="n">_pmf_to_quantized_cdf</span><span class="p">(</span><span class="n">pmf</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">precision</span><span class="p">)</span>
     <span class="n">cdf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">(</span><span class="n">cdf</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">cdf</span>
 
 
-<span class="k">def</span> <span class="nf">_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
 
-<span class="k">class</span> <span class="nc">EntropyModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EntropyModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Entropy model base class.</span>
 
 <span class="sd">    Args:</span>
@@ -394,7 +397,7 @@ document.write(`
 <span class="sd">        entropy_coder_precision (int): set the entropy coder precision</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">likelihood_bound</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-9</span><span class="p">,</span>
         <span class="n">entropy_coder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -416,31 +419,31 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;_quantized_cdf&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;_cdf_length&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">attributes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;entropy_coder&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_coder</span><span class="o">.</span><span class="n">name</span>
         <span class="k">return</span> <span class="n">attributes</span>
 
-    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="n">state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">entropy_coder</span> <span class="o">=</span> <span class="n">_EntropyCoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;entropy_coder&quot;</span><span class="p">))</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">quantized_cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">quantized_cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quantized_cdf</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">cdf_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cdf_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cdf_length</span>
 
     <span class="c1"># See: https://github.com/python/mypy/issues/8795</span>
     <span class="n">forward</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">_forward</span>
 
-    <span class="k">def</span> <span class="nf">quantize</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">quantize</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">means</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;noise&quot;</span><span class="p">,</span> <span class="s2">&quot;dequantize&quot;</span><span class="p">,</span> <span class="s2">&quot;symbols&quot;</span><span class="p">):</span>
@@ -467,14 +470,14 @@ document.write(`
         <span class="n">outputs</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">outputs</span>
 
-    <span class="k">def</span> <span class="nf">_quantize</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_quantize</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">means</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;_quantize is deprecated. Use quantize instead.&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">means</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">dequantize</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dequantize</span><span class="p">(</span>
         <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">means</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">means</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -485,11 +488,11 @@ document.write(`
         <span class="k">return</span> <span class="n">outputs</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_dequantize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">means</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_dequantize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">means</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;_dequantize. Use dequantize instead.&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">dequantize</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">means</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_pmf_to_cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pmf</span><span class="p">,</span> <span class="n">tail_mass</span><span class="p">,</span> <span class="n">pmf_length</span><span class="p">,</span> <span class="n">max_length</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_pmf_to_cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pmf</span><span class="p">,</span> <span class="n">tail_mass</span><span class="p">,</span> <span class="n">pmf_length</span><span class="p">,</span> <span class="n">max_length</span><span class="p">):</span>
         <span class="n">cdf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
             <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pmf_length</span><span class="p">),</span> <span class="n">max_length</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">pmf</span><span class="o">.</span><span class="n">device</span>
         <span class="p">)</span>
@@ -499,34 +502,39 @@ document.write(`
             <span class="n">cdf</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span> <span class="n">_cdf</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">_cdf</span>
         <span class="k">return</span> <span class="n">cdf</span>
 
-    <span class="k">def</span> <span class="nf">_check_cdf_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_cdf_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quantized_cdf</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Uninitialized CDFs. Run update() first&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quantized_cdf</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid CDF size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_quantized_cdf</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_check_offsets_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_offsets_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Uninitialized offsets. Run update() first&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_offset</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid offsets size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_offset</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_check_cdf_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_cdf_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cdf_length</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Uninitialized CDF lengths. Run update() first&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cdf_length</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid offsets size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_cdf_length</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compress</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">indexes</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">means</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compress input tensors to char strings.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            inputs (torch.Tensor): input tensors</span>
-<span class="sd">            indexes (torch.IntTensor): tensors CDF indexes</span>
+<span class="sd">            indexes (torch.Tensor): tensors CDF indexes</span>
 <span class="sd">            means (torch.Tensor, optional): optional tensor means</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">symbols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="s2">&quot;symbols&quot;</span><span class="p">,</span> <span class="n">means</span><span class="p">)</span>
@@ -555,19 +563,19 @@ document.write(`
             <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rv</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">strings</span>
 
-    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decompress</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">strings</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">indexes</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">,</span>
+        <span class="n">strings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">bytes</span><span class="p">],</span>
+        <span class="n">indexes</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span>
-        <span class="n">means</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">means</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decompress char strings to tensors.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            strings (str): compressed tensors</span>
-<span class="sd">            indexes (torch.IntTensor): tensors CDF indexes</span>
+<span class="sd">            strings (list[bytes]): compressed tensors</span>
+<span class="sd">            indexes (torch.Tensor): tensors CDF indexes</span>
 <span class="sd">            dtype (torch.dtype): type of dequantized output</span>
 <span class="sd">            means (torch.Tensor, optional): optional tensor means</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -615,7 +623,7 @@ document.write(`
 
 <div class="viewcode-block" id="EntropyBottleneck">
 <a class="viewcode-back" href="../../../entropy_models.html#compressai.entropy_models.EntropyBottleneck">[docs]</a>
-<span class="k">class</span> <span class="nc">EntropyBottleneck</span><span class="p">(</span><span class="n">EntropyModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EntropyBottleneck</span><span class="p">(</span><span class="n">EntropyModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Entropy bottleneck layer, introduced by J. Ballé, D. Minnen, S. Singh,</span>
 <span class="sd">    S. J. Hwang, N. Johnston, in `&quot;Variational image compression with a scale</span>
 <span class="sd">    hyperprior&quot; &lt;https://arxiv.org/abs/1802.01436&gt;`_.</span>
@@ -629,7 +637,7 @@ document.write(`
 
     <span class="n">_offset</span><span class="p">:</span> <span class="n">Tensor</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -676,11 +684,11 @@ document.write(`
         <span class="n">target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tail_mass</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([</span><span class="o">-</span><span class="n">target</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">target</span><span class="p">]))</span>
 
-    <span class="k">def</span> <span class="nf">_get_medians</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_medians</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="n">medians</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantiles</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">medians</span>
 
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">update_quantiles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">update_quantiles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="c1"># Check if we need to update the bottleneck parameters, the offsets are</span>
         <span class="c1"># only computed and stored when the conditonal model is update()&#39;d.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
@@ -718,12 +726,12 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_cdf_length</span> <span class="o">=</span> <span class="n">pmf_length</span> <span class="o">+</span> <span class="mi">2</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">loss</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logits_cumulative</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quantiles</span><span class="p">,</span> <span class="n">stop_gradient</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">logits</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">loss</span>
 
-    <span class="k">def</span> <span class="nf">_logits_cumulative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">stop_gradient</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_logits_cumulative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">stop_gradient</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="c1"># TorchScript not yet working (nn.Mmodule indexing not supported)</span>
         <span class="n">logits</span> <span class="o">=</span> <span class="n">inputs</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
@@ -744,7 +752,7 @@ document.write(`
                 <span class="n">logits</span> <span class="o">=</span> <span class="n">logits</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">logits</span>
 
-    <span class="k">def</span> <span class="nf">_likelihood</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_likelihood</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">stop_gradient</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
         <span class="n">half</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
@@ -753,7 +761,7 @@ document.write(`
         <span class="n">likelihood</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">upper</span><span class="p">)</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">lower</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">likelihood</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">training</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">training</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -804,7 +812,7 @@ document.write(`
         <span class="k">return</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">likelihood</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_build_indexes</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_indexes</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
         <span class="n">dims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">C</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -817,11 +825,11 @@ document.write(`
         <span class="k">return</span> <span class="n">indexes</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">size</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_extend_ndims</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_extend_ndims</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">tensor</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span><span class="p">))</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">tensor</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">_update_quantiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_radius</span><span class="o">=</span><span class="mf">1e5</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_quantiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_radius</span><span class="o">=</span><span class="mf">1e5</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fast quantile update via bisection search.</span>
 
 <span class="sd">        Often faster and much more precise than minimizing aux loss.</span>
@@ -831,7 +839,7 @@ document.write(`
         <span class="n">low</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="o">-</span><span class="n">search_radius</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
         <span class="n">high</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">search_radius</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">=</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logits_cumulative</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">stop_gradient</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)):</span>
@@ -839,7 +847,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">quantiles</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">q_i</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_search_target</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_search_target</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">assert</span> <span class="p">(</span><span class="n">low</span> <span class="o">&lt;=</span> <span class="n">high</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">strict</span><span class="p">:</span>
             <span class="k">assert</span> <span class="p">((</span><span class="n">f</span><span class="p">(</span><span class="n">low</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">target</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">target</span> <span class="o">&lt;=</span> <span class="n">f</span><span class="p">(</span><span class="n">high</span><span class="p">)))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
@@ -853,7 +861,7 @@ document.write(`
             <span class="n">high</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">f_mid</span> <span class="o">&gt;=</span> <span class="n">target</span><span class="p">,</span> <span class="n">mid</span><span class="p">,</span> <span class="n">high</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">low</span> <span class="o">+</span> <span class="n">high</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 
-    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_indexes</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
         <span class="n">medians</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_medians</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
         <span class="n">spatial_dims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">-</span> <span class="mi">2</span>
@@ -861,7 +869,7 @@ document.write(`
         <span class="n">medians</span> <span class="o">=</span> <span class="n">medians</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="o">*</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">spatial_dims</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">medians</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
         <span class="n">output_size</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">strings</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quantized_cdf</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="o">*</span><span class="n">size</span><span class="p">)</span>
         <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_indexes</span><span class="p">(</span><span class="n">output_size</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quantized_cdf</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="n">medians</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extend_ndims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_medians</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="nb">len</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
@@ -872,7 +880,7 @@ document.write(`
 
 <div class="viewcode-block" id="GaussianConditional">
 <a class="viewcode-back" href="../../../entropy_models.html#compressai.entropy_models.GaussianConditional">[docs]</a>
-<span class="k">class</span> <span class="nc">GaussianConditional</span><span class="p">(</span><span class="n">EntropyModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GaussianConditional</span><span class="p">(</span><span class="n">EntropyModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Gaussian conditional layer, introduced by J. Ballé, D. Minnen, S. Singh,</span>
 <span class="sd">    S. J. Hwang, N. Johnston, in `&quot;Variational image compression with a scale</span>
 <span class="sd">    hyperprior&quot; &lt;https://arxiv.org/abs/1802.01436&gt;`_.</span>
@@ -883,7 +891,7 @@ document.write(`
 <span class="sd">    for more information.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">scale_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">]],</span>
         <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -922,20 +930,20 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_prepare_scale_table</span><span class="p">(</span><span class="n">scale_table</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_scale_table</span><span class="p">(</span><span class="n">scale_table</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">scale_table</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">_standardized_cumulative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_standardized_cumulative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="n">half</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
         <span class="n">const</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mi">2</span><span class="o">**-</span><span class="mf">0.5</span><span class="p">))</span>
         <span class="c1"># Using the complementary error function maximizes numerical precision.</span>
         <span class="k">return</span> <span class="n">half</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">erfc</span><span class="p">(</span><span class="n">const</span> <span class="o">*</span> <span class="n">inputs</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_standardized_quantile</span><span class="p">(</span><span class="n">quantile</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_standardized_quantile</span><span class="p">(</span><span class="n">quantile</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">quantile</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">update_scale_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_table</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_scale_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_table</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># Check if we need to update the gaussian conditional parameters, the</span>
         <span class="c1"># offsets are only computed and stored when the conditonal model is</span>
         <span class="c1"># updated.</span>
@@ -946,7 +954,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">multiplier</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_standardized_quantile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tail_mass</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">pmf_center</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_table</span> <span class="o">*</span> <span class="n">multiplier</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
         <span class="n">pmf_length</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pmf_center</span> <span class="o">+</span> <span class="mi">1</span>
@@ -971,7 +979,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="o">-</span><span class="n">pmf_center</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cdf_length</span> <span class="o">=</span> <span class="n">pmf_length</span> <span class="o">+</span> <span class="mi">2</span>
 
-    <span class="k">def</span> <span class="nf">_likelihood</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_likelihood</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">scales</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">means</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="n">half</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
@@ -990,7 +998,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">likelihood</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">scales</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -1005,7 +1013,7 @@ document.write(`
             <span class="n">likelihood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood_lower_bound</span><span class="p">(</span><span class="n">likelihood</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">likelihood</span>
 
-    <span class="k">def</span> <span class="nf">build_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scales</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scales</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="n">scales</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_bound_scale</span><span class="p">(</span><span class="n">scales</span><span class="p">)</span>
         <span class="n">indexes</span> <span class="o">=</span> <span class="n">scales</span><span class="o">.</span><span class="n">new_full</span><span class="p">(</span><span class="n">scales</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_table</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_table</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
@@ -1014,8 +1022,8 @@ document.write(`
 
 
 
-<span class="k">class</span> <span class="nc">GaussianMixtureConditional</span><span class="p">(</span><span class="n">GaussianConditional</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GaussianMixtureConditional</span><span class="p">(</span><span class="n">GaussianConditional</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">K</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
         <span class="n">scale_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1026,7 +1034,7 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="n">K</span>
 
-    <span class="k">def</span> <span class="nf">_likelihood</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_likelihood</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">scales</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">means</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">Tensor</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="n">likelihood</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
@@ -1044,7 +1052,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">likelihood</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">scales</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -1063,7 +1071,7 @@ document.write(`
         <span class="k">return</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">likelihood</span>
 
     <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">_build_cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">abs_max</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">abs_max</span><span class="p">):</span>
         <span class="n">num_latents</span> <span class="o">=</span> <span class="n">scales</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">num_samples</span> <span class="o">=</span> <span class="n">abs_max</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">TINY</span> <span class="o">=</span> <span class="mf">1e-10</span>
@@ -1145,7 +1153,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">cdf</span>
 
-    <span class="k">def</span> <span class="nf">reshape_entropy_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">nonzero</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reshape_entropy_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">nonzero</span><span class="p">):</span>
         <span class="n">reshape_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">scales</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="n">scales</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="n">scales</span> <span class="o">=</span> <span class="p">(</span>
@@ -1165,7 +1173,7 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span>
 
-    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
         <span class="n">abs_max</span> <span class="o">=</span> <span class="p">(</span>
             <span class="nb">max</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="o">.</span><span class="n">int</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="p">)</span>
@@ -1201,7 +1209,7 @@ document.write(`
 
         <span class="k">return</span> <span class="p">(</span><span class="n">rv</span><span class="p">,</span> <span class="n">abs_max</span><span class="p">,</span> <span class="n">zero_bitmap</span><span class="p">),</span> <span class="n">y_quantized</span>
 
-    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">abs_max</span><span class="p">,</span> <span class="n">zero_bitmap</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strings</span><span class="p">,</span> <span class="n">abs_max</span><span class="p">,</span> <span class="n">zero_bitmap</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
         <span class="n">nonzero</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">zero_bitmap</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="n">cdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_cdf</span><span class="p">(</span>
             <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">reshape_entropy_parameters</span><span class="p">(</span><span class="n">scales</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">nonzero</span><span class="p">),</span> <span class="n">abs_max</span>
@@ -1242,7 +1250,7 @@ document.write(`
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
 </div>
@@ -1251,8 +1259,6 @@ document.write(`
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"></div>
               
             
           </div>
@@ -1297,8 +1303,8 @@ By InterDigital Communications, Inc.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>

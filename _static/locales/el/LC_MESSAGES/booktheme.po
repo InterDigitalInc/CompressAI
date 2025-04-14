@@ -8,68 +8,68 @@ msgstr ""
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Theme by the"
-msgstr "Θέμα από το"
-
-msgid "Open an issue"
-msgstr "Ανοίξτε ένα ζήτημα"
-
-msgid "Contents"
-msgstr "Περιεχόμενα"
-
-msgid "Download notebook file"
-msgstr "Λήψη αρχείου σημειωματάριου"
-
-msgid "Sphinx Book Theme"
-msgstr "Θέμα βιβλίου Sphinx"
-
-msgid "Fullscreen mode"
-msgstr "ΛΕΙΤΟΥΡΓΙΑ ΠΛΗΡΟΥΣ ΟΘΟΝΗΣ"
-
-msgid "Edit this page"
-msgstr "Επεξεργαστείτε αυτήν τη σελίδα"
+msgid "By the"
+msgstr "Από το"
 
 msgid "By"
 msgstr "Με"
 
+msgid "Contents"
+msgstr "Περιεχόμενα"
+
 msgid "Copyright"
 msgstr "Πνευματική ιδιοκτησία"
 
-msgid "Source repository"
-msgstr "Αποθήκη πηγής"
-
-msgid "previous page"
-msgstr "προηγούμενη σελίδα"
-
-msgid "next page"
-msgstr "επόμενη σελίδα"
-
-msgid "Toggle navigation"
-msgstr "Εναλλαγή πλοήγησης"
-
-msgid "repository"
-msgstr "αποθήκη"
-
-msgid "suggest edit"
-msgstr "προτείνω επεξεργασία"
-
-msgid "open issue"
-msgstr "ανοιχτό ζήτημα"
-
-msgid "Launch"
-msgstr "Εκτόξευση"
-
-msgid "Print to PDF"
-msgstr "Εκτύπωση σε PDF"
-
-msgid "By the"
-msgstr "Από το"
-
-msgid "Last updated on"
-msgstr "Τελευταία ενημέρωση στις"
+msgid "Download notebook file"
+msgstr "Λήψη αρχείου σημειωματάριου"
 
 msgid "Download source file"
 msgstr "Λήψη αρχείου προέλευσης"
 
 msgid "Download this page"
 msgstr "Λήψη αυτής της σελίδας"
+
+msgid "Edit this page"
+msgstr "Επεξεργαστείτε αυτήν τη σελίδα"
+
+msgid "Fullscreen mode"
+msgstr "ΛΕΙΤΟΥΡΓΙΑ ΠΛΗΡΟΥΣ ΟΘΟΝΗΣ"
+
+msgid "Last updated on"
+msgstr "Τελευταία ενημέρωση στις"
+
+msgid "Launch"
+msgstr "Εκτόξευση"
+
+msgid "Open an issue"
+msgstr "Ανοίξτε ένα ζήτημα"
+
+msgid "Print to PDF"
+msgstr "Εκτύπωση σε PDF"
+
+msgid "Source repository"
+msgstr "Αποθήκη πηγής"
+
+msgid "Sphinx Book Theme"
+msgstr "Θέμα βιβλίου Sphinx"
+
+msgid "Theme by the"
+msgstr "Θέμα από το"
+
+msgid "Toggle navigation"
+msgstr "Εναλλαγή πλοήγησης"
+
+msgid "next page"
+msgstr "επόμενη σελίδα"
+
+msgid "open issue"
+msgstr "ανοιχτό ζήτημα"
+
+msgid "previous page"
+msgstr "προηγούμενη σελίδα"
+
+msgid "repository"
+msgstr "αποθήκη"
+
+msgid "suggest edit"
+msgstr "προτείνω επεξεργασία"

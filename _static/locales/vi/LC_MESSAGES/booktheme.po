@@ -8,68 +8,68 @@ msgstr ""
 "Language: vi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Theme by the"
-msgstr "Chủ đề của"
-
-msgid "Open an issue"
-msgstr "Mở một vấn đề"
-
-msgid "Contents"
-msgstr "Nội dung"
-
-msgid "Download notebook file"
-msgstr "Tải xuống tệp sổ tay"
-
-msgid "Sphinx Book Theme"
-msgstr "Chủ đề sách nhân sư"
-
-msgid "Fullscreen mode"
-msgstr "Chế độ toàn màn hình"
-
-msgid "Edit this page"
-msgstr "chỉnh sửa trang này"
+msgid "By the"
+msgstr "Bằng"
 
 msgid "By"
 msgstr "Bởi"
 
+msgid "Contents"
+msgstr "Nội dung"
+
 msgid "Copyright"
 msgstr "Bản quyền"
 
-msgid "Source repository"
-msgstr "Kho nguồn"
-
-msgid "previous page"
-msgstr "trang trước"
-
-msgid "next page"
-msgstr "Trang tiếp theo"
-
-msgid "Toggle navigation"
-msgstr "Chuyển đổi điều hướng thành"
-
-msgid "repository"
-msgstr "kho"
-
-msgid "suggest edit"
-msgstr "đề nghị chỉnh sửa"
-
-msgid "open issue"
-msgstr "vấn đề mở"
-
-msgid "Launch"
-msgstr "Phóng"
-
-msgid "Print to PDF"
-msgstr "In sang PDF"
-
-msgid "By the"
-msgstr "Bằng"
-
-msgid "Last updated on"
-msgstr "Cập nhật lần cuối vào"
+msgid "Download notebook file"
+msgstr "Tải xuống tệp sổ tay"
 
 msgid "Download source file"
 msgstr "Tải xuống tệp nguồn"
 
 msgid "Download this page"
 msgstr "Tải xuống trang này"
+
+msgid "Edit this page"
+msgstr "chỉnh sửa trang này"
+
+msgid "Fullscreen mode"
+msgstr "Chế độ toàn màn hình"
+
+msgid "Last updated on"
+msgstr "Cập nhật lần cuối vào"
+
+msgid "Launch"
+msgstr "Phóng"
+
+msgid "Open an issue"
+msgstr "Mở một vấn đề"
+
+msgid "Print to PDF"
+msgstr "In sang PDF"
+
+msgid "Source repository"
+msgstr "Kho nguồn"
+
+msgid "Sphinx Book Theme"
+msgstr "Chủ đề sách nhân sư"
+
+msgid "Theme by the"
+msgstr "Chủ đề của"
+
+msgid "Toggle navigation"
+msgstr "Chuyển đổi điều hướng thành"
+
+msgid "next page"
+msgstr "Trang tiếp theo"
+
+msgid "open issue"
+msgstr "vấn đề mở"
+
+msgid "previous page"
+msgstr "trang trước"
+
+msgid "repository"
+msgstr "kho"
+
+msgid "suggest edit"
+msgstr "đề nghị chỉnh sửa"

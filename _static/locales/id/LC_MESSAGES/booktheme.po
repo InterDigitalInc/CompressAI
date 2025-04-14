@@ -8,68 +8,68 @@ msgstr ""
 "Language: id\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Theme by the"
-msgstr "Tema oleh"
-
-msgid "Open an issue"
-msgstr "Buka masalah"
-
-msgid "Contents"
-msgstr "Isi"
-
-msgid "Download notebook file"
-msgstr "Unduh file notebook"
-
-msgid "Sphinx Book Theme"
-msgstr "Tema Buku Sphinx"
-
-msgid "Fullscreen mode"
-msgstr "Mode layar penuh"
-
-msgid "Edit this page"
-msgstr "Edit halaman ini"
+msgid "By the"
+msgstr "Oleh"
 
 msgid "By"
 msgstr "Oleh"
 
+msgid "Contents"
+msgstr "Isi"
+
 msgid "Copyright"
 msgstr "hak cipta"
 
-msgid "Source repository"
-msgstr "Repositori sumber"
-
-msgid "previous page"
-msgstr "halaman sebelumnya"
-
-msgid "next page"
-msgstr "halaman selanjutnya"
-
-msgid "Toggle navigation"
-msgstr "Alihkan navigasi"
-
-msgid "repository"
-msgstr "gudang"
-
-msgid "suggest edit"
-msgstr "menyarankan edit"
-
-msgid "open issue"
-msgstr "masalah terbuka"
-
-msgid "Launch"
-msgstr "Meluncurkan"
-
-msgid "Print to PDF"
-msgstr "Cetak ke PDF"
-
-msgid "By the"
-msgstr "Oleh"
-
-msgid "Last updated on"
-msgstr "Terakhir diperbarui saat"
+msgid "Download notebook file"
+msgstr "Unduh file notebook"
 
 msgid "Download source file"
 msgstr "Unduh file sumber"
 
 msgid "Download this page"
 msgstr "Unduh halaman ini"
+
+msgid "Edit this page"
+msgstr "Edit halaman ini"
+
+msgid "Fullscreen mode"
+msgstr "Mode layar penuh"
+
+msgid "Last updated on"
+msgstr "Terakhir diperbarui saat"
+
+msgid "Launch"
+msgstr "Meluncurkan"
+
+msgid "Open an issue"
+msgstr "Buka masalah"
+
+msgid "Print to PDF"
+msgstr "Cetak ke PDF"
+
+msgid "Source repository"
+msgstr "Repositori sumber"
+
+msgid "Sphinx Book Theme"
+msgstr "Tema Buku Sphinx"
+
+msgid "Theme by the"
+msgstr "Tema oleh"
+
+msgid "Toggle navigation"
+msgstr "Alihkan navigasi"
+
+msgid "next page"
+msgstr "halaman selanjutnya"
+
+msgid "open issue"
+msgstr "masalah terbuka"
+
+msgid "previous page"
+msgstr "halaman sebelumnya"
+
+msgid "repository"
+msgstr "gudang"
+
+msgid "suggest edit"
+msgstr "menyarankan edit"
