@@ -48,7 +48,7 @@ flake8:
     - python --version
     - python -m pip install flake8 flake8-bugbear flake8-comprehensions
   script:
-    - flake8 compressai tests examples docs
+    - make check-flake8
   tags:
     - docker
 
