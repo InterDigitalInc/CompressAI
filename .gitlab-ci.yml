@@ -1,15 +1,23 @@
+variables:
+  UV_INSTALL_DIR: "${CI_PROJECT_DIR}/.local/bin"
+  UV_CACHE_DIR: "${CI_PROJECT_DIR}/.uv-cache"
+  UV_LINK_MODE: copy
+
 stages:
+  - setup
   - build
   - static-analysis
   - test
   - doc
 
 .default-before-script: &default-before-script
-  - python --version
+  - export PATH="${UV_INSTALL_DIR}:$PATH"
+  - source "${UV_INSTALL_DIR}/env"
+  - uv run --no-sync python --version
 
 .check-torch-cuda: &check-torch-cuda
   - |
-    TORCH_VERSION="$TORCH_VERSION" python <<EOF
+    TORCH_VERSION="$TORCH_VERSION" uv run --no-sync python <<EOF
     import os, torch
     from packaging import version
     print(f"{torch.__version__=}\n{torch.version.cuda=}\n{torch.cuda.is_available()=}")
@@ -21,14 +29,27 @@ stages:
     # assert torch.cuda.is_available(), "CUDA is not available"
     EOF
 
+uv-install:
+  image: python:3.10-buster
+  stage: setup
+  script:
+    - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - *default-before-script
+  artifacts:
+    paths:
+      - ".local/"
+    expire_in: 1 day
+  tags:
+    - docker
+
 wheel:
   image: python:$PYTHON_VERSION-buster
   stage: build
   before_script:
+    # - export UV_PYTHON="$PYTHON_VERSION"
     - *default-before-script
-    - python -m pip install build
   script:
-    - python -m build --wheel .
+    - uv build --wheel
   artifacts:
     paths:
       - dist/
@@ -44,9 +65,8 @@ sdist:
   stage: build
   before_script:
     - *default-before-script
-    - python -m pip install build
   script:
-    - python -m build --sdist .
+    - uv build --sdist
   tags:
     - docker
 
@@ -55,9 +75,9 @@ flake8:
   image: pytorch/pytorch:2.2.0-cuda11.8-cudnn8-devel
   before_script:
     - *default-before-script
-    - python -m pip install flake8 flake8-bugbear flake8-comprehensions
+    - uv sync --only-group=dev
   script:
-    - make check-flake8
+    - uv run --no-sync make check-flake8
   tags:
     - docker
 
@@ -66,11 +86,9 @@ ruff-format:
   image: python:3.10-buster
   before_script:
     - *default-before-script
-    - python -m pip install tomli
-    - RUFF_VERSION=$(python -c 'import tomli; config = tomli.load(open("uv.lock", "rb")); ruff_config = next(x for x in config["package"] if x["name"] == "ruff"); print(ruff_config["version"])')
-    - python -m pip install "ruff==$RUFF_VERSION"
+    - uv sync --only-group=dev
   script:
-    - make check-ruff-format
+    - uv run --no-sync make check-ruff-format
   tags:
     - docker
 
@@ -79,11 +97,9 @@ ruff-organize-imports:
   image: python:3.10-buster
   before_script:
     - *default-before-script
-    - python -m pip install tomli
-    - RUFF_VERSION=$(python -c 'import tomli; config = tomli.load(open("uv.lock", "rb")); ruff_config = next(x for x in config["package"] if x["name"] == "ruff"); print(ruff_config["version"])')
-    - python -m pip install "ruff==$RUFF_VERSION"
+    - uv sync --only-group=dev
   script:
-    - make check-ruff-organize-imports
+    - uv run --no-sync make check-ruff-organize-imports
   tags:
     - docker
 
@@ -102,9 +118,31 @@ test:
         TORCH_VERSION=2.2.0+cu118
         TORCHVISION_VERSION=0.17.0+cu118
       fi
-    - python -m pip install -U pip
-    - python -m pip install -e .
-    - python -m pip install pytest pytest-cov plotly
+    - |
+      if grep -q "tool.uv" pyproject.toml; then
+        echo "[tool.uv] already exists in pyproject.toml"
+        exit 1
+      fi
+    - |
+      cat <<EOF >> pyproject.toml
+
+      [tool.uv]
+      override-dependencies = [
+        "torch==$TORCH_VERSION",
+        "torchvision==$TORCHVISION_VERSION",
+      ]
+
+      [tool.uv.sources]
+      torch = { index = "pytorch-$CUDA_VERSION_NAME" }
+      torchvision = { index = "pytorch-$CUDA_VERSION_NAME" }
+
+      [[tool.uv.index]]
+      name = "pytorch-$CUDA_VERSION_NAME"
+      url = "https://download.pytorch.org/whl/$CUDA_VERSION_NAME"
+      explicit = true
+
+      EOF
+    - uv sync --group=test
     - *check-torch-cuda
     - |
       PYTEST_ARGS=(--cov=compressai --capture=no tests)
@@ -112,7 +150,7 @@ test:
         PYTEST_ARGS+=(-m "not pretrained")
       fi
   script:
-    - pytest "${PYTEST_ARGS[@]}"
+    - uv run --no-sync pytest "${PYTEST_ARGS[@]}"
   parallel:
     matrix:
       - PYTORCH_IMAGE:
@@ -126,10 +164,9 @@ doc:
   image: pytorch/pytorch:2.2.0-cuda11.8-cudnn8-devel
   before_script:
     - *default-before-script
-    - python -m pip install -e .
+    - uv sync --group=doc
     - cd docs
-    - python -m pip install -r requirements.txt
   script:
-    - make html
+    - uv run --no-sync make html
   tags:
     - docker
