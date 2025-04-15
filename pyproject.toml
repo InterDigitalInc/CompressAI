@@ -75,6 +75,34 @@ pointcloud = [
   "pyntcloud-yoda",
 ]
 
+# NOTE: Temporarily duplicated from [project.optional-dependencies] until
+# pip supports installing [dependency-groups].
+[dependency-groups]
+test = [
+  "plotly",
+  "pytest",
+  "pytest-cov",
+]
+dev = [
+  "black",
+  "flake8",
+  "flake8-bugbear",
+  "flake8-comprehensions",
+  "isort",
+  "mypy",
+  "ruff==0.8.6",
+  { include-group = "test" },
+]
+doc = [
+  "Jinja2<3.1",
+  "sphinx==4.3.0",
+  "sphinx-book-theme==1.0.1",
+]
+tutorials = [
+  "ipywidgets",
+  "jupyter",
+]
+
 [tool.setuptools]
 package-dir = {"" = "."}
 zip-safe = false

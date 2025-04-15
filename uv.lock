@@ -639,6 +639,34 @@ tutorials = [
     { name = "jupyter" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "black" },
+    { name = "flake8" },
+    { name = "flake8-bugbear" },
+    { name = "flake8-comprehensions" },
+    { name = "isort" },
+    { name = "mypy" },
+    { name = "plotly" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
+]
+doc = [
+    { name = "jinja2" },
+    { name = "sphinx" },
+    { name = "sphinx-book-theme" },
+]
+test = [
+    { name = "plotly" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+]
+tutorials = [
+    { name = "ipywidgets" },
+    { name = "jupyter" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "black", marker = "extra == 'dev'" },
@@ -674,6 +702,34 @@ requires-dist = [
     { name = "typing-extensions", specifier = ">=4.0.0" },
 ]
 provides-extras = ["test", "dev", "doc", "tutorials", "pointcloud"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "black" },
+    { name = "flake8" },
+    { name = "flake8-bugbear" },
+    { name = "flake8-comprehensions" },
+    { name = "isort" },
+    { name = "mypy" },
+    { name = "plotly" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "ruff", specifier = "==0.8.6" },
+]
+doc = [
+    { name = "jinja2", specifier = "<3.1" },
+    { name = "sphinx", specifier = "==4.3.0" },
+    { name = "sphinx-book-theme", specifier = "==1.0.1" },
+]
+test = [
+    { name = "plotly" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+]
+tutorials = [
+    { name = "ipywidgets" },
+    { name = "jupyter" },
+]
 
 [[package]]
 name = "contourpy"
