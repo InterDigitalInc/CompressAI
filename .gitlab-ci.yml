@@ -4,10 +4,14 @@ stages:
   - test
   - doc
 
+.default-before-script: &default-before-script
+  - python --version
+
 wheel:
   image: python:$PYTHON_VERSION-buster
   stage: build
   before_script:
+    - *default-before-script
     - python -m pip install build
   script:
     - python -m build --wheel .
@@ -25,6 +29,7 @@ sdist:
   image: python:3.10-buster
   stage: build
   before_script:
+    - *default-before-script
     - python -m pip install build
   script:
     - python -m build --sdist .
@@ -35,7 +40,7 @@ flake8:
   stage: static-analysis
   image: pytorch/pytorch:2.2.0-cuda11.8-cudnn8-devel
   before_script:
-    - python --version
+    - *default-before-script
     - python -m pip install flake8 flake8-bugbear flake8-comprehensions
   script:
     - make check-flake8
@@ -46,7 +51,7 @@ ruff-format:
   stage: static-analysis
   image: python:3.10-buster
   before_script:
-    - python --version
+    - *default-before-script
     - python -m pip install tomli
     - RUFF_VERSION=$(python -c 'import tomli; config = tomli.load(open("uv.lock", "rb")); ruff_config = next(x for x in config["package"] if x["name"] == "ruff"); print(ruff_config["version"])')
     - python -m pip install "ruff==$RUFF_VERSION"
@@ -59,7 +64,7 @@ ruff-organize-imports:
   stage: static-analysis
   image: python:3.10-buster
   before_script:
-    - python --version
+    - *default-before-script
     - python -m pip install tomli
     - RUFF_VERSION=$(python -c 'import tomli; config = tomli.load(open("uv.lock", "rb")); ruff_config = next(x for x in config["package"] if x["name"] == "ruff"); print(ruff_config["version"])')
     - python -m pip install "ruff==$RUFF_VERSION"
@@ -72,7 +77,7 @@ test:
   stage: test
   image: pytorch/pytorch:$PYTORCH_IMAGE
   before_script:
-    - python --version
+    - *default-before-script
     - python -m pip install -U pip
     - python -m pip install -e .
     - python -m pip install pytest pytest-cov plotly
@@ -95,7 +100,7 @@ doc:
   stage: doc
   image: pytorch/pytorch:2.2.0-cuda11.8-cudnn8-devel
   before_script:
-    - python --version
+    - *default-before-script
     - python -m pip install -e .
     - cd docs
     - python -m pip install -r requirements.txt
