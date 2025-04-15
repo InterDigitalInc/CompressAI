@@ -7,6 +7,20 @@ stages:
 .default-before-script: &default-before-script
   - python --version
 
+.check-torch-cuda: &check-torch-cuda
+  - |
+    TORCH_VERSION="$TORCH_VERSION" python <<EOF
+    import os, torch
+    from packaging import version
+    print(f"{torch.__version__=}\n{torch.version.cuda=}\n{torch.cuda.is_available()=}")
+    expected_torch_version = os.environ["TORCH_VERSION"]
+    assert (
+        version.parse(torch.__version__).base_version
+        == version.parse(expected_torch_version).base_version
+    ), f"Expected torch.__version__={expected_torch_version}, but got {torch.__version__=}"
+    # assert torch.cuda.is_available(), "CUDA is not available"
+    EOF
+
 wheel:
   image: python:$PYTHON_VERSION-buster
   stage: build
@@ -78,9 +92,20 @@ test:
   image: pytorch/pytorch:$PYTORCH_IMAGE
   before_script:
     - *default-before-script
+    - |
+      if [ "$PYTORCH_IMAGE" == "1.13.1-cuda11.6-cudnn8-devel" ]; then
+        CUDA_VERSION_NAME=cu116
+        TORCH_VERSION=1.13.1+cu116
+        TORCHVISION_VERSION=0.14.1+cu116
+      elif [ "$PYTORCH_IMAGE" == "2.2.0-cuda11.8-cudnn8-devel" ]; then
+        CUDA_VERSION_NAME=cu118
+        TORCH_VERSION=2.2.0+cu118
+        TORCHVISION_VERSION=0.17.0+cu118
+      fi
     - python -m pip install -U pip
     - python -m pip install -e .
     - python -m pip install pytest pytest-cov plotly
+    - *check-torch-cuda
     - |
       PYTEST_ARGS=(--cov=compressai --capture=no tests)
       if [ "$CI_COMMIT_BRANCH" != "master" ]; then
