@@ -1,10 +1,3 @@
-variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-
-cache:
-  paths:
-    - "$CI_PROJECT_DIR/.cache/pip"
-
 stages:
   - build
   - static-analysis
@@ -12,7 +5,6 @@ stages:
   - doc
 
 wheel:
-  cache: []
   image: python:$PYTHON_VERSION-buster
   stage: build
   before_script:
@@ -30,7 +22,6 @@ wheel:
     - docker
 
 sdist:
-  cache: []
   image: python:3.10-buster
   stage: build
   before_script:
@@ -41,7 +32,6 @@ sdist:
     - docker
 
 flake8:
-  cache: []
   stage: static-analysis
   image: pytorch/pytorch:2.2.0-cuda11.8-cudnn8-devel
   before_script:
@@ -53,7 +43,6 @@ flake8:
     - docker
 
 ruff-format:
-  cache: []
   stage: static-analysis
   image: python:3.10-buster
   before_script:
@@ -67,7 +56,6 @@ ruff-format:
     - docker
 
 ruff-organize-imports:
-  cache: []
   stage: static-analysis
   image: python:3.10-buster
   before_script:
@@ -81,7 +69,6 @@ ruff-organize-imports:
     - docker
 
 test:
-  cache: []
   stage: test
   image: pytorch/pytorch:$PYTORCH_IMAGE
   before_script:
@@ -105,7 +92,6 @@ test:
     - docker
 
 doc:
-  cache: []
   stage: doc
   image: pytorch/pytorch:2.2.0-cuda11.8-cudnn8-devel
   before_script:
