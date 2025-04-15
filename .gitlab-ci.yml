@@ -76,13 +76,13 @@ test:
     - python -m pip install -U pip
     - python -m pip install -e .
     - python -m pip install pytest pytest-cov plotly
-  script:
-    - >
-      if [ "$CI_COMMIT_BRANCH" == "master" ]; then
-        pytest --cov=compressai -s tests
-      else
-        pytest --cov=compressai -m "not pretrained" -s tests
+    - |
+      PYTEST_ARGS=(--cov=compressai --capture=no tests)
+      if [ "$CI_COMMIT_BRANCH" != "master" ]; then
+        PYTEST_ARGS+=(-m "not pretrained")
       fi
+  script:
+    - pytest "${PYTEST_ARGS[@]}"
   parallel:
     matrix:
       - PYTORCH_IMAGE:
