@@ -119,13 +119,7 @@ test:
         TORCHVISION_VERSION=0.17.0+cu118
       fi
     - |
-      if grep -q "tool.uv" pyproject.toml; then
-        echo "[tool.uv] already exists in pyproject.toml"
-        exit 1
-      fi
-    - |
-      cat <<EOF >> pyproject.toml
-
+      cat <<EOF >> pyproject.toml.delta
       [tool.uv]
       override-dependencies = [
         "torch==$TORCH_VERSION",
@@ -140,7 +134,27 @@ test:
       name = "pytorch-$CUDA_VERSION_NAME"
       url = "https://download.pytorch.org/whl/$CUDA_VERSION_NAME"
       explicit = true
+      EOF
+    - uv pip install tomlkit
+    - |
+      uv run --no-sync python <<EOF
+      from collections.abc import MutableMapping
+      from pathlib import Path
+      import tomlkit
 
+      def update_dict(d, d2):
+          for k, v in d2.items():
+              if k not in d:
+                  d[k] = v
+              elif isinstance(d[k], MutableMapping) and isinstance(v, MutableMapping):
+                  update_dict(d[k], v)
+              else:
+                  d[k] = v
+
+      base = tomlkit.parse(Path("pyproject.toml").read_text())
+      delta = tomlkit.parse(Path("pyproject.toml.delta").read_text())
+      update_dict(base, delta)
+      Path("pyproject.toml").write_text(tomlkit.dumps(base))
       EOF
     - uv sync --group=test
     - *check-torch-cuda
