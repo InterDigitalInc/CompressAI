@@ -591,7 +591,7 @@ wheels = [
 
 [[package]]
 name = "compressai"
-version = "1.2.6.dev1"
+version = "1.2.6.dev2"
 source = { editable = "." }
 dependencies = [
     { name = "einops" },
