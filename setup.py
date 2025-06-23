@@ -32,7 +32,7 @@ import subprocess
 from pathlib import Path
 
 from pybind11.setup_helpers import Pybind11Extension, build_ext
-from setuptools import setup
+from setuptools import find_packages, setup
 
 try:
     import tomllib
@@ -104,6 +104,15 @@ def get_extensions():
 
 setup(
     name=package_name,
+    version=pyproject["project"]["version"],
+    description=pyproject["project"]["description"],
+    url=pyproject["project"]["urls"]["Homepage"],
+    author_email=pyproject["project"]["authors"][0]["email"],
+    packages=find_packages(exclude=("tests",)),
+    python_requires=pyproject["project"]["requires-python"],
+    install_requires=pyproject["project"]["dependencies"],
+    license=pyproject["project"]["license"],
+    classifiers=pyproject["project"]["classifiers"],
     ext_modules=get_extensions(),
     cmdclass={"build_ext": build_ext},
 )
