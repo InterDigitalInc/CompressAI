@@ -67,7 +67,7 @@ jobs:
 
   linux-wheels:
     runs-on: ubuntu-latest
-    container: quay.io/pypa/manylinux2014_x86_64
+    container: quay.io/pypa/manylinux_2_34_x86_64
     strategy:
       matrix:
         python-version: ['cp38-cp38', 'cp39-cp39', 'cp310-cp310']
