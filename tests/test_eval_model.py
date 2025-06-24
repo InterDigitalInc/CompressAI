@@ -77,9 +77,7 @@ def test_eval_model():
 @pytest.mark.parametrize("quality", ("1", "4", "8"))
 @pytest.mark.parametrize("metric", ("mse", "ms-ssim"))
 @pytest.mark.parametrize("entropy_estimation", (False, True))
-def test_eval_model_pretrained(
-    capsys, model, quality, metric, entropy_estimation, tmpdir
-):
+def test_eval_model_pretrained(model, quality, metric, entropy_estimation, tmpdir):
     here = os.path.dirname(__file__)
     dirpath = os.path.join(here, "assets/dataset/image")
 
@@ -92,13 +90,18 @@ def test_eval_model_pretrained(
         metric,
         "-q",
         quality,
+        "-o",
+        f"{model}-{metric}-{quality}",
+        "-d",
+        str(tmpdir),
     ]
     if entropy_estimation:
         cmd += ["--entropy-estimation"]
     eval_model.main(cmd)
 
-    output = capsys.readouterr().out
-    output = json.loads(output)
+    with open(f"{tmpdir}/{model}-{metric}-{quality}.json") as f:
+        output = json.load(f)
+
     expected = os.path.join(
         here,
         "expected",

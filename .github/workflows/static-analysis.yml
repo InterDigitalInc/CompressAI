@@ -10,17 +10,10 @@ jobs:
         python-version:
           - "3.8"
           - "3.10"
+          - "3.12"
+
         include:
           - os: "ubuntu-latest"
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Python dependencies
-      run: |
-        python3 -m pip install -U pip
-        python3 -m pip install .[dev]
-    - name: Run static analysis checks
+    - uses: astral-sh/ruff-action@v3
       run: make static-analysis

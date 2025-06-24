@@ -468,6 +468,13 @@ def create_parser() -> argparse.ArgumentParser:
         help="metric trained against (default: %(default)s)",
     )
     parent_parser.add_argument(
+        "-d",
+        "--output_directory",
+        type=str,
+        default="",
+        help="path of output directory. Optional, required for output json file, results per video.",
+    )
+    parent_parser.add_argument(
         "-o",
         "--output-file",
         type=str,
@@ -506,7 +513,7 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(args: Any = None) -> None:
+def main(args: Any = None) -> None:  # noqa: C901
     if args is None:
         args = sys.argv[1:]
     parser = create_parser()
@@ -525,8 +532,8 @@ def main(args: Any = None) -> None:
         raise SystemExit(1)
 
     # create output directory
-    outputdir = args.output
-    Path(outputdir).mkdir(parents=True, exist_ok=True)
+    if args.output_directory:
+        Path(args.output_directory).mkdir(parents=True, exist_ok=True)
 
     if args.source == "pretrained":
         args.qualities = [int(q) for q in args.qualities.split(",") if q]
@@ -561,7 +568,7 @@ def main(args: Any = None) -> None:
             filepaths,
             args.dataset,
             model,
-            outputdir,
+            args.output_directory,
             trained_net=trained_net,
             description=description,
             **args_dict,
@@ -581,7 +588,9 @@ def main(args: Any = None) -> None:
     else:
         output_file = args.output_file
 
-    with (Path(f"{outputdir}/{output_file}").with_suffix(".json")).open("wb") as f:
+    with (Path(f"{args.output_directory}/{output_file}").with_suffix(".json")).open(
+        "wb"
+    ) as f:
         f.write(json.dumps(output, indent=2).encode())
     print(json.dumps(output, indent=2))
 
