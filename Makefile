@@ -15,7 +15,7 @@ help: ## Show this message
 
 
 # Check style and linting
-.PHONY: check-ruff-format check-ruff-organize-imports check-flake8 check-mypy static-analysis
+.PHONY: check-ruff-format check-ruff-organize-imports check-ruff-lint check-mypy static-analysis
 
 check-ruff-format: ## Run ruff format checks
 	@echo "--> Running ruff format checks"
@@ -25,15 +25,15 @@ check-ruff-organize-imports: ## Run ruff organize imports checks
 	@echo "--> Running ruff organize imports checks"
 	@ruff check --ignore ALL --select I $(src_dirs)
 
-check-flake8: ## Run flake8 checks
-	@echo "--> Running flake8 checks"
-	@flake8 $(src_dirs)
+check-ruff-lint: ## Run ruff lint checks
+	@echo "--> Running ruff lint checks"
+	@ruff check $(src_dirs)
 
 check-mypy: ## Run mypy checks
 	@echo "--> Running mypy checks"
 	@mypy
 
-static-analysis: check-ruff-format check-ruff-organize-imports check-flake8 # check-mypy ## Run all static checks
+static-analysis: check-ruff-format check-ruff-organize-imports check-ruff-lint # check-mypy ## Run all static checks
 
 
 # Apply styling

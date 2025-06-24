@@ -10,21 +10,21 @@ jobs:
     name: publish documentation
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: '3.10'
-
-      - name: install dependencies pip
-        run: |
-          python3 -m pip install -U pip
-          python3 -m pip install .[doc]
+      
+      - name: Install the project
+        run:
+          uv sync --group=doc
+          
 
       - name: make docs
         run: |
-          make -C docs clean
-          make -C docs html
-
+          cd docs
+          uv run --no-sync make html
+          
       - name: Init repo for generated files
         run: |
           cd docs/_build/html

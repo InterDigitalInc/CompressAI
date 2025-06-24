@@ -70,14 +70,14 @@ sdist:
   tags:
     - docker
 
-flake8:
+ruff-lint:
   stage: static-analysis
   image: pytorch/pytorch:2.2.0-cuda11.8-cudnn8-devel
   before_script:
     - *default-before-script
     - uv sync --only-group=dev
   script:
-    - uv run --no-sync make check-flake8
+    - uv run --no-sync make check-ruff-lint
   tags:
     - docker
 

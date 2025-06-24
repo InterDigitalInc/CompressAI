@@ -2,6 +2,14 @@ extend-exclude = [
     "*.ipynb",
 ]
 
+[lint]
+select = ["E", "F"]
+ignore = ["E203", "E501", "F401", "F403"]
+# E203, black and flake8 disagree on whitespace before ':'
+# E501, line too long (> 79 characters)
+# W503, black and flake8 disagree on how to place operators
+# F403, 'from module import *' used; unable to detect undefined names
+
 [lint.isort]
 lines-between-types = 1
 known-third-party = [
