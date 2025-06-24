@@ -1,12 +1,13 @@
 
+
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="./" >
+<html >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>compressai.transforms &#8212; CompressAI</title>
   
@@ -14,39 +15,39 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
   
-  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'transforms';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Image compression" href="zoo.html" />
     <link rel="prev" title="compressai.ops" href="ops.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:language" content="None"/>
   </head>
   
   
@@ -54,23 +55,19 @@
 
   
   
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -92,20 +89,12 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-</div>
-
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-    </header>
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
   
-
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
-      
-      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -120,13 +109,9 @@
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
-
-  
-    
   
 
 <a class="navbar-brand logo" href="index.html">
-  
   
   
   
@@ -136,23 +121,12 @@
       
     
     
-    <img src="_static/logo.svg" class="logo__image only-light" alt="CompressAI - Home"/>
-    <script>document.write(`<img src="_static/logo.svg" class="logo__image only-dark" alt="CompressAI - Home"/>`);</script>
+    <img src="_static/logo.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="_static/logo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
-        <div class="sidebar-primary-item">
-
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
-        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
@@ -203,7 +177,7 @@
 
       </div>
       
-      <main id="main-content" class="bd-main" role="main">
+      <main id="main-content" class="bd-main">
         
         
 
@@ -212,14 +186,14 @@
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article d-print-none">
+              <div class="bd-header-article">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</button></div>
+</label></div>
       
     </div>
   
@@ -293,28 +267,26 @@
 </div>
 
 
-
 <script>
 document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
   </button>
 `);
 </script>
 
-
 <script>
 document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
   </button>
 `);
 </script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
-</button>
+</label>
 </div></div>
       
     </div>
@@ -335,30 +307,9 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transforms-on-tensors">Transforms on Tensors</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.RGB2YCbCr"><code class="docutils literal notranslate"><span class="pre">RGB2YCbCr</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.YCbCr2RGB"><code class="docutils literal notranslate"><span class="pre">YCbCr2RGB</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.YUV420To444"><code class="docutils literal notranslate"><span class="pre">YUV420To444</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.YUV444To420"><code class="docutils literal notranslate"><span class="pre">YUV444To420</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functional-transforms">Functional Transforms</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.rgb2ycbcr"><code class="docutils literal notranslate"><span class="pre">rgb2ycbcr()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.ycbcr2rgb"><code class="docutils literal notranslate"><span class="pre">ycbcr2rgb()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.yuv_420_to_444"><code class="docutils literal notranslate"><span class="pre">yuv_420_to_444()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.yuv_444_to_420"><code class="docutils literal notranslate"><span class="pre">yuv_444_to_420()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compressai.transforms.point">Point Cloud Transforms</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.GeneratePositionNormals"><code class="docutils literal notranslate"><span class="pre">GeneratePositionNormals</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.NormalizeScaleV2"><code class="docutils literal notranslate"><span class="pre">NormalizeScaleV2</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.RandomPermutation"><code class="docutils literal notranslate"><span class="pre">RandomPermutation</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.RandomRotateFull"><code class="docutils literal notranslate"><span class="pre">RandomRotateFull</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.RandomSample"><code class="docutils literal notranslate"><span class="pre">RandomSample</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.SamplePointsV2"><code class="docutils literal notranslate"><span class="pre">SamplePointsV2</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.ToDict"><code class="docutils literal notranslate"><span class="pre">ToDict</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transforms-on-tensors">Transforms on Tensors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functional-transforms">Functional Transforms</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compressai.transforms.point">Point Cloud Transforms</a></li>
 </ul>
             </nav>
         </div>
@@ -368,15 +319,15 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article">
+                <article class="bd-article" role="main">
                   
   <section id="compressai-transforms">
-<h1>compressai.transforms<a class="headerlink" href="#compressai-transforms" title="Link to this heading">#</a></h1>
+<h1>compressai.transforms<a class="headerlink" href="#compressai-transforms" title="Permalink to this headline">#</a></h1>
 <section id="transforms-on-tensors">
-<h2>Transforms on Tensors<a class="headerlink" href="#transforms-on-tensors" title="Link to this heading">#</a></h2>
+<h2>Transforms on Tensors<a class="headerlink" href="#transforms-on-tensors" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.RGB2YCbCr">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">RGB2YCbCr</span></span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#RGB2YCbCr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.RGB2YCbCr" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">RGB2YCbCr</span></span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#RGB2YCbCr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.RGB2YCbCr" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a RGB tensor to YCbCr.
 The tensor is expected to be in the [0, 1] floating point range, with a
 shape of (3xHxW) or (Nx3xHxW).</p>
@@ -384,7 +335,7 @@ shape of (3xHxW) or (Nx3xHxW).</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.YCbCr2RGB">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YCbCr2RGB</span></span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YCbCr2RGB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YCbCr2RGB" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YCbCr2RGB</span></span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YCbCr2RGB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YCbCr2RGB" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a YCbCr tensor to RGB.
 The tensor is expected to be in the [0, 1] floating point range, with a
 shape of (3xHxW) or (Nx3xHxW).</p>
@@ -392,10 +343,10 @@ shape of (3xHxW) or (Nx3xHxW).</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.YUV420To444">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YUV420To444</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tuple</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YUV420To444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YUV420To444" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YUV420To444</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tuple</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YUV420To444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YUV420To444" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a YUV 420 input to a 444 representation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mode</strong> (<em>str</em>) – algorithm used for upsampling: <code class="docutils literal notranslate"><span class="pre">'bilinear'</span></code> | <code class="docutils literal notranslate"><span class="pre">'nearest'</span></code>.
 Default <code class="docutils literal notranslate"><span class="pre">'bilinear'</span></code></p></li>
@@ -416,10 +367,10 @@ tensor (default: False)</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.YUV444To420">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YUV444To420</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'avg_pool'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YUV444To420"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YUV444To420" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.</span></span><span class="sig-name descname"><span class="pre">YUV444To420</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'avg_pool'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/transforms.html#YUV444To420"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.YUV444To420" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a YUV 444 tensor to a 420 representation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>mode</strong> (<em>str</em>) – algorithm used for downsampling: <code class="docutils literal notranslate"><span class="pre">'avg_pool'</span></code>. Default
 <code class="docutils literal notranslate"><span class="pre">'avg_pool'</span></code></p>
 </dd>
@@ -435,21 +386,21 @@ tensor (default: False)</p></li>
 
 </section>
 <section id="functional-transforms">
-<h2>Functional Transforms<a class="headerlink" href="#functional-transforms" title="Link to this heading">#</a></h2>
+<h2>Functional Transforms<a class="headerlink" href="#functional-transforms" title="Permalink to this headline">#</a></h2>
 <p>Functional transforms can be used to define custom transform classes.</p>
-<dl class="py function" id="module-compressai.transforms.functional">
+<span class="target" id="module-compressai.transforms.functional"></span><dl class="py function">
 <dt class="sig sig-object py" id="compressai.transforms.functional.rgb2ycbcr">
-<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">rgb2ycbcr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#rgb2ycbcr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.rgb2ycbcr" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">rgb2ycbcr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#rgb2ycbcr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.rgb2ycbcr" title="Permalink to this definition">#</a></dt>
 <dd><p>RGB to YCbCr conversion for torch Tensor.
 Using ITU-R BT.709 coefficients.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rgb</strong> (<em>torch.Tensor</em>) – 3D or 4D floating point RGB tensor</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>converted tensor</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>ycbcr (torch.Tensor)</p>
 </dd>
 </dl>
@@ -457,17 +408,17 @@ Using ITU-R BT.709 coefficients.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai.transforms.functional.ycbcr2rgb">
-<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">ycbcr2rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ycbcr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#ycbcr2rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.ycbcr2rgb" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">ycbcr2rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ycbcr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#ycbcr2rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.ycbcr2rgb" title="Permalink to this definition">#</a></dt>
 <dd><p>YCbCr to RGB conversion for torch Tensor.
 Using ITU-R BT.709 coefficients.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>ycbcr</strong> (<em>torch.Tensor</em>) – 3D or 4D floating point RGB tensor</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>converted tensor</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>rgb (torch.Tensor)</p>
 </dd>
 </dl>
@@ -475,10 +426,10 @@ Using ITU-R BT.709 coefficients.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai.transforms.functional.yuv_420_to_444">
-<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">yuv_420_to_444</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yuv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tuple</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#yuv_420_to_444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.yuv_420_to_444" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">yuv_420_to_444</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yuv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tuple</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#yuv_420_to_444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.yuv_420_to_444" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a 420 input to a 444 representation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>yuv</strong> (<em>torch.Tensor</em><em>, </em><em>torch.Tensor</em><em>, </em><em>torch.Tensor</em>) – 420 input frames in
 (Nx1xHxW) format</p></li>
@@ -489,14 +440,14 @@ concatenated tensor, 3 (Nx1xHxW) tensors instead of one (Nx3xHxW)
 tensor (default: False)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><dl class="simple">
 <dt>Converted</dt><dd><p>444</p>
 </dd>
 </dl>
 </p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>(torch.Tensor or (torch.Tensor, torch.Tensor, torch.Tensor))</p>
 </dd>
 </dl>
@@ -504,10 +455,10 @@ tensor (default: False)</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai.transforms.functional.yuv_444_to_420">
-<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">yuv_444_to_420</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yuv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'avg_pool'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#yuv_444_to_420"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.yuv_444_to_420" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai.transforms.functional.</span></span><span class="sig-name descname"><span class="pre">yuv_444_to_420</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yuv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'avg_pool'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/compressai/transforms/functional.html#yuv_444_to_420"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.functional.yuv_444_to_420" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a 444 tensor to a 420 representation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>yuv</strong> (<em>torch.Tensor</em><em> or </em><em>(</em><em>torch.Tensor</em><em>, </em><em>torch.Tensor</em><em>, </em><em>torch.Tensor</em><em>)</em>) – 444
 input to be downsampled. Takes either a (Nx3xHxW) tensor or a tuple
@@ -516,10 +467,10 @@ of 3 (Nx1xHxW) tensors.</p></li>
 <code class="docutils literal notranslate"><span class="pre">'avg_pool'</span></code></p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Converted 420</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>(torch.Tensor, torch.Tensor, torch.Tensor)</p>
 </dd>
 </dl>
@@ -527,51 +478,51 @@ of 3 (Nx1xHxW) tensors.</p></li>
 
 </section>
 <section id="module-compressai.transforms.point">
-<span id="point-cloud-transforms"></span><h2>Point Cloud Transforms<a class="headerlink" href="#module-compressai.transforms.point" title="Link to this heading">#</a></h2>
+<span id="point-cloud-transforms"></span><h2>Point Cloud Transforms<a class="headerlink" href="#module-compressai.transforms.point" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.point.GeneratePositionNormals">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">GeneratePositionNormals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'any'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/generate_position_normals.html#GeneratePositionNormals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.GeneratePositionNormals" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">GeneratePositionNormals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'any'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/generate_position_normals.html#GeneratePositionNormals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.GeneratePositionNormals" title="Permalink to this definition">#</a></dt>
 <dd><p>Generates normals from node positions
 (functional name: <code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_position_normals</span></code>).</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.point.NormalizeScaleV2">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">NormalizeScaleV2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linf'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/normalize_scale_v2.html#NormalizeScaleV2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.NormalizeScaleV2" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">NormalizeScaleV2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linf'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/normalize_scale_v2.html#NormalizeScaleV2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.NormalizeScaleV2" title="Permalink to this definition">#</a></dt>
 <dd><p>Centers and normalizes node positions
 (functional name: <code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_scale_v2</span></code>).</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.point.RandomPermutation">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">RandomPermutation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('pos',)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/random_permutation.html#RandomPermutation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.RandomPermutation" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">RandomPermutation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('pos',)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/random_permutation.html#RandomPermutation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.RandomPermutation" title="Permalink to this definition">#</a></dt>
 <dd><p>Randomly permutes points and associated attributes
 (functional name: <code class="xref py py-obj docutils literal notranslate"><span class="pre">random_permutation</span></code>).</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.point.RandomRotateFull">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">RandomRotateFull</span></span><a class="reference internal" href="_modules/compressai/transforms/point/random_rotate_full.html#RandomRotateFull"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.RandomRotateFull" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">RandomRotateFull</span></span><a class="reference internal" href="_modules/compressai/transforms/point/random_rotate_full.html#RandomRotateFull"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.RandomRotateFull" title="Permalink to this definition">#</a></dt>
 <dd><p>Randomly rotates node positions around the origin
 (functional name: <code class="xref py py-obj docutils literal notranslate"><span class="pre">random_rotate_full</span></code>).</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.point.RandomSample">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">RandomSample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('pos',)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_duplicates_by</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/random_sample.html#RandomSample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.RandomSample" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">RandomSample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('pos',)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_duplicates_by</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/random_sample.html#RandomSample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.RandomSample" title="Permalink to this definition">#</a></dt>
 <dd><p>Randomly samples points and associated attributes
 (functional name: <code class="xref py py-obj docutils literal notranslate"><span class="pre">random_sample</span></code>).</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.point.SamplePointsV2">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">SamplePointsV2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_faces</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_normals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/sample_points_v2.html#SamplePointsV2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.SamplePointsV2" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">SamplePointsV2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_faces</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_normals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/sample_points_v2.html#SamplePointsV2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.SamplePointsV2" title="Permalink to this definition">#</a></dt>
 <dd><p>Uniformly samples a fixed number of points on the mesh faces according
 to their face area (functional name: <code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_points</span></code>).</p>
 <p>Adapted from PyTorch Geometric under MIT license at
 <a class="github reference external" href="https://github.com/pyg-team/pytorch_geometric/blob/master/LICENSE">pyg-team/pytorch_geometric</a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>num</strong> (<em>int</em>) – The number of points to sample.</p></li>
 <li><p><strong>remove_faces</strong> (<em>bool</em><em>, </em><em>optional</em>) – If set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code>, the face tensor
@@ -587,7 +538,7 @@ normals for each sampled point. (default: <code class="xref py py-obj docutils l
 
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.transforms.point.ToDict">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">ToDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wrapper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dict'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/to_dict.html#ToDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.ToDict" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.transforms.point.</span></span><span class="sig-name descname"><span class="pre">ToDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wrapper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dict'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/transforms/point/to_dict.html#ToDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.transforms.point.ToDict" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert <code class="xref py py-obj docutils literal notranslate"><span class="pre">Mapping[str,</span> <span class="pre">Any]</span></code>
 (functional name: <code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code>).</p>
 </dd></dl>
@@ -601,10 +552,11 @@ normals for each sampled point. (default: <code class="xref py py-obj docutils l
 
               
               
-              
-              
-                <footer class="prev-next-footer d-print-none">
+                <footer class="bd-footer-article">
                   
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="ops.html"
@@ -624,7 +576,10 @@ normals for each sampled point. (default: <code class="xref py py-obj docutils l
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
+</div></div>
+  
 </div>
+
                 </footer>
               
             </div>
@@ -633,37 +588,15 @@ normals for each sampled point. (default: <code class="xref py py-obj docutils l
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-
   <div class="sidebar-secondary-item">
   <div class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> Contents
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transforms-on-tensors">Transforms on Tensors</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.RGB2YCbCr"><code class="docutils literal notranslate"><span class="pre">RGB2YCbCr</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.YCbCr2RGB"><code class="docutils literal notranslate"><span class="pre">YCbCr2RGB</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.YUV420To444"><code class="docutils literal notranslate"><span class="pre">YUV420To444</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.YUV444To420"><code class="docutils literal notranslate"><span class="pre">YUV444To420</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functional-transforms">Functional Transforms</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.rgb2ycbcr"><code class="docutils literal notranslate"><span class="pre">rgb2ycbcr()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.ycbcr2rgb"><code class="docutils literal notranslate"><span class="pre">ycbcr2rgb()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.yuv_420_to_444"><code class="docutils literal notranslate"><span class="pre">yuv_420_to_444()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.functional.yuv_444_to_420"><code class="docutils literal notranslate"><span class="pre">yuv_444_to_420()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compressai.transforms.point">Point Cloud Transforms</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.GeneratePositionNormals"><code class="docutils literal notranslate"><span class="pre">GeneratePositionNormals</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.NormalizeScaleV2"><code class="docutils literal notranslate"><span class="pre">NormalizeScaleV2</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.RandomPermutation"><code class="docutils literal notranslate"><span class="pre">RandomPermutation</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.RandomRotateFull"><code class="docutils literal notranslate"><span class="pre">RandomRotateFull</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.RandomSample"><code class="docutils literal notranslate"><span class="pre">RandomSample</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.SamplePointsV2"><code class="docutils literal notranslate"><span class="pre">SamplePointsV2</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.transforms.point.ToDict"><code class="docutils literal notranslate"><span class="pre">ToDict</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transforms-on-tensors">Transforms on Tensors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functional-transforms">Functional Transforms</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compressai.transforms.point">Point Cloud Transforms</a></li>
 </ul>
   </nav></div>
 
@@ -685,7 +618,6 @@ By InterDigital Communications, Inc.
   
   <div class="footer-item">
     
-
   <p class="copyright">
     
       © Copyright 2021, InterDigital Communications, Inc.
@@ -712,8 +644,8 @@ By InterDigital Communications, Inc.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
 
   <footer class="bd-footer">
   </footer>

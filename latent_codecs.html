@@ -1,12 +1,13 @@
 
+
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="./" >
+<html >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>compressai.latent_codecs &#8212; CompressAI</title>
   
@@ -14,39 +15,39 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
   
-  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'latent_codecs';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="compressai.layers" href="layers.html" />
     <link rel="prev" title="compressai.entropy_models" href="entropy_models.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:language" content="None"/>
   </head>
   
   
@@ -54,23 +55,19 @@
 
   
   
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -92,20 +89,12 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-</div>
-
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-    </header>
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
   
-
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
-      
-      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -120,13 +109,9 @@
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
-
-  
-    
   
 
 <a class="navbar-brand logo" href="index.html">
-  
   
   
   
@@ -136,23 +121,12 @@
       
     
     
-    <img src="_static/logo.svg" class="logo__image only-light" alt="CompressAI - Home"/>
-    <script>document.write(`<img src="_static/logo.svg" class="logo__image only-dark" alt="CompressAI - Home"/>`);</script>
+    <img src="_static/logo.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="_static/logo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
-        <div class="sidebar-primary-item">
-
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
-        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
@@ -203,7 +177,7 @@
 
       </div>
       
-      <main id="main-content" class="bd-main" role="main">
+      <main id="main-content" class="bd-main">
         
         
 
@@ -212,14 +186,14 @@
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article d-print-none">
+              <div class="bd-header-article">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</button></div>
+</label></div>
       
     </div>
   
@@ -293,28 +267,26 @@
 </div>
 
 
-
 <script>
 document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
   </button>
 `);
 </script>
 
-
 <script>
 document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
   </button>
 `);
 </script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
-</button>
+</label>
 </div></div>
       
     </div>
@@ -338,42 +310,15 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rationale">Rationale</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-models">Example models</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-a-custom-latent-codec">Defining a custom latent codec</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entropybottlenecklatentcodec">EntropyBottleneckLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.EntropyBottleneckLatentCodec"><code class="docutils literal notranslate"><span class="pre">EntropyBottleneckLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaussianconditionallatentcodec">GaussianConditionalLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.GaussianConditionalLatentCodec"><code class="docutils literal notranslate"><span class="pre">GaussianConditionalLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hyperlatentcodec">HyperLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.HyperLatentCodec"><code class="docutils literal notranslate"><span class="pre">HyperLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hyperpriorlatentcodec">HyperpriorLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.HyperpriorLatentCodec"><code class="docutils literal notranslate"><span class="pre">HyperpriorLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rasterscanlatentcodec">RasterScanLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.RasterScanLatentCodec"><code class="docutils literal notranslate"><span class="pre">RasterScanLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gainhyperlatentcodec">GainHyperLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.GainHyperLatentCodec"><code class="docutils literal notranslate"><span class="pre">GainHyperLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gainhyperpriorlatentcodec">GainHyperpriorLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.GainHyperpriorLatentCodec"><code class="docutils literal notranslate"><span class="pre">GainHyperpriorLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#channelgroupslatentcodec">ChannelGroupsLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.ChannelGroupsLatentCodec"><code class="docutils literal notranslate"><span class="pre">ChannelGroupsLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#checkerboardlatentcodec">CheckerboardLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.CheckerboardLatentCodec"><code class="docutils literal notranslate"><span class="pre">CheckerboardLatentCodec</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entropybottlenecklatentcodec">EntropyBottleneckLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaussianconditionallatentcodec">GaussianConditionalLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hyperlatentcodec">HyperLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hyperpriorlatentcodec">HyperpriorLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rasterscanlatentcodec">RasterScanLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gainhyperlatentcodec">GainHyperLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gainhyperpriorlatentcodec">GainHyperpriorLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#channelgroupslatentcodec">ChannelGroupsLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#checkerboardlatentcodec">CheckerboardLatentCodec</a></li>
 </ul>
             </nav>
         </div>
@@ -383,19 +328,19 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article">
+                <article class="bd-article" role="main">
                   
   <section id="compressai-latent-codecs">
-<h1>compressai.latent_codecs<a class="headerlink" href="#compressai-latent-codecs" title="Link to this heading">#</a></h1>
+<h1>compressai.latent_codecs<a class="headerlink" href="#compressai-latent-codecs" title="Permalink to this headline">#</a></h1>
 <p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">LatentCodec</span></code> is an abstraction for compressing a latent space using some entropy modeling technique.
 A <code class="xref py py-class docutils literal notranslate"><span class="pre">LatentCodec</span></code> can be thought of as a miniature <a class="reference internal" href="models.html#compressai.models.CompressionModel" title="compressai.models.base.CompressionModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompressionModel</span></code></a>.
 In fact, it implements some of the same methods: <code class="docutils literal notranslate"><span class="pre">forward</span></code>, <code class="docutils literal notranslate"><span class="pre">compress</span></code>, and <code class="docutils literal notranslate"><span class="pre">decompress</span></code>, as described in <a class="reference internal" href="#define-custom-latent-codec"><span class="std std-ref">Defining a custom latent codec</span></a>.
 By composing latent codecs, we can easily create more complex entropy models.</p>
 <p>CompressAI provides the following predefined <code class="xref py py-class docutils literal notranslate"><span class="pre">LatentCodec</span></code> subclasses:</p>
-<div class="pst-scrollable-table-container"><table class="table">
+<table class="colwidths-given table">
 <colgroup>
-<col style="width: 25.0%" />
-<col style="width: 75.0%" />
+<col style="width: 25%" />
+<col style="width: 75%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Module name</p></th>
@@ -432,7 +377,6 @@ By composing latent codecs, we can easily create more complex entropy models.</p
 </tr>
 </tbody>
 </table>
-</div>
 <p>Diagrams for some of the above predefined latent codecs:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>HyperLatentCodec:
 
@@ -492,13 +436,13 @@ By composing latent codecs, we can easily create more complex entropy models.</p
 </pre></div>
 </div>
 <section id="rationale">
-<h2>Rationale<a class="headerlink" href="#rationale" title="Link to this heading">#</a></h2>
+<h2>Rationale<a class="headerlink" href="#rationale" title="Permalink to this headline">#</a></h2>
 <p>This abstraction makes it easy to swap between different entropy models such as “factorized”, “hyperprior”, “raster scan autoregressive”, “checkerboard”, or “channel conditional groups”.</p>
 <p>It also aids in composition: we may now easily take any complicated composition of the above <code class="xref py py-class docutils literal notranslate"><span class="pre">LatentCodec</span></code> subclasses. For example, we may create models containing multiple hyperprior branches (<a class="reference external" href="https://huzi96.github.io/coarse-to-fine-compression.html">Hu et al., 2020</a>), or a “channel conditional group” context model which encodes each group using “raster-scan” (<a class="reference external" href="https://arxiv.org/abs/2007.08739">Minnen et al., 2020</a>) or “checkerboard” (<a class="reference external" href="https://arxiv.org/abs/2203.10886">He et al., 2022</a>) autoregression, and so on.</p>
 <p>Lastly, it reduces code duplication, and favors <a class="reference external" href="https://en.wikipedia.org/wiki/Composition_over_inheritance">composition instead of inheritance</a>.</p>
 </section>
 <section id="example-models">
-<h2>Example models<a class="headerlink" href="#example-models" title="Link to this heading">#</a></h2>
+<h2>Example models<a class="headerlink" href="#example-models" title="Permalink to this headline">#</a></h2>
 <p>A simple VAE model with an arbitrary latent codec can be implemented as follows:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SimpleVAECompressionModel</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple VAE model with arbitrary latent codec.</span>
@@ -612,7 +556,7 @@ By composing latent codecs, we can easily create more complex entropy models.</p
 </div>
 </section>
 <section id="defining-a-custom-latent-codec">
-<span id="define-custom-latent-codec"></span><h2>Defining a custom latent codec<a class="headerlink" href="#defining-a-custom-latent-codec" title="Link to this heading">#</a></h2>
+<span id="define-custom-latent-codec"></span><h2>Defining a custom latent codec<a class="headerlink" href="#defining-a-custom-latent-codec" title="Permalink to this headline">#</a></h2>
 <p>Latent codecs should inherit from the abstract base class <code class="xref py py-class docutils literal notranslate"><span class="pre">LatentCodec</span></code>, which is defined as:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">LatentCodec</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
@@ -660,10 +604,10 @@ By composing latent codecs, we can easily create more complex entropy models.</p
 </section>
 <hr class="docutils" />
 <section id="entropybottlenecklatentcodec">
-<h2>EntropyBottleneckLatentCodec<a class="headerlink" href="#entropybottlenecklatentcodec" title="Link to this heading">#</a></h2>
+<h2>EntropyBottleneckLatentCodec<a class="headerlink" href="#entropybottlenecklatentcodec" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.latent_codecs.EntropyBottleneckLatentCodec">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">EntropyBottleneckLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entropy_bottleneck</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="entropy_models.html#compressai.entropy_models.EntropyBottleneck" title="compressai.entropy_models.entropy_models.EntropyBottleneck"><span class="pre">EntropyBottleneck</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/entropy_bottleneck.html#EntropyBottleneckLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.EntropyBottleneckLatentCodec" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">EntropyBottleneckLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entropy_bottleneck</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="entropy_models.html#compressai.entropy_models.EntropyBottleneck" title="compressai.entropy_models.entropy_models.EntropyBottleneck"><span class="pre">compressai.entropy_models.entropy_models.EntropyBottleneck</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/entropy_bottleneck.html#EntropyBottleneckLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.EntropyBottleneckLatentCodec" title="Permalink to this definition">#</a></dt>
 <dd><p>Entropy bottleneck codec.</p>
 <p>Factorized prior “entropy bottleneck” introduced in
 <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational Image Compression with a Scale Hyperprior”</a>,
@@ -678,10 +622,10 @@ y ──►──┤ Q ├───►───····───►─── y_h
 
 </section>
 <section id="gaussianconditionallatentcodec">
-<h2>GaussianConditionalLatentCodec<a class="headerlink" href="#gaussianconditionallatentcodec" title="Link to this heading">#</a></h2>
+<h2>GaussianConditionalLatentCodec<a class="headerlink" href="#gaussianconditionallatentcodec" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.latent_codecs.GaussianConditionalLatentCodec">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">GaussianConditionalLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gaussian_conditional</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="entropy_models.html#compressai.entropy_models.GaussianConditional" title="compressai.entropy_models.entropy_models.GaussianConditional"><span class="pre">GaussianConditional</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'noise'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('scales',</span> <span class="pre">'means')</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/gaussian_conditional.html#GaussianConditionalLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.GaussianConditionalLatentCodec" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">GaussianConditionalLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gaussian_conditional</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="entropy_models.html#compressai.entropy_models.GaussianConditional" title="compressai.entropy_models.entropy_models.GaussianConditional"><span class="pre">compressai.entropy_models.entropy_models.GaussianConditional</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.nn.modules.module.Module</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'noise'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('scales',</span> <span class="pre">'means')</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/gaussian_conditional.html#GaussianConditionalLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.GaussianConditionalLatentCodec" title="Permalink to this definition">#</a></dt>
 <dd><p>Gaussian conditional for compressing latent <code class="docutils literal notranslate"><span class="pre">y</span></code> using <code class="docutils literal notranslate"><span class="pre">ctx_params</span></code>.</p>
 <p>Probability model for Gaussian of <code class="docutils literal notranslate"><span class="pre">(scales,</span> <span class="pre">means)</span></code>.</p>
 <p>Gaussian conditonal entropy model introduced in
@@ -711,10 +655,10 @@ y ──►──┤ Q ├────►────····──►── y_h
 
 </section>
 <section id="hyperlatentcodec">
-<h2>HyperLatentCodec<a class="headerlink" href="#hyperlatentcodec" title="Link to this heading">#</a></h2>
+<h2>HyperLatentCodec<a class="headerlink" href="#hyperlatentcodec" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.latent_codecs.HyperLatentCodec">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">HyperLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entropy_bottleneck</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="entropy_models.html#compressai.entropy_models.EntropyBottleneck" title="compressai.entropy_models.entropy_models.EntropyBottleneck"><span class="pre">EntropyBottleneck</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'noise'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/hyper.html#HyperLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.HyperLatentCodec" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">HyperLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entropy_bottleneck</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="entropy_models.html#compressai.entropy_models.EntropyBottleneck" title="compressai.entropy_models.entropy_models.EntropyBottleneck"><span class="pre">compressai.entropy_models.entropy_models.EntropyBottleneck</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'noise'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/hyper.html#HyperLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.HyperLatentCodec" title="Permalink to this definition">#</a></dt>
 <dd><p>Entropy bottleneck codec with surrounding <cite>h_a</cite> and <cite>h_s</cite> transforms.</p>
 <p>“Hyper” side-information branch introduced in
 <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational Image Compression with a Scale Hyperprior”</a>,
@@ -734,10 +678,10 @@ y ──►──┤h_a├──►──┤ Q ├───►───····�
 
 </section>
 <section id="hyperpriorlatentcodec">
-<h2>HyperpriorLatentCodec<a class="headerlink" href="#hyperpriorlatentcodec" title="Link to this heading">#</a></h2>
+<h2>HyperpriorLatentCodec<a class="headerlink" href="#hyperpriorlatentcodec" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.latent_codecs.HyperpriorLatentCodec">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">HyperpriorLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latent_codec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">LatentCodec</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/hyperprior.html#HyperpriorLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.HyperpriorLatentCodec" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">HyperpriorLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latent_codec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">compressai.latent_codecs.base.LatentCodec</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/hyperprior.html#HyperpriorLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.HyperpriorLatentCodec" title="Permalink to this definition">#</a></dt>
 <dd><p>Hyperprior codec constructed from latent codec for <code class="docutils literal notranslate"><span class="pre">y</span></code> that
 compresses <code class="docutils literal notranslate"><span class="pre">y</span></code> using <code class="docutils literal notranslate"><span class="pre">params</span></code> from <code class="docutils literal notranslate"><span class="pre">hyper</span></code> branch.</p>
 <p>Hyperprior entropy modeling introduced in
@@ -781,10 +725,10 @@ y ──┴─►─┤ Q ├────►────····────►�
 
 </section>
 <section id="rasterscanlatentcodec">
-<h2>RasterScanLatentCodec<a class="headerlink" href="#rasterscanlatentcodec" title="Link to this heading">#</a></h2>
+<h2>RasterScanLatentCodec<a class="headerlink" href="#rasterscanlatentcodec" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.latent_codecs.RasterScanLatentCodec">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">RasterScanLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gaussian_conditional</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="entropy_models.html#compressai.entropy_models.GaussianConditional" title="compressai.entropy_models.entropy_models.GaussianConditional"><span class="pre">GaussianConditional</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context_prediction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="layers.html#compressai.layers.MaskedConv2d" title="compressai.layers.layers.MaskedConv2d"><span class="pre">MaskedConv2d</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/rasterscan.html#RasterScanLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.RasterScanLatentCodec" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">RasterScanLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gaussian_conditional</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="entropy_models.html#compressai.entropy_models.GaussianConditional" title="compressai.entropy_models.entropy_models.GaussianConditional"><span class="pre">compressai.entropy_models.entropy_models.GaussianConditional</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context_prediction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="layers.html#compressai.layers.MaskedConv2d" title="compressai.layers.layers.MaskedConv2d"><span class="pre">compressai.layers.layers.MaskedConv2d</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/rasterscan.html#RasterScanLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.RasterScanLatentCodec" title="Permalink to this definition">#</a></dt>
 <dd><p>Autoregression in raster-scan order with local decoded context.</p>
 <p>PixelCNN context model introduced in
 <a class="reference external" href="http://arxiv.org/abs/1601.06759">“Pixel Recurrent Neural Networks”</a>,
@@ -813,10 +757,10 @@ y ──►──┤ Q ├────►────····───►──�
 
 </section>
 <section id="gainhyperlatentcodec">
-<h2>GainHyperLatentCodec<a class="headerlink" href="#gainhyperlatentcodec" title="Link to this heading">#</a></h2>
+<h2>GainHyperLatentCodec<a class="headerlink" href="#gainhyperlatentcodec" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.latent_codecs.GainHyperLatentCodec">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">GainHyperLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entropy_bottleneck</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="entropy_models.html#compressai.entropy_models.EntropyBottleneck" title="compressai.entropy_models.entropy_models.EntropyBottleneck"><span class="pre">EntropyBottleneck</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/gain/hyper.html#GainHyperLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.GainHyperLatentCodec" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">GainHyperLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entropy_bottleneck</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="entropy_models.html#compressai.entropy_models.EntropyBottleneck" title="compressai.entropy_models.entropy_models.EntropyBottleneck"><span class="pre">compressai.entropy_models.entropy_models.EntropyBottleneck</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/gain/hyper.html#GainHyperLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.GainHyperLatentCodec" title="Permalink to this definition">#</a></dt>
 <dd><p>Entropy bottleneck codec with surrounding <cite>h_a</cite> and <cite>h_s</cite> transforms.</p>
 <p>Gain-controlled side branch for hyperprior introduced in
 <a class="reference external" href="https://arxiv.org/abs/2003.02012">“Asymmetric Gained Deep Image Compression With Continuous Rate Adaptation”</a>, by Ze Cui, Jing Wang,
@@ -838,10 +782,10 @@ y ──►──┤h_a├──►──×──►──┤ Q ├───►�
 
 </section>
 <section id="gainhyperpriorlatentcodec">
-<h2>GainHyperpriorLatentCodec<a class="headerlink" href="#gainhyperpriorlatentcodec" title="Link to this heading">#</a></h2>
+<h2>GainHyperpriorLatentCodec<a class="headerlink" href="#gainhyperpriorlatentcodec" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.latent_codecs.GainHyperpriorLatentCodec">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">GainHyperpriorLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latent_codec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">LatentCodec</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/gain/hyperprior.html#GainHyperpriorLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.GainHyperpriorLatentCodec" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">GainHyperpriorLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latent_codec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">compressai.latent_codecs.base.LatentCodec</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/gain/hyperprior.html#GainHyperpriorLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.GainHyperpriorLatentCodec" title="Permalink to this definition">#</a></dt>
 <dd><p>Hyperprior codec constructed from latent codec for <code class="docutils literal notranslate"><span class="pre">y</span></code> that
 compresses <code class="docutils literal notranslate"><span class="pre">y</span></code> using <code class="docutils literal notranslate"><span class="pre">params</span></code> from <code class="docutils literal notranslate"><span class="pre">hyper</span></code> branch.</p>
 <p>Gain-controlled hyperprior introduced in
@@ -892,10 +836,10 @@ y ──┴───►───×───►───┤ Q ├────►�
 
 </section>
 <section id="channelgroupslatentcodec">
-<h2>ChannelGroupsLatentCodec<a class="headerlink" href="#channelgroupslatentcodec" title="Link to this heading">#</a></h2>
+<h2>ChannelGroupsLatentCodec<a class="headerlink" href="#channelgroupslatentcodec" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.latent_codecs.ChannelGroupsLatentCodec">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">ChannelGroupsLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latent_codec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">LatentCodec</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Module</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/channel_groups.html#ChannelGroupsLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.ChannelGroupsLatentCodec" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">ChannelGroupsLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latent_codec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">compressai.latent_codecs.base.LatentCodec</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.nn.modules.module.Module</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/channel_groups.html#ChannelGroupsLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.ChannelGroupsLatentCodec" title="Permalink to this definition">#</a></dt>
 <dd><p>Reconstructs groups of channels using previously decoded groups.</p>
 <p>Context model from [Minnen2020] and [He2022].
 Also known as a “channel-conditional” (CC) entropy model.</p>
@@ -911,10 +855,10 @@ Weikun Peng, Rui Ma, Hongwei Qin, and Yan Wang, CVPR 2022.</p>
 
 </section>
 <section id="checkerboardlatentcodec">
-<h2>CheckerboardLatentCodec<a class="headerlink" href="#checkerboardlatentcodec" title="Link to this heading">#</a></h2>
+<h2>CheckerboardLatentCodec<a class="headerlink" href="#checkerboardlatentcodec" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.latent_codecs.CheckerboardLatentCodec">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">CheckerboardLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latent_codec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">LatentCodec</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context_prediction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CheckerboardMaskedConv2d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anchor_parity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'even'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'twopass'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/checkerboard.html#CheckerboardLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.CheckerboardLatentCodec" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">CheckerboardLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latent_codec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">compressai.latent_codecs.base.LatentCodec</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.modules.module.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context_prediction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">compressai.layers.layers.CheckerboardMaskedConv2d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anchor_parity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'even'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'twopass'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/checkerboard.html#CheckerboardLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.CheckerboardLatentCodec" title="Permalink to this definition">#</a></dt>
 <dd><p>Reconstructs latent using 2-pass context model with checkerboard anchors.</p>
 <p>Checkerboard context model introduced in [He2021].</p>
 <p>See <a class="reference internal" href="models.html#compressai.models.Cheng2020AnchorCheckerboard" title="compressai.models.sensetime.Cheng2020AnchorCheckerboard"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cheng2020AnchorCheckerboard</span></code></a>
@@ -981,10 +925,11 @@ LEGEND:
 
               
               
-              
-              
-                <footer class="prev-next-footer d-print-none">
+                <footer class="bd-footer-article">
                   
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="entropy_models.html"
@@ -1004,7 +949,10 @@ LEGEND:
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
+</div></div>
+  
 </div>
+
                 </footer>
               
             </div>
@@ -1012,7 +960,6 @@ LEGEND:
             
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
 
   <div class="sidebar-secondary-item">
   <div class="page-toc tocsection onthispage">
@@ -1023,42 +970,15 @@ LEGEND:
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rationale">Rationale</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-models">Example models</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-a-custom-latent-codec">Defining a custom latent codec</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entropybottlenecklatentcodec">EntropyBottleneckLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.EntropyBottleneckLatentCodec"><code class="docutils literal notranslate"><span class="pre">EntropyBottleneckLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaussianconditionallatentcodec">GaussianConditionalLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.GaussianConditionalLatentCodec"><code class="docutils literal notranslate"><span class="pre">GaussianConditionalLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hyperlatentcodec">HyperLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.HyperLatentCodec"><code class="docutils literal notranslate"><span class="pre">HyperLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hyperpriorlatentcodec">HyperpriorLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.HyperpriorLatentCodec"><code class="docutils literal notranslate"><span class="pre">HyperpriorLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rasterscanlatentcodec">RasterScanLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.RasterScanLatentCodec"><code class="docutils literal notranslate"><span class="pre">RasterScanLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gainhyperlatentcodec">GainHyperLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.GainHyperLatentCodec"><code class="docutils literal notranslate"><span class="pre">GainHyperLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gainhyperpriorlatentcodec">GainHyperpriorLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.GainHyperpriorLatentCodec"><code class="docutils literal notranslate"><span class="pre">GainHyperpriorLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#channelgroupslatentcodec">ChannelGroupsLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.ChannelGroupsLatentCodec"><code class="docutils literal notranslate"><span class="pre">ChannelGroupsLatentCodec</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#checkerboardlatentcodec">CheckerboardLatentCodec</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compressai.latent_codecs.CheckerboardLatentCodec"><code class="docutils literal notranslate"><span class="pre">CheckerboardLatentCodec</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#entropybottlenecklatentcodec">EntropyBottleneckLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaussianconditionallatentcodec">GaussianConditionalLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hyperlatentcodec">HyperLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hyperpriorlatentcodec">HyperpriorLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rasterscanlatentcodec">RasterScanLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gainhyperlatentcodec">GainHyperLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gainhyperpriorlatentcodec">GainHyperpriorLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#channelgroupslatentcodec">ChannelGroupsLatentCodec</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#checkerboardlatentcodec">CheckerboardLatentCodec</a></li>
 </ul>
   </nav></div>
 
@@ -1080,7 +1000,6 @@ By InterDigital Communications, Inc.
   
   <div class="footer-item">
     
-
   <p class="copyright">
     
       © Copyright 2021, InterDigital Communications, Inc.
@@ -1107,8 +1026,8 @@ By InterDigital Communications, Inc.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
 
   <footer class="bd-footer">
   </footer>
