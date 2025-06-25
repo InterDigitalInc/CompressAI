@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "compressai"
-version = "1.2.8"
+version = "1.2.9.dev0"
 description = "A PyTorch library and evaluation platform for end-to-end compression research"
 authors = [
     { name = "InterDigital AI Lab", email = "compressai@interdigital.com" },
