@@ -143,9 +143,7 @@ def get_raw_video_file_info(filename: str) -> Dict[str, Any]:
     framerate_pattern = r"(?P<framerate>[\d\.]+)(?:Hz|fps)"
     bitdepth_pattern = r"(?P<bitdepth>\d+)bit"
     formats = "|".join(video_formats.keys())
-    format_pattern = (
-        rf"(?P<format>{formats})(?:[p_]?(?P<bitdepth2>\d+)(?P<endianness>LE|BE))?"
-    )
+    format_pattern = rf"(?P<format>{formats})(?:[p_]?(?:(?P<bitdepth2>\d+)|(?P<chroma_sub>\d{3}[p]))?(?P<endianness>LE|BE))?"
     extension_pattern = rf"(?P<extension>{'|'.join(file_extensions)})"
     cut_pattern = "([0-9]+)-([0-9]+)"
 
@@ -165,6 +163,9 @@ def get_raw_video_file_info(filename: str) -> Dict[str, Any]:
 
     if not info:
         return {}
+
+    if "bitdepth" not in info:
+        info["bitdepth"] = "8"
 
     if info["bitdepth"] and info["bitdepth2"] and info["bitdepth"] != info["bitdepth2"]:
         raise ValueError(f'Filename "{filename}" specifies bit-depth twice.')
