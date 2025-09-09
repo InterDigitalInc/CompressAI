@@ -31,9 +31,12 @@ classifiers = [
 dependencies = [
   "einops",
   "matplotlib",
-  "numpy>=1.21.0,<2.0",
-  "pandas",
-  "pybind11>=2.6.0", # For --no-build-isolation.
+  "numpy >= 1.24.4,<2.0; python_version < '3.10'",
+  "numpy >= 2.2.4; python_version >= '3.10'",
+  "Pandas >= 2.0; python_version < '3.10'",
+  "Pandas >= 2.2.0; python_version >= '3.10'",
+  "pybind11>=2.6.0; python_version < '3.10'", # For --no-build-isolation.
+  "pybind11>=2.12.0; python_version >= '3.10'", # For --no-build-isolation.
   "pytorch-msssim",
   "scipy",
   "setuptools>=68", # For --no-build-isolation.
