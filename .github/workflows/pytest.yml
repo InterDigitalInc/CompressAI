@@ -21,7 +21,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install the project
-      run: uv sync --locked --all-extras --dev
+      run: uv sync --reinstall --locked --all-extras --dev
 
     - name: Run unit tests
       run: uv run pytest -m "not slow" --cov=compressai -s tests/

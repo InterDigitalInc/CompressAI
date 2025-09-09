@@ -3,7 +3,7 @@ requires = [
   "setuptools>=68",
   "wheel",
   "pybind11>=2.6.0",
-  "tomli; python_version < '3.11'",
+  "tomli; python_version < '3.14'",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -15,7 +15,7 @@ authors = [
     { name = "InterDigital AI Lab", email = "compressai@interdigital.com" },
 ]
 readme = "Readme.md"
-requires-python = ">=3.8"
+requires-python = ">=3.8,<14"
 urls = { Homepage = "https://github.com/InterDigitalInc/CompressAI" }
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -31,10 +31,9 @@ classifiers = [
 dependencies = [
   "einops",
   "matplotlib",
-  "numpy >= 1.24.4,<2.0; python_version < '3.10'",
-  "numpy >= 2.2.4; python_version >= '3.10'",
-  "Pandas >= 2.0; python_version < '3.10'",
-  "Pandas >= 2.2.0; python_version >= '3.10'",
+  "numpy >= 1.24.4,<2.0",
+  "Pandas >= 2.0.3; python_version < '3.9'",
+  "Pandas >= 2.3.2; python_version >= '3.9'",
   "pybind11>=2.6.0; python_version < '3.10'", # For --no-build-isolation.
   "pybind11>=2.12.0; python_version >= '3.10'", # For --no-build-isolation.
   "pytorch-msssim",
@@ -43,7 +42,8 @@ dependencies = [
   "tomli>=2.2.1",
   "torch-geometric>=2.3.0",
   "torch>=1.13.1",
-  "torchvision",
+  "torchvision>=0.14.1,<0.20; python_version < '3.9'",
+  "torchvision>=0.17.0; python_version >= '3.9'",
   "tqdm",
   "typing-extensions>=4.0.0",
   "wheel>=0.32.0", # For --no-build-isolation.
@@ -118,7 +118,7 @@ exclude = ["tests"]
 
 [tool.black]
 line-length = 88
-target-version = ['py38', 'py39', 'py310']
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
 include = '\.pyi?$'
 exclude = '''
 /(

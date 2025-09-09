@@ -43,7 +43,7 @@ uv-install:
     - docker
 
 wheel:
-  image: python:$PYTHON_VERSION-buster
+  image: python:$PYTHON_VERSION
   stage: build
   before_script:
     # - export UV_PYTHON="$PYTHON_VERSION"
@@ -56,7 +56,7 @@ wheel:
     expire_in: 1 day
   parallel:
     matrix:
-      - PYTHON_VERSION: ['3.8', '3.9', '3.10']
+      - PYTHON_VERSION: ['3.8', '3.9', '3.10', '3.11', '3.12']
   tags:
     - docker
 
@@ -117,6 +117,10 @@ test:
         CUDA_VERSION_NAME=cu118
         TORCH_VERSION=2.2.0+cu118
         TORCHVISION_VERSION=0.17.0+cu118
+      elif [ "$PYTORCH_IMAGE" == "2.7.1-cuda12.8-cudnn9-devel" ]; then
+        CUDA_VERSION_NAME=cu128
+        TORCH_VERSION=2.7.1+cu128
+        TORCHVISION_VERSION=0.22.0+cu128
       fi
     - |
       cat <<EOF >> pyproject.toml.delta
