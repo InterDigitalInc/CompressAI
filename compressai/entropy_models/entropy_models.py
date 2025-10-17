@@ -677,7 +677,6 @@ class GaussianConditional(EntropyModel):
 
         tail_mass = 2 * lower[:, :1]
 
-        quantized_cdf = torch.Tensor(len(pmf_length), max_length + 2)
         quantized_cdf = self._pmf_to_cdf(pmf, tail_mass, pmf_length, max_length)
         self._quantized_cdf = quantized_cdf
         self._offset = -pmf_center
