@@ -938,7 +938,6 @@ document.write(`
 
         <span class="n">tail_mass</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">lower</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="n">quantized_cdf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pmf_length</span><span class="p">),</span> <span class="n">max_length</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">quantized_cdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pmf_to_cdf</span><span class="p">(</span><span class="n">pmf</span><span class="p">,</span> <span class="n">tail_mass</span><span class="p">,</span> <span class="n">pmf_length</span><span class="p">,</span> <span class="n">max_length</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_quantized_cdf</span> <span class="o">=</span> <span class="n">quantized_cdf</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="o">-</span><span class="n">pmf_center</span>
