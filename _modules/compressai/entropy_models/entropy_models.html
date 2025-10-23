@@ -315,9 +315,7 @@ document.write(`
 
         <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">available_entropy_coders</span><span class="p">():</span>
             <span class="n">methods</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">available_entropy_coders</span><span class="p">())</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Unknown entropy coder &quot;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="sa">f</span><span class="s2">&quot; (available: </span><span class="si">{</span><span class="n">methods</span><span class="si">}</span><span class="s2">)&quot;</span>
-            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown entropy coder &quot;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s1">&quot; (available: </span><span class="si">{</span><span class="n">methods</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;ans&quot;</span><span class="p">:</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">compressai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ans</span>
@@ -735,28 +733,18 @@ document.write(`
         <span class="k">if</span> <span class="n">training</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">training</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
-            <span class="c1"># x from B x C x ... to C x B x ...</span>
-            <span class="n">perm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
-                <span class="p">(</span>
-                    <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
-                    <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
-            <span class="n">inv_perm</span> <span class="o">=</span> <span class="n">perm</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
-            <span class="c1"># TorchScript in 2D for static inference</span>
-            <span class="c1"># Convert to (channels, ... , batch) format</span>
-            <span class="c1"># perm = (1, 2, 3, 0)</span>
-            <span class="c1"># inv_perm = (3, 0, 1, 2)</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span>
+        <span class="c1"># B C ...  -&gt;  C B ...</span>
+        <span class="n">perm</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">D</span><span class="p">))</span>
+        <span class="n">inv_perm</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">D</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">perm</span><span class="p">):</span>
+            <span class="n">inv_perm</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
 
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="o">*</span><span class="n">perm</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># Add noise or quantize</span>
-
         <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span>
             <span class="n">values</span><span class="p">,</span> <span class="s2">&quot;noise&quot;</span> <span class="k">if</span> <span class="n">training</span> <span class="k">else</span> <span class="s2">&quot;dequantize&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_medians</span><span class="p">()</span>
         <span class="p">)</span>
@@ -771,11 +759,8 @@ document.write(`
             <span class="c1"># likelihood = torch.zeros_like(outputs)</span>
 
         <span class="c1"># Convert back to input tensor shape</span>
-        <span class="n">outputs</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-        <span class="n">outputs</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="o">*</span><span class="n">inv_perm</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
-
-        <span class="n">likelihood</span> <span class="o">=</span> <span class="n">likelihood</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-        <span class="n">likelihood</span> <span class="o">=</span> <span class="n">likelihood</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="o">*</span><span class="n">inv_perm</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="o">*</span><span class="n">inv_perm</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+        <span class="n">likelihood</span> <span class="o">=</span> <span class="n">likelihood</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="o">*</span><span class="n">inv_perm</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">likelihood</span>
 
