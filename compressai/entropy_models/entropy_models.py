@@ -437,7 +437,7 @@ class EntropyBottleneck(EntropyModel):
         return loss
 
     def _logits_cumulative(self, inputs: Tensor, stop_gradient: bool) -> Tensor:
-        # TorchScript not yet working (nn.Mmodule indexing not supported)
+        # TorchScript not yet working (nn.Module indexing not supported)
         logits = inputs
         for i in range(len(self.filters) + 1):
             matrix = self.matrices[i]
