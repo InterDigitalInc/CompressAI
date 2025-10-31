@@ -395,7 +395,7 @@ class EntropyBottleneck(EntropyModel):
 
     def update(self, force: bool = False, update_quantiles: bool = False) -> bool:
         # Check if we need to update the bottleneck parameters, the offsets are
-        # only computed and stored when the conditonal model is update()'d.
+        # only computed and stored when the conditional model is update()'d.
         if self._offset.numel() > 0 and not force:
             return False
 
