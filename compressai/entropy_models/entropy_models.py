@@ -196,7 +196,7 @@ class EntropyModel(nn.Module):
 
     @classmethod
     def _dequantize(cls, inputs: Tensor, means: Optional[Tensor] = None) -> Tensor:
-        warnings.warn("_dequantize. Use dequantize instead.", stacklevel=2)
+        warnings.warn("_dequantize is deprecated. Use dequantize instead.", stacklevel=2)
         return cls.dequantize(inputs, means)
 
     def _pmf_to_cdf(self, pmf, tail_mass, pmf_length, max_length):
