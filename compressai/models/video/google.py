@@ -359,7 +359,7 @@ class ScaleSpaceFlow(CompressionModel):
 
         N, C, _, H, W = volume.size()
 
-        with amp.autocast(device_type=volume.device.type, enabled=False):
+        with amp.autocast(volume.device.type, enabled=False):
             grid = meshgrid2d(N, C, H, W, volume.device)
             update_grid = grid + flow.permute(0, 2, 3, 1).float()
             update_scale = scale_field.permute(0, 2, 3, 1).float()

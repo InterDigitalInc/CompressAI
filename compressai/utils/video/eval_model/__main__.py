@@ -371,7 +371,7 @@ def run_inference(
             continue
 
         with amp.autocast(
-            device_type=next(net.parameters()).device.type, enabled=args["half"]
+            next(net.parameters()).device.type, enabled=args["half"]
         ):
             with torch.no_grad():
                 if entropy_estimation:
