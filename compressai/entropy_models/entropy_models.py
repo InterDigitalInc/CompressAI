@@ -158,7 +158,7 @@ class EntropyModel(nn.Module):
 
         if mode == "noise":
             half = float(0.5)
-            noise = torch.empty_like(inputs).uniform_(-half, half)
+            noise = 2*half*torch.rand_like(inputs) - half
             inputs = inputs + noise
             return inputs
 
