@@ -673,6 +673,7 @@ class JointAutoregressiveHierarchicalPriors(MeanScaleHyperprior):
         y_hat = torch.zeros(
             (z_hat.size(0), self.M, y_height + 2 * padding, y_width + 2 * padding),
             device=z_hat.device,
+            dtype=z_hat.dtype,
         )
 
         for i, y_string in enumerate(strings[0]):
