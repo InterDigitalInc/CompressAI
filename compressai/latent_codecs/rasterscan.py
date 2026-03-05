@@ -27,7 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from typing import Any, Callable, Dict, List, Tuple, TypeVar
+from typing import Any, Dict, List, Tuple, TypeVar
 
 import torch
 import torch.nn as nn
@@ -94,7 +94,9 @@ class RasterScanLatentCodec(LatentCodec):
         self.gaussian_conditional = gaussian_conditional
         self.entropy_parameters = entropy_parameters
         self.context_prediction = context_prediction
-        self.kernel_size = _to_single(self.context_prediction.kernel_size)
+        [k, *ks] = self.context_prediction.kernel_size
+        assert all(k == k_ for k_ in ks)
+        self.kernel_size = k
         self.padding = (self.kernel_size - 1) // 2
 
     def forward(self, y: Tensor, params: Tensor) -> Dict[str, Any]:
@@ -112,18 +114,12 @@ class RasterScanLatentCodec(LatentCodec):
         ds = []
         for i in range(n):
             encoder = BufferedRansEncoder()
-            y_hat = raster_scan_compress_single_stream(
+            y_hat = self._compress_single_stream(
                 encoder=encoder,
                 y=y[i : i + 1, :, :, :],
                 params=ctx_params[i : i + 1, :, :, :],
-                gaussian_conditional=self.gaussian_conditional,
-                entropy_parameters=self.entropy_parameters,
-                context_prediction=self.context_prediction,
                 height=y_height,
                 width=y_width,
-                padding=self.padding,
-                kernel_size=self.kernel_size,
-                merge=self.merge,
             )
             y_strings = encoder.flush()
             ds.append({"strings": [y_strings], "y_hat": y_hat.squeeze(0)})
@@ -142,168 +138,140 @@ class RasterScanLatentCodec(LatentCodec):
         for i in range(len(y_strings)):
             decoder = RansDecoder()
             decoder.set_stream(y_strings[i])
-            y_hat = raster_scan_decompress_single_stream(
+            y_hat = self._decompress_single_stream(
                 decoder=decoder,
                 params=ctx_params[i : i + 1, :, :, :],
-                gaussian_conditional=self.gaussian_conditional,
-                entropy_parameters=self.entropy_parameters,
-                context_prediction=self.context_prediction,
                 height=y_height,
                 width=y_width,
-                padding=self.padding,
-                kernel_size=self.kernel_size,
                 device=ctx_params.device,
-                merge=self.merge,
             )
             ds.append({"y_hat": y_hat.squeeze(0)})
         return default_collate(ds)
 
-    @staticmethod
-    def merge(*args):
+    def _compress_single_stream(
+        self,
+        encoder: BufferedRansEncoder,
+        y: Tensor,
+        params: Tensor,
+        *,
+        height: int,
+        width: int,
+    ) -> Tensor:
+        """Compresses y and writes to encoder bitstream.
+
+        Returns:
+            The y_hat that will be reconstructed at the decoder.
+        """
+        assert height == y.shape[-2]
+        assert width == y.shape[-1]
+
+        cdf = self.gaussian_conditional.quantized_cdf.tolist()
+        cdf_lengths = self.gaussian_conditional.cdf_length.tolist()
+        offsets = self.gaussian_conditional.offset.tolist()
+        masked_weight = self.context_prediction.weight * self.context_prediction.mask
+
+        y_hat = _pad_2d(y, self.padding)
+
+        symbols_list = []
+        indexes_list = []
+
+        # Warning, this is slow...
+        # TODO: profile the calls to the bindings...
+        for h in range(height):
+            for w in range(width):
+                # only perform the mask convolution on a cropped tensor
+                # centered in (h, w)
+                y_crop = y_hat[:, :, h : h + self.kernel_size, w : w + self.kernel_size]
+                ctx_p = F.conv2d(y_crop, masked_weight, self.context_prediction.bias)
+
+                # 1x1 conv for the entropy parameters prediction network, so
+                # we only keep the elements in the "center"
+                p = params[:, :, h : h + 1, w : w + 1]
+                gaussian_params = self.entropy_parameters(self.merge(p, ctx_p))
+                gaussian_params = gaussian_params.squeeze(3).squeeze(2)
+                scales_hat, means_hat = gaussian_params.chunk(2, 1)
+                indexes = self.gaussian_conditional.build_indexes(scales_hat)
+
+                y_crop = y_crop[:, :, self.padding, self.padding]
+                symbols = self.gaussian_conditional.quantize(
+                    y_crop, "symbols", means_hat
+                )
+                y_hat_item = symbols + means_hat
+
+                hp = h + self.padding
+                wp = w + self.padding
+                y_hat[:, :, hp, wp] = y_hat_item
+
+                symbols_list.extend(symbols.squeeze().tolist())
+                indexes_list.extend(indexes.squeeze().tolist())
+
+        encoder.encode_with_indexes(
+            symbols_list, indexes_list, cdf, cdf_lengths, offsets
+        )
+
+        y_hat = _pad_2d(y_hat, -self.padding)
+        return y_hat
+
+    def _decompress_single_stream(
+        self,
+        decoder: RansDecoder,
+        params: Tensor,
+        *,
+        height: int,
+        width: int,
+        device,
+    ) -> Tensor:
+        """Decodes y_hat from decoder bitstream.
+
+        Returns:
+            The reconstructed y_hat.
+        """
+        cdf = self.gaussian_conditional.quantized_cdf.tolist()
+        cdf_lengths = self.gaussian_conditional.cdf_length.tolist()
+        offsets = self.gaussian_conditional.offset.tolist()
+        masked_weight = self.context_prediction.weight * self.context_prediction.mask
+
+        c = self.context_prediction.in_channels
+        shape = (1, c, height + 2 * self.padding, width + 2 * self.padding)
+        y_hat = torch.zeros(shape, device=device)
+
+        # Warning: this is slow due to the auto-regressive nature of the
+        # decoding... See more recent publication where they use an
+        # auto-regressive module on chunks of channels for faster decoding...
+        for h in range(height):
+            for w in range(width):
+                # only perform the mask convolution on a cropped tensor
+                # centered in (h, w)
+                y_crop = y_hat[:, :, h : h + self.kernel_size, w : w + self.kernel_size]
+                ctx_p = F.conv2d(y_crop, masked_weight, self.context_prediction.bias)
+
+                # 1x1 conv for the entropy parameters prediction network, so
+                # we only keep the elements in the "center"
+                p = params[:, :, h : h + 1, w : w + 1]
+                gaussian_params = self.entropy_parameters(self.merge(p, ctx_p))
+                gaussian_params = gaussian_params.squeeze(3).squeeze(2)
+                scales_hat, means_hat = gaussian_params.chunk(2, 1)
+                indexes = self.gaussian_conditional.build_indexes(scales_hat)
+
+                symbols = decoder.decode_stream(
+                    indexes.squeeze().tolist(), cdf, cdf_lengths, offsets
+                )
+                symbols = Tensor(symbols).reshape(1, -1)
+                y_hat_item = self.gaussian_conditional.dequantize(symbols, means_hat)
+
+                hp = h + self.padding
+                wp = w + self.padding
+                y_hat[:, :, hp, wp] = y_hat_item
+
+        y_hat = _pad_2d(y_hat, -self.padding)
+        return y_hat
+
+    def merge(self, *args):
         return torch.cat(args, dim=1)
-
-
-def raster_scan_compress_single_stream(
-    encoder: BufferedRansEncoder,
-    y: Tensor,
-    params: Tensor,
-    *,
-    gaussian_conditional: GaussianConditional,
-    entropy_parameters: nn.Module,
-    context_prediction: MaskedConv2d,
-    height: int,
-    width: int,
-    padding: int,
-    kernel_size: int,
-    merge: Callable[..., Tensor] = lambda *args: torch.cat(args, dim=1),
-) -> Tensor:
-    """Compresses y and writes to encoder bitstream.
-
-    Returns:
-        The y_hat that will be reconstructed at the decoder.
-    """
-    assert height == y.shape[-2]
-    assert width == y.shape[-1]
-
-    cdf = gaussian_conditional.quantized_cdf.tolist()
-    cdf_lengths = gaussian_conditional.cdf_length.tolist()
-    offsets = gaussian_conditional.offset.tolist()
-    masked_weight = context_prediction.weight * context_prediction.mask
-
-    y_hat = _pad_2d(y, padding)
-
-    symbols_list = []
-    indexes_list = []
-
-    # Warning, this is slow...
-    # TODO: profile the calls to the bindings...
-    for h in range(height):
-        for w in range(width):
-            # only perform the mask convolution on a cropped tensor
-            # centered in (h, w)
-            y_crop = y_hat[:, :, h : h + kernel_size, w : w + kernel_size]
-            ctx_p = F.conv2d(
-                y_crop,
-                masked_weight,
-                context_prediction.bias,
-            )
-
-            # 1x1 conv for the entropy parameters prediction network, so
-            # we only keep the elements in the "center"
-            p = params[:, :, h : h + 1, w : w + 1]
-            gaussian_params = entropy_parameters(merge(p, ctx_p))
-            gaussian_params = gaussian_params.squeeze(3).squeeze(2)
-            scales_hat, means_hat = gaussian_params.chunk(2, 1)
-            indexes = gaussian_conditional.build_indexes(scales_hat)
-
-            y_crop = y_crop[:, :, padding, padding]
-            symbols = gaussian_conditional.quantize(y_crop, "symbols", means_hat)
-            y_hat_item = symbols + means_hat
-
-            hp = h + padding
-            wp = w + padding
-            y_hat[:, :, hp, wp] = y_hat_item
-
-            symbols_list.extend(symbols.squeeze().tolist())
-            indexes_list.extend(indexes.squeeze().tolist())
-
-    encoder.encode_with_indexes(symbols_list, indexes_list, cdf, cdf_lengths, offsets)
-
-    y_hat = _pad_2d(y_hat, -padding)
-    return y_hat
-
-
-def raster_scan_decompress_single_stream(
-    decoder: RansDecoder,
-    params: Tensor,
-    *,
-    gaussian_conditional: GaussianConditional,
-    entropy_parameters: nn.Module,
-    context_prediction: MaskedConv2d,
-    height: int,
-    width: int,
-    padding: int,
-    kernel_size: int,
-    device,
-    merge: Callable[..., Tensor] = lambda *args: torch.cat(args, dim=1),
-) -> Tensor:
-    """Decodes y_hat from decoder bitstream.
-
-    Returns:
-        The reconstructed y_hat.
-    """
-    cdf = gaussian_conditional.quantized_cdf.tolist()
-    cdf_lengths = gaussian_conditional.cdf_length.tolist()
-    offsets = gaussian_conditional.offset.tolist()
-    masked_weight = context_prediction.weight * context_prediction.mask
-
-    c = context_prediction.in_channels
-    shape = (1, c, height + 2 * padding, width + 2 * padding)
-    y_hat = torch.zeros(shape, device=device)
-
-    # Warning: this is slow due to the auto-regressive nature of the
-    # decoding... See more recent publication where they use an
-    # auto-regressive module on chunks of channels for faster decoding...
-    for h in range(height):
-        for w in range(width):
-            # only perform the mask convolution on a cropped tensor
-            # centered in (h, w)
-            y_crop = y_hat[:, :, h : h + kernel_size, w : w + kernel_size]
-            ctx_p = F.conv2d(
-                y_crop,
-                masked_weight,
-                context_prediction.bias,
-            )
-
-            # 1x1 conv for the entropy parameters prediction network, so
-            # we only keep the elements in the "center"
-            p = params[:, :, h : h + 1, w : w + 1]
-            gaussian_params = entropy_parameters(merge(p, ctx_p))
-            gaussian_params = gaussian_params.squeeze(3).squeeze(2)
-            scales_hat, means_hat = gaussian_params.chunk(2, 1)
-            indexes = gaussian_conditional.build_indexes(scales_hat)
-
-            symbols = decoder.decode_stream(
-                indexes.squeeze().tolist(), cdf, cdf_lengths, offsets
-            )
-            symbols = Tensor(symbols).reshape(1, -1)
-            y_hat_item = gaussian_conditional.dequantize(symbols, means_hat)
-
-            hp = h + padding
-            wp = w + padding
-            y_hat[:, :, hp, wp] = y_hat_item
-
-    y_hat = _pad_2d(y_hat, -padding)
-    return y_hat
 
 
 def _pad_2d(x: Tensor, padding: int) -> Tensor:
     return F.pad(x, (padding, padding, padding, padding))
-
-
-def _to_single(xs):
-    assert all(x == xs[0] for x in xs)
-    return xs[0]
 
 
 def default_collate(batch: List[Dict[K, V]]) -> Dict[K, List[V]]:
