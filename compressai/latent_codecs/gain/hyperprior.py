@@ -27,7 +27,9 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from typing import Any, Dict, List, Mapping, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Tuple
+
+import torch.nn as nn
 
 from torch import Tensor
 
@@ -43,7 +45,7 @@ __all__ = [
 @register_module("GainHyperpriorLatentCodec")
 class GainHyperpriorLatentCodec(LatentCodec):
     """Hyperprior codec constructed from latent codec for ``y`` that
-    compresses ``y`` using ``params`` from ``hyper`` branch.
+    compresses ``y`` using ``params`` derived from ``z_hat``.
 
     Gain-controlled hyperprior introduced in
     `"Asymmetric Gained Deep Image Compression With Continuous Rate Adaptation"
@@ -52,21 +54,22 @@ class GainHyperpriorLatentCodec(LatentCodec):
 
     .. code-block:: none
 
-                z_gain  z_gain_inv
-                   │        │
-                   ▼        ▼
-                  ┌┴────────┴┐
-            ┌──►──┤ lc_hyper ├──►─┐
-            │     └──────────┘    │
-            │                     │
-            │     y_gain          ▼ params   y_gain_inv
-            │        │            │              │
-            │        ▼            │              ▼
-            │        │         ┌──┴───┐          │
-        y ──┴────►───×───►─────┤ lc_y ├────►─────×─────►── y_hat
-                               └──────┘
+                        z_gain  z_gain_inv
+                           │        │
+                           ▼        ▼
+                ┌───┐  z  ┌┴────────┴┐ z_hat ┌───┐
+            ┌─►─┤h_a├──►──┤   lc_z   ├───►───┤h_s├──►─┐
+            │   └───┘     └──────────┘       └───┘    │
+            │                                         │
+            │                y_gain                   ▼ params   y_gain_inv
+            │                   │                     │              │
+            │                   ▼                     │              ▼
+            │                   │                  ┌──┴───┐          │
+        y ──┴───────────────►───×───►──────────────┤ lc_y ├────►─────×─────►── y_hat
+                                                   └──────┘
 
-    By default, the following codec is constructed:
+    The original gain hyperprior is the combination of an
+    entropy bottleneck for ``z`` and a gaussian conditional for ``y``:
 
     .. code-block:: none
 
@@ -88,14 +91,26 @@ class GainHyperpriorLatentCodec(LatentCodec):
                             └───┘          GC
 
     Common configurations of latent codecs include:
-     - entropy bottleneck ``hyper`` (default) and gaussian conditional ``y`` (default)
-     - entropy bottleneck ``hyper`` (default) and autoregressive ``y``
+     - entropy bottleneck ``z`` and gaussian conditional ``y``
+     - entropy bottleneck ``z`` and autoregressive ``y``
     """
 
-    def __init__(self, latent_codec: Mapping[str, LatentCodec], **kwargs):
+    def __init__(
+        self,
+        latent_codec: Mapping[str, LatentCodec],
+        h_a: Optional[nn.Module] = None,
+        h_s: Optional[nn.Module] = None,
+        **kwargs,
+    ):
         super().__init__()
+        self.h_a = h_a or nn.Identity()
+        self.h_s = h_s or nn.Identity()
+        latent_codec = {
+            "y": latent_codec["y"],
+            "z": latent_codec.get("z") or latent_codec["hyper"],
+        }
         self.y = latent_codec["y"]
-        self.hyper = latent_codec["hyper"]
+        self.z = latent_codec["z"]
         self.latent_codec = latent_codec
 
     def __getitem__(self, key: str) -> LatentCodec:
@@ -109,13 +124,18 @@ class GainHyperpriorLatentCodec(LatentCodec):
         y_gain_inv: Tensor,
         z_gain_inv: Tensor,
     ) -> Dict[str, Any]:
-        hyper_out = self.latent_codec["hyper"](y, z_gain, z_gain_inv)
-        y_out = self.latent_codec["y"](y * y_gain, hyper_out["params"])
+        z = self.h_a(y)
+        z = z * z_gain
+        z_out = self.latent_codec["z"](z)
+        z_hat = z_out["y_hat"]
+        z_hat = z_hat * z_gain_inv
+        params = self.h_s(z_hat)
+        y_out = self.latent_codec["y"](y * y_gain, params)
         y_hat = y_out["y_hat"] * y_gain_inv
         return {
             "likelihoods": {
                 "y": y_out["likelihoods"]["y"],
-                "z": hyper_out["likelihoods"]["z"],
+                "z": z_out["likelihoods"]["y"],
             },
             "y_hat": y_hat,
         }
@@ -128,12 +148,17 @@ class GainHyperpriorLatentCodec(LatentCodec):
         y_gain_inv: Tensor,
         z_gain_inv: Tensor,
     ) -> Dict[str, Any]:
-        hyper_out = self.latent_codec["hyper"].compress(y, z_gain, z_gain_inv)
-        y_out = self.latent_codec["y"].compress(y * y_gain, hyper_out["params"])
+        z = self.h_a(y)
+        z = z * z_gain
+        z_out = self.latent_codec["z"].compress(z)
+        z_hat = z_out["y_hat"]
+        z_hat = z_hat * z_gain_inv
+        params = self.h_s(z_hat)
+        y_out = self.latent_codec["y"].compress(y * y_gain, params)
         y_hat = y_out["y_hat"] * y_gain_inv
         return {
-            "strings": [*y_out["strings"], *hyper_out["strings"]],
-            "shape": {"y": y_out["shape"], "hyper": hyper_out["shape"]},
+            "strings": [*y_out["strings"], *z_out["strings"]],
+            "shape": {"y": y_out["shape"], "z": z_out["shape"]},
             "y_hat": y_hat,
         }
 
@@ -147,11 +172,10 @@ class GainHyperpriorLatentCodec(LatentCodec):
     ) -> Dict[str, Any]:
         *y_strings_, z_strings = strings
         assert all(len(y_strings) == len(z_strings) for y_strings in y_strings_)
-        hyper_out = self.latent_codec["hyper"].decompress(
-            [z_strings], shape["hyper"], z_gain_inv
-        )
-        y_out = self.latent_codec["y"].decompress(
-            y_strings_, shape["y"], hyper_out["params"]
-        )
+        z_out = self.latent_codec["z"].decompress([z_strings], shape["z"])
+        z_hat = z_out["y_hat"]
+        z_hat = z_hat * z_gain_inv
+        params = self.h_s(z_hat)
+        y_out = self.latent_codec["y"].decompress(y_strings_, shape["y"], params)
         y_hat = y_out["y_hat"] * y_gain_inv
         return {"y_hat": y_hat}
