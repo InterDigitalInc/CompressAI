@@ -27,6 +27,8 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import warnings
+
 from typing import Any, Dict, List, Tuple
 
 import torch.nn as nn
@@ -73,6 +75,20 @@ class HyperLatentCodec(LatentCodec):
         quantizer: str = "noise",
         **kwargs,
     ):
+        warnings.warn(
+            "The HyperLatentCodec is deprecated as it is not a true "
+            "lossless codec (after quantization). Use this instead:\n\n"
+            "HyperpriorLatentCodec(\n"
+            "    h_a=h_a,\n"
+            "    h_s=h_s,\n"
+            "    latent_codec={\n"
+            "        'z': EntropyBottleneckLatentCodec(N),\n"
+            "        'y': GaussianConditionalLatentCodec(),\n"
+            "    },\n"
+            ")\n",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         super().__init__()
         self.entropy_bottleneck = entropy_bottleneck
         self.h_a = h_a
