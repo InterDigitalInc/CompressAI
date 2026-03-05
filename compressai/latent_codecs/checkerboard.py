@@ -145,7 +145,7 @@ class CheckerboardLatentCodec(LatentCodec):
         This method uses uniform noise to roughly model quantization.
         """
         y_hat = self.quantize(y)
-        y_ctx = self._keep_only(self.context_prediction(y_hat), "non_anchor")
+        y_ctx = self._mask_all_but_step(self.context_prediction(y_hat), "non_anchor")
         params = self.entropy_parameters(self.merge(y_ctx, side_params))
         y_out = self.latent_codec["y"](y, params)
         return {
@@ -167,39 +167,28 @@ class CheckerboardLatentCodec(LatentCodec):
         To compute ``y_hat_anchors``, we need the predicted ``means_hat``:
         ``y_hat = quantize_ste(y - means_hat) + means_hat``.
         Thus, two passes of ``entropy_parameters`` are necessary.
-
         """
         B, C, H, W = y.shape
-
         params = y.new_zeros((B, C * 2, H, W))
-
         y_hat_ = []
 
-        # NOTE: The _i variables contain only the current step's pixels.
-        # i=0: step=anchor
-        # i=1: step=non_anchor
-
         for step in ("anchor", "non_anchor"):
+            # Determine y_ctx for current step.
             if step == "anchor":
-                y_ctx = self._y_ctx_zero(y)
+                y_ctx_i = self._y_ctx_zero(y)
             else:  # step == "non_anchor"
-                y_hat_anchors = y_hat_[0]
-                y_ctx = self.context_prediction(y_hat_anchors)
+                y_ctx_i = self.context_prediction(y_hat_[0])
 
-            params_i = self.entropy_parameters(self.merge(y_ctx, side_params))
-
-            # Save params for current step. This is later used for entropy estimation.
+            # Determine params for current step.
+            params_i = self.entropy_parameters(self.merge(y_ctx_i, side_params))
+            params_i = self._mask_all_but_step(params_i, step)
             self._copy(params, params_i, step)
 
-            # Keep only elements needed for current step.
-            # It's not necessary to mask the rest out just yet, but it doesn't hurt.
-            params_i = self._keep_only(params_i, step)
-            y_i = self._keep_only(y, step)
-
-            # Determine y_hat for current step, and mask out the other pixels.
+            # Determine y_hat for current step.
             _, means_i = self.latent_codec["y"]._chunk(params_i)
-            y_hat_i = self._keep_only(quantize_ste(y_i - means_i) + means_i, step)
-
+            y_i = self._mask_all_but_step(y, step)
+            y_hat_i = quantize_ste(y_i - means_i) + means_i
+            y_hat_i = self._mask_all_but_step(y_hat_i, step)
             y_hat_.append(y_hat_i)
 
         [y_hat_anchors, y_hat_non_anchors] = y_hat_
@@ -224,13 +213,13 @@ class CheckerboardLatentCodec(LatentCodec):
         """
         y_ctx = self._y_ctx_zero(y)
         params = self.entropy_parameters(self.merge(y_ctx, side_params))
-        params = self._keep_only(params, "anchor")  # Probably unnecessary.
+        params = self._mask_all_but_step(params, "anchor")  # Probably unnecessary.
         _, means_hat = self.latent_codec["y"]._chunk(params)
         y_hat_anchors = quantize_ste(y - means_hat) + means_hat
-        y_hat_anchors = self._keep_only(y_hat_anchors, "anchor")
+        y_hat_anchors = self._mask_all_but_step(y_hat_anchors, "anchor")
 
         y_ctx = self.context_prediction(y_hat_anchors)
-        y_ctx = self._keep_only(y_ctx, "non_anchor")  # Probably unnecessary.
+        y_ctx = self._mask_all_but_step(y_ctx, "non_anchor")  # Probably unnecessary.
         params = self.entropy_parameters(self.merge(y_ctx, side_params))
         y_out = self.latent_codec["y"](y, params)
 
@@ -365,7 +354,7 @@ class CheckerboardLatentCodec(LatentCodec):
             dest[..., 0::2, 1::2] = src[..., 0::2, 1::2]
             dest[..., 1::2, 0::2] = src[..., 1::2, 0::2]
 
-    def _keep_only(self, y: Tensor, step: str) -> Tensor:
+    def _mask_all_but_step(self, y: Tensor, step: str) -> Tensor:
         """Keep only pixels in the current step, and zero out the rest."""
         y = y.clone()
         parity = self.anchor_parity if step == "anchor" else self.non_anchor_parity
@@ -382,7 +371,7 @@ class CheckerboardLatentCodec(LatentCodec):
         y[:] = 0
         return y
 
-    def merge(self, *args):
+    def merge(self, *args: Tensor) -> Tensor:
         return torch.cat(args, dim=1)
 
     def quantize(self, y: Tensor) -> Tensor:
