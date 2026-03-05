@@ -32,6 +32,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from torch import Tensor
 
 from compressai.entropy_models import EntropyBottleneck
+from compressai.ops import quantize_ste
 from compressai.registry import register_module
 
 from .base import LatentCodec
@@ -64,13 +65,18 @@ class EntropyBottleneckLatentCodec(LatentCodec):
     def __init__(
         self,
         entropy_bottleneck: Optional[EntropyBottleneck] = None,
+        quantizer: str = "noise",
         **kwargs,
     ):
         super().__init__()
         self.entropy_bottleneck = entropy_bottleneck or EntropyBottleneck(**kwargs)
+        self.quantizer = quantizer
 
     def forward(self, y: Tensor) -> Dict[str, Any]:
         y_hat, y_likelihoods = self.entropy_bottleneck(y)
+        if self.quantizer == "ste":
+            y_medians = self.entropy_bottleneck._get_medians()
+            y_hat = quantize_ste(y - y_medians) + y_medians
         return {"likelihoods": {"y": y_likelihoods}, "y_hat": y_hat}
 
     def compress(self, y: Tensor) -> Dict[str, Any]:
