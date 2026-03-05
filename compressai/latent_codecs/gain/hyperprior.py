@@ -113,9 +113,6 @@ class GainHyperpriorLatentCodec(LatentCodec):
         self.z = latent_codec["z"]
         self.latent_codec = latent_codec
 
-    def __getitem__(self, key: str) -> LatentCodec:
-        return self.latent_codec[key]
-
     def forward(
         self,
         y: Tensor,

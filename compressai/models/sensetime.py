@@ -532,8 +532,9 @@ class Elic2022Chandelier(SimpleVAECompressionModel):
                 return torch.cat([args[0], args[-1]], dim=1)
             return torch.cat(args, dim=1)
 
-        chan_groups_latent_codec = self.latent_codec["y"]
-        obj = chan_groups_latent_codec
+        assert isinstance(self.latent_codec, HyperpriorLatentCodec)
+        obj = self.latent_codec.y
+        assert isinstance(obj, ChannelGroupsLatentCodec)
         obj.merge_y = types.MethodType(merge_y, obj)
 
     @classmethod
