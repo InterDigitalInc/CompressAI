@@ -38,8 +38,8 @@ from compressai.entropy_models import EntropyBottleneck
 from compressai.latent_codecs import (
     ChannelGroupsLatentCodec,
     CheckerboardLatentCodec,
+    EntropyBottleneckLatentCodec,
     GaussianConditionalLatentCodec,
-    HyperLatentCodec,
     HyperpriorLatentCodec,
 )
 from compressai.layers import (
@@ -135,8 +135,17 @@ class Cheng2020AnchorCheckerboard(SimpleVAECompressionModel):
             conv3x3(N * 3 // 2, N * 2),
         )
 
+        # [He2021] uses a "hyperprior" architecture, which reconstructs y using z.
         self.latent_codec = HyperpriorLatentCodec(
+            h_a=h_a,
+            h_s=h_s,
             latent_codec={
+                # Side information branch containing z:
+                "z": EntropyBottleneckLatentCodec(
+                    entropy_bottleneck=EntropyBottleneck(N),
+                    quantizer="ste",
+                ),
+                # Spatial context model:
                 "y": CheckerboardLatentCodec(
                     latent_codec={
                         "y": GaussianConditionalLatentCodec(quantizer="ste"),
@@ -151,12 +160,6 @@ class Cheng2020AnchorCheckerboard(SimpleVAECompressionModel):
                     context_prediction=CheckerboardMaskedConv2d(
                         N, 2 * N, kernel_size=5, stride=1, padding=2
                     ),
-                ),
-                "hyper": HyperLatentCodec(
-                    entropy_bottleneck=EntropyBottleneck(N),
-                    h_a=h_a,
-                    h_s=h_s,
-                    quantizer="ste",
                 ),
             },
         )
@@ -311,19 +314,19 @@ class Elic2022Official(SimpleVAECompressionModel):
 
         # [He2022] uses a "hyperprior" architecture, which reconstructs y using z.
         self.latent_codec = HyperpriorLatentCodec(
+            h_a=h_a,
+            h_s=h_s,
             latent_codec={
+                # Side information branch containing z:
+                "z": EntropyBottleneckLatentCodec(
+                    entropy_bottleneck=EntropyBottleneck(N),
+                    quantizer="ste",
+                ),
                 # Channel groups with space-channel context model (SCCTX):
                 "y": ChannelGroupsLatentCodec(
                     groups=self.groups,
                     channel_context=channel_context,
                     latent_codec=scctx_latent_codec,
-                ),
-                # Side information branch containing z:
-                "hyper": HyperLatentCodec(
-                    entropy_bottleneck=EntropyBottleneck(N),
-                    h_a=h_a,
-                    h_s=h_s,
-                    quantizer="ste",
                 ),
             },
         )
@@ -498,19 +501,19 @@ class Elic2022Chandelier(SimpleVAECompressionModel):
 
         # [He2022] uses a "hyperprior" architecture, which reconstructs y using z.
         self.latent_codec = HyperpriorLatentCodec(
+            h_a=h_a,
+            h_s=h_s,
             latent_codec={
+                # Side information branch containing z:
+                "z": EntropyBottleneckLatentCodec(
+                    entropy_bottleneck=EntropyBottleneck(N),
+                    quantizer="ste",
+                ),
                 # Channel groups with space-channel context model (SCCTX):
                 "y": ChannelGroupsLatentCodec(
                     groups=self.groups,
                     channel_context=channel_context,
                     latent_codec=scctx_latent_codec,
-                ),
-                # Side information branch containing z:
-                "hyper": HyperLatentCodec(
-                    entropy_bottleneck=EntropyBottleneck(N),
-                    h_a=h_a,
-                    h_s=h_s,
-                    quantizer="ste",
                 ),
             },
         )
