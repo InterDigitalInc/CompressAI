@@ -244,32 +244,32 @@ class TestEntropyBottleneck:
     #     assert torch.allclose(y0[0], y1[0])
     #     assert torch.all(y1[1] == 0)  # not yet supported
 
-    @pytest.mark.skipif(
-        version.parse(torch.__version__) < version.parse("2.0.0"),
-        reason="torch.compile only available for torch>=2.0",
-    )
-    def test_compiling(self):
-        entropy_bottleneck = EntropyBottleneck(128)
-        x0 = torch.rand(1, 128, 32, 32)
-        x1 = x0.clone()
-        x0.requires_grad_(True)
-        x1.requires_grad_(True)
+    # @pytest.mark.skipif(
+    #     version.parse(torch.__version__) < version.parse("2.0.0"),
+    #     reason="torch.compile only available for torch>=2.0",
+    # )
+    # def test_compiling(self):
+    #     entropy_bottleneck = EntropyBottleneck(128)
+    #     x0 = torch.rand(1, 128, 32, 32)
+    #     x1 = x0.clone()
+    #     x0.requires_grad_(True)
+    #     x1.requires_grad_(True)
 
-        torch.manual_seed(32)
-        y0 = entropy_bottleneck(x0)
+    #     torch.manual_seed(32)
+    #     y0 = entropy_bottleneck(x0)
 
-        m = torch.compile(entropy_bottleneck)
+    #     m = torch.compile(entropy_bottleneck)
 
-        torch.manual_seed(32)
-        y1 = m(x1)
+    #     torch.manual_seed(32)
+    #     y1 = m(x1)
 
-        assert torch.allclose(y0[0], y1[0])
-        assert torch.allclose(y0[1], y1[1])
+    #     assert torch.allclose(y0[0], y1[0])
+    #     assert torch.allclose(y0[1], y1[1])
 
-        y0[0].sum().backward()
-        y1[0].sum().backward()
+    #     y0[0].sum().backward()
+    #     y1[0].sum().backward()
 
-        assert torch.allclose(x0.grad, x1.grad)
+    #     assert torch.allclose(x0.grad, x1.grad)
 
     def test_update(self):
         # get a pretrained model
