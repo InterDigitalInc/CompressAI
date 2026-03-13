@@ -28,15 +28,19 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import argparse
+import os
 import random
 import shutil
 import sys
 
 import torch
+import torch.distributed as dist
 import torch.nn as nn
 import torch.optim as optim
 
+from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import DataLoader
+from torch.utils.data.distributed import DistributedSampler
 from torchvision import transforms
 
 from compressai.datasets import ImageFolder
@@ -71,6 +75,52 @@ class CustomDataParallel(nn.DataParallel):
             return getattr(self.module, key)
 
 
+def init_distributed_mode(args):
+    args.distributed = False
+    args.rank = 0
+    args.world_size = 1
+    args.local_rank = 0
+
+    if "RANK" not in os.environ or "WORLD_SIZE" not in os.environ:
+        return
+
+    args.distributed = True
+    args.rank = int(os.environ["RANK"])
+    args.world_size = int(os.environ["WORLD_SIZE"])
+    args.local_rank = int(os.environ.get("LOCAL_RANK", 0))
+
+    if args.cuda:
+        if not torch.cuda.is_available():
+            raise RuntimeError(
+                "CUDA was requested for distributed training, but is unavailable"
+            )
+        torch.cuda.set_device(args.local_rank)
+        backend = "nccl"
+    else:
+        backend = "gloo"
+
+    dist.init_process_group(backend=backend, init_method="env://")
+
+
+def is_main_process(args):
+    return args.rank == 0
+
+
+def unwrap_model(model):
+    if isinstance(model, (nn.DataParallel, DistributedDataParallel)):
+        return model.module
+    return model
+
+
+def reduce_mean(value, device, world_size):
+    if world_size == 1:
+        return value
+    reduced = torch.tensor(float(value), device=device)
+    dist.all_reduce(reduced, op=dist.ReduceOp.SUM)
+    reduced /= world_size
+    return reduced.item()
+
+
 def configure_optimizers(net, args):
     """Separate parameters for the main optimizer and the auxiliary optimizer.
     Return two optimizers"""
@@ -83,10 +133,18 @@ def configure_optimizers(net, args):
 
 
 def train_one_epoch(
-    model, criterion, train_dataloader, optimizer, aux_optimizer, epoch, clip_max_norm
+    model,
+    criterion,
+    train_dataloader,
+    optimizer,
+    aux_optimizer,
+    epoch,
+    clip_max_norm,
+    args,
 ):
     model.train()
     device = next(model.parameters()).device
+    model_for_aux = unwrap_model(model)
 
     for i, d in enumerate(train_dataloader):
         d = d.to(device)
@@ -102,51 +160,74 @@ def train_one_epoch(
             torch.nn.utils.clip_grad_norm_(model.parameters(), clip_max_norm)
         optimizer.step()
 
-        aux_loss = model.aux_loss()
+        aux_loss = model_for_aux.aux_loss()
         aux_loss.backward()
         aux_optimizer.step()
 
         if i % 10 == 0:
-            print(
-                f"Train epoch {epoch}: ["
-                f"{i*len(d)}/{len(train_dataloader.dataset)}"
-                f" ({100. * i / len(train_dataloader):.0f}%)]"
-                f'\tLoss: {out_criterion["loss"].item():.3f} |'
-                f'\tMSE loss: {out_criterion["mse_loss"].item():.3f} |'
-                f'\tBpp loss: {out_criterion["bpp_loss"].item():.2f} |'
-                f"\tAux loss: {aux_loss.item():.2f}"
+            loss = reduce_mean(out_criterion["loss"].item(), device, args.world_size)
+            mse_loss = reduce_mean(
+                out_criterion["mse_loss"].item(), device, args.world_size
             )
+            bpp_loss = reduce_mean(
+                out_criterion["bpp_loss"].item(), device, args.world_size
+            )
+            aux_loss_value = reduce_mean(aux_loss.item(), device, args.world_size)
+            if is_main_process(args):
+                print(
+                    f"Train epoch {epoch}: ["
+                    f"{i * len(d) * args.world_size}/{len(train_dataloader.dataset)}"
+                    f" ({100. * i / len(train_dataloader):.0f}%)]"
+                    f"\tLoss: {loss:.3f} |"
+                    f"\tMSE loss: {mse_loss:.3f} |"
+                    f"\tBpp loss: {bpp_loss:.2f} |"
+                    f"\tAux loss: {aux_loss_value:.2f}"
+                )
 
 
-def test_epoch(epoch, test_dataloader, model, criterion):
+def test_epoch(epoch, test_dataloader, model, criterion, args):
     model.eval()
     device = next(model.parameters()).device
+    model_for_aux = unwrap_model(model)
 
-    loss = AverageMeter()
-    bpp_loss = AverageMeter()
-    mse_loss = AverageMeter()
-    aux_loss = AverageMeter()
+    loss = torch.zeros(1, device=device)
+    bpp_loss = torch.zeros(1, device=device)
+    mse_loss = torch.zeros(1, device=device)
+    aux_loss = torch.zeros(1, device=device)
+    total_samples = torch.zeros(1, device=device)
 
     with torch.no_grad():
         for d in test_dataloader:
             d = d.to(device)
             out_net = model(d)
             out_criterion = criterion(out_net, d)
+            batch_size = d.size(0)
 
-            aux_loss.update(model.aux_loss())
-            bpp_loss.update(out_criterion["bpp_loss"])
-            loss.update(out_criterion["loss"])
-            mse_loss.update(out_criterion["mse_loss"])
+            aux_loss += model_for_aux.aux_loss() * batch_size
+            bpp_loss += out_criterion["bpp_loss"] * batch_size
+            loss += out_criterion["loss"] * batch_size
+            mse_loss += out_criterion["mse_loss"] * batch_size
+            total_samples += batch_size
 
-    print(
-        f"Test epoch {epoch}: Average losses:"
-        f"\tLoss: {loss.avg:.3f} |"
-        f"\tMSE loss: {mse_loss.avg:.3f} |"
-        f"\tBpp loss: {bpp_loss.avg:.2f} |"
-        f"\tAux loss: {aux_loss.avg:.2f}\n"
-    )
+    if args.distributed:
+        for metric in (loss, bpp_loss, mse_loss, aux_loss, total_samples):
+            dist.all_reduce(metric, op=dist.ReduceOp.SUM)
 
-    return loss.avg
+    loss_avg = (loss / total_samples).item()
+    mse_loss_avg = (mse_loss / total_samples).item()
+    bpp_loss_avg = (bpp_loss / total_samples).item()
+    aux_loss_avg = (aux_loss / total_samples).item()
+
+    if is_main_process(args):
+        print(
+            f"Test epoch {epoch}: Average losses:"
+            f"\tLoss: {loss_avg:.3f} |"
+            f"\tMSE loss: {mse_loss_avg:.3f} |"
+            f"\tBpp loss: {bpp_loss_avg:.2f} |"
+            f"\tAux loss: {aux_loss_avg:.2f}\n"
+        )
+
+    return loss_avg
 
 
 def save_checkpoint(state, is_best, filename="checkpoint.pth.tar"):
@@ -235,10 +316,12 @@ def parse_args(argv):
 
 def main(argv):
     args = parse_args(argv)
+    init_distributed_mode(args)
 
     if args.seed is not None:
-        torch.manual_seed(args.seed)
-        random.seed(args.seed)
+        seed = args.seed + args.rank
+        torch.manual_seed(seed)
+        random.seed(seed)
 
     train_transforms = transforms.Compose(
         [transforms.RandomCrop(args.patch_size), transforms.ToTensor()]
@@ -253,11 +336,18 @@ def main(argv):
 
     device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
 
+    train_sampler = None
+    test_sampler = None
+    if args.distributed:
+        train_sampler = DistributedSampler(train_dataset, shuffle=True)
+        test_sampler = DistributedSampler(test_dataset, shuffle=False)
+
     train_dataloader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
-        shuffle=True,
+        shuffle=train_sampler is None,
+        sampler=train_sampler,
         pin_memory=(device == "cuda"),
     )
 
@@ -266,13 +356,20 @@ def main(argv):
         batch_size=args.test_batch_size,
         num_workers=args.num_workers,
         shuffle=False,
+        sampler=test_sampler,
         pin_memory=(device == "cuda"),
     )
 
     net = image_models[args.model](quality=3)
     net = net.to(device)
 
-    if args.cuda and torch.cuda.device_count() > 1:
+    if args.distributed:
+        net = DistributedDataParallel(
+            net,
+            device_ids=[args.local_rank] if device == "cuda" else None,
+            output_device=args.local_rank if device == "cuda" else None,
+        )
+    elif args.cuda and torch.cuda.device_count() > 1:
         net = CustomDataParallel(net)
 
     optimizer, aux_optimizer = configure_optimizers(net, args)
@@ -281,17 +378,23 @@ def main(argv):
 
     last_epoch = 0
     if args.checkpoint:  # load from previous checkpoint
-        print("Loading", args.checkpoint)
+        if is_main_process(args):
+            print("Loading", args.checkpoint)
         checkpoint = torch.load(args.checkpoint, map_location=device)
         last_epoch = checkpoint["epoch"] + 1
-        net.load_state_dict(checkpoint["state_dict"])
+        best_loss = checkpoint.get("loss", float("inf"))
+        unwrap_model(net).load_state_dict(checkpoint["state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer"])
         aux_optimizer.load_state_dict(checkpoint["aux_optimizer"])
         lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
 
-    best_loss = float("inf")
+    else:
+        best_loss = float("inf")
     for epoch in range(last_epoch, args.epochs):
-        print(f"Learning rate: {optimizer.param_groups[0]['lr']}")
+        if train_sampler is not None:
+            train_sampler.set_epoch(epoch)
+        if is_main_process(args):
+            print(f"Learning rate: {optimizer.param_groups[0]['lr']}")
         train_one_epoch(
             net,
             criterion,
@@ -300,18 +403,19 @@ def main(argv):
             aux_optimizer,
             epoch,
             args.clip_max_norm,
+            args,
         )
-        loss = test_epoch(epoch, test_dataloader, net, criterion)
+        loss = test_epoch(epoch, test_dataloader, net, criterion, args)
         lr_scheduler.step(loss)
 
         is_best = loss < best_loss
         best_loss = min(loss, best_loss)
 
-        if args.save:
+        if args.save and is_main_process(args):
             save_checkpoint(
                 {
                     "epoch": epoch,
-                    "state_dict": net.state_dict(),
+                    "state_dict": unwrap_model(net).state_dict(),
                     "loss": loss,
                     "optimizer": optimizer.state_dict(),
                     "aux_optimizer": aux_optimizer.state_dict(),
@@ -319,6 +423,9 @@ def main(argv):
                 },
                 is_best,
             )
+
+    if args.distributed:
+        dist.destroy_process_group()
 
 
 if __name__ == "__main__":
