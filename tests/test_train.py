@@ -31,14 +31,26 @@ import importlib.util
 import io
 import os
 import re
+import subprocess
+import sys
 
 from contextlib import redirect_stdout
 from pathlib import Path
 
 import pytest
+import torch
 
 # Example: GENERATE_EXPECTED=1 pytest -sx tests/test_eval_model.py
 GENERATE_EXPECTED = os.getenv("GENERATE_EXPECTED")
+
+
+def load_train_module(rootdir):
+    spec = importlib.util.spec_from_file_location(
+        "examples.train", rootdir / "examples/train.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 @pytest.mark.slow
@@ -46,11 +58,7 @@ def test_train_example():
     cwd = Path(__file__).resolve().parent
     rootdir = cwd.parent
 
-    spec = importlib.util.spec_from_file_location(
-        "examples.train", rootdir / "examples/train.py"
-    )
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    module = load_train_module(rootdir)
 
     argv = [
         "-d",
@@ -94,3 +102,64 @@ def test_train_example():
             assert int(a) == int(b)
         except ValueError:
             assert float(a) == pytest.approx(float(b), rel=1e-3)
+
+
+@pytest.mark.slow
+def test_train_example_ddp(tmp_path):
+    if not torch.distributed.is_available():
+        pytest.skip("torch.distributed is unavailable")
+
+    cwd = Path(__file__).resolve().parent
+    rootdir = cwd.parent
+    env = os.environ.copy()
+    pythonpath = env.get("PYTHONPATH")
+    env["PYTHONPATH"] = (
+        f"{rootdir}{os.pathsep}{pythonpath}" if pythonpath else str(rootdir)
+    )
+
+    cmd = [
+        sys.executable,
+        "-m",
+        "torch.distributed.run",
+        "--standalone",
+        "--nproc_per_node",
+        "2",
+        str(rootdir / "examples/train.py"),
+        "-d",
+        str(rootdir / "tests/assets/fakedata/imagefolder"),
+        "-e",
+        "1",
+        "--batch-size",
+        "1",
+        "--test-batch-size",
+        "1",
+        "--patch-size",
+        "48",
+        "128",
+        "--seed",
+        "42",
+        "--num-workers",
+        "0",
+    ]
+    result = subprocess.run(
+        cmd,
+        cwd=tmp_path,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.count("Learning rate:") == 1
+    assert result.stdout.count("Test epoch 0: Average losses:") == 1
+    assert "Train epoch 0:" in result.stdout
+
+    checkpoint_path = tmp_path / "checkpoint.pth.tar"
+    best_checkpoint_path = tmp_path / "checkpoint_best_loss.pth.tar"
+    assert checkpoint_path.is_file()
+    assert best_checkpoint_path.is_file()
+
+    checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    assert checkpoint["epoch"] == 0
+    assert not any(key.startswith("module.") for key in checkpoint["state_dict"])
