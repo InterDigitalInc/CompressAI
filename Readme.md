@@ -82,7 +82,27 @@ simple training pipeline:
 ```bash
 python3 examples/train.py -d /path/to/my/image/dataset/ --epochs 300 -lr 1e-4 --batch-size 16 --cuda --save
 ```
+
+To run the same training script on 2 GPUs with Distributed Data Parallel, use
+`torchrun`:
+
+```bash
+CUDA_VISIBLE_DEVICES=0,1 torchrun --standalone --nproc_per_node=2 examples/train.py -d /path/to/my/image/dataset/ --epochs 300 -lr 1e-4 --batch-size 16 --cuda --save
+```
+
+> **Note:** `--batch-size` is per process, so the effective global batch size is
+> `2 x --batch-size` when using 2 GPUs.
+
 > **Note:** the training example uses a custom [ImageFolder](https://interdigitalinc.github.io/CompressAI/datasets.html#imagefolder) structure.
+
+For video training, `examples/train_video.py` can be launched the same way:
+
+```bash
+CUDA_VISIBLE_DEVICES=0,1 torchrun --standalone --nproc_per_node=2 examples/train_video.py -d /path/to/my/video/dataset/ --epochs 300 -lr 1e-4 --batch-size 16 --cuda --save
+```
+
+> **Note:** for `examples/train_video.py`, `--batch-size` is also per process, so
+> the effective global batch size is `2 x --batch-size` when using 2 GPUs.
 
 A jupyter notebook illustrating the usage of a pre-trained model for learned image
 compression is also provided in the `examples` directory:
@@ -191,4 +211,3 @@ For any work related to the variable bitrate models, please cite
  * AOM AV1 reference software: https://aomedia.googlesource.com/aom
  * Z. Cheng et al. 2020: https://github.com/ZhengxueCheng/Learned-Image-Compression-with-GMM-and-Attention
  * Kodak image dataset: http://r0k.us/graphics/kodak/
-
