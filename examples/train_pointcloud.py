@@ -41,27 +41,12 @@ from torchvision.transforms import Compose
 import compressai.transforms as transforms
 
 from compressai._utils.distributed import CustomDataParallel
+from compressai._utils.meters import AverageMeter
 from compressai.datasets import ModelNetDataset
 from compressai.losses import ChamferPccRateDistortionLoss
 from compressai.optimizers import net_aux_optimizer
 from compressai.registry import MODELS
 from compressai.zoo import pointcloud_models
-
-
-class AverageMeter:
-    """Compute running average."""
-
-    def __init__(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
-
-    def update(self, val, n=1):
-        self.val = val
-        self.sum += val * n
-        self.count += n
-        self.avg = self.sum / self.count
 
 
 def configure_optimizers(net, args):

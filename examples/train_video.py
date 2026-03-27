@@ -194,22 +194,6 @@ class RateDistortionLoss(nn.Module):
         return out
 
 
-class AverageMeter:
-    """Compute running average."""
-
-    def __init__(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
-
-    def update(self, val, n=1):
-        self.val = val
-        self.sum += val * n
-        self.count += n
-        self.avg = self.sum / self.count
-
-
 def compute_aux_loss(aux_list: List, backward=False):
     aux_loss_sum = 0
     for aux_loss in aux_list:
