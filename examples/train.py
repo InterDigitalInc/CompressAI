@@ -75,7 +75,7 @@ def train_one_epoch(
 ):
     model.train()
     device = next(model.parameters()).device
-    model_for_aux = unwrap_model(model)
+    unwrapped_model = unwrap_model(model)
 
     for i, d in enumerate(train_dataloader):
         d = d.to(device)
@@ -91,7 +91,7 @@ def train_one_epoch(
             torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_max_norm)
         optimizer.step()
 
-        aux_loss = model_for_aux.aux_loss()
+        aux_loss = unwrapped_model.aux_loss()
         aux_loss.backward()
         aux_optimizer.step()
 
@@ -110,7 +110,7 @@ def train_one_epoch(
 def test_epoch(epoch, test_dataloader, model, criterion, args):
     model.eval()
     device = next(model.parameters()).device
-    model_for_aux = unwrap_model(model)
+    unwrapped_model = unwrap_model(model)
     meter_keys = ("loss", "mse_loss", "bpp_loss", "aux_loss")
     meters = {key: AverageMeter() for key in meter_keys}
 
@@ -124,7 +124,7 @@ def test_epoch(epoch, test_dataloader, model, criterion, args):
                 "loss": out_criterion["loss"].item(),
                 "mse_loss": out_criterion["mse_loss"].item(),
                 "bpp_loss": out_criterion["bpp_loss"].item(),
-                "aux_loss": model_for_aux.aux_loss().item(),
+                "aux_loss": unwrapped_model.aux_loss().item(),
             }
             for key, value in metric_values.items():
                 meters[key].update(value, batch_size)
