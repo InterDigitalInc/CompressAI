@@ -33,14 +33,21 @@ import shutil
 import sys
 
 import torch
+import torch.distributed as dist
 import torch.optim as optim
 
+from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import DataLoader
+from torch.utils.data.distributed import DistributedSampler
 from torchvision.transforms import Compose
 
 import compressai.transforms as transforms
 
-from compressai._utils.distributed import unwrap_model
+from compressai._utils.distributed import (
+    init_distributed_mode,
+    is_main_process,
+    unwrap_model,
+)
 from compressai._utils.meters import AverageMeter
 from compressai.datasets import ModelNetDataset
 from compressai.losses import ChamferPccRateDistortionLoss
@@ -92,9 +99,9 @@ def train_one_epoch(
         aux_loss.backward()
         aux_optimizer.step()
 
-        if i % 10 == 0:
+        if i % 10 == 0 and is_main_process(args):
             metrics = {
-                "samples": i * batch_size,
+                "samples": i * batch_size * args.world_size,
                 "progress": 100.0 * i / len(train_dataloader),
                 "loss": out_criterion["loss"].item(),
                 "bpp_loss": out_criterion["bpp_loss"].item(),
@@ -138,14 +145,18 @@ def test_epoch(epoch, test_dataloader, model, criterion, args):
             for key, value in metrics.items():
                 meters[key].update(value, batch_size)
 
-    print(
-        f"Test epoch {epoch}: Average losses: "
-        f"Loss: {meters['loss'].avg:.3f} | "
-        f"Bpp loss: {meters['bpp_loss'].avg:.3f} | "
-        f"Rec loss: {meters['rec_loss'].avg:.4f} | "
-        # f"Aux loss: {meters['aux_loss'].avg:.0f} | "
-        "\n"
-    )
+    for meter in meters.values():
+        meter.sync(device)
+
+    if is_main_process(args):
+        print(
+            f"Test epoch {epoch}: Average losses: "
+            f"Loss: {meters['loss'].avg:.3f} | "
+            f"Bpp loss: {meters['bpp_loss'].avg:.3f} | "
+            f"Rec loss: {meters['rec_loss'].avg:.4f} | "
+            # f"Aux loss: {meters['aux_loss'].avg:.0f} | "
+            "\n"
+        )
 
     return meters["loss"].avg
 
@@ -236,10 +247,12 @@ def parse_args(argv):
 
 def main(argv):
     args = parse_args(argv)
+    init_distributed_mode(args)
 
     if args.seed is not None:
-        torch.manual_seed(args.seed)
-        random.seed(args.seed)
+        seed = args.seed + args.rank
+        torch.manual_seed(seed)
+        random.seed(seed)
 
     num_points = 1024
 
@@ -290,12 +303,18 @@ def main(argv):
     )
 
     device = "cuda" if args.cuda and torch.cuda.is_available() else "cpu"
+    train_sampler = None
+    test_sampler = None
+    if args.distributed:
+        train_sampler = DistributedSampler(train_dataset, shuffle=True)
+        test_sampler = DistributedSampler(test_dataset, shuffle=False)
 
     train_dataloader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
-        shuffle=True,
+        shuffle=train_sampler is None,
+        sampler=train_sampler,
         pin_memory=(device == "cuda"),
     )
 
@@ -304,11 +323,18 @@ def main(argv):
         batch_size=args.test_batch_size,
         num_workers=args.num_workers,
         shuffle=False,
+        sampler=test_sampler,
         pin_memory=(device == "cuda"),
     )
 
     net = MODELS[args.model]()
     net = net.to(device)
+    if args.distributed:
+        net = DistributedDataParallel(
+            net,
+            device_ids=[args.local_rank] if device == "cuda" else None,
+            output_device=args.local_rank if device == "cuda" else None,
+        )
 
     optimizer, aux_optimizer = configure_optimizers(net, args)
     lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min")
@@ -317,7 +343,8 @@ def main(argv):
     last_epoch = 0
     best_loss = float("inf")
     if args.checkpoint:  # load from previous checkpoint
-        print("Loading", args.checkpoint)
+        if is_main_process(args):
+            print("Loading", args.checkpoint)
         checkpoint = torch.load(args.checkpoint, map_location=device)
         last_epoch = checkpoint["epoch"] + 1
         best_loss = checkpoint.get("loss", float("inf"))
@@ -327,7 +354,10 @@ def main(argv):
         lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
 
     for epoch in range(last_epoch, args.epochs):
-        print(f"Learning rate: {optimizer.param_groups[0]['lr']}")
+        if train_sampler is not None:
+            train_sampler.set_epoch(epoch)
+        if is_main_process(args):
+            print(f"Learning rate: {optimizer.param_groups[0]['lr']}")
         train_one_epoch(
             net,
             criterion,
@@ -343,7 +373,7 @@ def main(argv):
         is_best = loss < best_loss
         best_loss = min(loss, best_loss)
 
-        if args.save:
+        if args.save and is_main_process(args):
             save_checkpoint(
                 {
                     "epoch": epoch,
@@ -355,6 +385,9 @@ def main(argv):
                 },
                 is_best,
             )
+
+    if args.distributed:
+        dist.destroy_process_group()
 
 
 if __name__ == "__main__":
