@@ -79,6 +79,7 @@ def train_one_epoch(
 
     for i, d in enumerate(train_dataloader):
         d = d.to(device)
+        batch_size = d.shape[0]
 
         optimizer.zero_grad()
         aux_optimizer.zero_grad()
@@ -96,14 +97,22 @@ def train_one_epoch(
         aux_optimizer.step()
 
         if i % 10 == 0 and is_main_process(args):
+            metrics = {
+                "samples": i * batch_size * args.world_size,
+                "progress": 100.0 * i / len(train_dataloader),
+                "loss": out_criterion["loss"].item(),
+                "mse_loss": out_criterion["mse_loss"].item(),
+                "bpp_loss": out_criterion["bpp_loss"].item(),
+                "aux_loss": aux_loss.item(),
+            }
             print(
                 f"Train epoch {epoch}: ["
-                f"{i * len(d) * args.world_size}/{len(train_dataloader.dataset)}"
-                f" ({100.0 * i / len(train_dataloader):.0f}%)]"
-                f"\tLoss: {out_criterion['loss'].item():.3f} |"
-                f"\tMSE loss: {out_criterion['mse_loss'].item():.3f} |"
-                f"\tBpp loss: {out_criterion['bpp_loss'].item():.2f} |"
-                f"\tAux loss: {aux_loss.item():.2f}"
+                f"{metrics['samples']}/{len(train_dataloader.dataset)}"
+                f" ({metrics['progress']:.0f}%)]"
+                f"\tLoss: {metrics['loss']:.3f} |"
+                f"\tMSE loss: {metrics['mse_loss']:.3f} |"
+                f"\tBpp loss: {metrics['bpp_loss']:.2f} |"
+                f"\tAux loss: {metrics['aux_loss']:.2f}"
             )
 
 
@@ -119,14 +128,14 @@ def test_epoch(epoch, test_dataloader, model, criterion, args):
             d = d.to(device)
             out_net = model(d)
             out_criterion = criterion(out_net, d)
-            batch_size = d.size(0)
-            metric_values = {
+            batch_size = d.shape[0]
+            metrics = {
                 "loss": out_criterion["loss"].item(),
                 "mse_loss": out_criterion["mse_loss"].item(),
                 "bpp_loss": out_criterion["bpp_loss"].item(),
                 "aux_loss": unwrapped_model.aux_loss().item(),
             }
-            for key, value in metric_values.items():
+            for key, value in metrics.items():
                 meters[key].update(value, batch_size)
 
     for meter in meters.values():
