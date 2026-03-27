@@ -36,16 +36,6 @@ import torch.nn as nn
 from torch.nn.parallel import DistributedDataParallel
 
 
-class CustomDataParallel(nn.DataParallel):
-    """Custom DataParallel to access the wrapped module methods."""
-
-    def __getattr__(self, key):
-        try:
-            return super().__getattr__(key)
-        except AttributeError:
-            return getattr(self.module, key)
-
-
 def init_distributed_mode(args):
     args.distributed = False
     args.rank = 0

@@ -42,7 +42,6 @@ from torch.utils.data.distributed import DistributedSampler
 from torchvision import transforms
 
 from compressai._utils.distributed import (
-    CustomDataParallel,
     init_distributed_mode,
     is_main_process,
     unwrap_model,
@@ -284,8 +283,6 @@ def main(argv):
             device_ids=[args.local_rank] if device == "cuda" else None,
             output_device=args.local_rank if device == "cuda" else None,
         )
-    elif args.cuda and torch.cuda.device_count() > 1:
-        net = CustomDataParallel(net)
 
     optimizer, aux_optimizer = configure_optimizers(net, args)
     lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min")

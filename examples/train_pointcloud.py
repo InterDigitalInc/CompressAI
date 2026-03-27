@@ -40,7 +40,7 @@ from torchvision.transforms import Compose
 
 import compressai.transforms as transforms
 
-from compressai._utils.distributed import CustomDataParallel
+from compressai._utils.distributed import unwrap_model
 from compressai._utils.meters import AverageMeter
 from compressai.datasets import ModelNetDataset
 from compressai.losses import ChamferPccRateDistortionLoss
@@ -71,6 +71,7 @@ def train_one_epoch(
 ):
     model.train()
     device = next(model.parameters()).device
+    unwrapped_model = unwrap_model(model)
 
     for i, d in enumerate(train_dataloader):
         d = {k: v.to(device) for k, v in d.items()}
@@ -86,7 +87,7 @@ def train_one_epoch(
             torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_max_norm)
         optimizer.step()
 
-        aux_loss = model.aux_loss()
+        aux_loss = unwrapped_model.aux_loss()
         aux_loss.backward()
         aux_optimizer.step()
 
@@ -105,7 +106,8 @@ def train_one_epoch(
 
 def test_epoch(epoch, test_dataloader, model, criterion, args):
     model.eval()
-    model.update(force=True, update_quantiles=True)
+    unwrapped_model = unwrap_model(model)
+    unwrapped_model.update(force=True, update_quantiles=True)
     device = next(model.parameters()).device
 
     meter_keys = ["loss", "bpp_loss", "rec_loss", "aux_loss"]
@@ -117,7 +119,7 @@ def test_epoch(epoch, test_dataloader, model, criterion, args):
 
             out_net = model(d)
             out_criterion = criterion(out_net, d)
-            out_criterion["aux_loss"] = model.aux_loss()
+            out_criterion["aux_loss"] = unwrapped_model.aux_loss()
 
             for key in meters:
                 if key in out_criterion:
@@ -295,9 +297,6 @@ def main(argv):
     net = MODELS[args.model]()
     net = net.to(device)
 
-    if args.cuda and torch.cuda.device_count() > 1:
-        net = CustomDataParallel(net)
-
     optimizer, aux_optimizer = configure_optimizers(net, args)
     lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min")
     criterion = ChamferPccRateDistortionLoss(lmbda={"bpp": 1.0, "rec": args.lmbda})
@@ -307,7 +306,7 @@ def main(argv):
         print("Loading", args.checkpoint)
         checkpoint = torch.load(args.checkpoint, map_location=device)
         last_epoch = checkpoint["epoch"] + 1
-        net.load_state_dict(checkpoint["state_dict"])
+        unwrap_model(net).load_state_dict(checkpoint["state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer"])
         aux_optimizer.load_state_dict(checkpoint["aux_optimizer"])
         lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
@@ -334,7 +333,7 @@ def main(argv):
             save_checkpoint(
                 {
                     "epoch": epoch,
-                    "state_dict": net.state_dict(),
+                    "state_dict": unwrap_model(net).state_dict(),
                     "loss": loss,
                     "optimizer": optimizer.state_dict(),
                     "aux_optimizer": aux_optimizer.state_dict(),
