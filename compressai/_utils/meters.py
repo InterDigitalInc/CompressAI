@@ -27,6 +27,9 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import torch
+import torch.distributed as dist
+
 
 class AverageMeter:
     """Compute running average."""
@@ -42,4 +45,17 @@ class AverageMeter:
         self.val = value
         self.sum += value * n
         self.count += n
+        self.avg = self.sum / self.count
+
+    def sync(self, device):
+        if not dist.is_available() or not dist.is_initialized():
+            return
+
+        sum_tensor = torch.tensor(self.sum, device=device, dtype=torch.float64)
+        count_tensor = torch.tensor(self.count, device=device, dtype=torch.int64)
+        dist.all_reduce(sum_tensor, op=dist.ReduceOp.SUM)
+        dist.all_reduce(count_tensor, op=dist.ReduceOp.SUM)
+
+        self.sum = sum_tensor.item()
+        self.count = count_tensor.item()
         self.avg = self.sum / self.count

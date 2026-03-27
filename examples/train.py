@@ -48,6 +48,7 @@ from compressai._utils.distributed import (
     reduce_mean,
     unwrap_model,
 )
+from compressai._utils.meters import AverageMeter
 from compressai.datasets import ImageFolder
 from compressai.losses import RateDistortionLoss
 from compressai.optimizers import net_aux_optimizer
@@ -121,12 +122,8 @@ def test_epoch(epoch, test_dataloader, model, criterion, args):
     model.eval()
     device = next(model.parameters()).device
     model_for_aux = unwrap_model(model)
-
-    loss = torch.zeros(1, device=device)
-    bpp_loss = torch.zeros(1, device=device)
-    mse_loss = torch.zeros(1, device=device)
-    aux_loss = torch.zeros(1, device=device)
-    total_samples = torch.zeros(1, device=device)
+    meter_keys = ("loss", "mse_loss", "bpp_loss", "aux_loss")
+    meters = {key: AverageMeter() for key in meter_keys}
 
     with torch.no_grad():
         for d in test_dataloader:
@@ -134,32 +131,28 @@ def test_epoch(epoch, test_dataloader, model, criterion, args):
             out_net = model(d)
             out_criterion = criterion(out_net, d)
             batch_size = d.size(0)
+            metric_values = {
+                "loss": out_criterion["loss"].item(),
+                "mse_loss": out_criterion["mse_loss"].item(),
+                "bpp_loss": out_criterion["bpp_loss"].item(),
+                "aux_loss": model_for_aux.aux_loss().item(),
+            }
+            for key, value in metric_values.items():
+                meters[key].update(value, batch_size)
 
-            aux_loss += model_for_aux.aux_loss() * batch_size
-            bpp_loss += out_criterion["bpp_loss"] * batch_size
-            loss += out_criterion["loss"] * batch_size
-            mse_loss += out_criterion["mse_loss"] * batch_size
-            total_samples += batch_size
-
-    if args.distributed:
-        for metric in (loss, bpp_loss, mse_loss, aux_loss, total_samples):
-            dist.all_reduce(metric, op=dist.ReduceOp.SUM)
-
-    loss_avg = (loss / total_samples).item()
-    mse_loss_avg = (mse_loss / total_samples).item()
-    bpp_loss_avg = (bpp_loss / total_samples).item()
-    aux_loss_avg = (aux_loss / total_samples).item()
+    for meter in meters.values():
+        meter.sync(device)
 
     if is_main_process(args):
         print(
             f"Test epoch {epoch}: Average losses:"
-            f"\tLoss: {loss_avg:.3f} |"
-            f"\tMSE loss: {mse_loss_avg:.3f} |"
-            f"\tBpp loss: {bpp_loss_avg:.2f} |"
-            f"\tAux loss: {aux_loss_avg:.2f}\n"
+            f"\tLoss: {meters['loss'].avg:.3f} |"
+            f"\tMSE loss: {meters['mse_loss'].avg:.3f} |"
+            f"\tBpp loss: {meters['bpp_loss'].avg:.2f} |"
+            f"\tAux loss: {meters['aux_loss'].avg:.2f}\n"
         )
 
-    return loss_avg
+    return meters["loss"].avg
 
 
 def save_checkpoint(state, is_best, filename="checkpoint.pth.tar"):
