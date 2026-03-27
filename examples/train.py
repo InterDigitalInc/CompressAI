@@ -289,6 +289,7 @@ def main(argv):
     criterion = RateDistortionLoss(lmbda=args.lmbda)
 
     last_epoch = 0
+    best_loss = float("inf")
     if args.checkpoint:  # load from previous checkpoint
         if is_main_process(args):
             print("Loading", args.checkpoint)
@@ -300,8 +301,6 @@ def main(argv):
         aux_optimizer.load_state_dict(checkpoint["aux_optimizer"])
         lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
 
-    else:
-        best_loss = float("inf")
     for epoch in range(last_epoch, args.epochs):
         if train_sampler is not None:
             train_sampler.set_epoch(epoch)
