@@ -45,7 +45,6 @@ from compressai._utils.distributed import (
     CustomDataParallel,
     init_distributed_mode,
     is_main_process,
-    reduce_mean,
     unwrap_model,
 )
 from compressai._utils.meters import AverageMeter
@@ -97,25 +96,16 @@ def train_one_epoch(
         aux_loss.backward()
         aux_optimizer.step()
 
-        if i % 10 == 0:
-            loss = reduce_mean(out_criterion["loss"].item(), device, args.world_size)
-            mse_loss = reduce_mean(
-                out_criterion["mse_loss"].item(), device, args.world_size
+        if i % 10 == 0 and is_main_process(args):
+            print(
+                f"Train epoch {epoch}: ["
+                f"{i * len(d) * args.world_size}/{len(train_dataloader.dataset)}"
+                f" ({100. * i / len(train_dataloader):.0f}%)]"
+                f'\tLoss: {out_criterion["loss"].item():.3f} |'
+                f'\tMSE loss: {out_criterion["mse_loss"].item():.3f} |'
+                f'\tBpp loss: {out_criterion["bpp_loss"].item():.2f} |'
+                f"\tAux loss: {aux_loss.item():.2f}"
             )
-            bpp_loss = reduce_mean(
-                out_criterion["bpp_loss"].item(), device, args.world_size
-            )
-            aux_loss_value = reduce_mean(aux_loss.item(), device, args.world_size)
-            if is_main_process(args):
-                print(
-                    f"Train epoch {epoch}: ["
-                    f"{i * len(d) * args.world_size}/{len(train_dataloader.dataset)}"
-                    f" ({100. * i / len(train_dataloader):.0f}%)]"
-                    f"\tLoss: {loss:.3f} |"
-                    f"\tMSE loss: {mse_loss:.3f} |"
-                    f"\tBpp loss: {bpp_loss:.2f} |"
-                    f"\tAux loss: {aux_loss_value:.2f}"
-                )
 
 
 def test_epoch(epoch, test_dataloader, model, criterion, args):

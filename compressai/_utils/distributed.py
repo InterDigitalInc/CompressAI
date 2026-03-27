@@ -81,12 +81,3 @@ def unwrap_model(model: nn.Module) -> nn.Module:
     if isinstance(model, (nn.DataParallel, DistributedDataParallel)):
         return model.module
     return model
-
-
-def reduce_mean(value, device, world_size):
-    if world_size == 1:
-        return value
-    reduced = torch.tensor(float(value), device=device)
-    dist.all_reduce(reduced, op=dist.ReduceOp.SUM)
-    reduced /= world_size
-    return reduced.item()
