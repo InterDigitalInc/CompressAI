@@ -251,10 +251,10 @@ def train_one_epoch(
             print(
                 f"Train epoch {epoch}: ["
                 f"{i * batch_size * args.world_size}/{len(train_dataloader.dataset)}"
-                f" ({100. * i / len(train_dataloader):.0f}%)]"
-                f'\tLoss: {out_criterion["loss"].item():.3f} |'
-                f'\tMSE loss: {out_criterion["mse_loss"].item():.3f} |'
-                f'\tBpp loss: {out_criterion["bpp_loss"].item():.2f} |'
+                f" ({100.0 * i / len(train_dataloader):.0f}%)]"
+                f"\tLoss: {out_criterion['loss'].item():.3f} |"
+                f"\tMSE loss: {out_criterion['mse_loss'].item():.3f} |"
+                f"\tBpp loss: {out_criterion['bpp_loss'].item():.2f} |"
                 f"\tAux loss: {aux_loss.item():.2f}"
             )
 
