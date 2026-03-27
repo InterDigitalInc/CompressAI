@@ -86,7 +86,13 @@ def configure_optimizers(net, args):
 
 
 def train_one_epoch(
-    model, criterion, train_dataloader, optimizer, aux_optimizer, epoch, clip_max_norm
+    model,
+    criterion,
+    train_dataloader,
+    optimizer,
+    aux_optimizer,
+    epoch,
+    args,
 ):
     model.train()
     device = next(model.parameters()).device
@@ -101,8 +107,8 @@ def train_one_epoch(
 
         out_criterion = criterion(out_net, d)
         out_criterion["loss"].backward()
-        if clip_max_norm > 0:
-            torch.nn.utils.clip_grad_norm_(model.parameters(), clip_max_norm)
+        if args.clip_max_norm > 0:
+            torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_max_norm)
         optimizer.step()
 
         aux_loss = model.aux_loss()
@@ -122,7 +128,7 @@ def train_one_epoch(
             )
 
 
-def test_epoch(epoch, test_dataloader, model, criterion):
+def test_epoch(epoch, test_dataloader, model, criterion, args):
     model.eval()
     model.update(force=True, update_quantiles=True)
     device = next(model.parameters()).device
@@ -341,9 +347,9 @@ def main(argv):
             optimizer,
             aux_optimizer,
             epoch,
-            args.clip_max_norm,
+            args,
         )
-        loss = test_epoch(epoch, test_dataloader, net, criterion)
+        loss = test_epoch(epoch, test_dataloader, net, criterion, args)
         lr_scheduler.step(loss)
 
         is_best = loss < best_loss

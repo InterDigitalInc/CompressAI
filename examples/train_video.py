@@ -280,7 +280,6 @@ def train_one_epoch(
     optimizer,
     aux_optimizer,
     epoch,
-    clip_max_norm,
     args,
 ):
     model.train()
@@ -298,8 +297,8 @@ def train_one_epoch(
 
         out_criterion = criterion(out_net, d)
         out_criterion["loss"].backward()
-        if clip_max_norm > 0:
-            torch.nn.utils.clip_grad_norm_(model.parameters(), clip_max_norm)
+        if args.clip_max_norm > 0:
+            torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_max_norm)
         optimizer.step()
 
         aux_loss = compute_aux_loss(model_for_aux.aux_loss(), backward=True)
@@ -554,7 +553,6 @@ def main(argv):
             optimizer,
             aux_optimizer,
             epoch,
-            args.clip_max_norm,
             args,
         )
         loss = test_epoch(epoch, test_dataloader, net, criterion, args)
