@@ -33,7 +33,6 @@ import shutil
 import sys
 
 import torch
-import torch.nn as nn
 import torch.optim as optim
 
 from torch.utils.data import DataLoader
@@ -41,6 +40,7 @@ from torchvision.transforms import Compose
 
 import compressai.transforms as transforms
 
+from compressai._utils.distributed import CustomDataParallel
 from compressai.datasets import ModelNetDataset
 from compressai.losses import ChamferPccRateDistortionLoss
 from compressai.optimizers import net_aux_optimizer
@@ -62,16 +62,6 @@ class AverageMeter:
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
-
-
-class CustomDataParallel(nn.DataParallel):
-    """Custom DataParallel to access the module methods."""
-
-    def __getattr__(self, key):
-        try:
-            return super().__getattr__(key)
-        except AttributeError:
-            return getattr(self.module, key)
 
 
 def configure_optimizers(net, args):

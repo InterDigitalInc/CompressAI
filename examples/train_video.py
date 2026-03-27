@@ -29,7 +29,6 @@
 
 import argparse
 import math
-import os
 import random
 import shutil
 import sys
@@ -47,6 +46,12 @@ from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 from torchvision import transforms
 
+from compressai._utils.distributed import (
+    init_distributed_mode,
+    is_main_process,
+    reduce_mean,
+    unwrap_model,
+)
 from compressai.datasets import VideoFolder
 from compressai.optimizers import net_aux_optimizer
 from compressai.zoo import video_models
@@ -203,52 +208,6 @@ class AverageMeter:
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
-
-
-def init_distributed_mode(args):
-    args.distributed = False
-    args.rank = 0
-    args.world_size = 1
-    args.local_rank = 0
-
-    if "RANK" not in os.environ or "WORLD_SIZE" not in os.environ:
-        return
-
-    args.distributed = True
-    args.rank = int(os.environ["RANK"])
-    args.world_size = int(os.environ["WORLD_SIZE"])
-    args.local_rank = int(os.environ.get("LOCAL_RANK", 0))
-
-    if args.cuda:
-        if not torch.cuda.is_available():
-            raise RuntimeError(
-                "CUDA was requested for distributed training, but is unavailable"
-            )
-        torch.cuda.set_device(args.local_rank)
-        backend = "nccl"
-    else:
-        backend = "gloo"
-
-    dist.init_process_group(backend=backend, init_method="env://")
-
-
-def is_main_process(args):
-    return args.rank == 0
-
-
-def unwrap_model(model):
-    if isinstance(model, DistributedDataParallel):
-        return model.module
-    return model
-
-
-def reduce_mean(value, device, world_size):
-    if world_size == 1:
-        return value
-    reduced = torch.tensor(float(value), device=device)
-    dist.all_reduce(reduced, op=dist.ReduceOp.SUM)
-    reduced /= world_size
-    return reduced.item()
 
 
 def compute_aux_loss(aux_list: List, backward=False):
