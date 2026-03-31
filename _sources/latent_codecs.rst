@@ -71,16 +71,17 @@ Diagrams for some of the above predefined latent codecs:
 
     HyperpriorLatentCodec:
 
-                 ┌──────────┐
-            ┌─►──┤ lc_hyper ├──►─┐
-            │    └──────────┘    │
-            │                    ▼ params
-            │                    │
-            │                 ┌──┴───┐
-        y ──┴───────►─────────┤ lc_y ├───►── y_hat
-                              └──────┘
+                ┌───┐  z  ┌──────┐ z_hat ┌───┐
+            ┌─►─┤h_a├──►──┤ lc_z ├───►───┤h_s├─►─┐
+            │   └───┘     └──────┘       └───┘   │
+            │                                    ▼ params
+            │                                    │
+            │                                 ┌──┴───┐
+        y ──┴───────────────────►─────────────┤ lc_y ├───►── y_hat
+                                              └──────┘
 
-        Composes a HyperLatentCodec and a "lc_y" latent codec such as
+        Composes a "lc_z" latent codec such as EntropyBottleneckLatentCodec,
+        and a "lc_y" latent codec such as
         GaussianConditionalLatentCodec or RasterScanLatentCodec.
 
 .. code-block:: none
@@ -194,12 +195,12 @@ Using :py:class:`~compressai.models.base.SimpleVAECompressionModel`, some Google
             h_s = nn.Sequential(...)
 
             self.latent_codec = HyperpriorLatentCodec(
-                # A HyperpriorLatentCodec is made of "hyper" and "y" latent codecs.
+                h_a=h_a,
+                h_s=h_s,
+                # A HyperpriorLatentCodec is made of "z" and "y" latent codecs.
                 latent_codec={
                     # Side-information branch with entropy bottleneck for "z":
-                    "hyper": HyperLatentCodec(
-                        h_a=h_a,
-                        h_s=h_s,
+                    "z": EntropyBottleneckLatentCodec(
                         entropy_bottleneck=EntropyBottleneck(N),
                     ),
                     # Encode y using GaussianConditional:
@@ -221,12 +222,12 @@ Using :py:class:`~compressai.models.base.SimpleVAECompressionModel`, some Google
             h_s = nn.Sequential(...)
 
             self.latent_codec = HyperpriorLatentCodec(
-                # A HyperpriorLatentCodec is made of "hyper" and "y" latent codecs.
+                h_a=h_a,
+                h_s=h_s,
+                # A HyperpriorLatentCodec is made of "z" and "y" latent codecs.
                 latent_codec={
                     # Side-information branch with entropy bottleneck for "z":
-                    "hyper": HyperLatentCodec(
-                        h_a=h_a,
-                        h_s=h_s,
+                    "z": EntropyBottleneckLatentCodec(
                         entropy_bottleneck=EntropyBottleneck(N),
                     ),
                     # Encode y using autoregression in raster-scan order:

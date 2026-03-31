@@ -299,8 +299,8 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">compressai.latent_codecs</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ChannelGroupsLatentCodec</span><span class="p">,</span>
     <span class="n">CheckerboardLatentCodec</span><span class="p">,</span>
+    <span class="n">EntropyBottleneckLatentCodec</span><span class="p">,</span>
     <span class="n">GaussianConditionalLatentCodec</span><span class="p">,</span>
-    <span class="n">HyperLatentCodec</span><span class="p">,</span>
     <span class="n">HyperpriorLatentCodec</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">compressai.layers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -396,8 +396,17 @@ document.write(`
             <span class="n">conv3x3</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">N</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span>
         <span class="p">)</span>
 
+        <span class="c1"># [He2021] uses a &quot;hyperprior&quot; architecture, which reconstructs y using z.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span> <span class="o">=</span> <span class="n">HyperpriorLatentCodec</span><span class="p">(</span>
+            <span class="n">h_a</span><span class="o">=</span><span class="n">h_a</span><span class="p">,</span>
+            <span class="n">h_s</span><span class="o">=</span><span class="n">h_s</span><span class="p">,</span>
             <span class="n">latent_codec</span><span class="o">=</span><span class="p">{</span>
+                <span class="c1"># Side information branch containing z:</span>
+                <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">EntropyBottleneckLatentCodec</span><span class="p">(</span>
+                    <span class="n">entropy_bottleneck</span><span class="o">=</span><span class="n">EntropyBottleneck</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+                    <span class="n">quantizer</span><span class="o">=</span><span class="s2">&quot;ste&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="c1"># Spatial context model:</span>
                 <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">CheckerboardLatentCodec</span><span class="p">(</span>
                     <span class="n">latent_codec</span><span class="o">=</span><span class="p">{</span>
                         <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">GaussianConditionalLatentCodec</span><span class="p">(</span><span class="n">quantizer</span><span class="o">=</span><span class="s2">&quot;ste&quot;</span><span class="p">),</span>
@@ -412,12 +421,6 @@ document.write(`
                     <span class="n">context_prediction</span><span class="o">=</span><span class="n">CheckerboardMaskedConv2d</span><span class="p">(</span>
                         <span class="n">N</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">N</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">2</span>
                     <span class="p">),</span>
-                <span class="p">),</span>
-                <span class="s2">&quot;hyper&quot;</span><span class="p">:</span> <span class="n">HyperLatentCodec</span><span class="p">(</span>
-                    <span class="n">entropy_bottleneck</span><span class="o">=</span><span class="n">EntropyBottleneck</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
-                    <span class="n">h_a</span><span class="o">=</span><span class="n">h_a</span><span class="p">,</span>
-                    <span class="n">h_s</span><span class="o">=</span><span class="n">h_s</span><span class="p">,</span>
-                    <span class="n">quantizer</span><span class="o">=</span><span class="s2">&quot;ste&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">},</span>
         <span class="p">)</span>
@@ -572,19 +575,19 @@ document.write(`
 
         <span class="c1"># [He2022] uses a &quot;hyperprior&quot; architecture, which reconstructs y using z.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span> <span class="o">=</span> <span class="n">HyperpriorLatentCodec</span><span class="p">(</span>
+            <span class="n">h_a</span><span class="o">=</span><span class="n">h_a</span><span class="p">,</span>
+            <span class="n">h_s</span><span class="o">=</span><span class="n">h_s</span><span class="p">,</span>
             <span class="n">latent_codec</span><span class="o">=</span><span class="p">{</span>
+                <span class="c1"># Side information branch containing z:</span>
+                <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">EntropyBottleneckLatentCodec</span><span class="p">(</span>
+                    <span class="n">entropy_bottleneck</span><span class="o">=</span><span class="n">EntropyBottleneck</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+                    <span class="n">quantizer</span><span class="o">=</span><span class="s2">&quot;ste&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
                 <span class="c1"># Channel groups with space-channel context model (SCCTX):</span>
                 <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">ChannelGroupsLatentCodec</span><span class="p">(</span>
                     <span class="n">groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">,</span>
                     <span class="n">channel_context</span><span class="o">=</span><span class="n">channel_context</span><span class="p">,</span>
                     <span class="n">latent_codec</span><span class="o">=</span><span class="n">scctx_latent_codec</span><span class="p">,</span>
-                <span class="p">),</span>
-                <span class="c1"># Side information branch containing z:</span>
-                <span class="s2">&quot;hyper&quot;</span><span class="p">:</span> <span class="n">HyperLatentCodec</span><span class="p">(</span>
-                    <span class="n">entropy_bottleneck</span><span class="o">=</span><span class="n">EntropyBottleneck</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
-                    <span class="n">h_a</span><span class="o">=</span><span class="n">h_a</span><span class="p">,</span>
-                    <span class="n">h_s</span><span class="o">=</span><span class="n">h_s</span><span class="p">,</span>
-                    <span class="n">quantizer</span><span class="o">=</span><span class="s2">&quot;ste&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">},</span>
         <span class="p">)</span>
@@ -759,19 +762,19 @@ document.write(`
 
         <span class="c1"># [He2022] uses a &quot;hyperprior&quot; architecture, which reconstructs y using z.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span> <span class="o">=</span> <span class="n">HyperpriorLatentCodec</span><span class="p">(</span>
+            <span class="n">h_a</span><span class="o">=</span><span class="n">h_a</span><span class="p">,</span>
+            <span class="n">h_s</span><span class="o">=</span><span class="n">h_s</span><span class="p">,</span>
             <span class="n">latent_codec</span><span class="o">=</span><span class="p">{</span>
+                <span class="c1"># Side information branch containing z:</span>
+                <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">EntropyBottleneckLatentCodec</span><span class="p">(</span>
+                    <span class="n">entropy_bottleneck</span><span class="o">=</span><span class="n">EntropyBottleneck</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+                    <span class="n">quantizer</span><span class="o">=</span><span class="s2">&quot;ste&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
                 <span class="c1"># Channel groups with space-channel context model (SCCTX):</span>
                 <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">ChannelGroupsLatentCodec</span><span class="p">(</span>
                     <span class="n">groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">,</span>
                     <span class="n">channel_context</span><span class="o">=</span><span class="n">channel_context</span><span class="p">,</span>
                     <span class="n">latent_codec</span><span class="o">=</span><span class="n">scctx_latent_codec</span><span class="p">,</span>
-                <span class="p">),</span>
-                <span class="c1"># Side information branch containing z:</span>
-                <span class="s2">&quot;hyper&quot;</span><span class="p">:</span> <span class="n">HyperLatentCodec</span><span class="p">(</span>
-                    <span class="n">entropy_bottleneck</span><span class="o">=</span><span class="n">EntropyBottleneck</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
-                    <span class="n">h_a</span><span class="o">=</span><span class="n">h_a</span><span class="p">,</span>
-                    <span class="n">h_s</span><span class="o">=</span><span class="n">h_s</span><span class="p">,</span>
-                    <span class="n">quantizer</span><span class="o">=</span><span class="s2">&quot;ste&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">},</span>
         <span class="p">)</span>
@@ -790,8 +793,9 @@ document.write(`
                 <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">chan_groups_latent_codec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="n">chan_groups_latent_codec</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">,</span> <span class="n">HyperpriorLatentCodec</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="o">.</span><span class="n">y</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ChannelGroupsLatentCodec</span><span class="p">)</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">merge_y</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">merge_y</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>

@@ -288,7 +288,9 @@ document.write(`
 <span class="c1"># OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF</span>
 <span class="c1"># ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
 
@@ -304,7 +306,7 @@ document.write(`
 <div class="viewcode-block" id="HyperpriorLatentCodec"><a class="viewcode-back" href="../../../latent_codecs.html#compressai.latent_codecs.HyperpriorLatentCodec">[docs]</a><span class="nd">@register_module</span><span class="p">(</span><span class="s2">&quot;HyperpriorLatentCodec&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">HyperpriorLatentCodec</span><span class="p">(</span><span class="n">LatentCodec</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Hyperprior codec constructed from latent codec for ``y`` that</span>
-<span class="sd">    compresses ``y`` using ``params`` from ``hyper`` branch.</span>
+<span class="sd">    compresses ``y`` using ``params`` derived from ``z_hat``.</span>
 
 <span class="sd">    Hyperprior entropy modeling introduced in</span>
 <span class="sd">    `&quot;Variational Image Compression with a Scale Hyperprior&quot;</span>
@@ -314,16 +316,17 @@ document.write(`
 
 <span class="sd">    .. code-block:: none</span>
 
-<span class="sd">                 ┌──────────┐</span>
-<span class="sd">            ┌─►──┤ lc_hyper ├──►─┐</span>
-<span class="sd">            │    └──────────┘    │</span>
-<span class="sd">            │                    ▼ params</span>
-<span class="sd">            │                    │</span>
-<span class="sd">            │                 ┌──┴───┐</span>
-<span class="sd">        y ──┴───────►─────────┤ lc_y ├───►── y_hat</span>
-<span class="sd">                              └──────┘</span>
+<span class="sd">                ┌───┐  z  ┌──────┐ z_hat ┌───┐</span>
+<span class="sd">            ┌─►─┤h_a├──►──┤ lc_z ├───►───┤h_s├─►─┐</span>
+<span class="sd">            │   └───┘     └──────┘       └───┘   │</span>
+<span class="sd">            │                                    ▼ params</span>
+<span class="sd">            │                                    │</span>
+<span class="sd">            │                                 ┌──┴───┐</span>
+<span class="sd">        y ──┴───────────────────►─────────────┤ lc_y ├───►── y_hat</span>
+<span class="sd">                                              └──────┘</span>
 
-<span class="sd">    By default, the following codec is constructed:</span>
+<span class="sd">    The original hyperprior is the combination of an</span>
+<span class="sd">    entropy bottleneck for ``z`` and a gaussian conditional for ``y``:</span>
 
 <span class="sd">    .. code-block:: none</span>
 
@@ -342,37 +345,52 @@ document.write(`
 <span class="sd">                └───┘          GC</span>
 
 <span class="sd">    Common configurations of latent codecs include:</span>
-<span class="sd">     - entropy bottleneck ``hyper`` (default) and gaussian conditional ``y`` (default)</span>
-<span class="sd">     - entropy bottleneck ``hyper`` (default) and autoregressive ``y``</span>
+<span class="sd">     - entropy bottleneck ``z`` and gaussian conditional ``y``</span>
+<span class="sd">     - entropy bottleneck ``z`` and autoregressive ``y``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latent_codec</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LatentCodec</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">latent_codec</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LatentCodec</span><span class="p">],</span>
+        <span class="n">h_a</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">h_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span> <span class="o">=</span> <span class="n">h_a</span> <span class="ow">or</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span> <span class="o">=</span> <span class="n">h_s</span> <span class="ow">or</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
+        <span class="n">latent_codec</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">latent_codec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;hyper&quot;</span><span class="p">],</span>
+        <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hyper</span> <span class="o">=</span> <span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;hyper&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span> <span class="o">=</span> <span class="n">latent_codec</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LatentCodec</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-        <span class="n">hyper_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;hyper&quot;</span><span class="p">](</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">](</span><span class="n">y</span><span class="p">,</span> <span class="n">hyper_out</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">z_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">](</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">z_hat</span> <span class="o">=</span> <span class="n">z_out</span><span class="p">[</span><span class="s2">&quot;y_hat&quot;</span><span class="p">]</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+        <span class="n">y_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">](</span><span class="n">y</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;likelihoods&quot;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y_out</span><span class="p">[</span><span class="s2">&quot;likelihoods&quot;</span><span class="p">][</span><span class="s2">&quot;y&quot;</span><span class="p">],</span>
-                <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">hyper_out</span><span class="p">[</span><span class="s2">&quot;likelihoods&quot;</span><span class="p">][</span><span class="s2">&quot;z&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">z_out</span><span class="p">[</span><span class="s2">&quot;likelihoods&quot;</span><span class="p">][</span><span class="s2">&quot;y&quot;</span><span class="p">],</span>
             <span class="p">},</span>
             <span class="s2">&quot;y_hat&quot;</span><span class="p">:</span> <span class="n">y_out</span><span class="p">[</span><span class="s2">&quot;y_hat&quot;</span><span class="p">],</span>
         <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-        <span class="n">hyper_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;hyper&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">hyper_out</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>
-        <span class="p">[</span><span class="n">z_strings</span><span class="p">]</span> <span class="o">=</span> <span class="n">hyper_out</span><span class="p">[</span><span class="s2">&quot;strings&quot;</span><span class="p">]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">z_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">z_hat</span> <span class="o">=</span> <span class="n">z_out</span><span class="p">[</span><span class="s2">&quot;y_hat&quot;</span><span class="p">]</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+        <span class="n">y_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="p">[</span><span class="n">z_strings</span><span class="p">]</span> <span class="o">=</span> <span class="n">z_out</span><span class="p">[</span><span class="s2">&quot;strings&quot;</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;strings&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">*</span><span class="n">y_out</span><span class="p">[</span><span class="s2">&quot;strings&quot;</span><span class="p">],</span> <span class="n">z_strings</span><span class="p">],</span>
-            <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y_out</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">],</span> <span class="s2">&quot;hyper&quot;</span><span class="p">:</span> <span class="n">hyper_out</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]},</span>
+            <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y_out</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">],</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">z_out</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]},</span>
             <span class="s2">&quot;y_hat&quot;</span><span class="p">:</span> <span class="n">y_out</span><span class="p">[</span><span class="s2">&quot;y_hat&quot;</span><span class="p">],</span>
         <span class="p">}</span>
 
@@ -381,10 +399,10 @@ document.write(`
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="o">*</span><span class="n">y_strings_</span><span class="p">,</span> <span class="n">z_strings</span> <span class="o">=</span> <span class="n">strings</span>
         <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_strings</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">z_strings</span><span class="p">)</span> <span class="k">for</span> <span class="n">y_strings</span> <span class="ow">in</span> <span class="n">y_strings_</span><span class="p">)</span>
-        <span class="n">hyper_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;hyper&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">decompress</span><span class="p">([</span><span class="n">z_strings</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="s2">&quot;hyper&quot;</span><span class="p">])</span>
-        <span class="n">y_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span>
-            <span class="n">y_strings_</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">hyper_out</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
-        <span class="p">)</span>
+        <span class="n">z_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">decompress</span><span class="p">([</span><span class="n">z_strings</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">])</span>
+        <span class="n">z_hat</span> <span class="o">=</span> <span class="n">z_out</span><span class="p">[</span><span class="s2">&quot;y_hat&quot;</span><span class="p">]</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_s</span><span class="p">(</span><span class="n">z_hat</span><span class="p">)</span>
+        <span class="n">y_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">y_strings_</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;y_hat&quot;</span><span class="p">:</span> <span class="n">y_out</span><span class="p">[</span><span class="s2">&quot;y_hat&quot;</span><span class="p">]}</span></div>
 </pre></div>
 

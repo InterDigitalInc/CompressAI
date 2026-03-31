@@ -388,9 +388,6 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span> <span class="o">=</span> <span class="n">latent_codec</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LatentCodec</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">side_params</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward_method</span> <span class="o">==</span> <span class="s2">&quot;onepass&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_onepass</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">side_params</span><span class="p">)</span>
@@ -409,7 +406,7 @@ document.write(`
 <span class="sd">        This method uses uniform noise to roughly model quantization.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">y_ctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_only</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span><span class="p">(</span><span class="n">y_hat</span><span class="p">),</span> <span class="s2">&quot;non_anchor&quot;</span><span class="p">)</span>
+        <span class="n">y_ctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_all_but_step</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span><span class="p">(</span><span class="n">y_hat</span><span class="p">),</span> <span class="s2">&quot;non_anchor&quot;</span><span class="p">)</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">y_ctx</span><span class="p">,</span> <span class="n">side_params</span><span class="p">))</span>
         <span class="n">y_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">](</span><span class="n">y</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -431,39 +428,28 @@ document.write(`
 <span class="sd">        To compute ``y_hat_anchors``, we need the predicted ``means_hat``:</span>
 <span class="sd">        ``y_hat = quantize_ste(y - means_hat) + means_hat``.</span>
 <span class="sd">        Thus, two passes of ``entropy_parameters`` are necessary.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span>
-
         <span class="n">params</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">((</span><span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">))</span>
-
         <span class="n">y_hat_</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="c1"># NOTE: The _i variables contain only the current step&#39;s pixels.</span>
-        <span class="c1"># i=0: step=anchor</span>
-        <span class="c1"># i=1: step=non_anchor</span>
-
         <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;anchor&quot;</span><span class="p">,</span> <span class="s2">&quot;non_anchor&quot;</span><span class="p">):</span>
+            <span class="c1"># Determine y_ctx for current step.</span>
             <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="s2">&quot;anchor&quot;</span><span class="p">:</span>
-                <span class="n">y_ctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_ctx_zero</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+                <span class="n">y_ctx_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_ctx_zero</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># step == &quot;non_anchor&quot;</span>
-                <span class="n">y_hat_anchors</span> <span class="o">=</span> <span class="n">y_hat_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">y_ctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span><span class="p">(</span><span class="n">y_hat_anchors</span><span class="p">)</span>
+                <span class="n">y_ctx_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span><span class="p">(</span><span class="n">y_hat_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-            <span class="n">params_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">y_ctx</span><span class="p">,</span> <span class="n">side_params</span><span class="p">))</span>
-
-            <span class="c1"># Save params for current step. This is later used for entropy estimation.</span>
+            <span class="c1"># Determine params for current step.</span>
+            <span class="n">params_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">y_ctx_i</span><span class="p">,</span> <span class="n">side_params</span><span class="p">))</span>
+            <span class="n">params_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_all_but_step</span><span class="p">(</span><span class="n">params_i</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_copy</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">params_i</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
 
-            <span class="c1"># Keep only elements needed for current step.</span>
-            <span class="c1"># It&#39;s not necessary to mask the rest out just yet, but it doesn&#39;t hurt.</span>
-            <span class="n">params_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_only</span><span class="p">(</span><span class="n">params_i</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
-            <span class="n">y_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_only</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
-
-            <span class="c1"># Determine y_hat for current step, and mask out the other pixels.</span>
+            <span class="c1"># Determine y_hat for current step.</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">means_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">_chunk</span><span class="p">(</span><span class="n">params_i</span><span class="p">)</span>
-            <span class="n">y_hat_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_only</span><span class="p">(</span><span class="n">quantize_ste</span><span class="p">(</span><span class="n">y_i</span> <span class="o">-</span> <span class="n">means_i</span><span class="p">)</span> <span class="o">+</span> <span class="n">means_i</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
-
+            <span class="n">y_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_all_but_step</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+            <span class="n">y_hat_i</span> <span class="o">=</span> <span class="n">quantize_ste</span><span class="p">(</span><span class="n">y_i</span> <span class="o">-</span> <span class="n">means_i</span><span class="p">)</span> <span class="o">+</span> <span class="n">means_i</span>
+            <span class="n">y_hat_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_all_but_step</span><span class="p">(</span><span class="n">y_hat_i</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
             <span class="n">y_hat_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_hat_i</span><span class="p">)</span>
 
         <span class="p">[</span><span class="n">y_hat_anchors</span><span class="p">,</span> <span class="n">y_hat_non_anchors</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_hat_</span>
@@ -488,13 +474,13 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y_ctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_ctx_zero</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">y_ctx</span><span class="p">,</span> <span class="n">side_params</span><span class="p">))</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_only</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s2">&quot;anchor&quot;</span><span class="p">)</span>  <span class="c1"># Probably unnecessary.</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_all_but_step</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="s2">&quot;anchor&quot;</span><span class="p">)</span>  <span class="c1"># Probably unnecessary.</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">means_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">_chunk</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="n">y_hat_anchors</span> <span class="o">=</span> <span class="n">quantize_ste</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">means_hat</span><span class="p">)</span> <span class="o">+</span> <span class="n">means_hat</span>
-        <span class="n">y_hat_anchors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_only</span><span class="p">(</span><span class="n">y_hat_anchors</span><span class="p">,</span> <span class="s2">&quot;anchor&quot;</span><span class="p">)</span>
+        <span class="n">y_hat_anchors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_all_but_step</span><span class="p">(</span><span class="n">y_hat_anchors</span><span class="p">,</span> <span class="s2">&quot;anchor&quot;</span><span class="p">)</span>
 
         <span class="n">y_ctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context_prediction</span><span class="p">(</span><span class="n">y_hat_anchors</span><span class="p">)</span>
-        <span class="n">y_ctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_only</span><span class="p">(</span><span class="n">y_ctx</span><span class="p">,</span> <span class="s2">&quot;non_anchor&quot;</span><span class="p">)</span>  <span class="c1"># Probably unnecessary.</span>
+        <span class="n">y_ctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_all_but_step</span><span class="p">(</span><span class="n">y_ctx</span><span class="p">,</span> <span class="s2">&quot;non_anchor&quot;</span><span class="p">)</span>  <span class="c1"># Probably unnecessary.</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entropy_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">y_ctx</span><span class="p">,</span> <span class="n">side_params</span><span class="p">))</span>
         <span class="n">y_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">](</span><span class="n">y</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
 
@@ -629,7 +615,7 @@ document.write(`
             <span class="n">dest</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">src</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
             <span class="n">dest</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">src</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_keep_only</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_all_but_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Keep only pixels in the current step, and zero out the rest.&quot;&quot;&quot;</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
         <span class="n">parity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">anchor_parity</span> <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="s2">&quot;anchor&quot;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_anchor_parity</span>
@@ -646,7 +632,7 @@ document.write(`
         <span class="n">y</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">y</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">quantize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>

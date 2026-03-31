@@ -406,16 +406,17 @@ By composing latent codecs, we can easily create more complex entropy models.</p
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>HyperpriorLatentCodec:
 
-             ┌──────────┐
-        ┌─►──┤ lc_hyper ├──►─┐
-        │    └──────────┘    │
-        │                    ▼ params
-        │                    │
-        │                 ┌──┴───┐
-    y ──┴───────►─────────┤ lc_y ├───►── y_hat
-                          └──────┘
+            ┌───┐  z  ┌──────┐ z_hat ┌───┐
+        ┌─►─┤h_a├──►──┤ lc_z ├───►───┤h_s├─►─┐
+        │   └───┘     └──────┘       └───┘   │
+        │                                    ▼ params
+        │                                    │
+        │                                 ┌──┴───┐
+    y ──┴───────────────────►─────────────┤ lc_y ├───►── y_hat
+                                          └──────┘
 
-    Composes a HyperLatentCodec and a &quot;lc_y&quot; latent codec such as
+    Composes a &quot;lc_z&quot; latent codec such as EntropyBottleneckLatentCodec,
+    and a &quot;lc_y&quot; latent codec such as
     GaussianConditionalLatentCodec or RasterScanLatentCodec.
 </pre></div>
 </div>
@@ -509,12 +510,12 @@ By composing latent codecs, we can easily create more complex entropy models.</p
         <span class="n">h_s</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span> <span class="o">=</span> <span class="n">HyperpriorLatentCodec</span><span class="p">(</span>
-            <span class="c1"># A HyperpriorLatentCodec is made of &quot;hyper&quot; and &quot;y&quot; latent codecs.</span>
+            <span class="n">h_a</span><span class="o">=</span><span class="n">h_a</span><span class="p">,</span>
+            <span class="n">h_s</span><span class="o">=</span><span class="n">h_s</span><span class="p">,</span>
+            <span class="c1"># A HyperpriorLatentCodec is made of &quot;z&quot; and &quot;y&quot; latent codecs.</span>
             <span class="n">latent_codec</span><span class="o">=</span><span class="p">{</span>
                 <span class="c1"># Side-information branch with entropy bottleneck for &quot;z&quot;:</span>
-                <span class="s2">&quot;hyper&quot;</span><span class="p">:</span> <span class="n">HyperLatentCodec</span><span class="p">(</span>
-                    <span class="n">h_a</span><span class="o">=</span><span class="n">h_a</span><span class="p">,</span>
-                    <span class="n">h_s</span><span class="o">=</span><span class="n">h_s</span><span class="p">,</span>
+                <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">EntropyBottleneckLatentCodec</span><span class="p">(</span>
                     <span class="n">entropy_bottleneck</span><span class="o">=</span><span class="n">EntropyBottleneck</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
                 <span class="p">),</span>
                 <span class="c1"># Encode y using GaussianConditional:</span>
@@ -534,12 +535,12 @@ By composing latent codecs, we can easily create more complex entropy models.</p
         <span class="n">h_s</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">latent_codec</span> <span class="o">=</span> <span class="n">HyperpriorLatentCodec</span><span class="p">(</span>
-            <span class="c1"># A HyperpriorLatentCodec is made of &quot;hyper&quot; and &quot;y&quot; latent codecs.</span>
+            <span class="n">h_a</span><span class="o">=</span><span class="n">h_a</span><span class="p">,</span>
+            <span class="n">h_s</span><span class="o">=</span><span class="n">h_s</span><span class="p">,</span>
+            <span class="c1"># A HyperpriorLatentCodec is made of &quot;z&quot; and &quot;y&quot; latent codecs.</span>
             <span class="n">latent_codec</span><span class="o">=</span><span class="p">{</span>
                 <span class="c1"># Side-information branch with entropy bottleneck for &quot;z&quot;:</span>
-                <span class="s2">&quot;hyper&quot;</span><span class="p">:</span> <span class="n">HyperLatentCodec</span><span class="p">(</span>
-                    <span class="n">h_a</span><span class="o">=</span><span class="n">h_a</span><span class="p">,</span>
-                    <span class="n">h_s</span><span class="o">=</span><span class="n">h_s</span><span class="p">,</span>
+                <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">EntropyBottleneckLatentCodec</span><span class="p">(</span>
                     <span class="n">entropy_bottleneck</span><span class="o">=</span><span class="n">EntropyBottleneck</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
                 <span class="p">),</span>
                 <span class="c1"># Encode y using autoregression in raster-scan order:</span>
@@ -607,7 +608,7 @@ By composing latent codecs, we can easily create more complex entropy models.</p
 <h2>EntropyBottleneckLatentCodec<a class="headerlink" href="#entropybottlenecklatentcodec" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.latent_codecs.EntropyBottleneckLatentCodec">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">EntropyBottleneckLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entropy_bottleneck</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="entropy_models.html#compressai.entropy_models.EntropyBottleneck" title="compressai.entropy_models.entropy_models.EntropyBottleneck"><span class="pre">compressai.entropy_models.entropy_models.EntropyBottleneck</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/entropy_bottleneck.html#EntropyBottleneckLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.EntropyBottleneckLatentCodec" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">EntropyBottleneckLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entropy_bottleneck</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="entropy_models.html#compressai.entropy_models.EntropyBottleneck" title="compressai.entropy_models.entropy_models.EntropyBottleneck"><span class="pre">compressai.entropy_models.entropy_models.EntropyBottleneck</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'noise'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/entropy_bottleneck.html#EntropyBottleneckLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.EntropyBottleneckLatentCodec" title="Permalink to this definition">#</a></dt>
 <dd><p>Entropy bottleneck codec.</p>
 <p>Factorized prior “entropy bottleneck” introduced in
 <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational Image Compression with a Scale Hyperprior”</a>,
@@ -681,24 +682,25 @@ y ──►──┤h_a├──►──┤ Q ├───►───····�
 <h2>HyperpriorLatentCodec<a class="headerlink" href="#hyperpriorlatentcodec" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.latent_codecs.HyperpriorLatentCodec">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">HyperpriorLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latent_codec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">compressai.latent_codecs.base.LatentCodec</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/hyperprior.html#HyperpriorLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.HyperpriorLatentCodec" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">HyperpriorLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latent_codec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">compressai.latent_codecs.base.LatentCodec</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.nn.modules.module.Module</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.nn.modules.module.Module</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/hyperprior.html#HyperpriorLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.HyperpriorLatentCodec" title="Permalink to this definition">#</a></dt>
 <dd><p>Hyperprior codec constructed from latent codec for <code class="docutils literal notranslate"><span class="pre">y</span></code> that
-compresses <code class="docutils literal notranslate"><span class="pre">y</span></code> using <code class="docutils literal notranslate"><span class="pre">params</span></code> from <code class="docutils literal notranslate"><span class="pre">hyper</span></code> branch.</p>
+compresses <code class="docutils literal notranslate"><span class="pre">y</span></code> using <code class="docutils literal notranslate"><span class="pre">params</span></code> derived from <code class="docutils literal notranslate"><span class="pre">z_hat</span></code>.</p>
 <p>Hyperprior entropy modeling introduced in
 <a class="reference external" href="https://arxiv.org/abs/1802.01436">“Variational Image Compression with a Scale Hyperprior”</a>,
 by J. Balle, D. Minnen, S. Singh, S.J. Hwang, and N. Johnston,
 International Conference on Learning Representations (ICLR), 2018.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>         ┌──────────┐
-    ┌─►──┤ lc_hyper ├──►─┐
-    │    └──────────┘    │
-    │                    ▼ params
-    │                    │
-    │                 ┌──┴───┐
-y ──┴───────►─────────┤ lc_y ├───►── y_hat
-                      └──────┘
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>        ┌───┐  z  ┌──────┐ z_hat ┌───┐
+    ┌─►─┤h_a├──►──┤ lc_z ├───►───┤h_s├─►─┐
+    │   └───┘     └──────┘       └───┘   │
+    │                                    ▼ params
+    │                                    │
+    │                                 ┌──┴───┐
+y ──┴───────────────────►─────────────┤ lc_y ├───►── y_hat
+                                      └──────┘
 </pre></div>
 </div>
-<p>By default, the following codec is constructed:</p>
+<p>The original hyperprior is the combination of an
+entropy bottleneck for <code class="docutils literal notranslate"><span class="pre">z</span></code> and a gaussian conditional for <code class="docutils literal notranslate"><span class="pre">y</span></code>:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>         ┌───┐  z  ┌───┐ z_hat      z_hat ┌───┐
     ┌─►──┤h_a├──►──┤ Q ├───►───····───►───┤h_s├──►─┐
     │    └───┘     └───┘        EB        └───┘    │
@@ -716,8 +718,8 @@ y ──┴─►─┤ Q ├────►────····────►�
 </div>
 <dl class="simple">
 <dt>Common configurations of latent codecs include:</dt><dd><ul class="simple">
-<li><p>entropy bottleneck <code class="docutils literal notranslate"><span class="pre">hyper</span></code> (default) and gaussian conditional <code class="docutils literal notranslate"><span class="pre">y</span></code> (default)</p></li>
-<li><p>entropy bottleneck <code class="docutils literal notranslate"><span class="pre">hyper</span></code> (default) and autoregressive <code class="docutils literal notranslate"><span class="pre">y</span></code></p></li>
+<li><p>entropy bottleneck <code class="docutils literal notranslate"><span class="pre">z</span></code> and gaussian conditional <code class="docutils literal notranslate"><span class="pre">y</span></code></p></li>
+<li><p>entropy bottleneck <code class="docutils literal notranslate"><span class="pre">z</span></code> and autoregressive <code class="docutils literal notranslate"><span class="pre">y</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -785,28 +787,29 @@ y ──►──┤h_a├──►──×──►──┤ Q ├───►�
 <h2>GainHyperpriorLatentCodec<a class="headerlink" href="#gainhyperpriorlatentcodec" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compressai.latent_codecs.GainHyperpriorLatentCodec">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">GainHyperpriorLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latent_codec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">compressai.latent_codecs.base.LatentCodec</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/gain/hyperprior.html#GainHyperpriorLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.GainHyperpriorLatentCodec" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai.latent_codecs.</span></span><span class="sig-name descname"><span class="pre">GainHyperpriorLatentCodec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latent_codec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">compressai.latent_codecs.base.LatentCodec</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.nn.modules.module.Module</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.nn.modules.module.Module</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/compressai/latent_codecs/gain/hyperprior.html#GainHyperpriorLatentCodec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai.latent_codecs.GainHyperpriorLatentCodec" title="Permalink to this definition">#</a></dt>
 <dd><p>Hyperprior codec constructed from latent codec for <code class="docutils literal notranslate"><span class="pre">y</span></code> that
-compresses <code class="docutils literal notranslate"><span class="pre">y</span></code> using <code class="docutils literal notranslate"><span class="pre">params</span></code> from <code class="docutils literal notranslate"><span class="pre">hyper</span></code> branch.</p>
+compresses <code class="docutils literal notranslate"><span class="pre">y</span></code> using <code class="docutils literal notranslate"><span class="pre">params</span></code> derived from <code class="docutils literal notranslate"><span class="pre">z_hat</span></code>.</p>
 <p>Gain-controlled hyperprior introduced in
 <a class="reference external" href="https://arxiv.org/abs/2003.02012">“Asymmetric Gained Deep Image Compression With Continuous Rate Adaptation”</a>, by Ze Cui, Jing Wang,
 Shangyin Gao, Bo Bai, Tiansheng Guo, and Yihui Feng, CVPR, 2021.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>        z_gain  z_gain_inv
-           │        │
-           ▼        ▼
-          ┌┴────────┴┐
-    ┌──►──┤ lc_hyper ├──►─┐
-    │     └──────────┘    │
-    │                     │
-    │     y_gain          ▼ params   y_gain_inv
-    │        │            │              │
-    │        ▼            │              ▼
-    │        │         ┌──┴───┐          │
-y ──┴────►───×───►─────┤ lc_y ├────►─────×─────►── y_hat
-                       └──────┘
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                z_gain  z_gain_inv
+                   │        │
+                   ▼        ▼
+        ┌───┐  z  ┌┴────────┴┐ z_hat ┌───┐
+    ┌─►─┤h_a├──►──┤   lc_z   ├───►───┤h_s├──►─┐
+    │   └───┘     └──────────┘       └───┘    │
+    │                                         │
+    │                y_gain                   ▼ params   y_gain_inv
+    │                   │                     │              │
+    │                   ▼                     │              ▼
+    │                   │                  ┌──┴───┐          │
+y ──┴───────────────►───×───►──────────────┤ lc_y ├────►─────×─────►── y_hat
+                                           └──────┘
 </pre></div>
 </div>
-<p>By default, the following codec is constructed:</p>
+<p>The original gain hyperprior is the combination of an
+entropy bottleneck for <code class="docutils literal notranslate"><span class="pre">z</span></code> and a gaussian conditional for <code class="docutils literal notranslate"><span class="pre">y</span></code>:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                z_gain                      z_gain_inv
                    │                             │
                    ▼                             ▼
@@ -827,8 +830,8 @@ y ──┴───►───×───►───┤ Q ├────►�
 </div>
 <dl class="simple">
 <dt>Common configurations of latent codecs include:</dt><dd><ul class="simple">
-<li><p>entropy bottleneck <code class="docutils literal notranslate"><span class="pre">hyper</span></code> (default) and gaussian conditional <code class="docutils literal notranslate"><span class="pre">y</span></code> (default)</p></li>
-<li><p>entropy bottleneck <code class="docutils literal notranslate"><span class="pre">hyper</span></code> (default) and autoregressive <code class="docutils literal notranslate"><span class="pre">y</span></code></p></li>
+<li><p>entropy bottleneck <code class="docutils literal notranslate"><span class="pre">z</span></code> and gaussian conditional <code class="docutils literal notranslate"><span class="pre">y</span></code></p></li>
+<li><p>entropy bottleneck <code class="docutils literal notranslate"><span class="pre">z</span></code> and autoregressive <code class="docutils literal notranslate"><span class="pre">y</span></code></p></li>
 </ul>
 </dd>
 </dl>

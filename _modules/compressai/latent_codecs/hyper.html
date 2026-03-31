@@ -288,6 +288,8 @@ document.write(`
 <span class="c1"># OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF</span>
 <span class="c1"># ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
@@ -334,6 +336,20 @@ document.write(`
         <span class="n">quantizer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;noise&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The HyperLatentCodec is deprecated as it is not a true &quot;</span>
+            <span class="s2">&quot;lossless codec (after quantization). Use this instead:</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;HyperpriorLatentCodec(</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    h_a=h_a,</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    h_s=h_s,</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    latent_codec={</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;        &#39;z&#39;: EntropyBottleneckLatentCodec(N),</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;        &#39;y&#39;: GaussianConditionalLatentCodec(),</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    },</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">entropy_bottleneck</span> <span class="o">=</span> <span class="n">entropy_bottleneck</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">h_a</span> <span class="o">=</span> <span class="n">h_a</span>
