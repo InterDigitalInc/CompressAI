@@ -38,8 +38,16 @@ import torch.nn as nn
 from torch import Tensor
 
 from compressai.entropy_models import EntropyBottleneck, GaussianConditional
-from compressai.latent_codecs import LatentCodec
-from compressai.models.utils import remap_old_keys, update_registered_buffers
+from compressai.latent_codecs import (
+    GainHyperpriorLatentCodec,
+    HyperpriorLatentCodec,
+    LatentCodec,
+)
+from compressai.models.utils import (
+    remap_legacy_hyperprior_keys,
+    remap_old_keys,
+    update_registered_buffers,
+)
 
 __all__ = [
     "CompressionModel",
@@ -95,6 +103,9 @@ class CompressionModel(nn.Module):
         for name, module in self.named_modules():
             if not any(x.startswith(name) for x in state_dict.keys()):
                 continue
+
+            if isinstance(module, (HyperpriorLatentCodec, GainHyperpriorLatentCodec)):
+                state_dict = remap_legacy_hyperprior_keys(name, state_dict)
 
             if isinstance(module, EntropyBottleneck):
                 update_registered_buffers(

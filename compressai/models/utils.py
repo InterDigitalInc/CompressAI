@@ -147,6 +147,27 @@ def remap_old_keys(module_name, state_dict):
     return new_state_dict
 
 
+def remap_legacy_hyperprior_keys(module_name, state_dict):
+    old_prefix = f"{module_name}.hyper."
+    new_state_dict = OrderedDict()
+
+    for k, v in state_dict.items():
+        if k.startswith(f"{old_prefix}h_a."):
+            k = k.replace(f"{old_prefix}h_a.", f"{module_name}.h_a.", 1)
+        elif k.startswith(f"{old_prefix}h_s."):
+            k = k.replace(f"{old_prefix}h_s.", f"{module_name}.h_s.", 1)
+        elif k.startswith(f"{old_prefix}entropy_bottleneck."):
+            k = k.replace(
+                f"{old_prefix}entropy_bottleneck.",
+                f"{module_name}.z.entropy_bottleneck.",
+                1,
+            )
+
+        new_state_dict[k] = v
+
+    return new_state_dict
+
+
 def conv(in_channels, out_channels, kernel_size=5, stride=2):
     return nn.Conv2d(
         in_channels,
