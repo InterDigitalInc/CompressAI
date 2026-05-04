@@ -31,5 +31,6 @@ from .base import *
 from .google import *
 from .pointcloud import *
 from .sensetime import *
+from .stf import *
 from .vbr import *
 from .waseda import *

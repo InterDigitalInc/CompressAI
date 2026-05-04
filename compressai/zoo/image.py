@@ -37,6 +37,8 @@ from compressai.models import (
     JointAutoregressiveHierarchicalPriors,
     MeanScaleHyperprior,
     ScaleHyperprior,
+    SymmetricalTransFormer,
+    WACNN,
 )
 
 from .pretrained import load_pretrained
@@ -49,6 +51,8 @@ __all__ = [
     "mbt2018_mean",
     "cheng2020_anchor",
     "cheng2020_attn",
+    "stf",
+    "stf_wacnn",
 ]
 
 model_architectures = {
@@ -59,6 +63,8 @@ model_architectures = {
     "mbt2018": JointAutoregressiveHierarchicalPriors,
     "cheng2020-anchor": Cheng2020Anchor,
     "cheng2020-attn": Cheng2020Attention,
+    "stf": SymmetricalTransFormer,
+    "stf-wacnn": WACNN,
 }
 
 root_url = "https://compressai.s3.amazonaws.com/models/v1"
@@ -447,3 +453,39 @@ def cheng2020_attn(quality, metric="mse", pretrained=False, progress=True, **kwa
     return _load_model(
         "cheng2020-attn", metric, quality, pretrained, progress, **kwargs
     )
+
+
+def stf(pretrained: bool = False, progress: bool = True, **kwargs):
+    r"""Symmetrical TransFormer (STF) model from R. Zou, C. Song, Z. Zhang:
+    `"The Devil Is in the Details: Window-based Attention for Image
+    Compression" <https://arxiv.org/abs/2203.08450>`_, IEEE/CVF Conf. on
+    Computer Vision and Pattern Recognition (CVPR), 2022.
+
+    Args:
+        pretrained (bool): If True, returns a pre-trained model. Currently
+            unavailable; raises ``RuntimeError``.
+        progress (bool): If True, displays a progress bar of the download to
+            stderr.
+    """
+    del progress
+    if pretrained:
+        raise RuntimeError("Pre-trained STF weights are not yet hosted on S3.")
+    return SymmetricalTransFormer(**kwargs)
+
+
+def stf_wacnn(pretrained: bool = False, progress: bool = True, **kwargs):
+    r"""WACNN model from R. Zou, C. Song, Z. Zhang:
+    `"The Devil Is in the Details: Window-based Attention for Image
+    Compression" <https://arxiv.org/abs/2203.08450>`_, IEEE/CVF Conf. on
+    Computer Vision and Pattern Recognition (CVPR), 2022.
+
+    Args:
+        pretrained (bool): If True, returns a pre-trained model. Currently
+            unavailable; raises ``RuntimeError``.
+        progress (bool): If True, displays a progress bar of the download to
+            stderr.
+    """
+    del progress
+    if pretrained:
+        raise RuntimeError("Pre-trained WACNN weights are not yet hosted on S3.")
+    return WACNN(**kwargs)
