@@ -39,6 +39,7 @@ dependencies = [
   "pytorch-msssim",
   "scipy",
   "setuptools>=68", # For --no-build-isolation.
+  "timm",
   "tomli>=2.2.1",
   "torch-geometric>=2.3.0",
   "torch>=1.13.1",

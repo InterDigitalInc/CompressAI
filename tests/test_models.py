@@ -278,6 +278,63 @@ class TestModels:
         assert z_likelihoods_shape[3] == x[1].shape[3] / 2**7
 
 
+class TestStf:
+    def test_wacnn_forward_and_state_dict_round_trip(self):
+        from compressai.models import WACNN
+
+        model = WACNN(N=64, M=128, num_slices=4, max_support_slices=2).eval()
+        x = torch.rand(1, 3, 64, 64)
+        with torch.no_grad():
+            out = model(x)
+        assert out["x_hat"].shape == x.shape
+        assert "y" in out["likelihoods"]
+        assert "z" in out["likelihoods"]
+
+        loaded = WACNN.from_state_dict(model.state_dict()).eval()
+        with torch.no_grad():
+            out_loaded = loaded(x)
+        assert torch.allclose(out["x_hat"], out_loaded["x_hat"])
+
+    def test_symmetrical_transformer_forward_and_state_dict_round_trip(self):
+        from compressai.models import SymmetricalTransFormer
+
+        model = SymmetricalTransFormer(
+            embed_dim=24,
+            depths=(1, 1, 1, 1),
+            num_heads=(2, 2, 2, 2),
+            num_slices=4,
+            max_support_slices=2,
+        ).eval()
+        x = torch.rand(1, 3, 128, 128)
+        with torch.no_grad():
+            out = model(x)
+        assert out["x_hat"].shape == x.shape
+        assert "y" in out["likelihoods"]
+        assert "z" in out["likelihoods"]
+
+        loaded = SymmetricalTransFormer.from_state_dict(model.state_dict()).eval()
+        with torch.no_grad():
+            out_loaded = loaded(x)
+        assert torch.allclose(out["x_hat"], out_loaded["x_hat"])
+
+    def test_stf_upstream_state_dict_conversion(self):
+        from compressai.models.stf import (
+            convert_upstream_stf_state_dict,
+        )
+
+        upstream = {
+            "module.g_a.0.weight": torch.zeros(2),
+            "module.cc_mean_transforms.0.0.weight": torch.zeros(2),
+            "module.gaussian_conditional.scale_table": torch.zeros(2),
+            "module.h_a.0.weight": torch.zeros(2),
+        }
+        converted = convert_upstream_stf_state_dict(upstream)
+        assert "g_a.0.weight" in converted
+        assert "latent_codec.cc_mean_transforms.0.0.weight" in converted
+        assert "latent_codec.gaussian_conditional.scale_table" in converted
+        assert "h_a.0.weight" in converted
+
+
 def test_scale_table_default():
     table = get_scale_table()
     assert SCALES_MIN == 0.11

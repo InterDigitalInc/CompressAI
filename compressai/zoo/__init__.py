@@ -35,6 +35,8 @@ from .image import (
     cheng2020_attn,
     mbt2018,
     mbt2018_mean,
+    stf,
+    stf_wacnn,
 )
 from .image_vbr import bmshj2018_hyperprior_vbr, mbt2018_mean_vbr, mbt2018_vbr
 from .pretrained import load_pretrained as load_state_dict
@@ -48,6 +50,8 @@ image_models = {
     "mbt2018": mbt2018,
     "cheng2020-anchor": cheng2020_anchor,
     "cheng2020-attn": cheng2020_attn,
+    "stf": stf,
+    "stf-wacnn": stf_wacnn,
     "bmshj2018-hyperprior-vbr": bmshj2018_hyperprior_vbr,
     "mbt2018-mean-vbr": mbt2018_mean_vbr,
     "mbt2018-vbr": mbt2018_vbr,
