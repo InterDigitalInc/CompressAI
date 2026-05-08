@@ -638,7 +638,6 @@ dependencies = [
     { name = "scipy", version = "1.10.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "scipy", version = "1.13.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "setuptools" },
-    { name = "timm" },
     { name = "tomli" },
     { name = "torch", version = "2.2.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "torch", version = "2.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
@@ -651,6 +650,9 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+attn = [
+    { name = "timm" },
+]
 dev = [
     { name = "black" },
     { name = "flake8" },
@@ -740,7 +742,7 @@ requires-dist = [
     { name = "setuptools", specifier = ">=68" },
     { name = "sphinx", marker = "extra == 'doc'", specifier = "==4.3.0" },
     { name = "sphinx-book-theme", marker = "extra == 'doc'", specifier = "==1.0.1" },
-    { name = "timm" },
+    { name = "timm", marker = "extra == 'attn'" },
     { name = "tomli", specifier = ">=2.2.1" },
     { name = "torch", specifier = ">=1.13.1" },
     { name = "torch", marker = "python_full_version >= '3.12'", specifier = ">=2.6.0" },
@@ -751,7 +753,7 @@ requires-dist = [
     { name = "typing-extensions", specifier = ">=4.0.0" },
     { name = "wheel", specifier = ">=0.32.0" },
 ]
-provides-extras = ["test", "dev", "doc", "tutorials", "pointcloud"]
+provides-extras = ["test", "dev", "doc", "tutorials", "pointcloud", "attn"]
 
 [package.metadata.requires-dev]
 dev = [

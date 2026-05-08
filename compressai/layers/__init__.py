@@ -27,7 +27,10 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .attn import *
 from .basic import *
 from .gdn import *
 from .layers import *
+
+# Window-based attention layers in `.attn` depend on `timm` (optional via the
+# `[attn]` extras). Not re-exported here so that `import compressai` works
+# without `timm` — import them via `from compressai.layers.attn import ...`.

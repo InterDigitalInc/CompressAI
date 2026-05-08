@@ -39,7 +39,6 @@ dependencies = [
   "pytorch-msssim",
   "scipy",
   "setuptools>=68", # For --no-build-isolation.
-  "timm",
   "tomli>=2.2.1",
   "torch-geometric>=2.3.0",
   "torch>=1.13.1",
@@ -81,6 +80,9 @@ tutorials = [
 pointcloud = [
   # "pointops-yoda", # Please install via uv pip install pointops-yoda --no-build-isolation
   "pyntcloud-yoda",
+]
+attn = [
+  "timm",
 ]
 
 # NOTE: Temporarily duplicated from [project.optional-dependencies] until

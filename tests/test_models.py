@@ -280,7 +280,7 @@ class TestModels:
 
 class TestStf:
     def test_wacnn_forward_and_state_dict_round_trip(self):
-        from compressai.models import WACNN
+        from compressai.models.stf import WACNN
 
         model = WACNN(N=64, M=128, num_slices=4, max_support_slices=2).eval()
         x = torch.rand(1, 3, 64, 64)
@@ -296,7 +296,7 @@ class TestStf:
         assert torch.allclose(out["x_hat"], out_loaded["x_hat"])
 
     def test_symmetrical_transformer_forward_and_state_dict_round_trip(self):
-        from compressai.models import SymmetricalTransFormer
+        from compressai.models.stf import SymmetricalTransFormer
 
         model = SymmetricalTransFormer(
             embed_dim=24,
