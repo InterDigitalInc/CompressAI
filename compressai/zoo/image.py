@@ -30,7 +30,6 @@
 from torch.hub import load_state_dict_from_url
 
 from compressai.models import (
-    WACNN,
     Cheng2020Anchor,
     Cheng2020Attention,
     FactorizedPrior,
@@ -38,10 +37,42 @@ from compressai.models import (
     JointAutoregressiveHierarchicalPriors,
     MeanScaleHyperprior,
     ScaleHyperprior,
-    SymmetricalTransFormer,
 )
 
 from .pretrained import load_pretrained
+
+
+class _LazyImport:
+    """Defer ``from <module> import <attr>`` until the attribute is actually used.
+
+    Lets ``model_architectures`` reference classes that live in modules with
+    optional dependencies (e.g. ``compressai.models.stf`` needs ``timm``)
+    without importing them at zoo-import time. Forwards ``__call__`` and
+    attribute access to the resolved class so existing call sites
+    (``model_architectures[arch](...)`` and ``....from_state_dict(...)``)
+    keep working.
+    """
+
+    __slots__ = ("_module", "_name", "_resolved")
+
+    def __init__(self, module: str, name: str):
+        self._module = module
+        self._name = name
+        self._resolved = None
+
+    def _load(self):
+        if self._resolved is None:
+            import importlib
+
+            self._resolved = getattr(importlib.import_module(self._module), self._name)
+        return self._resolved
+
+    def __call__(self, *args, **kwargs):
+        return self._load()(*args, **kwargs)
+
+    def __getattr__(self, item):
+        return getattr(self._load(), item)
+
 
 __all__ = [
     "bmshj2018_factorized",
@@ -63,8 +94,9 @@ model_architectures = {
     "mbt2018": JointAutoregressiveHierarchicalPriors,
     "cheng2020-anchor": Cheng2020Anchor,
     "cheng2020-attn": Cheng2020Attention,
-    "stf": SymmetricalTransFormer,
-    "stf-wacnn": WACNN,
+    # Resolved lazily so `compressai.zoo` is importable without `timm`.
+    "stf": _LazyImport("compressai.models.stf", "SymmetricalTransFormer"),
+    "stf-wacnn": _LazyImport("compressai.models.stf", "WACNN"),
 }
 
 root_url = "https://compressai.s3.amazonaws.com/models/v1"
@@ -470,6 +502,8 @@ def stf(pretrained: bool = False, progress: bool = True, **kwargs):
     del progress
     if pretrained:
         raise RuntimeError("Pre-trained STF weights are not yet hosted on S3.")
+    from compressai.models.stf import SymmetricalTransFormer
+
     return SymmetricalTransFormer(**kwargs)
 
 
@@ -488,4 +522,6 @@ def stf_wacnn(pretrained: bool = False, progress: bool = True, **kwargs):
     del progress
     if pretrained:
         raise RuntimeError("Pre-trained WACNN weights are not yet hosted on S3.")
+    from compressai.models.stf import WACNN
+
     return WACNN(**kwargs)

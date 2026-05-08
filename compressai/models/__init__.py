@@ -31,6 +31,10 @@ from .base import *
 from .google import *
 from .pointcloud import *
 from .sensetime import *
-from .stf import *
 from .vbr import *
 from .waseda import *
+
+# Models in `.stf` (WACNN, SymmetricalTransFormer) depend on `timm`, which is
+# an optional extras dependency (`pip install compressai[attn]`). They are not
+# re-exported here so that `import compressai` works without `timm` installed —
+# import them directly via `from compressai.models.stf import ...`.

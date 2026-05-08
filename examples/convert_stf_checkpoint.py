@@ -29,7 +29,7 @@ from pathlib import Path
 
 import torch
 
-from compressai.models import (
+from compressai.models.stf import (
     WACNN,
     SymmetricalTransFormer,
     convert_upstream_stf_state_dict,
