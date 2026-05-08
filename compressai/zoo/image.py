@@ -30,6 +30,7 @@
 from torch.hub import load_state_dict_from_url
 
 from compressai.models import (
+    WACNN,
     Cheng2020Anchor,
     Cheng2020Attention,
     FactorizedPrior,
@@ -38,7 +39,6 @@ from compressai.models import (
     MeanScaleHyperprior,
     ScaleHyperprior,
     SymmetricalTransFormer,
-    WACNN,
 )
 
 from .pretrained import load_pretrained

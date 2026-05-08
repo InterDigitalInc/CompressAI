@@ -4,15 +4,15 @@ from .inference import (
     infer_swatten_window_size,
 )
 from .swin import (
+    WMSA,
     ConvTransBlock,
     PatchMerging,
     PatchSplit,
     SWAtten,
     SwinBlock,
-    WMSA,
+    WindowAttention,
     WinNoShiftAttention,
     WinResidualUnit,
-    WindowAttention,
     build_window_attention_mask,
     pad_to_window_multiple,
     window_partition,

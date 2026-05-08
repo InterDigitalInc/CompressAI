@@ -93,7 +93,8 @@ class _STFBasicLayer(nn.Module):
         super().__init__()
         drop_path_values = (
             list(drop_path)
-            if isinstance(drop_path, Sequence) and not isinstance(drop_path, (str, bytes))
+            if isinstance(drop_path, Sequence)
+            and not isinstance(drop_path, (str, bytes))
             else [float(drop_path)] * depth
         )
         self.window_size = window_size
@@ -118,7 +119,9 @@ class _STFBasicLayer(nn.Module):
                 for index in range(depth)
             ]
         )
-        self.downsample = downsample(dim=dim, norm_layer=norm_layer) if downsample else None
+        self.downsample = (
+            downsample(dim=dim, norm_layer=norm_layer) if downsample else None
+        )
 
         # Released STF checkpoints carry `attn.relative_position_index` per block
         # (the upstream WindowAttention registers it as a persistent buffer).
@@ -127,9 +130,13 @@ class _STFBasicLayer(nn.Module):
         for block in self.blocks:
             index = block.attn.relative_position_index
             del block.attn._buffers["relative_position_index"]
-            block.attn.register_buffer("relative_position_index", index, persistent=True)
+            block.attn.register_buffer(
+                "relative_position_index", index, persistent=True
+            )
 
-    def forward(self, input_tensor: Tensor, height: int, width: int) -> tuple[Tensor, int, int]:
+    def forward(
+        self, input_tensor: Tensor, height: int, width: int
+    ) -> tuple[Tensor, int, int]:
         batch_size, length, channels = input_tensor.shape
         if length != height * width:
             raise ValueError("input feature has wrong size")
@@ -226,7 +233,7 @@ def convert_upstream_stf_state_dict(state_dict: Dict[str, Tensor]) -> Dict[str, 
     """
     converted: Dict[str, Tensor] = {}
     for key, value in state_dict.items():
-        new_key = key[len("module."):] if key.startswith("module.") else key
+        new_key = key[len("module.") :] if key.startswith("module.") else key
         head = new_key.split(".", 1)[0]
         if head in _UPSTREAM_LATENT_CODEC_PREFIXES:
             new_key = "latent_codec." + new_key
@@ -241,7 +248,9 @@ def _is_upstream_stf_state_dict(state_dict: Dict[str, Tensor]) -> bool:
     for key in state_dict:
         if key.startswith("module."):
             return True
-        if key.startswith("cc_mean_transforms.") or key.startswith("gaussian_conditional."):
+        if key.startswith("cc_mean_transforms.") or key.startswith(
+            "gaussian_conditional."
+        ):
             return True
     return False
 
@@ -278,19 +287,27 @@ class WACNN(SliceEntropyCompressionModel):
             GDN(N),
             conv(N, N, kernel_size=5, stride=2),
             GDN(N),
-            WinNoShiftAttention(dim=N, num_heads=8, window_size=8, shift_size=4, output_proj=False),
+            WinNoShiftAttention(
+                dim=N, num_heads=8, window_size=8, shift_size=4, output_proj=False
+            ),
             conv(N, N, kernel_size=5, stride=2),
             GDN(N),
             conv(N, M, kernel_size=5, stride=2),
-            WinNoShiftAttention(dim=M, num_heads=8, window_size=4, shift_size=2, output_proj=False),
+            WinNoShiftAttention(
+                dim=M, num_heads=8, window_size=4, shift_size=2, output_proj=False
+            ),
         )
         self.g_s = nn.Sequential(
-            WinNoShiftAttention(dim=M, num_heads=8, window_size=4, shift_size=2, output_proj=False),
+            WinNoShiftAttention(
+                dim=M, num_heads=8, window_size=4, shift_size=2, output_proj=False
+            ),
             deconv(M, N, kernel_size=5, stride=2),
             GDN(N, inverse=True),
             deconv(N, N, kernel_size=5, stride=2),
             GDN(N, inverse=True),
-            WinNoShiftAttention(dim=N, num_heads=8, window_size=8, shift_size=4, output_proj=False),
+            WinNoShiftAttention(
+                dim=N, num_heads=8, window_size=8, shift_size=4, output_proj=False
+            ),
             deconv(N, N, kernel_size=5, stride=2),
             GDN(N, inverse=True),
             deconv(N, 3, kernel_size=5, stride=2),
@@ -346,7 +363,9 @@ class WACNN(SliceEntropyCompressionModel):
     def compress(self, x: Tensor) -> Dict[str, object]:
         return self._compress_latent(self.g_a(x))
 
-    def decompress(self, strings: Sequence[Sequence[bytes]], shape: Tuple[int, int]) -> Dict[str, Tensor]:
+    def decompress(
+        self, strings: Sequence[Sequence[bytes]], shape: Tuple[int, int]
+    ) -> Dict[str, Tensor]:
         return {"x_hat": self.g_s(self._decompress_latent(strings, shape)).clamp_(0, 1)}
 
     @classmethod
@@ -436,9 +455,13 @@ class SymmetricalTransFormer(SliceEntropyCompressionModel):
                     qk_scale=qk_scale,
                     drop=drop_rate,
                     attn_drop=attn_drop_rate,
-                    drop_path=dpr[sum(depths[:layer_index]) : sum(depths[: layer_index + 1])],
+                    drop_path=dpr[
+                        sum(depths[:layer_index]) : sum(depths[: layer_index + 1])
+                    ],
                     norm_layer=norm_layer,
-                    downsample=None if layer_index == self.num_layers - 1 else PatchMerging,
+                    downsample=None
+                    if layer_index == self.num_layers - 1
+                    else PatchMerging,
                 )
             )
 
@@ -458,15 +481,21 @@ class SymmetricalTransFormer(SliceEntropyCompressionModel):
                     drop=drop_rate,
                     attn_drop=attn_drop_rate,
                     drop_path=dpr[
-                        sum(reversed_depths[:layer_index]) : sum(reversed_depths[: layer_index + 1])
+                        sum(reversed_depths[:layer_index]) : sum(
+                            reversed_depths[: layer_index + 1]
+                        )
                     ],
                     norm_layer=norm_layer,
-                    downsample=None if layer_index == self.num_layers - 1 else PatchSplit,
+                    downsample=None
+                    if layer_index == self.num_layers - 1
+                    else PatchSplit,
                 )
             )
 
         self.end_conv = nn.Sequential(
-            nn.Conv2d(embed_dim, embed_dim * patch_size**2, kernel_size=5, stride=1, padding=2),
+            nn.Conv2d(
+                embed_dim, embed_dim * patch_size**2, kernel_size=5, stride=1, padding=2
+            ),
             nn.PixelShuffle(patch_size),
             nn.Conv2d(embed_dim, 3, kernel_size=3, stride=1, padding=1),
         )
@@ -478,7 +507,9 @@ class SymmetricalTransFormer(SliceEntropyCompressionModel):
             nn.GELU(),
             conv3x3(latent_channels, latent_channels - embed_dim),
             nn.GELU(),
-            conv3x3(latent_channels - embed_dim, latent_channels - 2 * embed_dim, stride=2),
+            conv3x3(
+                latent_channels - embed_dim, latent_channels - 2 * embed_dim, stride=2
+            ),
             nn.GELU(),
             conv3x3(latent_channels - 2 * embed_dim, latent_channels - 3 * embed_dim),
             nn.GELU(),
@@ -487,7 +518,9 @@ class SymmetricalTransFormer(SliceEntropyCompressionModel):
         self.h_mean_s = nn.Sequential(
             conv3x3(bottleneck_channels, latent_channels - 3 * embed_dim),
             nn.GELU(),
-            subpel_conv3x3(latent_channels - 3 * embed_dim, latent_channels - 2 * embed_dim, 2),
+            subpel_conv3x3(
+                latent_channels - 3 * embed_dim, latent_channels - 2 * embed_dim, 2
+            ),
             nn.GELU(),
             conv3x3(latent_channels - 2 * embed_dim, latent_channels - embed_dim),
             nn.GELU(),
@@ -498,7 +531,9 @@ class SymmetricalTransFormer(SliceEntropyCompressionModel):
         self.h_scale_s = nn.Sequential(
             conv3x3(bottleneck_channels, latent_channels - 3 * embed_dim),
             nn.GELU(),
-            subpel_conv3x3(latent_channels - 3 * embed_dim, latent_channels - 2 * embed_dim, 2),
+            subpel_conv3x3(
+                latent_channels - 3 * embed_dim, latent_channels - 2 * embed_dim, 2
+            ),
             nn.GELU(),
             conv3x3(latent_channels - 2 * embed_dim, latent_channels - embed_dim),
             nn.GELU(),
@@ -520,15 +555,23 @@ class SymmetricalTransFormer(SliceEntropyCompressionModel):
         for layer in self.layers:
             output, height, width = layer(output, height, width)
         channels = self.embed_dim * 2 ** (self.num_layers - 1)
-        output = output.view(-1, height, width, channels).permute(0, 3, 1, 2).contiguous()
+        output = (
+            output.view(-1, height, width, channels).permute(0, 3, 1, 2).contiguous()
+        )
         return output, height, width
 
     def _synthesis_transform(self, y_hat: Tensor, height: int, width: int) -> Tensor:
         channels = self.embed_dim * 2 ** (self.num_layers - 1)
-        output = y_hat.permute(0, 2, 3, 1).contiguous().view(-1, height * width, channels)
+        output = (
+            y_hat.permute(0, 2, 3, 1).contiguous().view(-1, height * width, channels)
+        )
         for layer in self.syn_layers:
             output, height, width = layer(output, height, width)
-        output = output.view(-1, height, width, self.embed_dim).permute(0, 3, 1, 2).contiguous()
+        output = (
+            output.view(-1, height, width, self.embed_dim)
+            .permute(0, 3, 1, 2)
+            .contiguous()
+        )
         return self.end_conv(output)
 
     def forward(self, x: Tensor) -> Dict[str, Dict[str, Tensor] | Tensor]:
@@ -543,7 +586,9 @@ class SymmetricalTransFormer(SliceEntropyCompressionModel):
         y, _, _ = self._analysis_transform(x)
         return self._compress_latent(y)
 
-    def decompress(self, strings: Sequence[Sequence[bytes]], shape: Tuple[int, int]) -> Dict[str, Tensor]:
+    def decompress(
+        self, strings: Sequence[Sequence[bytes]], shape: Tuple[int, int]
+    ) -> Dict[str, Tensor]:
         y_hat = self._decompress_latent(strings, shape)
         height, width = y_hat.shape[2:]
         return {"x_hat": self._synthesis_transform(y_hat, height, width).clamp_(0, 1)}
@@ -572,14 +617,20 @@ class SymmetricalTransFormer(SliceEntropyCompressionModel):
             for layer_index in layer_indices
         ]
         num_heads = [
-            state_dict[f"layers.{layer_index}.blocks.0.attn.relative_position_bias_table"].size(1)
+            state_dict[
+                f"layers.{layer_index}.blocks.0.attn.relative_position_bias_table"
+            ].size(1)
             for layer_index in layer_indices
         ]
-        table_size = state_dict["layers.0.blocks.0.attn.relative_position_bias_table"].size(0)
+        table_size = state_dict[
+            "layers.0.blocks.0.attn.relative_position_bias_table"
+        ].size(0)
         window_size = (math.isqrt(table_size) + 1) // 2
         num_slices = infer_num_slices(state_dict) or 12
         latent_channels = embed_dim * 2 ** (len(depths) - 1)
-        max_support_slices = infer_max_support_slices(state_dict, latent_channels, num_slices)
+        max_support_slices = infer_max_support_slices(
+            state_dict, latent_channels, num_slices
+        )
 
         net = cls(
             patch_size=patch_size,
