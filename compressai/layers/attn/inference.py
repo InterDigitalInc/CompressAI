@@ -4,6 +4,7 @@ Used by MambaIC / MambaVC ``from_state_dict`` to recover ``window_size``,
 ``head_dim`` and ``inter_dim`` (a.k.a. ``support_attention_dim``) from a
 checkpoint. Each model used to ship a private ``_infer_*`` copy of these.
 """
+
 from __future__ import annotations
 
 import math

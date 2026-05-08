@@ -5,6 +5,7 @@ class is discoverable by name. Channel-counting helpers and a parameterised
 entropy-transform factory live here too — they used to be duplicated across
 ``stf_support`` / ``ssm_support`` / ``weconvene_support``.
 """
+
 from __future__ import annotations
 
 from typing import Dict, Optional, Sequence, Tuple
@@ -112,7 +113,9 @@ def infer_max_support_slices(
     if not matching:
         return 0
     max_input_channels = max(matching)
-    return max(0, (max_input_channels - extra_factor * latent_channels) // slice_channels)
+    return max(
+        0, (max_input_channels - extra_factor * latent_channels) // slice_channels
+    )
 
 
 class SliceEntropyCompressionModel(CompressionModel):
@@ -212,7 +215,9 @@ class SliceEntropyCompressionModel(CompressionModel):
         latent_scales = self.h_scale_s(z_hat)
         return z, z_likelihoods, latent_means, latent_scales
 
-    def _forward_latent_output(self, y: Tensor) -> Dict[str, Dict[str, Tensor] | Tensor]:
+    def _forward_latent_output(
+        self, y: Tensor
+    ) -> Dict[str, Dict[str, Tensor] | Tensor]:
         _, z_likelihoods, latent_means, latent_scales = self._hyper_priors(y)
         y_out = self.latent_codec(y, latent_means, latent_scales)
         output: Dict[str, Dict[str, Tensor] | Tensor] = {

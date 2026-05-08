@@ -20,19 +20,20 @@ Example::
         --arch wacnn \\
         --smoke
 """
+
 from __future__ import annotations
 
 import argparse
+
 from pathlib import Path
 
 import torch
 
 from compressai.models import (
-    SymmetricalTransFormer,
     WACNN,
+    SymmetricalTransFormer,
     convert_upstream_stf_state_dict,
 )
-
 
 _ARCHES = {"stf": SymmetricalTransFormer, "wacnn": WACNN}
 
@@ -43,9 +44,7 @@ def _detect_arch(state_dict: dict) -> str:
         return "stf"
     if any(k.endswith("g_a.0.weight") for k in keys):
         return "wacnn"
-    raise SystemExit(
-        "could not auto-detect arch; pass --arch {stf,wacnn} explicitly"
-    )
+    raise SystemExit("could not auto-detect arch; pass --arch {stf,wacnn} explicitly")
 
 
 def parse_args() -> argparse.Namespace:
@@ -85,7 +84,9 @@ def main() -> None:
         raise SystemExit(f"checkpoint not found: {args.src}")
 
     upstream = torch.load(args.src, map_location="cpu", weights_only=False)
-    upstream = upstream.get("state_dict", upstream) if isinstance(upstream, dict) else upstream
+    upstream = (
+        upstream.get("state_dict", upstream) if isinstance(upstream, dict) else upstream
+    )
     converted = convert_upstream_stf_state_dict(upstream)
     print(f"loaded {len(upstream)} upstream keys → {len(converted)} compressai keys")
 
@@ -107,21 +108,23 @@ def main() -> None:
             torch.linspace(0, 1, width),
             indexing="ij",
         )
-        img = torch.stack(
-            [
-                0.5 + 0.3 * torch.sin(8 * xs),
-                0.5 + 0.3 * torch.sin(8 * ys),
-                0.5 + 0.3 * torch.cos(8 * (xs + ys)),
-            ],
-            dim=0,
-        ).unsqueeze(0).clamp(0, 1)
+        img = (
+            torch.stack(
+                [
+                    0.5 + 0.3 * torch.sin(8 * xs),
+                    0.5 + 0.3 * torch.sin(8 * ys),
+                    0.5 + 0.3 * torch.cos(8 * (xs + ys)),
+                ],
+                dim=0,
+            )
+            .unsqueeze(0)
+            .clamp(0, 1)
+        )
 
         with torch.no_grad():
             out = net(img)
         n_pix = height * width
-        psnr = -10 * torch.log10(
-            ((out["x_hat"].clamp(0, 1) - img) ** 2).mean()
-        ).item()
+        psnr = -10 * torch.log10(((out["x_hat"].clamp(0, 1) - img) ** 2).mean()).item()
         y_bpp = -torch.log2(out["likelihoods"]["y"]).sum().item() / n_pix
         z_bpp = -torch.log2(out["likelihoods"]["z"]).sum().item() / n_pix
         print(

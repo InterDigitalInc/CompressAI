@@ -9,7 +9,11 @@ import torch.nn.functional as F
 from timm.layers import DropPath, Mlp
 from timm.models.swin_transformer import (
     WindowAttention as _TimmWindowAttention,
+)
+from timm.models.swin_transformer import (
     window_partition as _timm_window_partition,
+)
+from timm.models.swin_transformer import (
     window_reverse as _timm_window_reverse,
 )
 from torch import Tensor

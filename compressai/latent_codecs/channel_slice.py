@@ -108,9 +108,15 @@ class ChannelSliceLatentCodec(LatentCodec):
             raise ValueError("cc_scale_transforms must have num_slices entries")
         if lrp_transforms is not None and len(lrp_transforms) != num_slices:
             raise ValueError("lrp_transforms must have num_slices entries")
-        if mean_support_transforms is not None and len(mean_support_transforms) != num_slices:
+        if (
+            mean_support_transforms is not None
+            and len(mean_support_transforms) != num_slices
+        ):
             raise ValueError("mean_support_transforms must have num_slices entries")
-        if scale_support_transforms is not None and len(scale_support_transforms) != num_slices:
+        if (
+            scale_support_transforms is not None
+            and len(scale_support_transforms) != num_slices
+        ):
             raise ValueError("scale_support_transforms must have num_slices entries")
         if quantizer not in ("ste", "noise"):
             raise ValueError(f"unknown quantizer {quantizer!r}")
@@ -178,9 +184,7 @@ class ChannelSliceLatentCodec(LatentCodec):
             mu, scale, mean_support = self._slice_params(
                 slice_index, latent_means, latent_scales, y_hat_slices, spatial_shape
             )
-            _, y_slice_likelihoods = self.gaussian_conditional(
-                y_slice, scale, means=mu
-            )
+            _, y_slice_likelihoods = self.gaussian_conditional(y_slice, scale, means=mu)
             if self.quantizer == "ste":
                 y_hat_slice = quantize_ste(y_slice - mu) + mu
             else:
@@ -223,7 +227,9 @@ class ChannelSliceLatentCodec(LatentCodec):
             y_hat_slice = self._apply_lrp(slice_index, mean_support, y_hat_slice)
             y_hat_slices.append(y_hat_slice)
 
-        encoder.encode_with_indexes(symbols_list, indexes_list, cdf, cdf_lengths, offsets)
+        encoder.encode_with_indexes(
+            symbols_list, indexes_list, cdf, cdf_lengths, offsets
+        )
         return {
             "strings": [encoder.flush()],
             "shape": spatial_shape,
@@ -253,9 +259,9 @@ class ChannelSliceLatentCodec(LatentCodec):
             values = decoder.decode_stream(
                 indexes.reshape(-1).tolist(), cdf, cdf_lengths, offsets
             )
-            y_q_slice = torch.tensor(
-                values, device=mu.device, dtype=mu.dtype
-            ).reshape(mu.shape)
+            y_q_slice = torch.tensor(values, device=mu.device, dtype=mu.dtype).reshape(
+                mu.shape
+            )
             y_hat_slice = self.gaussian_conditional.dequantize(y_q_slice, mu)
             y_hat_slice = self._apply_lrp(slice_index, mean_support, y_hat_slice)
             y_hat_slices.append(y_hat_slice)
