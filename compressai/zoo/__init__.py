@@ -31,12 +31,14 @@ from .image import (
     bmshj2018_factorized,
     bmshj2018_factorized_relu,
     bmshj2018_hyperprior,
+    cca,
     cheng2020_anchor,
     cheng2020_attn,
     mbt2018,
     mbt2018_mean,
     stf,
     stf_wacnn,
+    tcm,
 )
 from .image_vbr import bmshj2018_hyperprior_vbr, mbt2018_mean_vbr, mbt2018_vbr
 from .pretrained import load_pretrained as load_state_dict
@@ -52,6 +54,8 @@ image_models = {
     "cheng2020-attn": cheng2020_attn,
     "stf": stf,
     "stf-wacnn": stf_wacnn,
+    "tcm": tcm,
+    "cca": cca,
     "bmshj2018-hyperprior-vbr": bmshj2018_hyperprior_vbr,
     "mbt2018-mean-vbr": mbt2018_mean_vbr,
     "mbt2018-vbr": mbt2018_vbr,
