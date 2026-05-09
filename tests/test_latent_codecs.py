@@ -27,6 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import pytest
 import torch
 import torch.nn as nn
 
@@ -243,6 +244,75 @@ class TestChannelGroupsLatentCodecExtensions:
         assert out["y_hat"].shape == (2, 16, 8, 8)
 
 
+class TestChannelGroupsSideInContext:
+    """Phase 3 ``side_in_context`` mode used by Family 1 codecs."""
+
+    def _make_family1_codec(
+        self,
+        groups=(4, 4, 4),
+        side_ch=8,
+        max_support_slices=-1,
+    ):
+        K = len(groups)
+
+        # channel_context for k=0: input is just side_params (= side_ch).
+        # channel_context for k>=1: input is cat(side_params, *prev_y_hat).
+        # Use 1x1 convs that map to 2 * groups[k] (the leaf chunks into scales/means).
+        def _ctx_in(k):
+            count = k if max_support_slices < 0 else min(k, max_support_slices)
+            return side_ch + sum(groups[:count])
+
+        channel_context = {
+            f"y{k}": nn.Conv2d(_ctx_in(k), 2 * groups[k], 1) for k in range(K)
+        }
+        # Leaves see only the channel_context output (no re-cat with side_params)
+        # in side_in_context mode -> entropy_parameters can be Identity since
+        # channel_context already shaped the tensor to 2 * slice_ch.
+        latent_codec = {f"y{k}": GaussianConditionalLatentCodec() for k in range(K)}
+        return ChannelGroupsLatentCodec(
+            latent_codec=latent_codec,
+            channel_context=channel_context,
+            groups=list(groups),
+            max_support_slices=max_support_slices,
+            side_in_context=True,
+        )
+
+    def test_constructor_requires_y0_entry(self):
+        # side_in_context=True but missing y0 channel_context -> ValueError.
+        with pytest.raises(ValueError, match="y0"):
+            ChannelGroupsLatentCodec(
+                latent_codec={"y0": GaussianConditionalLatentCodec()},
+                channel_context={},  # missing y0
+                groups=[4],
+                side_in_context=True,
+            )
+
+    def test_forward_routes_through_y0_channel_context(self):
+        torch.manual_seed(11)
+        codec = self._make_family1_codec(groups=(4, 4))
+        y = torch.randn(2, 8, 8, 8)
+        side_params = torch.randn(2, 8, 8, 8)
+        out = codec(y, side_params)
+        assert out["y_hat"].shape == (2, 8, 8, 8)
+        assert out["likelihoods"]["y"].shape == (2, 8, 8, 8)
+
+    def test_get_ctx_params_for_k_zero_calls_y0(self):
+        codec = self._make_family1_codec(groups=(4, 4))
+        side_params = torch.zeros(1, 8, 4, 4)
+        ctx = codec._get_ctx_params(0, side_params, [])
+        # Output shape == channel_context.y0(side_params) -> (1, 2 * groups[0], 4, 4).
+        assert ctx.shape == (1, 8, 4, 4)
+
+    def test_get_ctx_params_for_k_positive_concats_side(self):
+        codec = self._make_family1_codec(groups=(4, 4))
+        side_params = torch.zeros(1, 8, 4, 4)
+        prev_y_hat = [torch.zeros(1, 4, 4, 4)]
+        ctx = codec._get_ctx_params(1, side_params, prev_y_hat)
+        # Channel_context.y1 input width = side_ch + groups[0] = 8 + 4 = 12;
+        # output = 2 * groups[1] = 8.
+        assert ctx.shape == (1, 8, 4, 4)
+
+
 class TestSliceHelpers:
     def test_slice_support_channels_default_use_all(self):
         # With max_support_slices = -1 the helper returns the full latent + k slices.
@@ -272,13 +342,22 @@ class TestSliceHelpers:
         assert y.shape == (2, 8, 8, 8)
 
     def test_infer_num_slices_new_path(self):
-        # New state-dict layout: channel_context entries exist for k >= 1.
-        # For 4 slices total, we expect 3 mean_cc keys -> infer returns 4.
+        # New state-dict layout (ELIC default): channel_context entries exist
+        # for k >= 1. For 4 slices total, we expect 3 mean_cc keys -> infer
+        # returns 4 (helper adds 1 because y0 is missing).
         sd = {
-            f"latent_codec.latent_codec.y.channel_context.y{k}.mean_cc.0.weight": (
-                torch.zeros(8, 4)
-            )
+            f"latent_codec.y.channel_context.y{k}.mean_cc.0.weight": (torch.zeros(8, 4))
             for k in range(1, 4)
+        }
+        assert infer_num_slices(sd) == 4
+
+    def test_infer_num_slices_side_in_context(self):
+        # Family 1 side_in_context=True layout: channel_context covers every
+        # slice (y0..yK-1). Helper auto-detects via the presence of y0 and
+        # does NOT add 1.
+        sd = {
+            f"latent_codec.y.channel_context.y{k}.mean_cc.0.weight": (torch.zeros(8, 4))
+            for k in range(0, 4)
         }
         assert infer_num_slices(sd) == 4
 
@@ -289,10 +368,10 @@ class TestSliceHelpers:
         # mean_cc.0 takes (latent_means + slice_channels * support) input channels.
         # With M=64, num_slices=8, slice_channels=8, support=2 -> input ch = 64 + 16 = 80.
         sd = {
-            "latent_codec.latent_codec.y.channel_context.y2.mean_cc.0.weight": (
+            "latent_codec.y.channel_context.y2.mean_cc.0.weight": (
                 torch.zeros(64, 80, 3, 3)
             ),
-            "latent_codec.latent_codec.y.channel_context.y3.mean_cc.0.weight": (
+            "latent_codec.y.channel_context.y3.mean_cc.0.weight": (
                 torch.zeros(64, 80, 3, 3)
             ),
         }

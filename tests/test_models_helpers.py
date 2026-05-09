@@ -27,6 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import pytest
 import torch
 import torch.nn as nn
 
@@ -84,6 +85,38 @@ class TestMeanScaleContextHead:
         x = torch.randn(2, 12, 4, 4)
         with torch.no_grad():
             assert torch.allclose(head(x), rebuilt(x))
+
+    def test_side_split_routes_means_to_mean_cc_and_scales_to_scale_cc(self):
+        # side_split=8 means input is cat(latent_means(8), latent_scales(8), prev_y_hat(4));
+        # mean_cc should see cat(latent_means(8), prev_y_hat(4)) = 12 channels;
+        # scale_cc same width but reading latent_scales instead of latent_means.
+        torch.manual_seed(0)
+        head = build_mean_scale_head(
+            slice_ch=4, support_ch=20, widths=(8,), side_split=8
+        )
+        # Sub-network input width = support_ch - side_split = 12.
+        first_mean_conv = next(m for m in head.mean_cc if isinstance(m, nn.Conv2d))
+        first_scale_conv = next(m for m in head.scale_cc if isinstance(m, nn.Conv2d))
+        assert first_mean_conv.in_channels == 12
+        assert first_scale_conv.in_channels == 12
+
+        latent_means = torch.randn(2, 8, 4, 4)
+        latent_scales = torch.randn(2, 8, 4, 4)
+        prev_y_hat = torch.randn(2, 4, 4, 4)
+        x = torch.cat([latent_means, latent_scales, prev_y_hat], dim=1)
+        with torch.no_grad():
+            head_out = head(x)
+        assert head_out.shape == (2, 8, 4, 4)
+        # Verify routing: mean_cc(cat(latent_means, prev_y_hat)) appears as
+        # the second half of head_out (chunks=("scales","means")).
+        with torch.no_grad():
+            expected_mean = head.mean_cc(torch.cat([latent_means, prev_y_hat], dim=1))
+            expected_scale = head.scale_cc(
+                torch.cat([latent_scales, prev_y_hat], dim=1)
+            )
+            scale_out, mean_out = head_out.chunk(2, dim=1)
+        assert torch.allclose(scale_out, expected_scale)
+        assert torch.allclose(mean_out, expected_mean)
 
 
 class TestBuildChannelSliceCodec:
@@ -176,3 +209,58 @@ class TestBuildChannelSliceCodec:
             support_filter=skip_recent,
         )
         assert codec.support_filter is skip_recent
+
+    def test_side_in_context_builds_y0_entry(self):
+        # In side_in_context mode the leaf gets only channel_context output
+        # (already shaped 2*slice_ch); each leaf can use Identity entropy_parameters.
+        codec = build_channel_slice_codec(
+            groups=[4, 4, 4],
+            side_channels=8,
+            side_in_context=True,
+            leaf_factory=lambda k, ch: GaussianConditionalLatentCodec(),
+            channel_context_factory=lambda k, ch, sup: build_mean_scale_head(
+                slice_ch=ch, support_ch=sup, side_split=4, widths=(8,)
+            ),
+        )
+        ctx_keys = set(codec.channel_context.keys())
+        assert ctx_keys == {"y0", "y1", "y2"}
+        assert codec.side_in_context is True
+
+        # y0 head input width = side_channels = 8.
+        head_y0 = codec.channel_context["y0"]
+        first_conv_y0 = next(m for m in head_y0.mean_cc if isinstance(m, nn.Conv2d))
+        # mean_cc input = support_ch - side_split = 8 - 4 = 4.
+        assert first_conv_y0.in_channels == 4
+
+        # y2 head input width = side_channels + groups[0] + groups[1] = 8 + 8 = 16;
+        # mean_cc input = 16 - 4 = 12.
+        head_y2 = codec.channel_context["y2"]
+        first_conv_y2 = next(m for m in head_y2.mean_cc if isinstance(m, nn.Conv2d))
+        assert first_conv_y2.in_channels == 12
+
+    def test_side_in_context_requires_side_channels(self):
+        with pytest.raises(ValueError, match="side_channels"):
+            build_channel_slice_codec(
+                groups=[4, 4],
+                side_in_context=True,
+                leaf_factory=lambda k, ch: GaussianConditionalLatentCodec(),
+            )
+
+    def test_side_in_context_forward_runs_end_to_end(self):
+        torch.manual_seed(0)
+        codec = build_channel_slice_codec(
+            groups=[4, 4],
+            side_channels=8,
+            side_in_context=True,
+            leaf_factory=lambda k, ch: GaussianConditionalLatentCodec(),
+            channel_context_factory=lambda k, ch, sup: build_mean_scale_head(
+                slice_ch=ch, support_ch=sup, side_split=4, widths=(8,)
+            ),
+        )
+        codec.eval()
+        y = torch.randn(2, 8, 8, 8)
+        side_params = torch.randn(2, 8, 8, 8)
+        with torch.no_grad():
+            out = codec(y, side_params)
+        assert out["y_hat"].shape == (2, 8, 8, 8)
+        assert out["likelihoods"]["y"].shape == (2, 8, 8, 8)
