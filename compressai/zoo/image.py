@@ -84,6 +84,8 @@ __all__ = [
     "cheng2020_attn",
     "stf",
     "stf_wacnn",
+    "tcm",
+    "cca",
 ]
 
 model_architectures = {
@@ -97,6 +99,8 @@ model_architectures = {
     # Resolved lazily so `compressai.zoo` is importable without `timm`.
     "stf": _LazyImport("compressai.models.stf", "SymmetricalTransFormer"),
     "stf-wacnn": _LazyImport("compressai.models.stf", "WACNN"),
+    "tcm": _LazyImport("compressai.models.tcm", "TCM"),
+    "cca": _LazyImport("compressai.models.cca", "CCAModel"),
 }
 
 root_url = "https://compressai.s3.amazonaws.com/models/v1"
@@ -525,3 +529,43 @@ def stf_wacnn(pretrained: bool = False, progress: bool = True, **kwargs):
     from compressai.models.stf import WACNN
 
     return WACNN(**kwargs)
+
+
+def tcm(pretrained: bool = False, progress: bool = True, **kwargs):
+    r"""TCM (Transformer-CNN Mixture) model from J. Liu, H. Sun, J. Katto:
+    `"Learned Image Compression with Mixed Transformer-CNN Architectures"
+    <https://arxiv.org/abs/2303.14978>`_, IEEE/CVF Conf. on Computer Vision
+    and Pattern Recognition (CVPR), 2023.
+
+    Args:
+        pretrained (bool): If True, returns a pre-trained model. Currently
+            unavailable; raises ``RuntimeError``.
+        progress (bool): If True, displays a progress bar of the download to
+            stderr.
+    """
+    del progress
+    if pretrained:
+        raise RuntimeError("Pre-trained TCM weights are not yet hosted on S3.")
+    from compressai.models.tcm import TCM
+
+    return TCM(**kwargs)
+
+
+def cca(pretrained: bool = False, progress: bool = True, **kwargs):
+    r"""CCA (Causal Context Adjustment) model from M. Han, S. Jiang, S. Li,
+    X. Deng, M. Xu, C. Zhu, S. Liu: `"Causal Context Adjustment Loss for
+    Learned Image Compression" <https://arxiv.org/abs/2410.04847>`_, NeurIPS
+    2024.
+
+    Args:
+        pretrained (bool): If True, returns a pre-trained model. Currently
+            unavailable; raises ``RuntimeError``.
+        progress (bool): If True, displays a progress bar of the download to
+            stderr.
+    """
+    del progress
+    if pretrained:
+        raise RuntimeError("Pre-trained CCA weights are not yet hosted on S3.")
+    from compressai.models.cca import CCAModel
+
+    return CCAModel(**kwargs)
