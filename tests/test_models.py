@@ -393,6 +393,158 @@ class TestStf:
         assert "lrp_transforms.0.0.weight" not in converted
 
 
+class TestTcm:
+    def test_tcm_forward_and_state_dict_round_trip(self):
+        from compressai.models.tcm import TCM
+
+        model = TCM(
+            N=32,
+            M=64,
+            hyper_channels=48,
+            num_slices=4,
+            max_support_slices=2,
+        ).eval()
+        x = torch.rand(1, 3, 64, 64)
+        with torch.no_grad():
+            out = model(x)
+        assert out["x_hat"].shape == x.shape
+        assert "y" in out["likelihoods"]
+        assert "z" in out["likelihoods"]
+
+        # Phase 4 containerised state-dict layout self-check.
+        sd_keys = set(model.state_dict().keys())
+        # Hyperprior backbone moved under latent_codec.* (TCM's h_a / h_*_s
+        # use ResidualBlockWithStride / ResidualBlockUpsample, so the first
+        # learnable weight is conv1 / conv).
+        assert "latent_codec.h_a.0.conv1.weight" in sd_keys
+        assert "latent_codec.h_s.h_mean_s.0.conv.weight" in sd_keys
+        assert "latent_codec.h_s.h_scale_s.0.conv.weight" in sd_keys
+        assert "latent_codec.z.entropy_bottleneck.quantiles" in sd_keys
+        # side_in_context=True -> channel_context covers y0..y(K-1).
+        assert "latent_codec.y.channel_context.y0.mean_cc.0.weight" in sd_keys
+        assert "latent_codec.y.channel_context.y1.mean_cc.0.weight" in sd_keys
+        assert "latent_codec.y.channel_context.y0.scale_cc.0.weight" in sd_keys
+        # SWAtten support transforms (TCM-specific; absent on STF/WACNN).
+        assert (
+            "latent_codec.y.channel_context.y0.mean_support_transform.in_conv.weight"
+            in sd_keys
+        )
+        assert (
+            "latent_codec.y.channel_context.y0.scale_support_transform.in_conv.weight"
+            in sd_keys
+        )
+        # Per-slice leaves (LRP + per-slice GaussianConditional copy).
+        assert "latent_codec.y.latent_codec.y0.lrp_transform.0.weight" in sd_keys
+        assert (
+            "latent_codec.y.latent_codec.y0.gaussian_conditional.scale_table" in sd_keys
+        )
+        # Old monolithic / pr-stf-wacnn paths should be gone.
+        assert not any(
+            k.startswith("latent_codec.cc_mean_transforms.") for k in sd_keys
+        )
+        assert not any(k.startswith("latent_codec.atten_mean.") for k in sd_keys)
+        assert "h_a.0.conv1.weight" not in sd_keys  # moved under latent_codec.
+
+        loaded = TCM.from_state_dict(model.state_dict()).eval()
+        with torch.no_grad():
+            out_loaded = loaded(x)
+        assert torch.allclose(out["x_hat"], out_loaded["x_hat"])
+        assert loaded.N == 32
+        assert loaded.M == 64
+        assert loaded.hyper_channels == 48
+        assert loaded.num_slices == 4
+        assert loaded.max_support_slices == 2
+
+    def test_tcm_upstream_state_dict_conversion(self):
+        from compressai.models.tcm import convert_upstream_tcm_state_dict
+
+        # Synthetic upstream LIC_TCM-style state_dict: DataParallel ``module.``
+        # prefix, raw entropy heads at the root, the SWAtten ``nn.Sequential``
+        # wrapper level (``atten_mean.{k}.0.``), and a ConvTransBlock attention
+        # buffer in upstream layout (``.msa.relative_position_params``).
+        upstream = {
+            "module.g_a.0.conv1.weight": torch.zeros(2),
+            "module.g_a.1.trans_block.msa.relative_position_params": torch.zeros(
+                4, 15, 15
+            ),
+            "module.g_a.1.trans_block.msa.embedding_layer.weight": torch.zeros(2),
+            "module.g_a.1.trans_block.ln1.weight": torch.zeros(2),
+            "module.g_a.1.trans_block.mlp.0.weight": torch.zeros(2),
+            "module.g_a.1.trans_block.mlp.2.weight": torch.zeros(2),
+            "module.cc_mean_transforms.0.0.weight": torch.zeros(2),
+            "module.cc_mean_transforms.1.0.weight": torch.zeros(2),
+            "module.cc_scale_transforms.0.0.weight": torch.zeros(2),
+            "module.atten_mean.0.0.in_conv.weight": torch.zeros(2),
+            "module.atten_scale.0.0.in_conv.weight": torch.zeros(2),
+            "module.lrp_transforms.0.0.weight": torch.zeros(2),
+            "module.gaussian_conditional.scale_table": torch.zeros(2),
+            "module.h_a.0.conv1.weight": torch.zeros(2),
+            "module.h_mean_s.0.conv.weight": torch.zeros(2),
+            "module.h_scale_s.0.conv.weight": torch.zeros(2),
+            "module.entropy_bottleneck.quantiles": torch.zeros(2),
+        }
+        converted = convert_upstream_tcm_state_dict(upstream)
+
+        # ``module.`` prefix gone; g_a / ConvTransBlock pass through with the
+        # MSA / layer-name renames applied.
+        assert "g_a.0.conv1.weight" in converted
+        # ``relative_position_params`` -> ``relative_position_bias_table``
+        # with shape permuted from (2*win-1, 2*win-1, num_heads) =
+        # (15, 15, 4) into the flat (225, 4) layout.
+        assert "g_a.1.trans_block.msa.attn.relative_position_bias_table" in converted
+        assert converted[
+            "g_a.1.trans_block.msa.attn.relative_position_bias_table"
+        ].shape == (15 * 15, 4)
+        # ``embedding_layer`` -> ``attn.qkv``.
+        assert "g_a.1.trans_block.msa.attn.qkv.weight" in converted
+        # ``ln1`` -> ``norm1``; ``mlp.0`` / ``mlp.2`` -> ``mlp.fc1`` / ``fc2``.
+        assert "g_a.1.trans_block.norm1.weight" in converted
+        assert "g_a.1.trans_block.mlp.fc1.weight" in converted
+        assert "g_a.1.trans_block.mlp.fc2.weight" in converted
+
+        # Hyperprior backbone moves under latent_codec.
+        assert "latent_codec.h_a.0.conv1.weight" in converted
+        assert "latent_codec.h_s.h_mean_s.0.conv.weight" in converted
+        assert "latent_codec.h_s.h_scale_s.0.conv.weight" in converted
+        assert "latent_codec.z.entropy_bottleneck.quantiles" in converted
+
+        # cc_mean / cc_scale re-rooted per slice.
+        assert "latent_codec.y.channel_context.y0.mean_cc.0.weight" in converted
+        assert "latent_codec.y.channel_context.y1.mean_cc.0.weight" in converted
+        assert "latent_codec.y.channel_context.y0.scale_cc.0.weight" in converted
+
+        # SWAtten wrapper unwrapped: ``atten_mean.0.0.<...>`` ->
+        # ``...mean_support_transform.<...>`` (no extra ``.0`` level).
+        assert (
+            "latent_codec.y.channel_context.y0.mean_support_transform.in_conv.weight"
+            in converted
+        )
+        assert (
+            "latent_codec.y.channel_context.y0.scale_support_transform.in_conv.weight"
+            in converted
+        )
+
+        # gaussian_conditional replicated per slice (driven by mean_cc count).
+        assert (
+            "latent_codec.y.latent_codec.y0.gaussian_conditional.scale_table"
+            in converted
+        )
+        assert (
+            "latent_codec.y.latent_codec.y1.gaussian_conditional.scale_table"
+            in converted
+        )
+
+        # LRP weights retained byte-for-byte (emit_mean_support=True path).
+        assert "latent_codec.y.latent_codec.y0.lrp_transform.0.weight" in converted
+
+        # Old root-level paths should be gone after conversion.
+        assert "h_a.0.conv1.weight" not in converted
+        assert "cc_mean_transforms.0.0.weight" not in converted
+        assert "atten_mean.0.0.in_conv.weight" not in converted
+        assert "lrp_transforms.0.0.weight" not in converted
+        assert "module.g_a.0.conv1.weight" not in converted
+
+
 def test_scale_table_default():
     table = get_scale_table()
     assert SCALES_MIN == 0.11
