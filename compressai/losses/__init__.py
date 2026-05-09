@@ -28,10 +28,12 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from . import pointcloud
+from .cca import CCARateDistortionLoss
 from .pointcloud import *
 from .rate_distortion import RateDistortionLoss
 
 __all__ = [
     *pointcloud.__all__,
+    "CCARateDistortionLoss",
     "RateDistortionLoss",
 ]

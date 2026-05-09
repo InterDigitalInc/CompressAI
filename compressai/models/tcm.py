@@ -233,7 +233,7 @@ def convert_upstream_tcm_state_dict(
     - leaves ``g_a`` / ``g_s`` keys (other than the MSA renames inside their
       ConvTransBlocks) untouched.
 
-    The Phase 3 wiring sets ``emit_mean_support=True`` on the
+    The wiring sets ``emit_mean_support=True`` on the
     :class:`MeanScaleContextHead`, so the upstream LRP layout
     (``cat(latent_means, *prev_y_hat, y_hat)``) is recoverable inside the
     leaf — upstream ``lrp_transforms.{k}`` weights therefore transfer

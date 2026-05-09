@@ -245,7 +245,7 @@ class TestChannelGroupsLatentCodecExtensions:
 
 
 class TestChannelGroupsSideInContext:
-    """Phase 3 ``side_in_context`` mode used by Family 1 codecs."""
+    """``side_in_context`` mode used by Family 1 codecs."""
 
     def _make_family1_codec(
         self,

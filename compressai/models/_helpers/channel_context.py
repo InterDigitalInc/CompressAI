@@ -39,7 +39,7 @@ CCA — and concatenates their outputs to form the
 
 from __future__ import annotations
 
-from typing import Callable, Optional, Sequence
+from typing import Callable, Literal, Optional, Sequence, Union
 
 import torch
 import torch.nn as nn
@@ -89,15 +89,27 @@ class MeanScaleContextHead(nn.Module):
     When ``side_split == 0`` (default) the head is generic: ``mean_cc`` and
     ``scale_cc`` both see the full input, no internal split.
 
-    When ``emit_mean_support=True`` (only meaningful with ``side_split > 0``)
-    the head appends the ``mean_in = cat(latent_means, *prev_y_hat)`` tensor
-    to the output, producing
-    ``cat(scale, mean, mean_in)`` of shape
-    ``(B, 2*slice_ch + side_split + sum(prev_groups), H, W)``. This trailing
-    block is consumed by :class:`LRPGaussianLatentCodec` (with matching
-    ``mean_support_trail_channels``) to recover the upstream STF / WACNN
-    LRP input layout (``cat(latent_means, *prev_y_hat, y_hat)``), enabling
-    byte-for-byte transfer of upstream LRP weights.
+    When ``emit_mean_support`` is truthy (only meaningful with
+    ``side_split > 0``) the head appends a copy of the mean-path tensor to
+    the output, producing
+    ``cat(scale, mean, mean_support)`` of shape
+    ``(B, 2*slice_ch + side_split + sum(prev_groups), H, W)``. Two flavours:
+
+    - ``"pre"`` (legacy ``True``) — emit the raw ``mean_in =
+      cat(latent_means, *prev_y_hat)`` (i.e., before
+      ``mean_support_transform``). STF / WACNN / TCM use this because their
+      ``mean_support_transform`` is :class:`Identity` (or the upstream LRP
+      input is the un-transformed mean_in).
+    - ``"post"`` — emit ``mean_support_transform(mean_in)`` (the same tensor
+      that feeds ``mean_cc``). CCA-main / CCA-aux use this because their
+      upstream ``lrp_transforms`` consume the *post*-NAFTransform mean
+      support; emitting "pre" would produce wrong LRP outputs even though
+      the channel widths match.
+
+    The trailing block is consumed by :class:`LRPGaussianLatentCodec` (with
+    matching ``mean_support_trail_channels``) to recover the upstream LRP
+    input layout (``cat(mean_support, y_hat)``), enabling byte-for-byte
+    transfer of upstream LRP weights.
     """
 
     mean_cc: nn.Module
@@ -113,7 +125,7 @@ class MeanScaleContextHead(nn.Module):
         scale_support_transform: Optional[nn.Module] = None,
         *,
         side_split: int = 0,
-        emit_mean_support: bool = False,
+        emit_mean_support: Union[bool, Literal["pre", "post"]] = False,
     ) -> None:
         super().__init__()
         self.mean_cc = mean_cc
@@ -121,11 +133,22 @@ class MeanScaleContextHead(nn.Module):
         self.mean_support_transform = mean_support_transform or nn.Identity()
         self.scale_support_transform = scale_support_transform or nn.Identity()
         self.side_split = int(side_split)
-        self.emit_mean_support = bool(emit_mean_support)
+        self.emit_mean_support: Literal[False, "pre", "post"]
+        if emit_mean_support is True:
+            self.emit_mean_support = "pre"
+        elif emit_mean_support is False:
+            self.emit_mean_support = False
+        elif emit_mean_support in ("pre", "post"):
+            self.emit_mean_support = emit_mean_support
+        else:
+            raise ValueError(
+                f"emit_mean_support must be False, True, 'pre', or 'post'; "
+                f"got {emit_mean_support!r}"
+            )
         if self.emit_mean_support and self.side_split <= 0:
             raise ValueError(
-                "emit_mean_support=True requires side_split > 0 to recover "
-                "the legacy mean_support layout cat(latent_means, *prev_y_hat)."
+                "emit_mean_support requires side_split > 0 to recover the "
+                "legacy mean_support layout cat(latent_means, *prev_y_hat)."
             )
 
     def forward(self, x: Tensor) -> Tensor:
@@ -138,11 +161,14 @@ class MeanScaleContextHead(nn.Module):
             scale_in = torch.cat([latent_scales, prev_y_hat], dim=1)
         else:
             mean_in = scale_in = x
-        mean = self.mean_cc(self.mean_support_transform(mean_in))
+        mean_support = self.mean_support_transform(mean_in)
+        mean = self.mean_cc(mean_support)
         scale = self.scale_cc(self.scale_support_transform(scale_in))
         out = torch.cat([scale, mean], dim=1)
-        if self.emit_mean_support:
+        if self.emit_mean_support == "pre":
             out = torch.cat([out, mean_in], dim=1)
+        elif self.emit_mean_support == "post":
+            out = torch.cat([out, mean_support], dim=1)
         return out
 
 
@@ -153,7 +179,7 @@ def build_mean_scale_head(
     widths: Sequence[int] = (224, 128),
     support_transform_factory: Optional[Callable[[int, int], nn.Module]] = None,
     side_split: int = 0,
-    emit_mean_support: bool = False,
+    emit_mean_support: Union[bool, Literal["pre", "post"]] = False,
 ) -> MeanScaleContextHead:
     """Construct a :class:`MeanScaleContextHead` with default conv-stack heads.
 
@@ -189,19 +215,22 @@ def build_mean_scale_head(
     emit_mean_support
         Forwarded to :class:`MeanScaleContextHead`. Why this flag exists:
         the upstream STF / WACNN / TCM / CCA LRP transform consumes
-        ``cat(latent_means, *prev_y_hat, y_hat)`` (i.e. ``M + slice_ch *
-        (support_count + 1)`` channels — variable per slice). The Phase 3
+        ``cat(mean_support, y_hat)`` (i.e. ``M + slice_ch *
+        (support_count + 1)`` channels — variable per slice). A naive
         leaf only sees the channel-context ``ctx_params`` (= 2*slice_ch) and
         ``y_hat``, which would force an architectural change to the LRP
         transform input width and prevent byte-for-byte transfer of upstream
-        LRP weights. Setting ``emit_mean_support=True`` makes the head
-        append ``mean_in = cat(latent_means, *prev_y_hat)`` to its output;
-        :class:`LRPGaussianLatentCodec` (with matching
-        ``mean_support_trail_channels``) then strips that trailing block off
+        LRP weights. Setting ``emit_mean_support`` to ``"pre"`` (or legacy
+        ``True``) makes the head append ``mean_in = cat(latent_means,
+        *prev_y_hat)`` to its output; setting it to ``"post"`` appends
+        ``mean_support_transform(mean_in)`` instead (CCA-main / CCA-aux,
+        whose upstream LRP heads consume the *post*-NAFTransform mean
+        support). :class:`LRPGaussianLatentCodec` (with matching
+        ``mean_support_trail_channels``) strips that trailing block off
         ``ctx_params``, feeds only the leading ``2*slice_ch`` to the
         Gaussian conditional's ``chunks=("scales","means")`` step, and uses
-        the trailing block as the LRP input — recovering the upstream layout
-        exactly.
+        the trailing block as the LRP input — recovering the upstream
+        layout exactly.
     """
     sub_in_ch = support_ch - side_split
     mean_cc = make_entropy_transform(sub_in_ch, slice_ch, widths=widths)
