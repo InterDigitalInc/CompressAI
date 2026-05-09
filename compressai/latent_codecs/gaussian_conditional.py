@@ -152,15 +152,31 @@ class LRPGaussianLatentCodec(GaussianConditionalLatentCodec):
 
     Wraps :class:`GaussianConditionalLatentCodec` and applies an additive LRP
     head to the quantized latent ``y_hat``. The LRP head receives
-    ``cat(ctx_params, y_hat)`` and produces a residual scaled by ``lrp_scale``
-    and squashed by ``tanh``::
+    ``cat(mean_support, y_hat)`` and produces a residual scaled by
+    ``lrp_scale`` and squashed by ``tanh``::
 
-        y_hat = y_hat + lrp_scale * tanh(lrp_transform(cat(ctx_params, y_hat)))
+        y_hat = y_hat + lrp_scale * tanh(lrp_transform(cat(mean_support, y_hat)))
 
     Used as the per-slice leaf for Family 1 channel-slice models (STF / WACNN
     / TCM / CCA-main, plus the first ``K-2`` slices of CCA-aux). The LRP
     refinement variant was introduced in [Zhu2022] and is widely adopted by
     follow-up work (ELIC checkerboard variants, MLIC++, TCM, ...).
+
+    The ``mean_support`` tensor that feeds the LRP head depends on
+    ``mean_support_trail_channels``:
+
+    - ``0`` (default): ``mean_support = ctx_params`` — LRP sees the full
+      ctx_params concatenated with ``y_hat``.
+    - ``> 0``: ``ctx_params`` is expected to be laid out as
+      ``cat(gaussian_params, mean_support)`` where the trailing
+      ``mean_support_trail_channels`` block carries
+      ``cat(latent_means, *prev_y_hat)``. The leaf forwards only
+      ``gaussian_params = ctx_params[:, :-mean_support_trail_channels]`` to
+      the underlying :class:`GaussianConditionalLatentCodec` (so chunk
+      semantics are preserved) and uses the trailing block as
+      ``mean_support`` for LRP. This recovers the upstream STF / WACNN LRP
+      input layout (``cat(latent_means, *prev_y_hat, y_hat)``), enabling
+      byte-for-byte transfer of upstream LRP weights.
 
     [Zhu2022]: `"Transformer-based Transform Coding"
     <https://openreview.net/forum?id=IDwN6xjHnK8>`_, by Yinhao Zhu, Yang Yang
@@ -174,26 +190,38 @@ class LRPGaussianLatentCodec(GaussianConditionalLatentCodec):
         lrp_transform: nn.Module,
         *,
         lrp_scale: float = 0.5,
+        mean_support_trail_channels: int = 0,
         **gc_kwargs: Any,
     ) -> None:
         super().__init__(**gc_kwargs)
         self.lrp_transform = lrp_transform
         self.lrp_scale = float(lrp_scale)
+        self.mean_support_trail_channels = int(mean_support_trail_channels)
 
-    def _apply_lrp(self, ctx_params: Tensor, y_hat: Tensor) -> Tensor:
+    def _split_ctx_params(self, ctx_params: Tensor) -> Tuple[Tensor, Tensor]:
+        if self.mean_support_trail_channels <= 0:
+            return ctx_params, ctx_params
+        trail = self.mean_support_trail_channels
+        gaussian_params = ctx_params[:, :-trail]
+        mean_support = ctx_params[:, -trail:]
+        return gaussian_params, mean_support
+
+    def _apply_lrp(self, mean_support: Tensor, y_hat: Tensor) -> Tensor:
         lrp = self.lrp_scale * torch.tanh(
-            self.lrp_transform(torch.cat([ctx_params, y_hat], dim=1))
+            self.lrp_transform(torch.cat([mean_support, y_hat], dim=1))
         )
         return y_hat + lrp
 
     def forward(self, y: Tensor, ctx_params: Tensor) -> Dict[str, Any]:
-        out = super().forward(y, ctx_params)
-        out["y_hat"] = self._apply_lrp(ctx_params, out["y_hat"])
+        gaussian_params, mean_support = self._split_ctx_params(ctx_params)
+        out = super().forward(y, gaussian_params)
+        out["y_hat"] = self._apply_lrp(mean_support, out["y_hat"])
         return out
 
     def compress(self, y: Tensor, ctx_params: Tensor) -> Dict[str, Any]:
-        out = super().compress(y, ctx_params)
-        out["y_hat"] = self._apply_lrp(ctx_params, out["y_hat"])
+        gaussian_params, mean_support = self._split_ctx_params(ctx_params)
+        out = super().compress(y, gaussian_params)
+        out["y_hat"] = self._apply_lrp(mean_support, out["y_hat"])
         return out
 
     def decompress(
@@ -203,6 +231,7 @@ class LRPGaussianLatentCodec(GaussianConditionalLatentCodec):
         ctx_params: Tensor,
         **kwargs: Any,
     ) -> Dict[str, Any]:
-        out = super().decompress(strings, shape, ctx_params, **kwargs)
-        out["y_hat"] = self._apply_lrp(ctx_params, out["y_hat"])
+        gaussian_params, mean_support = self._split_ctx_params(ctx_params)
+        out = super().decompress(strings, shape, gaussian_params, **kwargs)
+        out["y_hat"] = self._apply_lrp(mean_support, out["y_hat"])
         return out

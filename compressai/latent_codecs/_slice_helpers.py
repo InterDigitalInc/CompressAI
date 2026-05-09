@@ -57,11 +57,14 @@ __all__ = [
 ]
 
 
-# Post-refactor state-dict layout: ``ChannelGroupsLatentCodec`` lives at
-# ``latent_codec.latent_codec.y`` and stores per-slice mean / scale heads
-# under ``channel_context.y{k}.{mean,scale}_cc.0.weight``. Slice 0 has no
-# channel context, so prefix scans should expect ``k >= 1``.
-_DEFAULT_NUM_SLICES_PREFIX = "latent_codec.latent_codec.y.channel_context.y"
+# Post-refactor state-dict layout: ``HyperpriorLatentCodec`` exposes
+# ``ChannelGroupsLatentCodec`` as ``self.y`` (the inner ``self.latent_codec``
+# dict is not a registered nn.Module), so the channel-context entries live
+# under ``latent_codec.y.channel_context.y{k}``. Slice 0 has no channel
+# context entry by default (``side_in_context=False`` ELIC mode); Family 1
+# ``side_in_context=True`` mode adds a ``y0`` entry whose presence triggers
+# the auto-detection in :func:`infer_num_slices`.
+_DEFAULT_NUM_SLICES_PREFIX = "latent_codec.y.channel_context.y"
 _DEFAULT_KEY_SUFFIX = ".mean_cc.0.weight"
 
 
@@ -119,9 +122,16 @@ def infer_num_slices(
 ) -> int:
     """Count distinct ``y{k}`` channel-context entries in ``state_dict``.
 
-    Slice 0 has no channel-context entry (it consumes ``side_params`` only),
-    so the count returned is ``num_slices - 1``; callers wanting the slice
-    count should add one whenever any channel context is present.
+    Two layouts are supported:
+
+    - ELIC default: channel_context starts at ``y1`` (slice 0 bypasses it),
+      so the count returned is ``num_slices - 1`` and we add ``1`` to recover
+      ``num_slices``.
+    - Family 1 ``side_in_context=True``: channel_context covers every
+      slice including ``y0``, so the count is already ``num_slices``.
+
+    The two cases are auto-detected by whether ``y0`` appears in the matched
+    keys.
     """
     slice_indices = {
         int(key[len(prefix) :].split(".", 1)[0])
@@ -130,6 +140,8 @@ def infer_num_slices(
     }
     if not slice_indices:
         return 0
+    if 0 in slice_indices:
+        return len(slice_indices)
     return len(slice_indices) + 1
 
 

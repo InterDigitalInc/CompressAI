@@ -290,6 +290,27 @@ class TestStf:
         assert "y" in out["likelihoods"]
         assert "z" in out["likelihoods"]
 
+        # Phase 3 containerised state-dict layout self-check.
+        sd_keys = set(model.state_dict().keys())
+        assert "latent_codec.h_a.0.weight" in sd_keys
+        assert "latent_codec.h_s.h_mean_s.0.weight" in sd_keys
+        assert "latent_codec.h_s.h_scale_s.0.weight" in sd_keys
+        assert "latent_codec.z.entropy_bottleneck.quantiles" in sd_keys
+        # side_in_context=True -> channel_context covers y0..y(K-1).
+        assert "latent_codec.y.channel_context.y0.mean_cc.0.weight" in sd_keys
+        assert "latent_codec.y.channel_context.y1.mean_cc.0.weight" in sd_keys
+        assert "latent_codec.y.channel_context.y0.scale_cc.0.weight" in sd_keys
+        # Per-slice leaves (LRP + per-slice GaussianConditional copy).
+        assert "latent_codec.y.latent_codec.y0.lrp_transform.0.weight" in sd_keys
+        assert (
+            "latent_codec.y.latent_codec.y0.gaussian_conditional.scale_table" in sd_keys
+        )
+        # Old monolithic paths should be gone.
+        assert not any(
+            k.startswith("latent_codec.cc_mean_transforms.") for k in sd_keys
+        )
+        assert "h_a.0.weight" not in sd_keys  # moved under latent_codec.
+
         loaded = WACNN.from_state_dict(model.state_dict()).eval()
         with torch.no_grad():
             out_loaded = loaded(x)
@@ -312,6 +333,13 @@ class TestStf:
         assert "y" in out["likelihoods"]
         assert "z" in out["likelihoods"]
 
+        sd_keys = set(model.state_dict().keys())
+        assert "latent_codec.h_a.0.weight" in sd_keys
+        assert "latent_codec.h_s.h_mean_s.0.weight" in sd_keys
+        assert "latent_codec.z.entropy_bottleneck.quantiles" in sd_keys
+        assert "latent_codec.y.channel_context.y0.mean_cc.0.weight" in sd_keys
+        assert "latent_codec.y.latent_codec.y0.lrp_transform.0.weight" in sd_keys
+
         loaded = SymmetricalTransFormer.from_state_dict(model.state_dict()).eval()
         with torch.no_grad():
             out_loaded = loaded(x)
@@ -325,14 +353,44 @@ class TestStf:
         upstream = {
             "module.g_a.0.weight": torch.zeros(2),
             "module.cc_mean_transforms.0.0.weight": torch.zeros(2),
+            "module.cc_mean_transforms.1.0.weight": torch.zeros(2),
+            "module.cc_scale_transforms.0.0.weight": torch.zeros(2),
+            "module.lrp_transforms.0.0.weight": torch.zeros(2),
             "module.gaussian_conditional.scale_table": torch.zeros(2),
             "module.h_a.0.weight": torch.zeros(2),
+            "module.h_mean_s.0.weight": torch.zeros(2),
+            "module.h_scale_s.0.weight": torch.zeros(2),
+            "module.entropy_bottleneck.quantiles": torch.zeros(2),
         }
         converted = convert_upstream_stf_state_dict(upstream)
+        # g_a passes through unchanged.
         assert "g_a.0.weight" in converted
-        assert "latent_codec.cc_mean_transforms.0.0.weight" in converted
-        assert "latent_codec.gaussian_conditional.scale_table" in converted
-        assert "h_a.0.weight" in converted
+        # Hyperprior backbone moves under latent_codec.
+        assert "latent_codec.h_a.0.weight" in converted
+        assert "latent_codec.h_s.h_mean_s.0.weight" in converted
+        assert "latent_codec.h_s.h_scale_s.0.weight" in converted
+        assert "latent_codec.z.entropy_bottleneck.quantiles" in converted
+        # cc_mean / cc_scale re-rooted per slice.
+        assert "latent_codec.y.channel_context.y0.mean_cc.0.weight" in converted
+        assert "latent_codec.y.channel_context.y1.mean_cc.0.weight" in converted
+        assert "latent_codec.y.channel_context.y0.scale_cc.0.weight" in converted
+        # gaussian_conditional replicated to every slice (driven by mean_cc count).
+        assert (
+            "latent_codec.y.latent_codec.y0.gaussian_conditional.scale_table"
+            in converted
+        )
+        assert (
+            "latent_codec.y.latent_codec.y1.gaussian_conditional.scale_table"
+            in converted
+        )
+        # LRP weights are now retained: emit_mean_support=True on the head
+        # makes the leaf consume cat(latent_means, *prev_y_hat) as the LRP
+        # input, matching upstream's M + slice_ch*(support+1) input width.
+        assert "latent_codec.y.latent_codec.y0.lrp_transform.0.weight" in converted
+        # Old root-level paths should be gone after conversion.
+        assert "h_a.0.weight" not in converted
+        assert "cc_mean_transforms.0.0.weight" not in converted
+        assert "lrp_transforms.0.0.weight" not in converted
 
 
 def test_scale_table_default():

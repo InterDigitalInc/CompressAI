@@ -50,12 +50,18 @@ def build_channel_slice_codec(
     channel_context_factory: Optional[Callable[[int, int, int], nn.Module]] = None,
     max_support_slices: int = -1,
     support_filter: Optional[Callable[[int, List[Tensor]], List[Tensor]]] = None,
+    side_in_context: bool = False,
+    side_channels: int = 0,
 ) -> ChannelGroupsLatentCodec:
     """Assemble a :class:`ChannelGroupsLatentCodec` with per-slice modules.
 
     Generates the ``{"y0".."yK-1"}`` ``latent_codec`` dict and the
     ``{"y1".."yK-1"}`` ``channel_context`` dict (slice 0 has no channel
-    context — it consumes ``side_params`` only).
+    context — it consumes ``side_params`` only). When
+    ``side_in_context=True`` the ``channel_context`` dict additionally
+    includes a ``"y0"`` entry whose input is just ``side_params``; the
+    leaf for slice 0 then receives the head's output (already shaped
+    ``2 * groups[0]``) instead of raw ``side_params``.
 
     Parameters
     ----------
@@ -68,33 +74,59 @@ def build_channel_slice_codec(
         :class:`GaussianConditionalLatentCodec`.
     channel_context_factory
         ``(k, slice_ch_k, support_ch_k) -> nn.Module``. Constructs the
-        channel-context module for slice ``k`` (``k >= 1``). ``support_ch_k``
-        is the total channel count of the previous slices that will be fed
-        in (post ``max_support_slices`` clamp). Default ``None`` uses
-        :class:`~torch.nn.Identity`, which is rarely useful in practice but
-        keeps the API parallel with ``leaf_factory``.
+        channel-context module for slice ``k``. ``support_ch_k`` is the
+        TOTAL channel count of the head's input — i.e., what
+        :class:`ChannelGroupsLatentCodec._get_ctx_params` will hand it.
+        For ELIC default mode (``side_in_context=False``) ``support_ch_k =
+        sum(groups[:clamped_k])`` and only ``k >= 1`` entries are built.
+        For Family 1 mode (``side_in_context=True``) ``support_ch_k =
+        side_channels + sum(groups[:clamped_k])`` and a ``y0`` entry with
+        ``support_ch_0 = side_channels`` is built too.
     max_support_slices
         Forwarded to :class:`ChannelGroupsLatentCodec`. Default ``-1`` uses
         all previous slices (ELIC / CCA-main behaviour).
     support_filter
         Forwarded to :class:`ChannelGroupsLatentCodec`. Used by CCA-aux for
         skip-most-recent support selection.
+    side_in_context
+        Forwarded to :class:`ChannelGroupsLatentCodec`. When ``True`` the
+        ``channel_context`` for ``y0`` consumes ``side_params`` and
+        downstream ``y_k`` heads receive ``cat(side_params, prev_y_hat)``.
+    side_channels
+        Width of ``side_params`` (= hyper-synthesis output channel count).
+        Required when ``side_in_context=True`` so the factory can size
+        ``support_ch`` correctly.
     """
     if channel_context_factory is None:
         channel_context_factory = lambda *_: nn.Identity()  # noqa: E731
+    if side_in_context and side_channels <= 0:
+        raise ValueError(
+            "side_in_context=True requires side_channels > 0 so the factory "
+            "can size the channel_context heads (== side_channels for k=0; "
+            "side_channels + sum(groups[:k]) clamped, for k>=1)."
+        )
 
     K = len(groups)
 
-    def _support_ch(k: int) -> int:
+    def _support_count(k: int) -> int:
         if max_support_slices < 0:
-            count = k
-        else:
-            count = min(k, max_support_slices)
-        return sum(groups[:count])
+            return k
+        return min(k, max_support_slices)
 
+    def _support_ch(k: int) -> int:
+        prior_ch = sum(groups[: _support_count(k)])
+        if side_in_context:
+            return side_channels + prior_ch
+        return prior_ch
+
+    if side_in_context:
+        # y0 entry: head sees only side_params (no prev_y_hat yet).
+        ctx_keys = range(0, K)
+    else:
+        # ELIC default: slice 0 bypasses channel_context entirely.
+        ctx_keys = range(1, K)
     channel_context = {
-        f"y{k}": channel_context_factory(k, groups[k], _support_ch(k))
-        for k in range(1, K)
+        f"y{k}": channel_context_factory(k, groups[k], _support_ch(k)) for k in ctx_keys
     }
     latent_codec = {f"y{k}": leaf_factory(k, groups[k]) for k in range(K)}
 
@@ -104,4 +136,5 @@ def build_channel_slice_codec(
         groups=list(groups),
         max_support_slices=max_support_slices,
         support_filter=support_filter,
+        side_in_context=side_in_context,
     )
