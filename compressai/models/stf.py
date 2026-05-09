@@ -272,7 +272,7 @@ def convert_upstream_stf_state_dict(
       ``syn_layers`` / ``end_conv`` keys unchanged.
 
     .. caveat::
-       The Phase 3 wiring sets ``emit_mean_support=True`` on the
+       The wiring sets ``emit_mean_support=True`` on the
        ``MeanScaleContextHead`` so the upstream LRP layout
        (``cat(latent_means, *prev_y_hat, y_hat)``) is recoverable inside the
        leaf — upstream ``lrp_transforms.{k}`` weights therefore transfer
@@ -562,7 +562,7 @@ def _build_family1_latent_codec(
     h_mean_s: nn.Module,
     h_scale_s: nn.Module,
 ) -> HyperpriorLatentCodec:
-    """Assemble the Phase 3 Family 1 entropy stack: ``HyperpriorLatentCodec``
+    """Assemble the Family 1 entropy stack: ``HyperpriorLatentCodec``
     wrapping ``DualHyperSynthesis`` and a per-slice
     ``ChannelGroupsLatentCodec`` (``side_in_context=True``) whose channel
     contexts are :class:`MeanScaleContextHead` instances and leaves are

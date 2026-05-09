@@ -195,6 +195,12 @@ class ChannelGroupsLatentCodec(LatentCodec):
         if k == 0:
             return self.channel_context["y0"](side_params)
         support = self._select_support(k, y_hat_)
+        # ``support`` can be empty when ``support_filter`` skips the most
+        # recent slice for k=1 (e.g., CCA-aux's
+        # ``lambda k, prior: prior[: max(k - 1, 0)]``); in that case the
+        # head sees only ``side_params``.
+        if not support:
+            return self.channel_context[f"y{k}"](side_params)
         ch_input = self.merge_params(side_params, self.merge_y(*support))
         return self.channel_context[f"y{k}"](ch_input)
 

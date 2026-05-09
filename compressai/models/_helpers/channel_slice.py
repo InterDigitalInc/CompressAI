@@ -50,6 +50,7 @@ def build_channel_slice_codec(
     channel_context_factory: Optional[Callable[[int, int, int], nn.Module]] = None,
     max_support_slices: int = -1,
     support_filter: Optional[Callable[[int, List[Tensor]], List[Tensor]]] = None,
+    support_count_fn: Optional[Callable[[int], int]] = None,
     side_in_context: bool = False,
     side_channels: int = 0,
 ) -> ChannelGroupsLatentCodec:
@@ -88,6 +89,15 @@ def build_channel_slice_codec(
     support_filter
         Forwarded to :class:`ChannelGroupsLatentCodec`. Used by CCA-aux for
         skip-most-recent support selection.
+    support_count_fn
+        ``(k) -> int``. Override for the number of prior slices that
+        ``channel_context.y{k}`` will see at *runtime*. Required when
+        ``support_filter`` selects a non-default count (e.g., CCA-aux's
+        skip-most-recent ``lambda k: max(k - 1, 0)``); the factory uses
+        this count when sizing the channel_context heads. Defaults to
+        ``min(k, max_support_slices)`` (or ``k`` when
+        ``max_support_slices < 0``), matching ``ChannelGroupsLatentCodec``'s
+        own clamp logic when ``support_filter`` is unset.
     side_in_context
         Forwarded to :class:`ChannelGroupsLatentCodec`. When ``True`` the
         ``channel_context`` for ``y0`` consumes ``side_params`` and
@@ -108,10 +118,12 @@ def build_channel_slice_codec(
 
     K = len(groups)
 
-    def _support_count(k: int) -> int:
+    def _default_support_count(k: int) -> int:
         if max_support_slices < 0:
             return k
         return min(k, max_support_slices)
+
+    _support_count = support_count_fn or _default_support_count
 
     def _support_ch(k: int) -> int:
         prior_ch = sum(groups[: _support_count(k)])
