@@ -27,30 +27,34 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from ._hyper_synthesis import DualHyperSynthesis
-from .base import LatentCodec
-from .channel_groups import ChannelGroupsLatentCodec
-from .channel_slice import ChannelSliceLatentCodec
-from .checkerboard import CheckerboardLatentCodec
-from .entropy_bottleneck import EntropyBottleneckLatentCodec
-from .gain import GainHyperLatentCodec, GainHyperpriorLatentCodec
-from .gaussian_conditional import GaussianConditionalLatentCodec, LRPGaussianLatentCodec
-from .hyper import HyperLatentCodec
-from .hyperprior import HyperpriorLatentCodec
-from .rasterscan import RasterScanLatentCodec
+import torch
+import torch.nn as nn
+
+from torch import Tensor
 
 __all__ = [
-    "LatentCodec",
-    "ChannelGroupsLatentCodec",
-    "ChannelSliceLatentCodec",
-    "CheckerboardLatentCodec",
     "DualHyperSynthesis",
-    "EntropyBottleneckLatentCodec",
-    "GainHyperLatentCodec",
-    "GainHyperpriorLatentCodec",
-    "GaussianConditionalLatentCodec",
-    "HyperLatentCodec",
-    "HyperpriorLatentCodec",
-    "LRPGaussianLatentCodec",
-    "RasterScanLatentCodec",
 ]
+
+
+class DualHyperSynthesis(nn.Module):
+    """Concatenate outputs of two parallel hyper-synthesis heads.
+
+    Channel-slice models in Family 1 (STF, WACNN, TCM, CCA, ...) factor the
+    hyperprior as ``params = cat(h_mean_s(z_hat), h_scale_s(z_hat))``. Pass
+    an instance as the ``h_s`` argument of
+    :class:`~compressai.latent_codecs.HyperpriorLatentCodec` to fold both
+    heads into the codec while keeping their state-dict paths separate
+    (``h_s.h_mean_s.*`` / ``h_s.h_scale_s.*``).
+    """
+
+    h_mean_s: nn.Module
+    h_scale_s: nn.Module
+
+    def __init__(self, h_mean_s: nn.Module, h_scale_s: nn.Module) -> None:
+        super().__init__()
+        self.h_mean_s = h_mean_s
+        self.h_scale_s = h_scale_s
+
+    def forward(self, z_hat: Tensor) -> Tensor:
+        return torch.cat([self.h_mean_s(z_hat), self.h_scale_s(z_hat)], dim=1)
