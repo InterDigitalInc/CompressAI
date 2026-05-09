@@ -29,6 +29,7 @@
 
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+import torch
 import torch.nn as nn
 
 from torch import Tensor
@@ -41,6 +42,7 @@ from .base import LatentCodec
 
 __all__ = [
     "GaussianConditionalLatentCodec",
+    "LRPGaussianLatentCodec",
 ]
 
 
@@ -142,3 +144,65 @@ class GaussianConditionalLatentCodec(LatentCodec):
         if self.chunks == ("means", "scales"):
             means, scales = params.chunk(2, 1)
         return scales, means
+
+
+@register_module("LRPGaussianLatentCodec")
+class LRPGaussianLatentCodec(GaussianConditionalLatentCodec):
+    """Gaussian conditional with a latent residual prediction (LRP) refinement.
+
+    Wraps :class:`GaussianConditionalLatentCodec` and applies an additive LRP
+    head to the quantized latent ``y_hat``. The LRP head receives
+    ``cat(ctx_params, y_hat)`` and produces a residual scaled by ``lrp_scale``
+    and squashed by ``tanh``::
+
+        y_hat = y_hat + lrp_scale * tanh(lrp_transform(cat(ctx_params, y_hat)))
+
+    Used as the per-slice leaf for Family 1 channel-slice models (STF / WACNN
+    / TCM / CCA-main, plus the first ``K-2`` slices of CCA-aux). The LRP
+    refinement variant was introduced in [Zhu2022] and is widely adopted by
+    follow-up work (ELIC checkerboard variants, MLIC++, TCM, ...).
+
+    [Zhu2022]: `"Transformer-based Transform Coding"
+    <https://openreview.net/forum?id=IDwN6xjHnK8>`_, by Yinhao Zhu, Yang Yang
+    and Taco Cohen, ICLR 2022.
+    """
+
+    lrp_transform: nn.Module
+
+    def __init__(
+        self,
+        lrp_transform: nn.Module,
+        *,
+        lrp_scale: float = 0.5,
+        **gc_kwargs: Any,
+    ) -> None:
+        super().__init__(**gc_kwargs)
+        self.lrp_transform = lrp_transform
+        self.lrp_scale = float(lrp_scale)
+
+    def _apply_lrp(self, ctx_params: Tensor, y_hat: Tensor) -> Tensor:
+        lrp = self.lrp_scale * torch.tanh(
+            self.lrp_transform(torch.cat([ctx_params, y_hat], dim=1))
+        )
+        return y_hat + lrp
+
+    def forward(self, y: Tensor, ctx_params: Tensor) -> Dict[str, Any]:
+        out = super().forward(y, ctx_params)
+        out["y_hat"] = self._apply_lrp(ctx_params, out["y_hat"])
+        return out
+
+    def compress(self, y: Tensor, ctx_params: Tensor) -> Dict[str, Any]:
+        out = super().compress(y, ctx_params)
+        out["y_hat"] = self._apply_lrp(ctx_params, out["y_hat"])
+        return out
+
+    def decompress(
+        self,
+        strings: List[List[bytes]],
+        shape: Tuple[int, int],
+        ctx_params: Tensor,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        out = super().decompress(strings, shape, ctx_params, **kwargs)
+        out["y_hat"] = self._apply_lrp(ctx_params, out["y_hat"])
+        return out

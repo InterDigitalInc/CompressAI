@@ -28,7 +28,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from itertools import accumulate
-from typing import Any, Dict, List, Mapping, Tuple
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple
 
 import torch
 import torch.nn as nn
@@ -74,12 +74,16 @@ class ChannelGroupsLatentCodec(LatentCodec):
         channel_context: Mapping[str, nn.Module],
         *,
         groups: List[int],
+        max_support_slices: int = -1,
+        support_filter: Optional[Callable[[int, List[Tensor]], List[Tensor]]] = None,
         **kwargs,
     ):
         super().__init__()
         self._kwargs = kwargs
         self.groups = list(groups)
         self.groups_acc = list(accumulate(self.groups, initial=0))
+        self.max_support_slices = int(max_support_slices)
+        self.support_filter = support_filter
         self.channel_context = nn.ModuleDict(channel_context)
         self.latent_codec = nn.ModuleDict(latent_codec)
 
@@ -165,5 +169,14 @@ class ChannelGroupsLatentCodec(LatentCodec):
     ) -> Tensor:
         if k == 0:
             return side_params
-        ch_ctx_params = self.channel_context[f"y{k}"](self.merge_y(*y_hat_[:k]))
+        support = self._select_support(k, y_hat_)
+        ch_ctx_params = self.channel_context[f"y{k}"](self.merge_y(*support))
         return self.merge_params(ch_ctx_params, side_params)
+
+    def _select_support(self, k: int, y_hat_: List[Tensor]) -> List[Tensor]:
+        prior = list(y_hat_[:k])
+        if self.support_filter is not None:
+            return list(self.support_filter(k, prior))
+        if self.max_support_slices < 0:
+            return prior
+        return prior[: self.max_support_slices]

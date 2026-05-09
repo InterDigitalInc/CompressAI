@@ -27,30 +27,11 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from ._hyper_synthesis import DualHyperSynthesis
-from .base import LatentCodec
-from .channel_groups import ChannelGroupsLatentCodec
-from .channel_slice import ChannelSliceLatentCodec
-from .checkerboard import CheckerboardLatentCodec
-from .entropy_bottleneck import EntropyBottleneckLatentCodec
-from .gain import GainHyperLatentCodec, GainHyperpriorLatentCodec
-from .gaussian_conditional import GaussianConditionalLatentCodec, LRPGaussianLatentCodec
-from .hyper import HyperLatentCodec
-from .hyperprior import HyperpriorLatentCodec
-from .rasterscan import RasterScanLatentCodec
+"""Application-layer helpers for assembling Family 1 channel-slice codecs.
 
-__all__ = [
-    "LatentCodec",
-    "ChannelGroupsLatentCodec",
-    "ChannelSliceLatentCodec",
-    "CheckerboardLatentCodec",
-    "DualHyperSynthesis",
-    "EntropyBottleneckLatentCodec",
-    "GainHyperLatentCodec",
-    "GainHyperpriorLatentCodec",
-    "GaussianConditionalLatentCodec",
-    "HyperLatentCodec",
-    "HyperpriorLatentCodec",
-    "LRPGaussianLatentCodec",
-    "RasterScanLatentCodec",
-]
+These helpers wrap :class:`~compressai.latent_codecs.ChannelGroupsLatentCodec`
+behind a per-slice factory interface, removing the
+``{"y0": ..., "y1": ..., ...}`` dictionary boilerplate that would otherwise
+appear in every Family 1 model. They live outside ``compressai.latent_codecs``
+because they are application-layer ergonomics, not codec primitives.
+"""
