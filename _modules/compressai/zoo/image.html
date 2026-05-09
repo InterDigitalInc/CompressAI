@@ -302,6 +302,39 @@ document.write(`
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.pretrained</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_pretrained</span>
 
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_LazyImport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defer ``from &lt;module&gt; import &lt;attr&gt;`` until the attribute is actually used.</span>
+
+<span class="sd">    Lets ``model_architectures`` reference classes that live in modules with</span>
+<span class="sd">    optional dependencies (e.g. ``compressai.models.stf`` needs ``timm``)</span>
+<span class="sd">    without importing them at zoo-import time. Forwards ``__call__`` and</span>
+<span class="sd">    attribute access to the resolved class so existing call sites</span>
+<span class="sd">    (``model_architectures[arch](...)`` and ``....from_state_dict(...)``)</span>
+<span class="sd">    keep working.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_module&quot;</span><span class="p">,</span> <span class="s2">&quot;_name&quot;</span><span class="p">,</span> <span class="s2">&quot;_resolved&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_module</span> <span class="o">=</span> <span class="n">module</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_module</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">()(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">(),</span> <span class="n">item</span><span class="p">)</span>
+
+
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;bmshj2018_factorized&quot;</span><span class="p">,</span>
     <span class="s2">&quot;bmshj2018_factorized_relu&quot;</span><span class="p">,</span>
@@ -310,6 +343,8 @@ document.write(`
     <span class="s2">&quot;mbt2018_mean&quot;</span><span class="p">,</span>
     <span class="s2">&quot;cheng2020_anchor&quot;</span><span class="p">,</span>
     <span class="s2">&quot;cheng2020_attn&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;stf&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;stf_wacnn&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
 <span class="n">model_architectures</span> <span class="o">=</span> <span class="p">{</span>
@@ -320,6 +355,9 @@ document.write(`
     <span class="s2">&quot;mbt2018&quot;</span><span class="p">:</span> <span class="n">JointAutoregressiveHierarchicalPriors</span><span class="p">,</span>
     <span class="s2">&quot;cheng2020-anchor&quot;</span><span class="p">:</span> <span class="n">Cheng2020Anchor</span><span class="p">,</span>
     <span class="s2">&quot;cheng2020-attn&quot;</span><span class="p">:</span> <span class="n">Cheng2020Attention</span><span class="p">,</span>
+    <span class="c1"># Resolved lazily so `compressai.zoo` is importable without `timm`.</span>
+    <span class="s2">&quot;stf&quot;</span><span class="p">:</span> <span class="n">_LazyImport</span><span class="p">(</span><span class="s2">&quot;compressai.models.stf&quot;</span><span class="p">,</span> <span class="s2">&quot;SymmetricalTransFormer&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;stf-wacnn&quot;</span><span class="p">:</span> <span class="n">_LazyImport</span><span class="p">(</span><span class="s2">&quot;compressai.models.stf&quot;</span><span class="p">,</span> <span class="s2">&quot;WACNN&quot;</span><span class="p">),</span>
 <span class="p">}</span>
 
 <span class="n">root_url</span> <span class="o">=</span> <span class="s2">&quot;https://compressai.s3.amazonaws.com/models/v1&quot;</span>
@@ -708,6 +746,46 @@ document.write(`
     <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span>
         <span class="s2">&quot;cheng2020-attn&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">stf</span><span class="p">(</span><span class="n">pretrained</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Symmetrical TransFormer (STF) model from R. Zou, C. Song, Z. Zhang:</span>
+<span class="sd">    `&quot;The Devil Is in the Details: Window-based Attention for Image</span>
+<span class="sd">    Compression&quot; &lt;https://arxiv.org/abs/2203.08450&gt;`_, IEEE/CVF Conf. on</span>
+<span class="sd">    Computer Vision and Pattern Recognition (CVPR), 2022.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pretrained (bool): If True, returns a pre-trained model. Currently</span>
+<span class="sd">            unavailable; raises ``RuntimeError``.</span>
+<span class="sd">        progress (bool): If True, displays a progress bar of the download to</span>
+<span class="sd">            stderr.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">del</span> <span class="n">progress</span>
+    <span class="k">if</span> <span class="n">pretrained</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Pre-trained STF weights are not yet hosted on S3.&quot;</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">compressai.models.stf</span><span class="w"> </span><span class="kn">import</span> <span class="n">SymmetricalTransFormer</span>
+
+    <span class="k">return</span> <span class="n">SymmetricalTransFormer</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">stf_wacnn</span><span class="p">(</span><span class="n">pretrained</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;WACNN model from R. Zou, C. Song, Z. Zhang:</span>
+<span class="sd">    `&quot;The Devil Is in the Details: Window-based Attention for Image</span>
+<span class="sd">    Compression&quot; &lt;https://arxiv.org/abs/2203.08450&gt;`_, IEEE/CVF Conf. on</span>
+<span class="sd">    Computer Vision and Pattern Recognition (CVPR), 2022.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pretrained (bool): If True, returns a pre-trained model. Currently</span>
+<span class="sd">            unavailable; raises ``RuntimeError``.</span>
+<span class="sd">        progress (bool): If True, displays a progress bar of the download to</span>
+<span class="sd">            stderr.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">del</span> <span class="n">progress</span>
+    <span class="k">if</span> <span class="n">pretrained</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Pre-trained WACNN weights are not yet hosted on S3.&quot;</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">compressai.models.stf</span><span class="w"> </span><span class="kn">import</span> <span class="n">WACNN</span>
+
+    <span class="k">return</span> <span class="n">WACNN</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 
                 </article>
