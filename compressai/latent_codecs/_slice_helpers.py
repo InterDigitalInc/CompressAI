@@ -30,12 +30,10 @@
 """Channel-slice support helpers shared by Family 1 codecs.
 
 These functions support the Family 1 (pure 1-pass channel-slice) entropy
-models — STF / WACNN / TCM / CCA / DCAE / MambaVC. They were previously
-hosted in ``compressai.models._bases.slice_entropy``; the canonical home is
-now this module so they sit alongside the latent-codec primitives that
-consume them. ``_DEFAULT_NUM_SLICES_PREFIX`` reflects the post-refactor
-state-dict layout used by the containerised
-:class:`~compressai.latent_codecs.ChannelGroupsLatentCodec` wiring.
+models — STF / WACNN / TCM / CCA / DCAE / MambaVC. They sit alongside the
+latent-codec primitives that consume them.
+``_DEFAULT_NUM_SLICES_PREFIX`` reflects the containerised state-dict layout
+used by :class:`~compressai.latent_codecs.ChannelGroupsLatentCodec`.
 """
 
 from __future__ import annotations
