@@ -313,6 +313,95 @@ class TestChannelGroupsSideInContext:
         assert ctx.shape == (1, 8, 4, 4)
 
 
+class TestChannelGroupsDecompressShape:
+    """Regression coverage for ``ChannelGroupsLatentCodec.decompress`` shape
+    reconstruction.
+
+    Family 1 (STF/WACNN/TCM/CCA) leaves are :class:`LRPGaussianLatentCodec`
+    which inherits :class:`GaussianConditionalLatentCodec.compress` → returns
+    ``shape = y.shape[2:4]`` (2D ``(H, W)``). ELIC-style leaves use
+    :class:`CheckerboardLatentCodec` → returns ``shape = y_hat.shape[1:]``
+    (3D ``(C, H, W)``). ``decompress`` must allocate the correct 4D
+    ``(N, sum_C, H, W)`` buffer in either case.
+    """
+
+    class _LeafMock2D(nn.Module):
+        """Mimics GaussianConditionalLatentCodec: shape=(H, W) from compress,
+        no real entropy coding (zeros for y_hat)."""
+
+        def __init__(self, slice_ch):
+            super().__init__()
+            self.slice_ch = slice_ch
+
+        def compress(self, y, ctx_params):
+            n = y.shape[0]
+            return {
+                "strings": [[b"" for _ in range(n)]],
+                "shape": tuple(y.shape[2:4]),
+                "y_hat": torch.zeros_like(y),
+            }
+
+        def decompress(self, strings, shape, ctx_params, **kwargs):
+            n = len(strings[0])
+            h, w = shape
+            return {"y_hat": torch.zeros((n, self.slice_ch, h, w))}
+
+    class _LeafMock3D(nn.Module):
+        """Mimics CheckerboardLatentCodec: shape=(C, H, W) from compress."""
+
+        def __init__(self, slice_ch):
+            super().__init__()
+            self.slice_ch = slice_ch
+
+        def compress(self, y, ctx_params):
+            n = y.shape[0]
+            return {
+                "strings": [[b"" for _ in range(n)]],
+                "shape": tuple(y.shape[1:]),
+                "y_hat": torch.zeros_like(y),
+            }
+
+        def decompress(self, strings, shape, ctx_params, **kwargs):
+            n = len(strings[0])
+            c, h, w = shape
+            return {"y_hat": torch.zeros((n, c, h, w))}
+
+    def _make_codec(self, leaf_cls, groups=(4, 4, 4), side_ch=8):
+        K = len(groups)
+        return ChannelGroupsLatentCodec(
+            latent_codec={f"y{k}": leaf_cls(groups[k]) for k in range(K)},
+            channel_context={f"y{k}": nn.Identity() for k in range(1, K)},
+            groups=list(groups),
+        )
+
+    def test_decompress_with_2d_leaf_shape(self):
+        # Pre-fix: y_shape = (sum(s[0] for s in shape), *shape[0][1:])
+        # collapsed to (sum_H, W) = (3*6, 5) -> y_hat 3D -> RuntimeError when
+        # assigning the 4D leaf y_hat into a 3D split slice.
+        groups = [4, 4, 4]
+        codec = self._make_codec(self._LeafMock2D, groups=groups)
+        # Deliberately pick H != W and H != sum(groups) so a regression in
+        # axis-confusion (e.g. sum_H instead of sum_C) surfaces as a shape
+        # error, not a silent wrong-shape pass.
+        h, w = 6, 5
+        y = torch.randn(1, sum(groups), h, w)
+        side_params = torch.zeros(1, 8, h, w)
+        out_enc = codec.compress(y, side_params)
+        out_dec = codec.decompress(out_enc["strings"], out_enc["shape"], side_params)
+        assert out_dec["y_hat"].shape == (1, sum(groups), h, w)
+
+    def test_decompress_with_3d_leaf_shape_still_works(self):
+        # ELIC-style path must keep working.
+        groups = [4, 4, 4]
+        codec = self._make_codec(self._LeafMock3D, groups=groups)
+        h, w = 6, 5
+        y = torch.randn(1, sum(groups), h, w)
+        side_params = torch.zeros(1, 8, h, w)
+        out_enc = codec.compress(y, side_params)
+        out_dec = codec.decompress(out_enc["strings"], out_enc["shape"], side_params)
+        assert out_dec["y_hat"].shape == (1, sum(groups), h, w)
+
+
 class TestSliceHelpers:
     def test_slice_support_channels_default_use_all(self):
         # With max_support_slices = -1 the helper returns the full latent + k slices.

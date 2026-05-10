@@ -149,8 +149,12 @@ class ChannelGroupsLatentCodec(LatentCodec):
         strings_per_group = len(strings) // len(self.groups)
 
         y_out_ = [{}] * len(self.groups)
-        y_shape = (sum(s[0] for s in shape), *shape[0][1:])
-        y_hat = torch.zeros((n, *y_shape), device=side_params.device)
+        # Spatial dims are the trailing two entries of any per-group shape;
+        # the channel total is determined by ``self.groups`` (so this works
+        # for both leaves that report ``(C, H, W)`` -- e.g. CheckerboardLatentCodec --
+        # and leaves that report ``(H, W)`` -- e.g. GaussianConditionalLatentCodec).
+        spatial = tuple(shape[0])[-2:]
+        y_hat = torch.zeros((n, sum(self.groups), *spatial), device=side_params.device)
         y_hat_ = y_hat.split(self.groups, dim=1)
 
         for k in range(len(self.groups)):
