@@ -747,7 +747,7 @@ def _build_tcm_latent_codec(
         latent_codec={
             "z": EntropyBottleneckLatentCodec(
                 entropy_bottleneck=EntropyBottleneck(hyper_channels),
-                quantizer="noise",
+                quantizer="ste",
             ),
             "y": build_channel_slice_codec(
                 groups=[slice_ch] * num_slices,
