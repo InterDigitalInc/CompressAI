@@ -93,6 +93,11 @@ __all__ = [
 #    ``cat(latent_means, *prev_y_hat, y_hat)`` layout for byte-for-byte
 #    weight transfer.
 #
+# All Family 1 models use ``EntropyBottleneckLatentCodec(quantizer="ste")``
+# for the ``z`` leaf, mirroring the upstream
+# ``quantize_ste(z - z_offset) + z_offset`` pattern: noise-based likelihoods
+# during training but a STE-rounded ``z_hat`` propagated to ``h_s``.
+#
 # Application-layer helpers in
 # :mod:`compressai.models._helpers.channel_slice` and
 # :mod:`compressai.models._helpers.channel_context`
@@ -106,8 +111,7 @@ __all__ = [
 #   ``support_transform_factory=SWAtten`` (independent windowed-attention
 #   transforms per mean / scale path).
 # - **CCA-main**: variable-length slices (``groups=resolved_slice_sizes``),
-#   ``support_transform_factory=NAFTransform``,
-#   ``EntropyBottleneckLatentCodec(quantizer="ste")`` for the ``z`` leaf.
+#   ``support_transform_factory=NAFTransform``.
 # - **CCA-aux**: lives outside the hyperprior container (separate
 #   ``ChannelGroupsLatentCodec``), uses ``support_filter`` for
 #   skip-most-recent prior selection, and mixes

@@ -616,7 +616,7 @@ def _build_family1_latent_codec(
         h_s=DualHyperSynthesis(h_mean_s, h_scale_s),
         latent_codec={
             "z": EntropyBottleneckLatentCodec(
-                entropy_bottleneck=EntropyBottleneck(N), quantizer="noise"
+                entropy_bottleneck=EntropyBottleneck(N), quantizer="ste"
             ),
             "y": build_channel_slice_codec(
                 groups=[slice_ch] * num_slices,

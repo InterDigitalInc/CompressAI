@@ -578,7 +578,8 @@ class TestCca:
         assert "latent_codec.h_a.0.weight" in sd_keys
         assert "latent_codec.h_s.h_mean_s.0.weight" in sd_keys
         assert "latent_codec.h_s.h_scale_s.0.weight" in sd_keys
-        # CCA-main uses STE quantization on z (vs. STF/TCM noise mode).
+        # All Family 1 models (STF/WACNN/TCM/CCA) use STE on z; the
+        # entropy_bottleneck still owns the parametric prior.
         assert "latent_codec.z.entropy_bottleneck.quantiles" in sd_keys
         # side_in_context=True -> channel_context covers y0..y(K-1).
         assert "latent_codec.y.channel_context.y0.mean_cc.0.weight" in sd_keys
