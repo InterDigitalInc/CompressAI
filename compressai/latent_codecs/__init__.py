@@ -98,12 +98,13 @@ __all__ = [
 # ``quantize_ste(z - z_offset) + z_offset`` pattern: noise-based likelihoods
 # during training but a STE-rounded ``z_hat`` propagated to ``h_s``.
 #
-# Application-layer helpers in
-# :mod:`compressai.models._helpers.channel_slice` and
+# Each Family 1 model wires these pieces inline (ELIC-style) in its
+# ``__init__`` -- the per-slice ``channel_context`` / ``latent_codec`` dicts
+# are built with dict comprehensions over
+# :class:`ChannelGroupsLatentCodec`, and the channel-context heads use the
+# :class:`MeanScaleContextHead` helper from
 # :mod:`compressai.models._helpers.channel_context`
-# (``build_channel_slice_codec``, ``MeanScaleContextHead``,
-# ``build_mean_scale_head``) wire these pieces declaratively. Per-model
-# variations stay in the kwargs:
+# (``build_mean_scale_head``). Per-model variations stay in the kwargs:
 #
 # - **STF / WACNN**: 5-conv cc heads ``widths=(224, 176, 128, 64)``, no
 #   support transform.

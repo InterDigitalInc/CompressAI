@@ -27,19 +27,13 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pytest
 import torch
 import torch.nn as nn
 
-from compressai.latent_codecs import (
-    ChannelGroupsLatentCodec,
-    GaussianConditionalLatentCodec,
-)
 from compressai.models._helpers.channel_context import (
     MeanScaleContextHead,
     build_mean_scale_head,
 )
-from compressai.models._helpers.channel_slice import build_channel_slice_codec
 
 
 class TestMeanScaleContextHead:
@@ -117,150 +111,3 @@ class TestMeanScaleContextHead:
             scale_out, mean_out = head_out.chunk(2, dim=1)
         assert torch.allclose(scale_out, expected_scale)
         assert torch.allclose(mean_out, expected_mean)
-
-
-class TestBuildChannelSliceCodec:
-    def _leaf_factory(self, side_ch=8):
-        # Return a leaf factory whose entropy_parameters width matches what
-        # ChannelGroupsLatentCodec hands the leaf at slice k.
-        def factory(k, slice_ch):
-            if k == 0:
-                ctx_in = side_ch
-            else:
-                ctx_in = (
-                    side_ch + 2 * slice_ch
-                )  # ch_ctx (= 2*slice_ch from MeanScaleHead) + side
-            return GaussianConditionalLatentCodec(
-                entropy_parameters=nn.Conv2d(ctx_in, 2 * slice_ch, 1),
-            )
-
-        return factory
-
-    def test_dict_keys_y0_through_yK_minus_one(self):
-        codec = build_channel_slice_codec(
-            groups=[4, 4, 4],
-            leaf_factory=self._leaf_factory(side_ch=8),
-            channel_context_factory=lambda k, ch, sup: build_mean_scale_head(
-                ch, sup, widths=(8, 8)
-            ),
-        )
-        latent_keys = set(codec.latent_codec.keys())
-        ctx_keys = set(codec.channel_context.keys())
-        assert latent_keys == {"y0", "y1", "y2"}
-        # Slice 0 has no channel context entry by design.
-        assert ctx_keys == {"y1", "y2"}
-
-    def test_state_dict_paths_match_design_doc(self):
-        codec = build_channel_slice_codec(
-            groups=[4, 4],
-            leaf_factory=self._leaf_factory(side_ch=8),
-            channel_context_factory=lambda k, ch, sup: build_mean_scale_head(
-                ch, sup, widths=(8,)
-            ),
-        )
-        keys = set(codec.state_dict().keys())
-        # Design doc paths (relative to ChannelGroupsLatentCodec root):
-        #   channel_context.y{k}.mean_cc.<idx>.weight
-        #   channel_context.y{k}.scale_cc.<idx>.weight
-        #   latent_codec.y{k}.gaussian_conditional.<buf>
-        assert any(k.startswith("channel_context.y1.mean_cc.") for k in keys)
-        assert any(k.startswith("channel_context.y1.scale_cc.") for k in keys)
-        assert any(k.startswith("latent_codec.y0.") for k in keys)
-        assert any(k.startswith("latent_codec.y1.") for k in keys)
-
-    def test_returns_channel_groups_latent_codec(self):
-        codec = build_channel_slice_codec(
-            groups=[4, 4, 4],
-            leaf_factory=self._leaf_factory(side_ch=8),
-            channel_context_factory=lambda k, ch, sup: build_mean_scale_head(
-                ch, sup, widths=(8, 8)
-            ),
-        )
-        assert isinstance(codec, ChannelGroupsLatentCodec)
-        assert codec.groups == [4, 4, 4]
-        assert codec.max_support_slices == -1
-        assert codec.support_filter is None
-
-    def test_max_support_slices_propagates(self):
-        codec = build_channel_slice_codec(
-            groups=[4, 4, 4, 4],
-            leaf_factory=self._leaf_factory(side_ch=8),
-            channel_context_factory=lambda k, ch, sup: build_mean_scale_head(
-                ch, sup, widths=(8,)
-            ),
-            max_support_slices=2,
-        )
-        assert codec.max_support_slices == 2
-        # support_ch passed to channel_context.y3 should be clamped to 2 slices.
-        # The MeanScaleContextHead's mean_cc input width is the first conv's
-        # in_channels.
-        head_y3 = codec.channel_context["y3"]
-        first_mean_conv = next(m for m in head_y3.mean_cc if isinstance(m, nn.Conv2d))
-        assert first_mean_conv.in_channels == 2 * 4  # 2 slices * 4 ch each
-
-    def test_support_filter_propagates(self):
-        def skip_recent(k, prior):
-            return prior[: max(k - 1, 0)]
-
-        codec = build_channel_slice_codec(
-            groups=[4, 4, 4],
-            leaf_factory=self._leaf_factory(side_ch=8),
-            channel_context_factory=lambda k, ch, sup: nn.Identity(),
-            support_filter=skip_recent,
-        )
-        assert codec.support_filter is skip_recent
-
-    def test_side_in_context_builds_y0_entry(self):
-        # In side_in_context mode the leaf gets only channel_context output
-        # (already shaped 2*slice_ch); each leaf can use Identity entropy_parameters.
-        codec = build_channel_slice_codec(
-            groups=[4, 4, 4],
-            side_channels=8,
-            side_in_context=True,
-            leaf_factory=lambda k, ch: GaussianConditionalLatentCodec(),
-            channel_context_factory=lambda k, ch, sup: build_mean_scale_head(
-                slice_ch=ch, support_ch=sup, side_split=4, widths=(8,)
-            ),
-        )
-        ctx_keys = set(codec.channel_context.keys())
-        assert ctx_keys == {"y0", "y1", "y2"}
-        assert codec.side_in_context is True
-
-        # y0 head input width = side_channels = 8.
-        head_y0 = codec.channel_context["y0"]
-        first_conv_y0 = next(m for m in head_y0.mean_cc if isinstance(m, nn.Conv2d))
-        # mean_cc input = support_ch - side_split = 8 - 4 = 4.
-        assert first_conv_y0.in_channels == 4
-
-        # y2 head input width = side_channels + groups[0] + groups[1] = 8 + 8 = 16;
-        # mean_cc input = 16 - 4 = 12.
-        head_y2 = codec.channel_context["y2"]
-        first_conv_y2 = next(m for m in head_y2.mean_cc if isinstance(m, nn.Conv2d))
-        assert first_conv_y2.in_channels == 12
-
-    def test_side_in_context_requires_side_channels(self):
-        with pytest.raises(ValueError, match="side_channels"):
-            build_channel_slice_codec(
-                groups=[4, 4],
-                side_in_context=True,
-                leaf_factory=lambda k, ch: GaussianConditionalLatentCodec(),
-            )
-
-    def test_side_in_context_forward_runs_end_to_end(self):
-        torch.manual_seed(0)
-        codec = build_channel_slice_codec(
-            groups=[4, 4],
-            side_channels=8,
-            side_in_context=True,
-            leaf_factory=lambda k, ch: GaussianConditionalLatentCodec(),
-            channel_context_factory=lambda k, ch, sup: build_mean_scale_head(
-                slice_ch=ch, support_ch=sup, side_split=4, widths=(8,)
-            ),
-        )
-        codec.eval()
-        y = torch.randn(2, 8, 8, 8)
-        side_params = torch.randn(2, 8, 8, 8)
-        with torch.no_grad():
-            out = codec(y, side_params)
-        assert out["y_hat"].shape == (2, 8, 8, 8)
-        assert out["likelihoods"]["y"].shape == (2, 8, 8, 8)
