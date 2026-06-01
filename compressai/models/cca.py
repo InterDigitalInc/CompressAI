@@ -55,6 +55,7 @@ from __future__ import annotations
 
 import math
 
+from itertools import accumulate
 from typing import Dict, List, Optional, Sequence, Tuple
 
 import torch
@@ -64,16 +65,15 @@ from torch import Tensor
 
 from compressai.entropy_models import EntropyBottleneck
 from compressai.latent_codecs import (
+    ChannelGroupsLatentCodec,
     DualHyperSynthesis,
     EntropyBottleneckLatentCodec,
-    GaussianConditionalLatentCodec,
     HyperpriorLatentCodec,
     LRPGaussianLatentCodec,
 )
 from compressai.latent_codecs._slice_helpers import make_entropy_transform
 from compressai.layers.layers import conv1x1
 from compressai.models._helpers.channel_context import build_mean_scale_head
-from compressai.models._helpers.channel_slice import build_channel_slice_codec
 from compressai.models.base import CompressionModel, get_scale_table
 from compressai.models.sensetime import ResidualBottleneckBlock
 from compressai.models.utils import conv, deconv
@@ -81,7 +81,6 @@ from compressai.registry import register_model
 
 __all__ = [
     "CCAModel",
-    "convert_upstream_cca_state_dict",
 ]
 
 
@@ -126,8 +125,8 @@ class _NAFBlock(nn.Module):
     image-compression model's analysis / synthesis stacks. State-dict keys
     (``norm1`` / ``pointwise_depthwise`` / ``channel_attention`` /
     ``project`` / ``feed_forward`` / ``beta`` / ``gamma``) match upstream
-    after :func:`convert_upstream_cca_state_dict` so released checkpoints
-    load 1:1.
+    after ``convert_upstream_cca_state_dict`` (in
+    ``examples/convert_cca_checkpoint.py``) so released checkpoints load 1:1.
     """
 
     def __init__(self, channels: int) -> None:
@@ -276,124 +275,8 @@ class _CCADecoder(nn.Module):
 
 
 # ----------------------------------------------------------------------------
-# Family 1 entropy-stack builders (main + auxiliary).
+# Auxiliary CCA entropy branch.
 # ----------------------------------------------------------------------------
-
-
-def _build_cca_main_latent_codec(
-    *,
-    M: int,
-    hyper_channels: int,
-    slice_sizes: Sequence[int],
-    em_hidden_channels: int,
-    em_num_layers: int,
-    h_a: nn.Module,
-    h_mean_s: nn.Module,
-    h_scale_s: nn.Module,
-) -> HyperpriorLatentCodec:
-    """Main entropy stack: ``HyperpriorLatentCodec`` wrapping
-    ``DualHyperSynthesis`` and a per-slice ``ChannelGroupsLatentCodec``.
-
-    Distinctive choices vs. STF/TCM (other Family 1 models):
-
-    - ``groups`` is a variable-length list (resolved from
-      ``slice_proportions``); STF / WACNN / TCM use uniform ``[M//K]*K``.
-    - ``support_transform_factory`` builds a per-slice
-      :class:`_NAFTransform` for both mean and scale paths (vs. STF
-      identity / TCM SWAtten).
-    - The leaf is :class:`LRPGaussianLatentCodec` with
-      ``mean_support_trail_channels`` matching
-      ``M + sum(slice_sizes[:k])``, paired with
-      ``MeanScaleContextHead(emit_mean_support="post")`` so the LRP head
-      receives the *post*-NAFTransform mean support — replicating the
-      upstream LIC LRP layout for byte-for-byte weight transfer.
-    - The ``z`` leaf uses ``EntropyBottleneckLatentCodec(quantizer="ste")``
-      to recover upstream's ``quantize_ste(z - z_offset) + z_offset``
-      behaviour without a model-side hack.
-    """
-    cumulative = list(_cumsum_with_zero(slice_sizes))
-    side_channels = 2 * M
-    K = len(slice_sizes)
-
-    def _support_count(k: int) -> int:
-        # use-all-prior; matches upstream LIC main path (no skip).
-        return k
-
-    def _mean_support_ch(k: int) -> int:
-        # cat(latent_means(M), *prev_y_hat(sum(slice_sizes[:k]))).
-        return M + cumulative[k]
-
-    def _leaf(k: int, slice_ch: int) -> LRPGaussianLatentCodec:
-        ms_ch = _mean_support_ch(k)
-        return LRPGaussianLatentCodec(
-            lrp_transform=_make_cca_head(
-                ms_ch + slice_ch,  # cat(mean_support, y_hat)
-                em_hidden_channels,
-                slice_ch,
-            ),
-            mean_support_trail_channels=ms_ch,
-            quantizer="ste",
-        )
-
-    def _naf_factory(c_in: int, c_out: int) -> nn.Module:
-        return _NAFTransform(c_in, c_out, em_hidden_channels, em_num_layers)
-
-    def _channel_context(_k: int, slice_ch: int, support_ch: int) -> nn.Module:
-        return build_mean_scale_head(
-            slice_ch=slice_ch,
-            support_ch=support_ch,
-            widths=(em_hidden_channels, 128),
-            side_split=M,
-            emit_mean_support="post",
-            support_transform_factory=_naf_factory,
-        )
-
-    if K == 0:
-        raise ValueError("slice_sizes must contain at least one entry")
-
-    return HyperpriorLatentCodec(
-        h_a=h_a,
-        h_s=DualHyperSynthesis(h_mean_s, h_scale_s),
-        latent_codec={
-            "z": EntropyBottleneckLatentCodec(
-                entropy_bottleneck=EntropyBottleneck(hyper_channels),
-                quantizer="ste",
-            ),
-            "y": build_channel_slice_codec(
-                groups=list(slice_sizes),
-                side_channels=side_channels,
-                side_in_context=True,
-                max_support_slices=-1,
-                support_count_fn=_support_count,
-                leaf_factory=_leaf,
-                channel_context_factory=_channel_context,
-            ),
-        },
-    )
-
-
-def _make_cca_head(
-    in_channels: int, hidden_channels: int, out_channels: int
-) -> nn.Sequential:
-    """Three-conv stack ``in -> hidden -> 128 -> out`` (kernel 3, stride 1).
-
-    Matches upstream ``mean_cc_transforms[k]`` / ``lrp_transforms[k]``
-    layout. Wraps :func:`make_entropy_transform` with the CCA-specific
-    ``widths=(hidden_channels, 128)``.
-    """
-    return make_entropy_transform(
-        in_channels, out_channels, widths=(hidden_channels, 128)
-    )
-
-
-def _cumsum_with_zero(values: Sequence[int]) -> List[int]:
-    """Return ``[0, values[0], values[0]+values[1], ...]`` (length ``len+1``)."""
-    out = [0]
-    running = 0
-    for value in values:
-        running += int(value)
-        out.append(running)
-    return out
 
 
 class _CCAAuxEntropyModel(nn.Module):
@@ -405,10 +288,10 @@ class _CCAAuxEntropyModel(nn.Module):
     Mirrors the upstream ``AuxEntropyModel`` in
     ``candidate/CCA/models/aux_em.py``: for slice ``i`` the support is
     ``cat(latent_means, *y_hat_slices[: max(i - 1, 0)])`` (i.e., skip the
-    *most recent* decoded slice). This is wired declaratively through
-    :func:`build_channel_slice_codec` with
-    ``support_filter=lambda k, prior: prior[: max(k - 1, 0)]`` and a
-    matching ``support_count_fn`` to size the channel-context heads.
+    *most recent* decoded slice). This is wired inline (ELIC-style) on a
+    :class:`ChannelGroupsLatentCodec` running ``side_in_context=True`` with
+    ``support_filter=lambda k, prior: prior[: max(k - 1, 0)]`` and matching
+    per-slice ``support_count`` to size the channel-context heads.
 
     Although upstream only *uses* the LRP path on the first ``num_slices -
     2`` slices, the published checkpoints carry LRP weights for *all*
@@ -433,53 +316,59 @@ class _CCAAuxEntropyModel(nn.Module):
         self.hidden_channels = int(hidden_channels)
         self.num_layers = int(num_layers)
 
-        cumulative = _cumsum_with_zero(self.slice_sizes)
-        side_channels = 2 * self.latent_channels
+        M = self.latent_channels
+        slice_sizes = self.slice_sizes
+        em_hidden_channels = self.hidden_channels
+        em_num_layers = self.num_layers
+        cumulative = list(accumulate(slice_sizes, initial=0))
+        widths = (em_hidden_channels, 128)
 
-        def _support_count(k: int) -> int:
+        # Skip-most-recent support: slice k sees max(k - 1, 0) prior slices.
+        def support_count(k: int) -> int:
             return max(k - 1, 0)
 
-        def _support_filter(k: int, prior: List[Tensor]) -> List[Tensor]:
+        def support_filter(k: int, prior: List[Tensor]) -> List[Tensor]:
             return prior[: max(k - 1, 0)]
 
-        def _mean_support_ch(k: int) -> int:
-            return self.latent_channels + cumulative[_support_count(k)]
+        def mean_support_ch(k: int) -> int:
+            return M + cumulative[support_count(k)]
 
-        def _leaf(k: int, slice_ch: int) -> LRPGaussianLatentCodec:
-            ms_ch = _mean_support_ch(k)
-            return LRPGaussianLatentCodec(
-                lrp_transform=_make_cca_head(
-                    ms_ch + slice_ch,
-                    self.hidden_channels,
-                    slice_ch,
+        def naf_factory(c_in: int, c_out: int) -> nn.Module:
+            return _NAFTransform(c_in, c_out, em_hidden_channels, em_num_layers)
+
+        # Family 1 side_in_context wiring, inlined ELIC-style. Differs from
+        # the main CCA stack only in the skip-most-recent support_filter /
+        # support_count (so the channel-context heads are sized smaller).
+        channel_context = {
+            f"y{k}": build_mean_scale_head(
+                slice_ch=slice_sizes[k],
+                support_ch=2 * M + cumulative[support_count(k)],
+                widths=widths,
+                side_split=M,
+                emit_mean_support="post",
+                support_transform_factory=naf_factory,
+            )
+            for k in range(self.num_slices)
+        }
+        y_latent_codec = {
+            f"y{k}": LRPGaussianLatentCodec(
+                lrp_transform=make_entropy_transform(
+                    mean_support_ch(k) + slice_sizes[k], slice_sizes[k], widths=widths
                 ),
-                mean_support_trail_channels=ms_ch,
+                mean_support_trail_channels=mean_support_ch(k),
                 quantizer="ste",
             )
+            for k in range(self.num_slices)
+        }
 
-        def _naf_factory(c_in: int, c_out: int) -> nn.Module:
-            return _NAFTransform(c_in, c_out, self.hidden_channels, self.num_layers)
-
-        def _channel_context(_k: int, slice_ch: int, support_ch: int) -> nn.Module:
-            return build_mean_scale_head(
-                slice_ch=slice_ch,
-                support_ch=support_ch,
-                widths=(self.hidden_channels, 128),
-                side_split=self.latent_channels,
-                emit_mean_support="post",
-                support_transform_factory=_naf_factory,
-            )
-
-        self.y_entropy_bottleneck = EntropyBottleneck(self.latent_channels)
-        self.inner_codec = build_channel_slice_codec(
-            groups=list(self.slice_sizes),
-            side_channels=side_channels,
-            side_in_context=True,
+        self.y_entropy_bottleneck = EntropyBottleneck(M)
+        self.inner_codec = ChannelGroupsLatentCodec(
+            groups=list(slice_sizes),
+            channel_context=channel_context,
+            latent_codec=y_latent_codec,
             max_support_slices=-1,
-            support_filter=_support_filter,
-            support_count_fn=_support_count,
-            leaf_factory=_leaf,
-            channel_context_factory=_channel_context,
+            support_filter=support_filter,
+            side_in_context=True,
         )
 
     def forward(
@@ -593,15 +482,72 @@ class CCAModel(CompressionModel):
             deconv(last_encoder_dim, self.M, kernel_size=3, stride=1),
         )
 
-        self.latent_codec = _build_cca_main_latent_codec(
-            M=self.M,
-            hyper_channels=self.N,
-            slice_sizes=self.slice_sizes,
-            em_hidden_channels=self.em_hidden_channels,
-            em_num_layers=self.em_num_layers,
+        # Main entropy stack, wired inline (ELIC-style). Distinctive choices
+        # vs. STF/WACNN/TCM (other Family 1 models):
+        #
+        # - ``groups`` is the variable-length ``slice_sizes`` (resolved from
+        #   ``slice_proportions``); STF / WACNN / TCM use uniform ``[M//K]*K``.
+        # - the per-slice mean / scale support transforms are _NAFTransform
+        #   instances (vs. STF identity / TCM SWAtten), with
+        #   ``emit_mean_support="post"`` so the LRP head receives the
+        #   *post*-NAFTransform mean support — replicating the upstream LIC
+        #   LRP layout for byte-for-byte weight transfer.
+        # - the ``z`` leaf uses ``EntropyBottleneckLatentCodec(quantizer="ste")``
+        #   to recover upstream's ``quantize_ste(z - z_offset) + z_offset``
+        #   behaviour without a model-side hack.
+        M = self.M
+        slice_sizes = self.slice_sizes
+        cumulative = list(accumulate(slice_sizes, initial=0))
+        widths = (self.em_hidden_channels, 128)
+
+        # use-all-prior support; matches upstream LIC main path (no skip).
+        def mean_support_ch(k: int) -> int:
+            # cat(latent_means(M), *prev_y_hat(sum(slice_sizes[:k]))).
+            return M + cumulative[k]
+
+        def naf_factory(c_in: int, c_out: int) -> nn.Module:
+            return _NAFTransform(
+                c_in, c_out, self.em_hidden_channels, self.em_num_layers
+            )
+
+        channel_context = {
+            f"y{k}": build_mean_scale_head(
+                slice_ch=slice_sizes[k],
+                support_ch=2 * M + cumulative[k],
+                widths=widths,
+                side_split=M,
+                emit_mean_support="post",
+                support_transform_factory=naf_factory,
+            )
+            for k in range(self.num_slices)
+        }
+        y_latent_codec = {
+            f"y{k}": LRPGaussianLatentCodec(
+                lrp_transform=make_entropy_transform(
+                    mean_support_ch(k) + slice_sizes[k], slice_sizes[k], widths=widths
+                ),
+                mean_support_trail_channels=mean_support_ch(k),
+                quantizer="ste",
+            )
+            for k in range(self.num_slices)
+        }
+
+        self.latent_codec = HyperpriorLatentCodec(
             h_a=h_a,
-            h_mean_s=h_mean_s,
-            h_scale_s=h_scale_s,
+            h_s=DualHyperSynthesis(h_mean_s, h_scale_s),
+            latent_codec={
+                "z": EntropyBottleneckLatentCodec(
+                    entropy_bottleneck=EntropyBottleneck(self.N),
+                    quantizer="ste",
+                ),
+                "y": ChannelGroupsLatentCodec(
+                    groups=list(slice_sizes),
+                    channel_context=channel_context,
+                    latent_codec=y_latent_codec,
+                    max_support_slices=-1,
+                    side_in_context=True,
+                ),
+            },
         )
 
         if self.cca_training:
@@ -655,359 +601,12 @@ class CCAModel(CompressionModel):
             scale_table = get_scale_table()
         return super().update(scale_table=scale_table, force=force, **kwargs)
 
-    def load_state_dict(self, state_dict: Dict[str, Tensor], strict: bool = True):
-        if _is_upstream_cca_state_dict(state_dict):
-            state_dict = convert_upstream_cca_state_dict(state_dict)
-        return super().load_state_dict(state_dict, strict=strict)
-
     @classmethod
     def from_state_dict(cls, state_dict: Dict[str, Tensor]) -> "CCAModel":
-        if _is_upstream_cca_state_dict(state_dict):
-            state_dict = convert_upstream_cca_state_dict(state_dict)
         cfg = _infer_config_from_state_dict(state_dict)
         net = cls(**cfg)
         net.load_state_dict(state_dict)
         return net
-
-
-# ----------------------------------------------------------------------------
-# Upstream → compressai state-dict conversion.
-# ----------------------------------------------------------------------------
-
-
-# NAFBlock interior renames (upstream -> compressai). These are scoped to
-# detected NAFBlock prefixes so they don't accidentally rewrite ``conv1`` in
-# unrelated modules (e.g. ResidualBottleneckBlock has its own ``conv1``).
-_NAF_BLOCK_RENAMES = {
-    "dwconv.": "pointwise_depthwise.",
-    "sca.": "channel_attention.",
-    "FFN.": "feed_forward.",
-    "conv1.": "project.",
-}
-# NAFTransform interior renames.
-_NAF_TRANSFORM_RENAMES = {
-    "in_conv.": "input_projection.",
-    "out_conv.": "output_projection.",
-}
-# Top-level rename map applied AFTER NAFBlock / NAFTransform interior renames
-# and BEFORE per-slice rerooting. Used for hyperprior backbone and aux module.
-_TOPLEVEL_RENAMES: Dict[str, str] = {
-    "aux_entropymodel.": "aux_entropy_model.",
-    "h_a.": "latent_codec.h_a.",
-    "h_mean_s.": "latent_codec.h_s.h_mean_s.",
-    "h_scale_s.": "latent_codec.h_s.h_scale_s.",
-    "z_entropy_bottleneck.": "latent_codec.z.entropy_bottleneck.",
-}
-# Upstream uses ``mean_NAF_transforms`` / ``scale_NAF_transforms``; this PR
-# stores them at ``{mean,scale}_support_transform`` inside the channel-context
-# head (singular per slice). Aliasing here keeps the per-slice rerooting pass
-# uniform across main and aux branches.
-_NAMED_PART_RENAMES: Dict[str, str] = {
-    "mean_NAF_transforms.": "mean_support_transforms.",
-    "scale_NAF_transforms.": "scale_support_transforms.",
-}
-
-
-def _is_upstream_cca_state_dict(state_dict: Dict[str, Tensor]) -> bool:
-    """Heuristic detector for upstream ``LICAutoencoder`` checkpoints."""
-    for key in state_dict:
-        if (
-            key.startswith("mean_NAF_transforms.")
-            or key.startswith("scale_NAF_transforms.")
-            or key.startswith("aux_entropymodel.")
-            or key.startswith("z_entropy_bottleneck.")
-            or key.startswith("mean_cc_transforms.")
-            or key.startswith("scale_cc_transforms.")
-            or key.startswith("lrp_transforms.")
-        ):
-            return True
-    return False
-
-
-def _find_naf_block_prefixes(state_dict: Dict[str, Tensor]) -> List[str]:
-    """Locate every NAFBlock instance by matching the ``.beta`` /  ``.gamma``
-    / ``.dwconv.0.weight`` / ``.FFN.0.weight`` 4-tuple at the same scope.
-    """
-    suffix = ".beta"
-    out: List[str] = []
-    for key in state_dict:
-        if not key.endswith(suffix):
-            continue
-        base = key[: -len(suffix)]
-        if (
-            f"{base}.gamma" in state_dict
-            and f"{base}.dwconv.0.weight" in state_dict
-            and f"{base}.FFN.0.weight" in state_dict
-        ):
-            out.append(base)
-    return out
-
-
-def _find_naf_transform_prefixes(state_dict: Dict[str, Tensor]) -> List[str]:
-    """Locate every NAFTransform instance by matching the ``.in_conv.weight``
-    / ``.out_conv.weight`` / ``.blocks.0.beta`` triple at the same scope.
-    """
-    suffix = ".in_conv.weight"
-    out: List[str] = []
-    for key in state_dict:
-        if not key.endswith(suffix):
-            continue
-        base = key[: -len(suffix)]
-        if (
-            f"{base}.out_conv.weight" in state_dict
-            and f"{base}.blocks.0.beta" in state_dict
-        ):
-            out.append(base)
-    return out
-
-
-def _strip_prefix(key: str, prefix: str) -> Optional[str]:
-    return key[len(prefix) :] if key.startswith(prefix) else None
-
-
-def _rename_with_table(
-    key: str,
-    base_prefixes: Sequence[str],
-    rename_map: Dict[str, str],
-) -> str:
-    for base in base_prefixes:
-        head = base + "."
-        rest = _strip_prefix(key, head)
-        if rest is None:
-            continue
-        for old, new in rename_map.items():
-            inner = _strip_prefix(rest, old)
-            if inner is not None:
-                return head + new + inner
-        return key
-    return key
-
-
-def _reroot_per_slice_keys(
-    cleaned: Dict[str, Tensor],
-    converted: Dict[str, Tensor],
-    *,
-    legacy_prefix: str,
-    container_prefix: str,
-    sub_name: str,
-    num_slices: int,
-    consume: List[str],
-) -> None:
-    """Move ``legacy_prefix.{k}.<...>`` keys to
-    ``container_prefix.y{k}.sub_name.<...>``.
-
-    Keys that match are removed from ``cleaned`` (recorded in ``consume``
-    for a later bulk drop) and inserted into ``converted`` under the new
-    path.
-    """
-    for key in list(cleaned.keys()):
-        rest = _strip_prefix(key, legacy_prefix + ".")
-        if rest is None:
-            continue
-        idx_str, _, tail = rest.partition(".")
-        try:
-            idx = int(idx_str)
-        except ValueError:
-            continue
-        if idx >= num_slices:
-            continue
-        new_key = (
-            f"{container_prefix}.y{idx}.{sub_name}.{tail}"
-            if tail
-            else f"{container_prefix}.y{idx}.{sub_name}"
-        )
-        converted[new_key] = cleaned[key]
-        consume.append(key)
-
-
-def _replicate_gaussian_conditional(
-    cleaned: Dict[str, Tensor],
-    converted: Dict[str, Tensor],
-    *,
-    legacy_prefix: str,
-    new_prefix: str,
-    num_slices: int,
-    consume: List[str],
-) -> None:
-    """Copy a single shared ``gaussian_conditional.<...>`` buffer set under
-    every per-slice leaf so the per-slice
-    :class:`GaussianConditionalLatentCodec` copies all strict-load.
-    """
-    for key in list(cleaned.keys()):
-        tail = _strip_prefix(key, legacy_prefix + ".")
-        if tail is None:
-            continue
-        for k in range(num_slices):
-            new_key = f"{new_prefix}.y{k}.gaussian_conditional.{tail}"
-            converted[new_key] = cleaned[key]
-        consume.append(key)
-
-
-def convert_upstream_cca_state_dict(
-    state_dict: Dict[str, Tensor],
-) -> Dict[str, Tensor]:
-    """Translate an upstream CCA ``LICAutoencoder`` state dict to the
-    compressai layout produced by :class:`CCAModel`.
-
-    Conversion runs three logical passes:
-
-    1. Interior renames: ``NAFBlock`` (``dwconv`` → ``pointwise_depthwise``,
-       etc.) and ``NAFTransform`` (``in_conv`` → ``input_projection``,
-       etc.). Detection is by structural fingerprint
-       (:func:`_find_naf_block_prefixes`) so the renames apply uniformly to
-       NAFBlocks anywhere in the state dict (``g_a`` / ``g_s`` / per-slice
-       support transforms / aux module).
-    2. Top-level renames: ``aux_entropymodel`` → ``aux_entropy_model``,
-       hyperprior backbone (``h_a`` / ``h_mean_s`` / ``h_scale_s``) and
-       ``z_entropy_bottleneck`` are moved under ``latent_codec.*``;
-       ``mean_NAF_transforms`` / ``scale_NAF_transforms`` are aliased to
-       the singular ``{mean,scale}_support_transforms`` form so the
-       per-slice rerooting in pass 3 only handles one name.
-    3. Per-slice rerooting: ``mean_cc_transforms.{k}`` /
-       ``scale_cc_transforms.{k}`` move to
-       ``latent_codec.y.channel_context.y{k}.{mean,scale}_cc.*``;
-       ``mean_support_transforms.{k}`` / ``scale_support_transforms.{k}``
-       move to
-       ``latent_codec.y.channel_context.y{k}.{mean,scale}_support_transform.*``;
-       ``lrp_transforms.{k}`` moves to
-       ``latent_codec.y.latent_codec.y{k}.lrp_transform.*``; the single
-       shared ``gaussian_conditional.*`` buffer set is replicated under
-       every per-slice leaf
-       (``latent_codec.y.latent_codec.y{k}.gaussian_conditional.*``). The
-       same rerooting is applied to ``aux_entropy_model.*`` (after the
-       top-level rename) under ``aux_entropy_model.inner_codec.*``.
-
-    The returned dict can be loaded by :meth:`CCAModel.from_state_dict`,
-    which auto-detects the upstream layout via
-    :func:`_is_upstream_cca_state_dict`, so direct invocation is only
-    needed when persisting the converted dict.
-    """
-    naf_blocks = _find_naf_block_prefixes(state_dict)
-    naf_transforms = _find_naf_transform_prefixes(state_dict)
-
-    # Pass 1+2: interior + top-level renames.
-    cleaned: Dict[str, Tensor] = {}
-    for key, value in state_dict.items():
-        new_key = _rename_with_table(key, naf_blocks, _NAF_BLOCK_RENAMES)
-        new_key = _rename_with_table(new_key, naf_transforms, _NAF_TRANSFORM_RENAMES)
-        for old, new in _NAMED_PART_RENAMES.items():
-            new_key = new_key.replace(old, new)
-        for old, new in _TOPLEVEL_RENAMES.items():
-            if new_key.startswith(old):
-                new_key = new + new_key[len(old) :]
-                break
-        cleaned[new_key] = value
-
-    # Pass 3a: per-slice rerooting for the main entropy stack. Discover
-    # ``num_slices`` from ``mean_cc_transforms`` first, then drive the rest.
-    main_indices = sorted(
-        {
-            int(key[len("mean_cc_transforms.") :].split(".", 1)[0])
-            for key in cleaned
-            if key.startswith("mean_cc_transforms.")
-        }
-    )
-    num_slices_main = len(main_indices)
-
-    converted: Dict[str, Tensor] = {}
-    consumed: List[str] = []
-
-    if num_slices_main:
-        for legacy, container, sub in (
-            ("mean_cc_transforms", "latent_codec.y.channel_context", "mean_cc"),
-            ("scale_cc_transforms", "latent_codec.y.channel_context", "scale_cc"),
-            (
-                "mean_support_transforms",
-                "latent_codec.y.channel_context",
-                "mean_support_transform",
-            ),
-            (
-                "scale_support_transforms",
-                "latent_codec.y.channel_context",
-                "scale_support_transform",
-            ),
-            ("lrp_transforms", "latent_codec.y.latent_codec", "lrp_transform"),
-        ):
-            _reroot_per_slice_keys(
-                cleaned,
-                converted,
-                legacy_prefix=legacy,
-                container_prefix=container,
-                sub_name=sub,
-                num_slices=num_slices_main,
-                consume=consumed,
-            )
-        _replicate_gaussian_conditional(
-            cleaned,
-            converted,
-            legacy_prefix="gaussian_conditional",
-            new_prefix="latent_codec.y.latent_codec",
-            num_slices=num_slices_main,
-            consume=consumed,
-        )
-
-    # Pass 3b: per-slice rerooting inside the aux entropy module. Discover
-    # ``num_slices_aux`` from ``aux_entropy_model.mean_cc_transforms``.
-    aux_indices = sorted(
-        {
-            int(key[len("aux_entropy_model.mean_cc_transforms.") :].split(".", 1)[0])
-            for key in cleaned
-            if key.startswith("aux_entropy_model.mean_cc_transforms.")
-        }
-    )
-    num_slices_aux = len(aux_indices)
-    if num_slices_aux:
-        for legacy, container, sub in (
-            (
-                "aux_entropy_model.mean_cc_transforms",
-                "aux_entropy_model.inner_codec.channel_context",
-                "mean_cc",
-            ),
-            (
-                "aux_entropy_model.scale_cc_transforms",
-                "aux_entropy_model.inner_codec.channel_context",
-                "scale_cc",
-            ),
-            (
-                "aux_entropy_model.mean_support_transforms",
-                "aux_entropy_model.inner_codec.channel_context",
-                "mean_support_transform",
-            ),
-            (
-                "aux_entropy_model.scale_support_transforms",
-                "aux_entropy_model.inner_codec.channel_context",
-                "scale_support_transform",
-            ),
-            (
-                "aux_entropy_model.lrp_transforms",
-                "aux_entropy_model.inner_codec.latent_codec",
-                "lrp_transform",
-            ),
-        ):
-            _reroot_per_slice_keys(
-                cleaned,
-                converted,
-                legacy_prefix=legacy,
-                container_prefix=container,
-                sub_name=sub,
-                num_slices=num_slices_aux,
-                consume=consumed,
-            )
-        _replicate_gaussian_conditional(
-            cleaned,
-            converted,
-            legacy_prefix="aux_entropy_model.gaussian_conditional",
-            new_prefix="aux_entropy_model.inner_codec.latent_codec",
-            num_slices=num_slices_aux,
-            consume=consumed,
-        )
-
-    for key in consumed:
-        cleaned.pop(key, None)
-    # Remaining keys (g_a / g_s / latent_codec.* hyperprior backbone /
-    # aux_entropy_model.y_entropy_bottleneck / etc.) pass through unchanged.
-    converted.update(cleaned)
-    return converted
 
 
 # ----------------------------------------------------------------------------
