@@ -478,7 +478,9 @@ class TestTcm:
         assert loaded.max_support_slices == 2
 
     def test_tcm_upstream_state_dict_conversion(self):
-        from compressai.models.tcm import convert_upstream_tcm_state_dict
+        convert_upstream_tcm_state_dict = _load_convert_fn(
+            "convert_tcm_checkpoint.py", "convert_upstream_tcm_state_dict"
+        )
 
         # Synthetic upstream LIC_TCM-style state_dict: DataParallel ``module.``
         # prefix, raw entropy heads at the root, the SWAtten ``nn.Sequential``
