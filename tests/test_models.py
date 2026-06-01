@@ -692,9 +692,11 @@ class TestCca:
         )
 
     def test_cca_upstream_state_dict_conversion(self):
-        from compressai.models.cca import (
-            _is_upstream_cca_state_dict,
-            convert_upstream_cca_state_dict,
+        convert_upstream_cca_state_dict = _load_convert_fn(
+            "convert_cca_checkpoint.py", "convert_upstream_cca_state_dict"
+        )
+        _is_upstream_cca_state_dict = _load_convert_fn(
+            "convert_cca_checkpoint.py", "_is_upstream_cca_state_dict"
         )
 
         # Synthetic upstream LICAutoencoder-style state_dict with one slice
