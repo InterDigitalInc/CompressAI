@@ -27,6 +27,10 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import importlib.util
+
+from pathlib import Path
+
 import pytest
 import torch
 import torch.nn as nn
@@ -50,6 +54,24 @@ from compressai.models.utils import (
 )
 from compressai.models.vbr import ScaleHyperpriorVbr
 from compressai.models.video.google import ScaleSpaceFlow
+
+_EXAMPLES_DIR = Path(__file__).resolve().parent.parent / "examples"
+
+
+def _load_convert_fn(script_name: str, fn_name: str):
+    """Load a ``convert_upstream_*_state_dict`` function from an
+    ``examples/convert_*_checkpoint.py`` script.
+
+    The upstream-checkpoint conversion helpers live in the example CLI
+    scripts (not in ``compressai.models.*``) so the model modules stay
+    clean compressai-native definitions. ``examples/`` is not an importable
+    package, so we load the module by file path.
+    """
+    path = _EXAMPLES_DIR / script_name
+    spec = importlib.util.spec_from_file_location(path.stem, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return getattr(module, fn_name)
 
 
 class DummyCompressionModel(CompressionModel):
@@ -346,8 +368,8 @@ class TestStf:
         assert torch.allclose(out["x_hat"], out_loaded["x_hat"])
 
     def test_stf_upstream_state_dict_conversion(self):
-        from compressai.models.stf import (
-            convert_upstream_stf_state_dict,
+        convert_upstream_stf_state_dict = _load_convert_fn(
+            "convert_stf_checkpoint.py", "convert_upstream_stf_state_dict"
         )
 
         upstream = {

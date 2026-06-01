@@ -36,19 +36,18 @@
 from __future__ import annotations
 
 import math
-import re
 
 from typing import Dict, Optional, Sequence, Tuple, Type
 
 import torch
 import torch.nn as nn
 
-from timm.layers import DropPath, Mlp
 from timm.models.swin_transformer import SwinTransformerBlock as _TimmSwinBlock
 from torch import Tensor
 
 from compressai.entropy_models import EntropyBottleneck
 from compressai.latent_codecs import (
+    ChannelGroupsLatentCodec,
     DualHyperSynthesis,
     EntropyBottleneckLatentCodec,
     HyperpriorLatentCodec,
@@ -66,15 +65,13 @@ from compressai.layers.attn import (
     WinNoShiftAttention,
 )
 from compressai.models._helpers.channel_context import build_mean_scale_head
-from compressai.models._helpers.channel_slice import build_channel_slice_codec
-from compressai.models.base import CompressionModel
+from compressai.models.base import CompressionModel, SimpleVAECompressionModel
 from compressai.models.utils import conv, deconv
 from compressai.registry import register_model
 
 __all__ = [
     "SymmetricalTransFormer",
     "WACNN",
-    "convert_upstream_stf_state_dict",
 ]
 
 
@@ -213,171 +210,8 @@ class _PatchEmbed(nn.Module):
 # ----------------------------------------------------------------------------
 
 
-_UPSTREAM_LATENT_CODEC_PREFIXES = (
-    "cc_mean_transforms",
-    "cc_scale_transforms",
-    "lrp_transforms",
-    "gaussian_conditional",
-)
-
-# Top-level rename map applied AFTER per-slice cc_/lrp_/gaussian_conditional
-# rerooting. Keys are matched as exact prefixes (with the trailing dot).
-_UPSTREAM_TOP_LEVEL_RENAMES: Dict[str, str] = {
-    "h_a.": "latent_codec.h_a.",
-    "h_mean_s.": "latent_codec.h_s.h_mean_s.",
-    "h_scale_s.": "latent_codec.h_s.h_scale_s.",
-    "entropy_bottleneck.": "latent_codec.z.entropy_bottleneck.",
-}
-
-# Upstream STF places the WindowAttention parameters directly under
-# ``conv_b.<i>.attn.{qkv,proj,relative_position_*}``. CompressAI wraps the
-# WindowAttention inside a :class:`compressai.layers.attn.swin.WMSA` shim, so
-# the live model keeps ``WMSA.attn = WindowAttention(...)`` and the
-# parameters land at ``conv_b.<i>.attn.attn.*``. This regex inserts the extra
-# ``.attn`` so renamed upstream keys round-trip into the WMSA wrapper without
-# changing the model topology.
-_WMSA_NEST_PATTERN = re.compile(
-    r"(\.conv_b\.\d+\.attn)\.(qkv\.|proj\.|relative_position_)"
-)
-
-
-def _nest_winmsa_keys(key: str) -> str:
-    """Insert the WMSA wrapper level (``.attn``) into upstream
-    ``conv_b.*.attn.{qkv,proj,relative_position_*}`` keys."""
-    return _WMSA_NEST_PATTERN.sub(r"\1.attn.\2", key)
-
-
-def convert_upstream_stf_state_dict(
-    state_dict: Dict[str, Tensor],
-) -> Dict[str, Tensor]:
-    """Translate a candidate ``STF`` / ``WACNN`` state dict into compressai layout.
-
-    Upstream checkpoints (``stf_<bpp>_best.pth.tar`` / ``cnn_<bpp>_best.pth.tar``
-    from `Zou et al. 2022 <https://arxiv.org/abs/2203.08450>`_) are saved from a
-    ``DataParallel``-wrapped module and place the channel-conditional entropy
-    transforms at the model root. After the H+G containerised refactor
-    compressai houses those transforms (plus the Gaussian conditional and
-    the hyperprior backbone) inside ``latent_codec.*``. This helper:
-
-    - strips the leading ``module.`` prefix added by ``DataParallel``;
-    - re-roots ``cc_mean_transforms.{k}`` / ``cc_scale_transforms.{k}`` /
-      ``lrp_transforms.{k}`` under
-      ``latent_codec.y.channel_context.y{k}.{mean_cc,scale_cc}.*`` /
-      ``latent_codec.y.latent_codec.y{k}.lrp_transform.*``;
-    - replicates the single shared ``gaussian_conditional.*`` buffer set
-      under each per-slice leaf (``latent_codec.y.latent_codec.y{k}.gaussian_conditional.*``);
-    - moves ``entropy_bottleneck.*`` / ``h_a.*`` / ``h_mean_s.*`` /
-      ``h_scale_s.*`` under ``latent_codec.*`` per the new layout;
-    - leaves ``g_a`` / ``g_s`` / ``patch_embed`` / ``layers`` /
-      ``syn_layers`` / ``end_conv`` keys unchanged.
-
-    .. caveat::
-       The wiring sets ``emit_mean_support=True`` on the
-       ``MeanScaleContextHead`` so the upstream LRP layout
-       (``cat(latent_means, *prev_y_hat, y_hat)``) is recoverable inside the
-       leaf — upstream ``lrp_transforms.{k}`` weights therefore transfer
-       byte-for-byte. The model's ``WinNoShiftAttention`` consumers wrap
-       their windowed-attention layers in a :class:`WMSA` shim, so the
-       conversion also nests upstream ``conv_b.{i}.attn.{qkv,proj,
-       relative_position_*}`` keys under the extra ``.attn`` level (see
-       :func:`_nest_winmsa_keys`).
-
-    The returned dict can be loaded by :meth:`WACNN.from_state_dict` or
-    :meth:`SymmetricalTransFormer.from_state_dict`. Both ``from_state_dict``
-    entry points auto-detect the upstream layout and call this helper, so
-    direct invocation is only needed when persisting the converted dict.
-    """
-    converted: Dict[str, Tensor] = {}
-
-    _LEGACY_ROOT_HEADS = set(_UPSTREAM_LATENT_CODEC_PREFIXES) | {
-        "h_a",
-        "h_mean_s",
-        "h_scale_s",
-        "entropy_bottleneck",
-    }
-
-    # Pass 1: strip module. prefix, fold the upstream single-``attn`` window
-    # attention path back into compressai's WMSA wrapper layout, and inventory
-    # which keys exist.
-    cleaned: Dict[str, Tensor] = {}
-    has_legacy_root_keys = False
-    for key, value in state_dict.items():
-        new_key = key[len("module.") :] if key.startswith("module.") else key
-        new_key = _nest_winmsa_keys(new_key)
-        cleaned[new_key] = value
-        if new_key.split(".", 1)[0] in _LEGACY_ROOT_HEADS:
-            has_legacy_root_keys = True
-
-    if not has_legacy_root_keys:
-        # Already in (or near) the new layout — return cleaned dict as-is.
-        return cleaned
-
-    # Pass 2: discover slice indices to drive gaussian_conditional replication
-    # and per-slice rerooting.
-    slice_indices = sorted(
-        {
-            int(key.split(".")[1])
-            for key in cleaned
-            if key.startswith("cc_mean_transforms.")
-        }
-    )
-    num_slices = len(slice_indices)
-
-    for key, value in cleaned.items():
-        head = key.split(".", 1)[0]
-        if head == "cc_mean_transforms":
-            _, k, *rest = key.split(".")
-            new_key = f"latent_codec.y.channel_context.y{k}.mean_cc." + ".".join(rest)
-            converted[new_key] = value
-        elif head == "cc_scale_transforms":
-            _, k, *rest = key.split(".")
-            new_key = f"latent_codec.y.channel_context.y{k}.scale_cc." + ".".join(rest)
-            converted[new_key] = value
-        elif head == "lrp_transforms":
-            _, k, *rest = key.split(".")
-            new_key = f"latent_codec.y.latent_codec.y{k}.lrp_transform." + ".".join(
-                rest
-            )
-            converted[new_key] = value
-        elif head == "gaussian_conditional":
-            # Replicate the single shared instance to per-slice leaves.
-            tail = key[len("gaussian_conditional.") :]
-            for k in range(num_slices):
-                new_key = (
-                    f"latent_codec.y.latent_codec.y{k}" f".gaussian_conditional.{tail}"
-                )
-                converted[new_key] = value
-        else:
-            renamed = key
-            for prefix, replacement in _UPSTREAM_TOP_LEVEL_RENAMES.items():
-                if key.startswith(prefix):
-                    renamed = replacement + key[len(prefix) :]
-                    break
-            converted[renamed] = value
-
-    return converted
-
-
-def _is_upstream_stf_state_dict(state_dict: Dict[str, Tensor]) -> bool:
-    """Heuristic: upstream checkpoints either carry a ``module.`` prefix or
-    place ``cc_mean_transforms`` at the root instead of under ``latent_codec``.
-    """
-    for key in state_dict:
-        if key.startswith("module."):
-            return True
-        head = key.split(".", 1)[0]
-        if head in _UPSTREAM_LATENT_CODEC_PREFIXES or head in {
-            "h_a",
-            "h_mean_s",
-            "h_scale_s",
-            "entropy_bottleneck",
-        }:
-            return True
-    return False
-
-
 @register_model("stf-wacnn")
-class WACNN(CompressionModel):
+class WACNN(SimpleVAECompressionModel):
     r"""WACNN model from R. Zou, C. Song, Z. Zhang: `"The Devil Is in the
     Details: Window-based Attention for Image Compression"
     <https://arxiv.org/abs/2203.08450>`_, IEEE/CVF Conf. on Computer Vision
@@ -391,7 +225,11 @@ class WACNN(CompressionModel):
     The entropy stack is a fully containerised
     :class:`HyperpriorLatentCodec` that owns ``h_a``, ``h_s``, the ``z``
     bottleneck and the per-slice ``ChannelGroupsLatentCodec`` running in
-    Family 1 ``side_in_context=True`` mode.
+    Family 1 ``side_in_context=True`` mode. The codec is wired inline in
+    ``__init__`` (ELIC-style) rather than behind a factory: the
+    ``channel_context`` heads are :class:`MeanScaleContextHead` instances
+    (split mean / scale, ``emit_mean_support=True``) and the per-slice
+    leaves are STE-quantised :class:`LRPGaussianLatentCodec`.
 
     Args:
         N (int): Number of channels in the hyperprior backbone.
@@ -457,43 +295,62 @@ class WACNN(CompressionModel):
         h_mean_s = _build_stf_h_subpel(N, M)
         h_scale_s = _build_stf_h_subpel(N, M)
 
-        self.latent_codec = _build_family1_latent_codec(
-            N=N,
-            M=M,
-            slice_ch=slice_ch,
-            num_slices=num_slices,
-            max_support_slices=max_support_slices,
-            widths=(224, 176, 128, 64),
-            h_a=h_a,
-            h_mean_s=h_mean_s,
-            h_scale_s=h_scale_s,
-        )
+        widths = (224, 176, 128, 64)
+        groups = [slice_ch] * num_slices
 
-    def forward(self, x: Tensor) -> Dict[str, Dict[str, Tensor] | Tensor]:
-        y = self.g_a(x)
-        y_out = self.latent_codec(y)
-        return {
-            "x_hat": self.g_s(y_out["y_hat"]),
-            "likelihoods": y_out["likelihoods"],
+        def support_count(k: int) -> int:
+            return k if max_support_slices < 0 else min(k, max_support_slices)
+
+        # mean_support = cat(latent_means(M), *prev_y_hat(slice_ch * support_count)).
+        def mean_support_ch(k: int) -> int:
+            return M + slice_ch * support_count(k)
+
+        # In Family 1 side_in_context mode, channel_context covers y0..y(K-1):
+        # each head sees cat(side_params(2M), *prev_y_hat) and emits
+        # cat(scale, mean, mean_support) for the LRP-aware leaf to consume.
+        channel_context = {
+            f"y{k}": build_mean_scale_head(
+                slice_ch=slice_ch,
+                support_ch=2 * M + slice_ch * support_count(k),
+                widths=widths,
+                side_split=M,
+                emit_mean_support=True,
+            )
+            for k in range(num_slices)
+        }
+        # Per-slice leaves: LRP transform reads cat(mean_support, y_hat) off
+        # the trailing block of ctx_params; upstream lrp_transforms.{k}
+        # weights transfer byte-for-byte (see convert_upstream_stf_state_dict).
+        y_latent_codec = {
+            f"y{k}": LRPGaussianLatentCodec(
+                lrp_transform=make_entropy_transform(
+                    mean_support_ch(k) + slice_ch, slice_ch, widths=widths
+                ),
+                mean_support_trail_channels=mean_support_ch(k),
+                quantizer="ste",
+            )
+            for k in range(num_slices)
         }
 
-    def compress(self, x: Tensor) -> Dict[str, object]:
-        y = self.g_a(x)
-        y_out = self.latent_codec.compress(y)
-        return {"strings": y_out["strings"], "shape": y_out["shape"]}
-
-    def decompress(
-        self,
-        strings: Sequence[Sequence[bytes]],
-        shape: Dict[str, Tuple[int, ...]] | Tuple[int, int],
-    ) -> Dict[str, Tensor]:
-        y_out = self.latent_codec.decompress(strings, shape)
-        return {"x_hat": self.g_s(y_out["y_hat"]).clamp_(0, 1)}
+        self.latent_codec = HyperpriorLatentCodec(
+            h_a=h_a,
+            h_s=DualHyperSynthesis(h_mean_s, h_scale_s),
+            latent_codec={
+                "z": EntropyBottleneckLatentCodec(
+                    entropy_bottleneck=EntropyBottleneck(N), quantizer="ste"
+                ),
+                "y": ChannelGroupsLatentCodec(
+                    groups=groups,
+                    channel_context=channel_context,
+                    latent_codec=y_latent_codec,
+                    max_support_slices=max_support_slices,
+                    side_in_context=True,
+                ),
+            },
+        )
 
     @classmethod
     def from_state_dict(cls, state_dict: Dict[str, Tensor]) -> "WACNN":
-        if _is_upstream_stf_state_dict(state_dict):
-            state_dict = convert_upstream_stf_state_dict(state_dict)
         N = state_dict["g_a.0.weight"].size(0)
         M = state_dict["g_a.7.weight"].size(0)
         num_slices = infer_num_slices(state_dict) or 10
@@ -547,86 +404,6 @@ def _build_stf_transformer_h_subpel(
         subpel_conv3x3(latent_channels - embed_dim, latent_channels, 2),
         nn.GELU(),
         conv3x3(latent_channels, latent_channels),
-    )
-
-
-def _build_family1_latent_codec(
-    *,
-    N: int,
-    M: int,
-    slice_ch: int,
-    num_slices: int,
-    max_support_slices: int,
-    widths: Sequence[int],
-    h_a: nn.Module,
-    h_mean_s: nn.Module,
-    h_scale_s: nn.Module,
-) -> HyperpriorLatentCodec:
-    """Assemble the Family 1 entropy stack: ``HyperpriorLatentCodec``
-    wrapping ``DualHyperSynthesis`` and a per-slice
-    ``ChannelGroupsLatentCodec`` (``side_in_context=True``) whose channel
-    contexts are :class:`MeanScaleContextHead` instances and leaves are
-    :class:`LRPGaussianLatentCodec` (STE-quantised). ``side_channels = 2 *
-    M`` because ``DualHyperSynthesis`` cats ``h_mean_s(z_hat)`` and
-    ``h_scale_s(z_hat)``.
-
-    The channel-context heads run with ``emit_mean_support=True`` so each
-    head appends ``cat(latent_means, *prev_y_hat)`` to its output; the leaf
-    splits that trailing block off (``mean_support_trail_channels``) and
-    uses it as the LRP input. This reproduces the upstream STF / WACNN LRP
-    layout (``cat(latent_means, *prev_y_hat, y_hat)``), so the
-    ``lrp_transforms.{k}`` weights from upstream Zou et al. checkpoints
-    transfer byte-for-byte after the rename pass in
-    :func:`convert_upstream_stf_state_dict`.
-    """
-    side_channels = 2 * M
-
-    def _support_count(k: int) -> int:
-        if max_support_slices < 0:
-            return k
-        return min(k, max_support_slices)
-
-    def _mean_support_ch(k: int) -> int:
-        # cat(latent_means(M), *prev_y_hat(slice_ch * support_count)).
-        return M + slice_ch * _support_count(k)
-
-    def _leaf(k: int, _slice_ch: int) -> LRPGaussianLatentCodec:
-        ms_ch = _mean_support_ch(k)
-        return LRPGaussianLatentCodec(
-            lrp_transform=make_entropy_transform(
-                ms_ch + _slice_ch,  # cat(mean_support, y_hat)
-                _slice_ch,
-                widths=widths,
-            ),
-            mean_support_trail_channels=ms_ch,
-            quantizer="ste",
-        )
-
-    def _channel_context(_k: int, _slice_ch: int, support_ch: int) -> nn.Module:
-        return build_mean_scale_head(
-            slice_ch=_slice_ch,
-            support_ch=support_ch,
-            widths=widths,
-            side_split=M,
-            emit_mean_support=True,
-        )
-
-    return HyperpriorLatentCodec(
-        h_a=h_a,
-        h_s=DualHyperSynthesis(h_mean_s, h_scale_s),
-        latent_codec={
-            "z": EntropyBottleneckLatentCodec(
-                entropy_bottleneck=EntropyBottleneck(N), quantizer="ste"
-            ),
-            "y": build_channel_slice_codec(
-                groups=[slice_ch] * num_slices,
-                side_channels=side_channels,
-                side_in_context=True,
-                max_support_slices=max_support_slices,
-                leaf_factory=_leaf,
-                channel_context_factory=_channel_context,
-            ),
-        },
     )
 
 
@@ -776,16 +553,55 @@ class SymmetricalTransFormer(CompressionModel):
             bottleneck_channels, latent_channels, embed_dim
         )
 
-        self.latent_codec = _build_family1_latent_codec(
-            N=bottleneck_channels,
-            M=latent_channels,
-            slice_ch=slice_ch,
-            num_slices=num_slices,
-            max_support_slices=resolved_max_support,
-            widths=(224, 176, 128, 64),
+        N = bottleneck_channels
+        M = latent_channels
+        widths = (224, 176, 128, 64)
+        groups = [slice_ch] * num_slices
+
+        def support_count(k: int) -> int:
+            return k if resolved_max_support < 0 else min(k, resolved_max_support)
+
+        def mean_support_ch(k: int) -> int:
+            return M + slice_ch * support_count(k)
+
+        # Family 1 side_in_context wiring, inlined ELIC-style (see WACNN
+        # for the per-key shape rationale).
+        channel_context = {
+            f"y{k}": build_mean_scale_head(
+                slice_ch=slice_ch,
+                support_ch=2 * M + slice_ch * support_count(k),
+                widths=widths,
+                side_split=M,
+                emit_mean_support=True,
+            )
+            for k in range(num_slices)
+        }
+        y_latent_codec = {
+            f"y{k}": LRPGaussianLatentCodec(
+                lrp_transform=make_entropy_transform(
+                    mean_support_ch(k) + slice_ch, slice_ch, widths=widths
+                ),
+                mean_support_trail_channels=mean_support_ch(k),
+                quantizer="ste",
+            )
+            for k in range(num_slices)
+        }
+
+        self.latent_codec = HyperpriorLatentCodec(
             h_a=h_a,
-            h_mean_s=h_mean_s,
-            h_scale_s=h_scale_s,
+            h_s=DualHyperSynthesis(h_mean_s, h_scale_s),
+            latent_codec={
+                "z": EntropyBottleneckLatentCodec(
+                    entropy_bottleneck=EntropyBottleneck(N), quantizer="ste"
+                ),
+                "y": ChannelGroupsLatentCodec(
+                    groups=groups,
+                    channel_context=channel_context,
+                    latent_codec=y_latent_codec,
+                    max_support_slices=resolved_max_support,
+                    side_in_context=True,
+                ),
+            },
         )
 
     def _analysis_transform(self, x: Tensor) -> Tuple[Tensor, int, int]:
@@ -839,8 +655,6 @@ class SymmetricalTransFormer(CompressionModel):
 
     @classmethod
     def from_state_dict(cls, state_dict: Dict[str, Tensor]) -> "SymmetricalTransFormer":
-        if _is_upstream_stf_state_dict(state_dict):
-            state_dict = convert_upstream_stf_state_dict(state_dict)
         patch_size = state_dict["patch_embed.proj.weight"].size(2)
         embed_dim = state_dict["patch_embed.proj.weight"].size(0)
         layer_indices = sorted(
