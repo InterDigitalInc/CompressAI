@@ -40,13 +40,11 @@ M. Han, S. Jiang, S. Li, X. Deng, M. Xu, C. Zhu, S. Gu:
 `"Causal Context Adjustment Loss for Learned Image Compression"
 <https://arxiv.org/abs/2410.04847>`_, NeurIPS 2024.
 
-Family 1 wiring (see :mod:`compressai.latent_codecs.__init__`): the main
-entropy stack is a fully containerised :class:`HyperpriorLatentCodec`
-running ``side_in_context=True`` with variable-length slice groups and
-per-slice :class:`_NAFTransform` support transforms. The optional
-auxiliary CCA branch (:class:`_CCAAuxEntropyModel`) is a separate
-``nn.Module`` that re-encodes ``y`` with the skip-most-recent
-``support_filter`` selection used by
+The main entropy stack is a fully containerised
+:class:`HyperpriorLatentCodec` with variable-length slice groups and
+per-slice :class:`_NAFTransform` support transforms. The optional auxiliary
+CCA branch (:class:`_CCAAuxEntropyModel`) is a separate ``nn.Module`` that
+re-encodes ``y`` with the skip-most-recent support selection used by
 :class:`compressai.losses.CCARateDistortionLoss` to align the causal
 context with the rate-distortion objective.
 """
@@ -56,7 +54,7 @@ from __future__ import annotations
 import math
 
 from itertools import accumulate
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 import torch
 import torch.nn as nn
@@ -66,14 +64,13 @@ from torch import Tensor
 from compressai.entropy_models import EntropyBottleneck
 from compressai.latent_codecs import (
     ChannelGroupsLatentCodec,
-    DualHyperSynthesis,
     EntropyBottleneckLatentCodec,
+    GaussianConditionalLatentCodec,
     HyperpriorLatentCodec,
-    LRPGaussianLatentCodec,
 )
-from compressai.latent_codecs._slice_helpers import make_entropy_transform
 from compressai.layers.layers import conv1x1
-from compressai.models._helpers.channel_context import build_mean_scale_head
+from compressai.models._helpers.channel_context import MeanScaleContextHead
+from compressai.models._helpers.slice_helpers import make_entropy_transform
 from compressai.models.base import CompressionModel, get_scale_table
 from compressai.models.sensetime import ResidualBottleneckBlock
 from compressai.models.utils import conv, deconv
@@ -82,6 +79,105 @@ from compressai.registry import register_model
 __all__ = [
     "CCAModel",
 ]
+
+
+class _DualHyperSynthesis(nn.Module):
+    h_mean_s: nn.Module
+    h_scale_s: nn.Module
+
+    def __init__(self, h_mean_s: nn.Module, h_scale_s: nn.Module) -> None:
+        super().__init__()
+        self.h_mean_s = h_mean_s
+        self.h_scale_s = h_scale_s
+
+    def forward(self, z_hat: Tensor) -> Tensor:
+        return torch.cat([self.h_mean_s(z_hat), self.h_scale_s(z_hat)], dim=1)
+
+
+class _LRPGaussianLatentCodec(GaussianConditionalLatentCodec):
+    lrp_transform: nn.Module
+
+    def __init__(
+        self,
+        lrp_transform: nn.Module,
+        *,
+        lrp_scale: float = 0.5,
+        mean_support_trail_channels: int = 0,
+        **gc_kwargs: Any,
+    ) -> None:
+        super().__init__(**gc_kwargs)
+        self.lrp_transform = lrp_transform
+        self.lrp_scale = float(lrp_scale)
+        self.mean_support_trail_channels = int(mean_support_trail_channels)
+
+    def _split_ctx_params(self, ctx_params: Tensor) -> Tuple[Tensor, Tensor]:
+        if self.mean_support_trail_channels <= 0:
+            return ctx_params, ctx_params
+        trail = self.mean_support_trail_channels
+        gaussian_params = ctx_params[:, :-trail]
+        mean_support = ctx_params[:, -trail:]
+        return gaussian_params, mean_support
+
+    def _apply_lrp(self, mean_support: Tensor, y_hat: Tensor) -> Tensor:
+        lrp = self.lrp_scale * torch.tanh(
+            self.lrp_transform(torch.cat([mean_support, y_hat], dim=1))
+        )
+        return y_hat + lrp
+
+    def forward(self, y: Tensor, ctx_params: Tensor) -> Dict[str, Any]:
+        gaussian_params, mean_support = self._split_ctx_params(ctx_params)
+        out = super().forward(y, gaussian_params)
+        out["y_hat"] = self._apply_lrp(mean_support, out["y_hat"])
+        return out
+
+    def compress(self, y: Tensor, ctx_params: Tensor) -> Dict[str, Any]:
+        gaussian_params, mean_support = self._split_ctx_params(ctx_params)
+        out = super().compress(y, gaussian_params)
+        out["y_hat"] = self._apply_lrp(mean_support, out["y_hat"])
+        return out
+
+    def decompress(
+        self,
+        strings: List[List[bytes]],
+        shape: Tuple[int, int],
+        ctx_params: Tensor,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        gaussian_params, mean_support = self._split_ctx_params(ctx_params)
+        out = super().decompress(strings, shape, gaussian_params, **kwargs)
+        out["y_hat"] = self._apply_lrp(mean_support, out["y_hat"])
+        return out
+
+
+class _SideContextChannelGroupsLatentCodec(ChannelGroupsLatentCodec):
+    def __init__(
+        self,
+        *args,
+        support_filter: Optional[Callable[[int, List[Tensor]], List[Tensor]]] = None,
+        **kwargs,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self.support_filter = support_filter
+        if "y0" not in self.channel_context:
+            raise ValueError("side-parameter channel groups require channel_context.y0")
+
+    def _get_ctx_params(
+        self, k: int, side_params: Tensor, y_hat_: List[Tensor]
+    ) -> Tensor:
+        if k == 0:
+            return self.channel_context["y0"](side_params)
+        support = self._select_support(k, y_hat_)
+        if not support:
+            return self.channel_context[f"y{k}"](side_params)
+        return self.channel_context[f"y{k}"](
+            self.merge_params(side_params, self.merge_y(*support))
+        )
+
+    def _select_support(self, k: int, y_hat_: List[Tensor]) -> List[Tensor]:
+        prior = list(y_hat_[:k])
+        if self.support_filter is not None:
+            return list(self.support_filter(k, prior))
+        return super()._select_support(k, y_hat_)
 
 
 # ----------------------------------------------------------------------------
@@ -289,16 +385,15 @@ class _CCAAuxEntropyModel(nn.Module):
     ``candidate/CCA/models/aux_em.py``: for slice ``i`` the support is
     ``cat(latent_means, *y_hat_slices[: max(i - 1, 0)])`` (i.e., skip the
     *most recent* decoded slice). This is wired inline (ELIC-style) on a
-    :class:`ChannelGroupsLatentCodec` running ``side_in_context=True`` with
-    ``support_filter=lambda k, prior: prior[: max(k - 1, 0)]`` and matching
-    per-slice ``support_count`` to size the channel-context heads.
+    private side-parameter channel-groups codec with matching per-slice
+    ``support_count`` to size the channel-context heads.
 
     Although upstream only *uses* the LRP path on the first ``num_slices -
     2`` slices, the published checkpoints carry LRP weights for *all*
-    slices. To strict-load those checkpoints every leaf is a
-    :class:`LRPGaussianLatentCodec`; the LRP applied to the trailing two
-    slices is benign (those slices' ``y_hat`` is excluded from every
-    later slice's support_filter, so it never feeds back into the
+    slices. To strict-load those checkpoints every leaf is a Gaussian codec
+    with local LRP refinement; the LRP applied to the trailing two slices is
+    benign (those slices' ``y_hat`` is excluded from every later slice's
+    skip-most-recent support selection, so it never feeds back into the
     likelihoods).
     """
 
@@ -336,22 +431,29 @@ class _CCAAuxEntropyModel(nn.Module):
         def naf_factory(c_in: int, c_out: int) -> nn.Module:
             return _NAFTransform(c_in, c_out, em_hidden_channels, em_num_layers)
 
-        # Family 1 side_in_context wiring, inlined ELIC-style. Differs from
-        # the main CCA stack only in the skip-most-recent support_filter /
-        # support_count (so the channel-context heads are sized smaller).
+        # Side-parameter channel-groups wiring, inlined ELIC-style. Differs
+        # from the main CCA stack only in the skip-most-recent support count.
         channel_context = {
-            f"y{k}": build_mean_scale_head(
-                slice_ch=slice_sizes[k],
-                support_ch=2 * M + cumulative[support_count(k)],
-                widths=widths,
+            f"y{k}": MeanScaleContextHead(
+                mean_cc=make_entropy_transform(
+                    mean_support_ch(k), slice_sizes[k], widths=widths
+                ),
+                scale_cc=make_entropy_transform(
+                    mean_support_ch(k), slice_sizes[k], widths=widths
+                ),
+                mean_support_transform=naf_factory(
+                    mean_support_ch(k), mean_support_ch(k)
+                ),
+                scale_support_transform=naf_factory(
+                    mean_support_ch(k), mean_support_ch(k)
+                ),
                 side_split=M,
                 emit_mean_support="post",
-                support_transform_factory=naf_factory,
             )
             for k in range(self.num_slices)
         }
         y_latent_codec = {
-            f"y{k}": LRPGaussianLatentCodec(
+            f"y{k}": _LRPGaussianLatentCodec(
                 lrp_transform=make_entropy_transform(
                     mean_support_ch(k) + slice_sizes[k], slice_sizes[k], widths=widths
                 ),
@@ -362,13 +464,12 @@ class _CCAAuxEntropyModel(nn.Module):
         }
 
         self.y_entropy_bottleneck = EntropyBottleneck(M)
-        self.inner_codec = ChannelGroupsLatentCodec(
+        self.inner_codec = _SideContextChannelGroupsLatentCodec(
             groups=list(slice_sizes),
             channel_context=channel_context,
             latent_codec=y_latent_codec,
             max_support_slices=-1,
             support_filter=support_filter,
-            side_in_context=True,
         )
 
     def forward(
@@ -399,11 +500,10 @@ class CCAModel(CompressionModel):
     (`Causal Context Adjustment Loss for Learned Image Compression
     <https://arxiv.org/abs/2410.04847>`_).
 
-    The entropy stack is a Family 1 :class:`HyperpriorLatentCodec` (see
-    :mod:`compressai.latent_codecs.__init__` for the full pattern) with
-    variable-length channel slices (``slice_proportions``), per-slice
-    :class:`_NAFTransform` support transforms, and a STE-quantised ``z``
-    leaf. When ``cca_training=True`` an auxiliary
+    The entropy stack is a :class:`HyperpriorLatentCodec` with variable-length
+    channel groups (``slice_proportions``), per-slice :class:`_NAFTransform`
+    support transforms, and a STE-quantised ``z`` leaf. When
+    ``cca_training=True`` an auxiliary
     :class:`_CCAAuxEntropyModel` branch is added that produces ``y_aux`` /
     ``y_cca`` likelihoods consumed by
     :class:`compressai.losses.CCARateDistortionLoss`.
@@ -483,7 +583,7 @@ class CCAModel(CompressionModel):
         )
 
         # Main entropy stack, wired inline (ELIC-style). Distinctive choices
-        # vs. STF/WACNN/TCM (other Family 1 models):
+        # vs. STF/WACNN/TCM:
         #
         # - ``groups`` is the variable-length ``slice_sizes`` (resolved from
         #   ``slice_proportions``); STF / WACNN / TCM use uniform ``[M//K]*K``.
@@ -511,18 +611,26 @@ class CCAModel(CompressionModel):
             )
 
         channel_context = {
-            f"y{k}": build_mean_scale_head(
-                slice_ch=slice_sizes[k],
-                support_ch=2 * M + cumulative[k],
-                widths=widths,
+            f"y{k}": MeanScaleContextHead(
+                mean_cc=make_entropy_transform(
+                    mean_support_ch(k), slice_sizes[k], widths=widths
+                ),
+                scale_cc=make_entropy_transform(
+                    mean_support_ch(k), slice_sizes[k], widths=widths
+                ),
+                mean_support_transform=naf_factory(
+                    mean_support_ch(k), mean_support_ch(k)
+                ),
+                scale_support_transform=naf_factory(
+                    mean_support_ch(k), mean_support_ch(k)
+                ),
                 side_split=M,
                 emit_mean_support="post",
-                support_transform_factory=naf_factory,
             )
             for k in range(self.num_slices)
         }
         y_latent_codec = {
-            f"y{k}": LRPGaussianLatentCodec(
+            f"y{k}": _LRPGaussianLatentCodec(
                 lrp_transform=make_entropy_transform(
                     mean_support_ch(k) + slice_sizes[k], slice_sizes[k], widths=widths
                 ),
@@ -534,18 +642,17 @@ class CCAModel(CompressionModel):
 
         self.latent_codec = HyperpriorLatentCodec(
             h_a=h_a,
-            h_s=DualHyperSynthesis(h_mean_s, h_scale_s),
+            h_s=_DualHyperSynthesis(h_mean_s, h_scale_s),
             latent_codec={
                 "z": EntropyBottleneckLatentCodec(
                     entropy_bottleneck=EntropyBottleneck(self.N),
                     quantizer="ste",
                 ),
-                "y": ChannelGroupsLatentCodec(
+                "y": _SideContextChannelGroupsLatentCodec(
                     groups=list(slice_sizes),
                     channel_context=channel_context,
                     latent_codec=y_latent_codec,
                     max_support_slices=-1,
-                    side_in_context=True,
                 ),
             },
         )
@@ -567,7 +674,7 @@ class CCAModel(CompressionModel):
             "likelihoods": y_out["likelihoods"],
         }
         if self.cca_training:
-            # ``self.latent_codec.h_s`` is the ``DualHyperSynthesis``; its
+            # ``self.latent_codec.h_s`` concatenates the dual hyper-synthesis heads; its
             # output is ``cat(latent_means, latent_scales)`` of width 2*M.
             # Recover them from the inner ``z`` round-trip so the aux
             # branch sees the same hyperprior context as the main path.

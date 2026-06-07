@@ -30,22 +30,32 @@
 import torch
 import torch.nn as nn
 
-from compressai.models._helpers.channel_context import (
-    MeanScaleContextHead,
-    build_mean_scale_head,
+from compressai.models._helpers.channel_context import MeanScaleContextHead
+from compressai.models._helpers.slice_helpers import (
+    infer_max_support_slices,
+    infer_num_slices,
+    lrp_support_channels,
+    make_entropy_transform,
+    slice_support_channels,
 )
 
 
 class TestMeanScaleContextHead:
     def test_forward_shape_concatenates_mean_and_scale(self):
         slice_ch, support_ch = 4, 12
-        head = build_mean_scale_head(slice_ch, support_ch, widths=(8, 8))
+        head = MeanScaleContextHead(
+            mean_cc=make_entropy_transform(support_ch, slice_ch, widths=(8, 8)),
+            scale_cc=make_entropy_transform(support_ch, slice_ch, widths=(8, 8)),
+        )
         x = torch.randn(2, support_ch, 4, 4)
         out = head(x)
         assert out.shape == (2, 2 * slice_ch, 4, 4)
 
     def test_state_dict_paths_split_mean_and_scale(self):
-        head = build_mean_scale_head(4, 12, widths=(8, 8))
+        head = MeanScaleContextHead(
+            mean_cc=make_entropy_transform(12, 4, widths=(8, 8)),
+            scale_cc=make_entropy_transform(12, 4, widths=(8, 8)),
+        )
         keys = set(head.state_dict().keys())
         assert any(k.startswith("mean_cc.") for k in keys)
         assert any(k.startswith("scale_cc.") for k in keys)
@@ -53,13 +63,13 @@ class TestMeanScaleContextHead:
         assert not any(k.startswith("mean_support_transform.") for k in keys)
         assert not any(k.startswith("scale_support_transform.") for k in keys)
 
-    def test_support_transform_factory_wraps_inputs(self):
+    def test_support_transforms_wrap_inputs(self):
         # Use 1x1 conv that preserves channel count.
-        def factory(c_in, c_out):
-            return nn.Conv2d(c_in, c_out, 1)
-
-        head = build_mean_scale_head(
-            4, 12, widths=(8, 8), support_transform_factory=factory
+        head = MeanScaleContextHead(
+            mean_cc=make_entropy_transform(12, 4, widths=(8, 8)),
+            scale_cc=make_entropy_transform(12, 4, widths=(8, 8)),
+            mean_support_transform=nn.Conv2d(12, 12, 1),
+            scale_support_transform=nn.Conv2d(12, 12, 1),
         )
         keys = set(head.state_dict().keys())
         assert any(k.startswith("mean_support_transform.") for k in keys)
@@ -85,8 +95,10 @@ class TestMeanScaleContextHead:
         # mean_cc should see cat(latent_means(8), prev_y_hat(4)) = 12 channels;
         # scale_cc same width but reading latent_scales instead of latent_means.
         torch.manual_seed(0)
-        head = build_mean_scale_head(
-            slice_ch=4, support_ch=20, widths=(8,), side_split=8
+        head = MeanScaleContextHead(
+            mean_cc=make_entropy_transform(12, 4, widths=(8,)),
+            scale_cc=make_entropy_transform(12, 4, widths=(8,)),
+            side_split=8,
         )
         # Sub-network input width = support_ch - side_split = 12.
         first_mean_conv = next(m for m in head.mean_cc if isinstance(m, nn.Conv2d))
@@ -111,3 +123,69 @@ class TestMeanScaleContextHead:
             scale_out, mean_out = head_out.chunk(2, dim=1)
         assert torch.allclose(scale_out, expected_scale)
         assert torch.allclose(mean_out, expected_mean)
+
+
+class TestSliceHelpers:
+    def test_slice_support_channels_default_use_all(self):
+        # With max_support_slices = -1 the helper returns the full latent + k slices.
+        assert slice_support_channels(64, 8, 0, -1) == 64
+        assert slice_support_channels(64, 8, 5, -1) == 64 + 8 * 5
+
+    def test_slice_support_channels_clamps(self):
+        assert slice_support_channels(64, 8, 5, 3) == 64 + 8 * 3
+        assert slice_support_channels(64, 8, 1, 3) == 64 + 8 * 1
+
+    def test_lrp_support_channels(self):
+        assert lrp_support_channels(64, 8, 0, -1) == 64 + 8
+        assert lrp_support_channels(64, 8, 5, 3) == 64 + 8 * 4
+
+    def test_make_entropy_transform_default_widths(self):
+        net = make_entropy_transform(40, 8)
+        # Default widths (224, 128): conv-gelu-conv-gelu-conv -> 5 modules.
+        assert len(net) == 5
+        x = torch.randn(2, 40, 8, 8)
+        y = net(x)
+        assert y.shape == (2, 8, 8, 8)
+
+    def test_make_entropy_transform_custom_widths(self):
+        net = make_entropy_transform(40, 8, widths=(64, 32))
+        x = torch.randn(2, 40, 8, 8)
+        y = net(x)
+        assert y.shape == (2, 8, 8, 8)
+
+    def test_infer_num_slices_new_path(self):
+        # New state-dict layout (ELIC default): channel_context entries exist
+        # for k >= 1. For 4 slices total, we expect 3 mean_cc keys -> infer
+        # returns 4 (helper adds 1 because y0 is missing).
+        sd = {
+            f"latent_codec.y.channel_context.y{k}.mean_cc.0.weight": (torch.zeros(8, 4))
+            for k in range(1, 4)
+        }
+        assert infer_num_slices(sd) == 4
+
+    def test_infer_num_slices_with_y0_context(self):
+        # Side-parameter channel-context layout: channel_context covers every
+        # slice (y0..yK-1). Helper auto-detects via the presence of y0 and
+        # does NOT add 1.
+        sd = {
+            f"latent_codec.y.channel_context.y{k}.mean_cc.0.weight": (torch.zeros(8, 4))
+            for k in range(0, 4)
+        }
+        assert infer_num_slices(sd) == 4
+
+    def test_infer_num_slices_empty(self):
+        assert infer_num_slices({}) == 0
+
+    def test_infer_max_support_slices_new_path(self):
+        # mean_cc.0 takes (latent_means + slice_channels * support) input channels.
+        # With M=64, num_slices=8, slice_channels=8, support=2 -> input ch = 64 + 16 = 80.
+        sd = {
+            "latent_codec.y.channel_context.y2.mean_cc.0.weight": (
+                torch.zeros(64, 80, 3, 3)
+            ),
+            "latent_codec.y.channel_context.y3.mean_cc.0.weight": (
+                torch.zeros(64, 80, 3, 3)
+            ),
+        }
+        # extra_factor=1 is the default single latent_means concat.
+        assert infer_max_support_slices(sd, latent_channels=64, num_slices=8) == 2

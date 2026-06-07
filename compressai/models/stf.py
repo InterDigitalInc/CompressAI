@@ -37,7 +37,7 @@ from __future__ import annotations
 
 import math
 
-from typing import Dict, Optional, Sequence, Tuple, Type
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Type
 
 import torch
 import torch.nn as nn
@@ -48,15 +48,9 @@ from torch import Tensor
 from compressai.entropy_models import EntropyBottleneck
 from compressai.latent_codecs import (
     ChannelGroupsLatentCodec,
-    DualHyperSynthesis,
     EntropyBottleneckLatentCodec,
+    GaussianConditionalLatentCodec,
     HyperpriorLatentCodec,
-    LRPGaussianLatentCodec,
-)
-from compressai.latent_codecs._slice_helpers import (
-    infer_max_support_slices,
-    infer_num_slices,
-    make_entropy_transform,
 )
 from compressai.layers import GDN, conv3x3, subpel_conv3x3
 from compressai.layers.attn import (
@@ -64,7 +58,12 @@ from compressai.layers.attn import (
     PatchSplit,
     WinNoShiftAttention,
 )
-from compressai.models._helpers.channel_context import build_mean_scale_head
+from compressai.models._helpers.channel_context import MeanScaleContextHead
+from compressai.models._helpers.slice_helpers import (
+    infer_max_support_slices,
+    infer_num_slices,
+    make_entropy_transform,
+)
 from compressai.models.base import CompressionModel, SimpleVAECompressionModel
 from compressai.models.utils import conv, deconv
 from compressai.registry import register_model
@@ -73,6 +72,93 @@ __all__ = [
     "SymmetricalTransFormer",
     "WACNN",
 ]
+
+
+class _DualHyperSynthesis(nn.Module):
+    h_mean_s: nn.Module
+    h_scale_s: nn.Module
+
+    def __init__(self, h_mean_s: nn.Module, h_scale_s: nn.Module) -> None:
+        super().__init__()
+        self.h_mean_s = h_mean_s
+        self.h_scale_s = h_scale_s
+
+    def forward(self, z_hat: Tensor) -> Tensor:
+        return torch.cat([self.h_mean_s(z_hat), self.h_scale_s(z_hat)], dim=1)
+
+
+class _LRPGaussianLatentCodec(GaussianConditionalLatentCodec):
+    lrp_transform: nn.Module
+
+    def __init__(
+        self,
+        lrp_transform: nn.Module,
+        *,
+        lrp_scale: float = 0.5,
+        mean_support_trail_channels: int = 0,
+        **gc_kwargs: Any,
+    ) -> None:
+        super().__init__(**gc_kwargs)
+        self.lrp_transform = lrp_transform
+        self.lrp_scale = float(lrp_scale)
+        self.mean_support_trail_channels = int(mean_support_trail_channels)
+
+    def _split_ctx_params(self, ctx_params: Tensor) -> Tuple[Tensor, Tensor]:
+        if self.mean_support_trail_channels <= 0:
+            return ctx_params, ctx_params
+        trail = self.mean_support_trail_channels
+        gaussian_params = ctx_params[:, :-trail]
+        mean_support = ctx_params[:, -trail:]
+        return gaussian_params, mean_support
+
+    def _apply_lrp(self, mean_support: Tensor, y_hat: Tensor) -> Tensor:
+        lrp = self.lrp_scale * torch.tanh(
+            self.lrp_transform(torch.cat([mean_support, y_hat], dim=1))
+        )
+        return y_hat + lrp
+
+    def forward(self, y: Tensor, ctx_params: Tensor) -> Dict[str, Any]:
+        gaussian_params, mean_support = self._split_ctx_params(ctx_params)
+        out = super().forward(y, gaussian_params)
+        out["y_hat"] = self._apply_lrp(mean_support, out["y_hat"])
+        return out
+
+    def compress(self, y: Tensor, ctx_params: Tensor) -> Dict[str, Any]:
+        gaussian_params, mean_support = self._split_ctx_params(ctx_params)
+        out = super().compress(y, gaussian_params)
+        out["y_hat"] = self._apply_lrp(mean_support, out["y_hat"])
+        return out
+
+    def decompress(
+        self,
+        strings: List[List[bytes]],
+        shape: Tuple[int, int],
+        ctx_params: Tensor,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        gaussian_params, mean_support = self._split_ctx_params(ctx_params)
+        out = super().decompress(strings, shape, gaussian_params, **kwargs)
+        out["y_hat"] = self._apply_lrp(mean_support, out["y_hat"])
+        return out
+
+
+class _SideContextChannelGroupsLatentCodec(ChannelGroupsLatentCodec):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        if "y0" not in self.channel_context:
+            raise ValueError("side-parameter channel groups require channel_context.y0")
+
+    def _get_ctx_params(
+        self, k: int, side_params: Tensor, y_hat_: List[Tensor]
+    ) -> Tensor:
+        if k == 0:
+            return self.channel_context["y0"](side_params)
+        support = self._select_support(k, y_hat_)
+        if not support:
+            return self.channel_context[f"y{k}"](side_params)
+        return self.channel_context[f"y{k}"](
+            self.merge_params(side_params, self.merge_y(*support))
+        )
 
 
 # ----------------------------------------------------------------------------
@@ -224,12 +310,11 @@ class WACNN(SimpleVAECompressionModel):
 
     The entropy stack is a fully containerised
     :class:`HyperpriorLatentCodec` that owns ``h_a``, ``h_s``, the ``z``
-    bottleneck and the per-slice ``ChannelGroupsLatentCodec`` running in
-    Family 1 ``side_in_context=True`` mode. The codec is wired inline in
-    ``__init__`` (ELIC-style) rather than behind a factory: the
+    bottleneck and the per-slice side-conditioned channel-groups path. The
+    codec is wired inline in ``__init__`` (ELIC-style) rather than behind a factory: the
     ``channel_context`` heads are :class:`MeanScaleContextHead` instances
     (split mean / scale, ``emit_mean_support=True``) and the per-slice
-    leaves are STE-quantised :class:`LRPGaussianLatentCodec`.
+    leaves are STE-quantised Gaussian codecs with local LRP refinement.
 
     Args:
         N (int): Number of channels in the hyperprior backbone.
@@ -292,8 +377,28 @@ class WACNN(SimpleVAECompressionModel):
             nn.GELU(),
             conv3x3(224, N, stride=2),
         )
-        h_mean_s = _build_stf_h_subpel(N, M)
-        h_scale_s = _build_stf_h_subpel(N, M)
+        h_mean_s = nn.Sequential(
+            conv3x3(N, N),
+            nn.GELU(),
+            subpel_conv3x3(N, 224, 2),
+            nn.GELU(),
+            conv3x3(224, 256),
+            nn.GELU(),
+            subpel_conv3x3(256, 288, 2),
+            nn.GELU(),
+            conv3x3(288, M),
+        )
+        h_scale_s = nn.Sequential(
+            conv3x3(N, N),
+            nn.GELU(),
+            subpel_conv3x3(N, 224, 2),
+            nn.GELU(),
+            conv3x3(224, 256),
+            nn.GELU(),
+            subpel_conv3x3(256, 288, 2),
+            nn.GELU(),
+            conv3x3(288, M),
+        )
 
         widths = (224, 176, 128, 64)
         groups = [slice_ch] * num_slices
@@ -305,14 +410,16 @@ class WACNN(SimpleVAECompressionModel):
         def mean_support_ch(k: int) -> int:
             return M + slice_ch * support_count(k)
 
-        # In Family 1 side_in_context mode, channel_context covers y0..y(K-1):
-        # each head sees cat(side_params(2M), *prev_y_hat) and emits
+        # Each head sees cat(side_params(2M), *prev_y_hat) and emits
         # cat(scale, mean, mean_support) for the LRP-aware leaf to consume.
         channel_context = {
-            f"y{k}": build_mean_scale_head(
-                slice_ch=slice_ch,
-                support_ch=2 * M + slice_ch * support_count(k),
-                widths=widths,
+            f"y{k}": MeanScaleContextHead(
+                mean_cc=make_entropy_transform(
+                    mean_support_ch(k), slice_ch, widths=widths
+                ),
+                scale_cc=make_entropy_transform(
+                    mean_support_ch(k), slice_ch, widths=widths
+                ),
                 side_split=M,
                 emit_mean_support=True,
             )
@@ -322,7 +429,7 @@ class WACNN(SimpleVAECompressionModel):
         # the trailing block of ctx_params; upstream lrp_transforms.{k}
         # weights transfer byte-for-byte (see convert_upstream_stf_state_dict).
         y_latent_codec = {
-            f"y{k}": LRPGaussianLatentCodec(
+            f"y{k}": _LRPGaussianLatentCodec(
                 lrp_transform=make_entropy_transform(
                     mean_support_ch(k) + slice_ch, slice_ch, widths=widths
                 ),
@@ -334,17 +441,16 @@ class WACNN(SimpleVAECompressionModel):
 
         self.latent_codec = HyperpriorLatentCodec(
             h_a=h_a,
-            h_s=DualHyperSynthesis(h_mean_s, h_scale_s),
+            h_s=_DualHyperSynthesis(h_mean_s, h_scale_s),
             latent_codec={
                 "z": EntropyBottleneckLatentCodec(
                     entropy_bottleneck=EntropyBottleneck(N), quantizer="ste"
                 ),
-                "y": ChannelGroupsLatentCodec(
+                "y": _SideContextChannelGroupsLatentCodec(
                     groups=groups,
                     channel_context=channel_context,
                     latent_codec=y_latent_codec,
                     max_support_slices=max_support_slices,
-                    side_in_context=True,
                 ),
             },
         )
@@ -365,48 +471,6 @@ class WACNN(SimpleVAECompressionModel):
         return net
 
 
-def _build_stf_h_subpel(N: int, M: int) -> nn.Sequential:
-    """Default ``h_mean_s`` / ``h_scale_s`` stack used by both WACNN and
-    SymmetricalTransFormer's WACNN-shaped variant: 5 conv / subpel blocks
-    going from ``N -> N -> 224 -> 256 -> 288 -> M`` with GELU activations.
-    """
-    return nn.Sequential(
-        conv3x3(N, N),
-        nn.GELU(),
-        subpel_conv3x3(N, 224, 2),
-        nn.GELU(),
-        conv3x3(224, 256),
-        nn.GELU(),
-        subpel_conv3x3(256, 288, 2),
-        nn.GELU(),
-        conv3x3(288, M),
-    )
-
-
-def _build_stf_transformer_h_subpel(
-    bottleneck_channels: int, latent_channels: int, embed_dim: int
-) -> nn.Sequential:
-    """Hyper-synthesis stack used by :class:`SymmetricalTransFormer`.
-
-    Mirrors the original Zou et al. STF Transformer configuration: widths
-    derived from the per-stage channel counts (``latent_channels - k *
-    embed_dim``) instead of the WACNN-style fixed ladder.
-    """
-    return nn.Sequential(
-        conv3x3(bottleneck_channels, latent_channels - 3 * embed_dim),
-        nn.GELU(),
-        subpel_conv3x3(
-            latent_channels - 3 * embed_dim, latent_channels - 2 * embed_dim, 2
-        ),
-        nn.GELU(),
-        conv3x3(latent_channels - 2 * embed_dim, latent_channels - embed_dim),
-        nn.GELU(),
-        subpel_conv3x3(latent_channels - embed_dim, latent_channels, 2),
-        nn.GELU(),
-        conv3x3(latent_channels, latent_channels),
-    )
-
-
 @register_model("stf")
 class SymmetricalTransFormer(CompressionModel):
     r"""Symmetrical Transformer model (STF) from R. Zou, C. Song, Z. Zhang:
@@ -417,9 +481,9 @@ class SymmetricalTransFormer(CompressionModel):
     Transformer-based companion of :class:`WACNN` that builds the
     analysis/synthesis transforms with stacked Swin-style basic layers and a
     channel-wise autoregressive entropy model. The entropy stack mirrors
-    :class:`WACNN`'s containerised :class:`HyperpriorLatentCodec` (Family 1
-    ``side_in_context=True`` mode), with widths derived from the
-    transformer's stage channel counts.
+    :class:`WACNN`'s containerised side-conditioned
+    :class:`HyperpriorLatentCodec`, with widths derived from the transformer's
+    stage channel counts.
 
     Args:
         embed_dim (int): Patch-embedding dimension.
@@ -546,11 +610,31 @@ class SymmetricalTransFormer(CompressionModel):
             nn.GELU(),
             conv3x3(latent_channels - 3 * embed_dim, bottleneck_channels, stride=2),
         )
-        h_mean_s = _build_stf_transformer_h_subpel(
-            bottleneck_channels, latent_channels, embed_dim
+        h_mean_s = nn.Sequential(
+            conv3x3(bottleneck_channels, latent_channels - 3 * embed_dim),
+            nn.GELU(),
+            subpel_conv3x3(
+                latent_channels - 3 * embed_dim, latent_channels - 2 * embed_dim, 2
+            ),
+            nn.GELU(),
+            conv3x3(latent_channels - 2 * embed_dim, latent_channels - embed_dim),
+            nn.GELU(),
+            subpel_conv3x3(latent_channels - embed_dim, latent_channels, 2),
+            nn.GELU(),
+            conv3x3(latent_channels, latent_channels),
         )
-        h_scale_s = _build_stf_transformer_h_subpel(
-            bottleneck_channels, latent_channels, embed_dim
+        h_scale_s = nn.Sequential(
+            conv3x3(bottleneck_channels, latent_channels - 3 * embed_dim),
+            nn.GELU(),
+            subpel_conv3x3(
+                latent_channels - 3 * embed_dim, latent_channels - 2 * embed_dim, 2
+            ),
+            nn.GELU(),
+            conv3x3(latent_channels - 2 * embed_dim, latent_channels - embed_dim),
+            nn.GELU(),
+            subpel_conv3x3(latent_channels - embed_dim, latent_channels, 2),
+            nn.GELU(),
+            conv3x3(latent_channels, latent_channels),
         )
 
         N = bottleneck_channels
@@ -564,20 +648,23 @@ class SymmetricalTransFormer(CompressionModel):
         def mean_support_ch(k: int) -> int:
             return M + slice_ch * support_count(k)
 
-        # Family 1 side_in_context wiring, inlined ELIC-style (see WACNN
+        # Side-parameter channel-groups wiring, inlined ELIC-style (see WACNN
         # for the per-key shape rationale).
         channel_context = {
-            f"y{k}": build_mean_scale_head(
-                slice_ch=slice_ch,
-                support_ch=2 * M + slice_ch * support_count(k),
-                widths=widths,
+            f"y{k}": MeanScaleContextHead(
+                mean_cc=make_entropy_transform(
+                    mean_support_ch(k), slice_ch, widths=widths
+                ),
+                scale_cc=make_entropy_transform(
+                    mean_support_ch(k), slice_ch, widths=widths
+                ),
                 side_split=M,
                 emit_mean_support=True,
             )
             for k in range(num_slices)
         }
         y_latent_codec = {
-            f"y{k}": LRPGaussianLatentCodec(
+            f"y{k}": _LRPGaussianLatentCodec(
                 lrp_transform=make_entropy_transform(
                     mean_support_ch(k) + slice_ch, slice_ch, widths=widths
                 ),
@@ -589,17 +676,16 @@ class SymmetricalTransFormer(CompressionModel):
 
         self.latent_codec = HyperpriorLatentCodec(
             h_a=h_a,
-            h_s=DualHyperSynthesis(h_mean_s, h_scale_s),
+            h_s=_DualHyperSynthesis(h_mean_s, h_scale_s),
             latent_codec={
                 "z": EntropyBottleneckLatentCodec(
                     entropy_bottleneck=EntropyBottleneck(N), quantizer="ste"
                 ),
-                "y": ChannelGroupsLatentCodec(
+                "y": _SideContextChannelGroupsLatentCodec(
                     groups=groups,
                     channel_context=channel_context,
                     latent_codec=y_latent_codec,
                     max_support_slices=resolved_max_support,
-                    side_in_context=True,
                 ),
             },
         )

@@ -27,11 +27,10 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Application-layer helpers for assembling Family 1 channel-slice codecs.
+"""Application-layer helpers for assembling model-specific entropy stacks.
 
-Currently houses :mod:`~compressai.models._helpers.channel_context`, whose
-:class:`MeanScaleContextHead` provides the split mean / scale channel-context
-head shared by the Family 1 models (STF / WACNN / TCM / CCA). It lives
-outside ``compressai.latent_codecs`` because it is application-layer
-ergonomics, not a codec primitive.
+The helpers in this package support STF / WACNN / TCM / CCA wiring, including
+split mean / scale channel-context heads and state-dict inference utilities.
+They live outside ``compressai.latent_codecs`` because they are model-layer
+assembly details, not codec primitives.
 """

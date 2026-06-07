@@ -27,30 +27,26 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Mean / scale split channel-context heads for Family 1 models.
+"""Mean / scale split channel-context heads for model-specific entropy stacks.
 
 The :class:`MeanScaleContextHead` keeps a separate ``mean_cc`` and
 ``scale_cc`` Sequential — matching the historical ``cc_mean_transforms`` /
 ``cc_scale_transforms`` ModuleList layout used by STF / WACNN / TCM /
 CCA — and concatenates their outputs to form the
-``channel_context.y{k}`` entry expected by
-:class:`~compressai.latent_codecs.ChannelGroupsLatentCodec`.
+``channel_context.y{k}`` entry used by those models.
 """
 
 from __future__ import annotations
 
-from typing import Callable, Literal, Optional, Sequence, Union
+from typing import Literal, Optional, Union
 
 import torch
 import torch.nn as nn
 
 from torch import Tensor
 
-from compressai.latent_codecs._slice_helpers import make_entropy_transform
-
 __all__ = [
     "MeanScaleContextHead",
-    "build_mean_scale_head",
 ]
 
 
@@ -71,9 +67,8 @@ class MeanScaleContextHead(nn.Module):
 
     When ``side_split > 0`` the head expects its input to be the
     concatenation ``cat(latent_means(side_split), latent_scales(side_split),
-    *prev_y_hat)`` produced by
-    :class:`~compressai.latent_codecs.ChannelGroupsLatentCodec` running in
-    ``side_in_context=True`` mode. The head splits the leading
+    *prev_y_hat)`` produced by the side-parameter channel-groups path. The
+    head splits the leading
     ``2 * side_split`` channels back into ``latent_means`` /
     ``latent_scales`` and routes:
 
@@ -106,10 +101,9 @@ class MeanScaleContextHead(nn.Module):
       support; emitting "pre" would produce wrong LRP outputs even though
       the channel widths match.
 
-    The trailing block is consumed by :class:`LRPGaussianLatentCodec` (with
-    matching ``mean_support_trail_channels``) to recover the upstream LRP
-    input layout (``cat(mean_support, y_hat)``), enabling byte-for-byte
-    transfer of upstream LRP weights.
+    The trailing block is consumed by the model-local LRP Gaussian leaf to
+    recover the upstream LRP input layout (``cat(mean_support, y_hat)``),
+    enabling byte-for-byte transfer of upstream LRP weights.
     """
 
     mean_cc: nn.Module
@@ -170,84 +164,3 @@ class MeanScaleContextHead(nn.Module):
         elif self.emit_mean_support == "post":
             out = torch.cat([out, mean_support], dim=1)
         return out
-
-
-def build_mean_scale_head(
-    slice_ch: int,
-    support_ch: int,
-    *,
-    widths: Sequence[int] = (224, 128),
-    support_transform_factory: Optional[Callable[[int, int], nn.Module]] = None,
-    side_split: int = 0,
-    emit_mean_support: Union[bool, Literal["pre", "post"]] = False,
-) -> MeanScaleContextHead:
-    """Construct a :class:`MeanScaleContextHead` with default conv-stack heads.
-
-    Parameters
-    ----------
-    slice_ch
-        Channel count of the slice being predicted (per-sub-head output).
-    support_ch
-        FULL input channel count to the head (i.e., what
-        :class:`ChannelGroupsLatentCodec` will hand it). When
-        ``side_split > 0`` this equals ``2 * side_split + slice_ch *
-        support_count``; the head will internally split off ``2 * side_split``
-        channels and route ``side_split`` each to ``mean_cc`` / ``scale_cc``,
-        so each sub-network receives ``support_ch - side_split`` channels.
-        When ``side_split == 0`` ``mean_cc`` / ``scale_cc`` see the full
-        ``support_ch`` directly.
-    widths
-        Hidden conv widths inside the ``mean_cc`` / ``scale_cc`` Sequentials.
-        STF / WACNN use ``(224, 176, 128, 64)``; TCM / CCA use
-        ``(224, 128)``.
-    support_transform_factory
-        ``(in_ch, out_ch) -> nn.Module``. When supplied, builds independent
-        instances for the mean and scale paths (e.g., per-slice SWAtten in
-        TCM or NAFTransform in CCA). Both transforms are expected to
-        preserve channel count and are applied to the per-path input
-        (``support_ch - side_split`` channels).
-    side_split
-        Number of leading channels in the input that hold ``latent_means``
-        (with ``latent_scales`` immediately after, also ``side_split`` wide).
-        Set to the hyper-synthesis output channel count ``M`` for the
-        Family 1 ``side_in_context=True`` wiring; leave ``0`` for generic
-        usage.
-    emit_mean_support
-        Forwarded to :class:`MeanScaleContextHead`. Why this flag exists:
-        the upstream STF / WACNN / TCM / CCA LRP transform consumes
-        ``cat(mean_support, y_hat)`` (i.e. ``M + slice_ch *
-        (support_count + 1)`` channels — variable per slice). A naive
-        leaf only sees the channel-context ``ctx_params`` (= 2*slice_ch) and
-        ``y_hat``, which would force an architectural change to the LRP
-        transform input width and prevent byte-for-byte transfer of upstream
-        LRP weights. Setting ``emit_mean_support`` to ``"pre"`` (or legacy
-        ``True``) makes the head append ``mean_in = cat(latent_means,
-        *prev_y_hat)`` to its output; setting it to ``"post"`` appends
-        ``mean_support_transform(mean_in)`` instead (CCA-main / CCA-aux,
-        whose upstream LRP heads consume the *post*-NAFTransform mean
-        support). :class:`LRPGaussianLatentCodec` (with matching
-        ``mean_support_trail_channels``) strips that trailing block off
-        ``ctx_params``, feeds only the leading ``2*slice_ch`` to the
-        Gaussian conditional's ``chunks=("scales","means")`` step, and uses
-        the trailing block as the LRP input — recovering the upstream
-        layout exactly.
-    """
-    sub_in_ch = support_ch - side_split
-    mean_cc = make_entropy_transform(sub_in_ch, slice_ch, widths=widths)
-    scale_cc = make_entropy_transform(sub_in_ch, slice_ch, widths=widths)
-    mean_support: Optional[nn.Module]
-    scale_support: Optional[nn.Module]
-    if support_transform_factory is not None:
-        mean_support = support_transform_factory(sub_in_ch, sub_in_ch)
-        scale_support = support_transform_factory(sub_in_ch, sub_in_ch)
-    else:
-        mean_support = None
-        scale_support = None
-    return MeanScaleContextHead(
-        mean_cc=mean_cc,
-        scale_cc=scale_cc,
-        mean_support_transform=mean_support,
-        scale_support_transform=scale_support,
-        side_split=side_split,
-        emit_mean_support=emit_mean_support,
-    )

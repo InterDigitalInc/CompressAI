@@ -27,11 +27,8 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Channel-slice support helpers shared by Family 1 codecs.
+"""State-dict inference helpers for model-local channel-groups wiring.
 
-These functions support the Family 1 (pure 1-pass channel-slice) entropy
-models — STF / WACNN / TCM / CCA / DCAE / MambaVC. They sit alongside the
-latent-codec primitives that consume them.
 ``_DEFAULT_NUM_SLICES_PREFIX`` reflects the containerised state-dict layout
 used by :class:`~compressai.latent_codecs.ChannelGroupsLatentCodec`.
 """
@@ -59,9 +56,9 @@ __all__ = [
 # ``ChannelGroupsLatentCodec`` as ``self.y`` (the inner ``self.latent_codec``
 # dict is not a registered nn.Module), so the channel-context entries live
 # under ``latent_codec.y.channel_context.y{k}``. Slice 0 has no channel
-# context entry by default (``side_in_context=False`` ELIC mode); Family 1
-# ``side_in_context=True`` mode adds a ``y0`` entry whose presence triggers
-# the auto-detection in :func:`infer_num_slices`.
+# context entry in the ELIC layout; side-parameter channel-context models add
+# a ``y0`` entry whose presence triggers the auto-detection in
+# :func:`infer_num_slices`.
 _DEFAULT_NUM_SLICES_PREFIX = "latent_codec.y.channel_context.y"
 _DEFAULT_KEY_SUFFIX = ".mean_cc.0.weight"
 
@@ -96,9 +93,9 @@ def make_entropy_transform(
 ) -> nn.Sequential:
     """Stack of stride-1 3x3 convs with GELU activations.
 
-    Used as the ``mean_cc`` / ``scale_cc`` per-slice heads (and as ``lrp_transform``)
-    by every Family 1 channel-slice model. ``widths`` specifies hidden conv
-    widths and defaults to the TCM / CCA / Mamba 3-conv stack
+    Used as the ``mean_cc`` / ``scale_cc`` per-group heads and as local
+    ``lrp_transform`` modules in STF / WACNN / TCM / CCA. ``widths``
+    specifies hidden conv widths and defaults to the TCM / CCA 3-conv stack
     ``(224, 128)``; pass ``widths=(224, 176, 128, 64)`` for the STF / WACNN
     5-conv stack.
     """
@@ -125,7 +122,7 @@ def infer_num_slices(
     - ELIC default: channel_context starts at ``y1`` (slice 0 bypasses it),
       so the count returned is ``num_slices - 1`` and we add ``1`` to recover
       ``num_slices``.
-    - Family 1 ``side_in_context=True``: channel_context covers every
+    - Side-parameter channel-context layout: channel_context covers every
       slice including ``y0``, so the count is already ``num_slices``.
 
     The two cases are auto-detected by whether ``y0`` appears in the matched
@@ -153,10 +150,10 @@ def infer_max_support_slices(
     extra_factor: int = 1,
 ) -> int:
     """Infer ``max_support_slices`` from the input width of the ``mean_cc``
-    first conv. ``extra_factor`` accounts for application-layer heads (e.g.,
-    DCAE / SAAF) that prepend additional copies of the latent
-    (``M*extra + slice_channels*N``); default ``1`` covers Family 1 models
-    whose ``mean_cc`` only sees the previous-slice support.
+    first conv. ``extra_factor`` accounts for model-layer heads that prepend
+    additional copies of the latent (``M*extra + slice_channels*N``); default
+    ``1`` covers STF / WACNN / TCM / CCA heads whose ``mean_cc`` sees one
+    latent-mean block plus previous-group support.
     """
     slice_channels = latent_channels // num_slices
     matching = [

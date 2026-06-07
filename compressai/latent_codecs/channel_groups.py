@@ -28,7 +28,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from itertools import accumulate
-from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple
+from typing import Any, Dict, List, Mapping, Tuple
 
 import torch
 import torch.nn as nn
@@ -75,8 +75,6 @@ class ChannelGroupsLatentCodec(LatentCodec):
         *,
         groups: List[int],
         max_support_slices: int = -1,
-        support_filter: Optional[Callable[[int, List[Tensor]], List[Tensor]]] = None,
-        side_in_context: bool = False,
         **kwargs,
     ):
         super().__init__()
@@ -84,16 +82,8 @@ class ChannelGroupsLatentCodec(LatentCodec):
         self.groups = list(groups)
         self.groups_acc = list(accumulate(self.groups, initial=0))
         self.max_support_slices = int(max_support_slices)
-        self.support_filter = support_filter
-        self.side_in_context = bool(side_in_context)
         self.channel_context = nn.ModuleDict(channel_context)
         self.latent_codec = nn.ModuleDict(latent_codec)
-        if self.side_in_context and "y0" not in self.channel_context:
-            raise ValueError(
-                "side_in_context=True requires a channel_context entry for 'y0' "
-                "(slice 0's channel_context absorbs side_params instead of "
-                "ChannelGroupsLatentCodec returning side_params raw)"
-            )
 
     def forward(self, y: Tensor, side_params: Tensor) -> Dict[str, Any]:
         y_ = torch.split(y, self.groups, dim=1)
@@ -179,39 +169,14 @@ class ChannelGroupsLatentCodec(LatentCodec):
     def _get_ctx_params(
         self, k: int, side_params: Tensor, y_hat_: List[Tensor]
     ) -> Tensor:
-        if self.side_in_context:
-            return self._get_ctx_params_side_in_context(k, side_params, y_hat_)
         if k == 0:
             return side_params
         support = self._select_support(k, y_hat_)
         ch_ctx_params = self.channel_context[f"y{k}"](self.merge_y(*support))
         return self.merge_params(ch_ctx_params, side_params)
 
-    def _get_ctx_params_side_in_context(
-        self, k: int, side_params: Tensor, y_hat_: List[Tensor]
-    ) -> Tensor:
-        # Family 1 layout (STF / WACNN / TCM / CCA): ``channel_context.y{k}``
-        # absorbs ``side_params`` directly so its mean_cc / scale_cc heads can
-        # see the hyperprior latent_means / latent_scales alongside the
-        # previously decoded slices. The head's output already encodes the
-        # final per-slice (mean, scale) prediction, so no further cat with
-        # ``side_params`` is needed before the leaf.
-        if k == 0:
-            return self.channel_context["y0"](side_params)
-        support = self._select_support(k, y_hat_)
-        # ``support`` can be empty when ``support_filter`` skips the most
-        # recent slice for k=1 (e.g., CCA-aux's
-        # ``lambda k, prior: prior[: max(k - 1, 0)]``); in that case the
-        # head sees only ``side_params``.
-        if not support:
-            return self.channel_context[f"y{k}"](side_params)
-        ch_input = self.merge_params(side_params, self.merge_y(*support))
-        return self.channel_context[f"y{k}"](ch_input)
-
     def _select_support(self, k: int, y_hat_: List[Tensor]) -> List[Tensor]:
         prior = list(y_hat_[:k])
-        if self.support_filter is not None:
-            return list(self.support_filter(k, prior))
         if self.max_support_slices < 0:
             return prior
         return prior[: self.max_support_slices]

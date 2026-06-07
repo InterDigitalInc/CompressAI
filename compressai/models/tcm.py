@@ -35,7 +35,7 @@
 
 from __future__ import annotations
 
-from typing import Dict, Iterable, List, Optional, Sequence
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 import torch
 import torch.nn as nn
@@ -45,15 +45,9 @@ from torch import Tensor
 from compressai.entropy_models import EntropyBottleneck
 from compressai.latent_codecs import (
     ChannelGroupsLatentCodec,
-    DualHyperSynthesis,
     EntropyBottleneckLatentCodec,
+    GaussianConditionalLatentCodec,
     HyperpriorLatentCodec,
-    LRPGaussianLatentCodec,
-)
-from compressai.latent_codecs._slice_helpers import (
-    infer_max_support_slices,
-    infer_num_slices,
-    make_entropy_transform,
 )
 from compressai.layers import (
     ResidualBlockUpsample,
@@ -62,13 +56,105 @@ from compressai.layers import (
     subpel_conv3x3,
 )
 from compressai.layers.attn import ConvTransBlock, SWAtten
-from compressai.models._helpers.channel_context import build_mean_scale_head
+from compressai.models._helpers.channel_context import MeanScaleContextHead
+from compressai.models._helpers.slice_helpers import (
+    infer_max_support_slices,
+    infer_num_slices,
+    make_entropy_transform,
+)
 from compressai.models.base import SimpleVAECompressionModel
 from compressai.registry import register_model
 
 __all__ = [
     "TCM",
 ]
+
+
+class _DualHyperSynthesis(nn.Module):
+    h_mean_s: nn.Module
+    h_scale_s: nn.Module
+
+    def __init__(self, h_mean_s: nn.Module, h_scale_s: nn.Module) -> None:
+        super().__init__()
+        self.h_mean_s = h_mean_s
+        self.h_scale_s = h_scale_s
+
+    def forward(self, z_hat: Tensor) -> Tensor:
+        return torch.cat([self.h_mean_s(z_hat), self.h_scale_s(z_hat)], dim=1)
+
+
+class _LRPGaussianLatentCodec(GaussianConditionalLatentCodec):
+    lrp_transform: nn.Module
+
+    def __init__(
+        self,
+        lrp_transform: nn.Module,
+        *,
+        lrp_scale: float = 0.5,
+        mean_support_trail_channels: int = 0,
+        **gc_kwargs: Any,
+    ) -> None:
+        super().__init__(**gc_kwargs)
+        self.lrp_transform = lrp_transform
+        self.lrp_scale = float(lrp_scale)
+        self.mean_support_trail_channels = int(mean_support_trail_channels)
+
+    def _split_ctx_params(self, ctx_params: Tensor) -> Tuple[Tensor, Tensor]:
+        if self.mean_support_trail_channels <= 0:
+            return ctx_params, ctx_params
+        trail = self.mean_support_trail_channels
+        gaussian_params = ctx_params[:, :-trail]
+        mean_support = ctx_params[:, -trail:]
+        return gaussian_params, mean_support
+
+    def _apply_lrp(self, mean_support: Tensor, y_hat: Tensor) -> Tensor:
+        lrp = self.lrp_scale * torch.tanh(
+            self.lrp_transform(torch.cat([mean_support, y_hat], dim=1))
+        )
+        return y_hat + lrp
+
+    def forward(self, y: Tensor, ctx_params: Tensor) -> Dict[str, Any]:
+        gaussian_params, mean_support = self._split_ctx_params(ctx_params)
+        out = super().forward(y, gaussian_params)
+        out["y_hat"] = self._apply_lrp(mean_support, out["y_hat"])
+        return out
+
+    def compress(self, y: Tensor, ctx_params: Tensor) -> Dict[str, Any]:
+        gaussian_params, mean_support = self._split_ctx_params(ctx_params)
+        out = super().compress(y, gaussian_params)
+        out["y_hat"] = self._apply_lrp(mean_support, out["y_hat"])
+        return out
+
+    def decompress(
+        self,
+        strings: List[List[bytes]],
+        shape: Tuple[int, int],
+        ctx_params: Tensor,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        gaussian_params, mean_support = self._split_ctx_params(ctx_params)
+        out = super().decompress(strings, shape, gaussian_params, **kwargs)
+        out["y_hat"] = self._apply_lrp(mean_support, out["y_hat"])
+        return out
+
+
+class _SideContextChannelGroupsLatentCodec(ChannelGroupsLatentCodec):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        if "y0" not in self.channel_context:
+            raise ValueError("side-parameter channel groups require channel_context.y0")
+
+    def _get_ctx_params(
+        self, k: int, side_params: Tensor, y_hat_: List[Tensor]
+    ) -> Tensor:
+        if k == 0:
+            return self.channel_context["y0"](side_params)
+        support = self._select_support(k, y_hat_)
+        if not support:
+            return self.channel_context[f"y{k}"](side_params)
+        return self.channel_context[f"y{k}"](
+            self.merge_params(side_params, self.merge_y(*support))
+        )
 
 
 # ----------------------------------------------------------------------------
@@ -178,12 +264,10 @@ class TCM(SimpleVAECompressionModel):
 
     The entropy stack is a fully containerised
     :class:`HyperpriorLatentCodec` that owns ``h_a``, ``h_s``, the ``z``
-    bottleneck and the per-slice ``ChannelGroupsLatentCodec`` running in
-    Family 1 ``side_in_context=True`` mode. The channel-context heads run
-    with ``support_transform_factory=SWAtten`` so per-slice ``mean_in`` /
-    ``scale_in`` are routed through independent SWAtten instances before the
-    3-conv ``mean_cc`` / ``scale_cc`` stacks (TCM's distinctive widths
-    ``(224, 128)``).
+    bottleneck and the per-slice side-conditioned channel-groups path. The
+    channel-context heads route per-slice ``mean_in`` / ``scale_in`` through
+    independent SWAtten instances before the 3-conv ``mean_cc`` /
+    ``scale_cc`` stacks (TCM's distinctive widths ``(224, 128)``).
 
     Args:
         N (int): Channel width of the analysis/synthesis transform branches.
@@ -356,22 +440,30 @@ class TCM(SimpleVAECompressionModel):
                 inter_dim=128,
             )
 
-        # Family 1 side_in_context wiring, inlined ELIC-style. Differs from
+        # Side-parameter channel-groups wiring, inlined ELIC-style. Differs from
         # WACNN/STF only in widths=(224, 128) and the per-slice SWAtten
         # support transforms wrapping mean_in / scale_in.
         channel_context = {
-            f"y{k}": build_mean_scale_head(
-                slice_ch=slice_ch,
-                support_ch=2 * M + slice_ch * support_count(k),
-                widths=widths,
+            f"y{k}": MeanScaleContextHead(
+                mean_cc=make_entropy_transform(
+                    mean_support_ch(k), slice_ch, widths=widths
+                ),
+                scale_cc=make_entropy_transform(
+                    mean_support_ch(k), slice_ch, widths=widths
+                ),
+                mean_support_transform=swatten_factory(
+                    mean_support_ch(k), mean_support_ch(k)
+                ),
+                scale_support_transform=swatten_factory(
+                    mean_support_ch(k), mean_support_ch(k)
+                ),
                 side_split=M,
                 emit_mean_support=True,
-                support_transform_factory=swatten_factory,
             )
             for k in range(num_slices)
         }
         y_latent_codec = {
-            f"y{k}": LRPGaussianLatentCodec(
+            f"y{k}": _LRPGaussianLatentCodec(
                 lrp_transform=make_entropy_transform(
                     mean_support_ch(k) + slice_ch, slice_ch, widths=widths
                 ),
@@ -383,18 +475,17 @@ class TCM(SimpleVAECompressionModel):
 
         self.latent_codec = HyperpriorLatentCodec(
             h_a=h_a,
-            h_s=DualHyperSynthesis(h_mean_s, h_scale_s),
+            h_s=_DualHyperSynthesis(h_mean_s, h_scale_s),
             latent_codec={
                 "z": EntropyBottleneckLatentCodec(
                     entropy_bottleneck=EntropyBottleneck(hyper_channels),
                     quantizer="ste",
                 ),
-                "y": ChannelGroupsLatentCodec(
+                "y": _SideContextChannelGroupsLatentCodec(
                     groups=groups,
                     channel_context=channel_context,
                     latent_codec=y_latent_codec,
                     max_support_slices=max_support_slices,
-                    side_in_context=True,
                 ),
             },
         )
