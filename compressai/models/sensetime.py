@@ -27,8 +27,6 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import types
-
 import torch
 import torch.nn as nn
 
@@ -455,6 +453,10 @@ class Elic2022Chandelier(SimpleVAECompressionModel):
             )
             for k in range(1, len(self.groups))
         }
+        support_slices = [
+            [] if k == 0 else [0] if k == 1 else [0, k - 1]
+            for k in range(len(self.groups))
+        ]
 
         # In [He2022], this is labeled "g_sp^(k)".
         spatial_context = [
@@ -514,28 +516,10 @@ class Elic2022Chandelier(SimpleVAECompressionModel):
                     groups=self.groups,
                     channel_context=channel_context,
                     latent_codec=scctx_latent_codec,
+                    support_slices=support_slices,
                 ),
             },
         )
-
-        self._monkey_patch()
-
-    def _monkey_patch(self):
-        """Monkey-patch to use only first group and most recent group."""
-
-        def merge_y(self: ChannelGroupsLatentCodec, *args):
-            if len(args) == 0:
-                return Tensor()
-            if len(args) == 1:
-                return args[0]
-            if len(args) < len(self.groups):
-                return torch.cat([args[0], args[-1]], dim=1)
-            return torch.cat(args, dim=1)
-
-        assert isinstance(self.latent_codec, HyperpriorLatentCodec)
-        obj = self.latent_codec.y
-        assert isinstance(obj, ChannelGroupsLatentCodec)
-        obj.merge_y = types.MethodType(merge_y, obj)
 
     @classmethod
     def from_state_dict(cls, state_dict):
