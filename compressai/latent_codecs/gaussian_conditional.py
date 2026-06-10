@@ -112,12 +112,12 @@ class GaussianConditionalLatentCodec(LatentCodec):
         y_hat = self.gaussian_conditional.decompress(
             y_strings, indexes, means=means_hat
         )
-        return {"strings": [y_strings], "shape": y.shape[2:4], "y_hat": y_hat}
+        return {"strings": [y_strings], "shape": y.shape[1:], "y_hat": y_hat}
 
     def decompress(
         self,
         strings: List[List[bytes]],
-        shape: Tuple[int, int],
+        shape: Tuple[int, ...],
         ctx_params: Tensor,
         **kwargs,
     ) -> Dict[str, Any]:
@@ -128,7 +128,7 @@ class GaussianConditionalLatentCodec(LatentCodec):
         y_hat = self.gaussian_conditional.decompress(
             y_strings, indexes, means=means_hat
         )
-        assert y_hat.shape[2:4] == shape
+        assert y_hat.shape[1:] == shape
         return {"y_hat": y_hat}
 
     def _chunk(self, params: Tensor) -> Tuple[Tensor, Tensor]:

@@ -123,14 +123,14 @@ class ChannelGroupsLatentCodec(LatentCodec):
 
         return {
             "strings": [s for ss in y_strings_groups for s in ss],
-            "shape": [y_out["shape"] for y_out in y_out_],
+            "shape": y.shape[1:],
             "y_hat": y_hat,
         }
 
     def decompress(
         self,
         strings: List[List[bytes]],
-        shape: List[Tuple[int, ...]],
+        shape: Tuple[int, ...],
         side_params: Tensor,
         **kwargs,
     ) -> Dict[str, Any]:
@@ -139,19 +139,14 @@ class ChannelGroupsLatentCodec(LatentCodec):
         strings_per_group = len(strings) // len(self.groups)
 
         y_out_ = [{}] * len(self.groups)
-        # Spatial dims are the trailing two entries of any per-group shape;
-        # the channel total is determined by ``self.groups`` (so this works
-        # for both leaves that report ``(C, H, W)`` -- e.g. CheckerboardLatentCodec --
-        # and leaves that report ``(H, W)`` -- e.g. GaussianConditionalLatentCodec).
-        spatial = tuple(shape[0])[-2:]
-        y_hat = torch.zeros((n, sum(self.groups), *spatial), device=side_params.device)
+        y_hat = torch.zeros((n, *shape), device=side_params.device)
         y_hat_ = y_hat.split(self.groups, dim=1)
 
         for k in range(len(self.groups)):
             params = self._get_ctx_params(k, side_params, y_hat_)
             y_out_[k] = self.latent_codec[f"y{k}"].decompress(
                 strings[strings_per_group * k : strings_per_group * (k + 1)],
-                shape[k],
+                (self.groups[k], *shape[1:]),
                 params,
             )
             y_hat_[k][:] = y_out_[k]["y_hat"]

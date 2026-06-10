@@ -106,16 +106,16 @@ class HyperLatentCodec(LatentCodec):
 
     def compress(self, y: Tensor) -> Dict[str, Any]:
         z = self.h_a(y)
-        shape = z.size()[-2:]
+        shape = z.shape[1:]
         z_strings = self.entropy_bottleneck.compress(z)
-        z_hat = self.entropy_bottleneck.decompress(z_strings, shape)
+        z_hat = self.entropy_bottleneck.decompress(z_strings, shape[1:])
         params = self.h_s(z_hat)
         return {"strings": [z_strings], "shape": shape, "params": params}
 
     def decompress(
-        self, strings: List[List[bytes]], shape: Tuple[int, int], **kwargs
+        self, strings: List[List[bytes]], shape: Tuple[int, ...], **kwargs
     ) -> Dict[str, Any]:
         (z_strings,) = strings
-        z_hat = self.entropy_bottleneck.decompress(z_strings, shape)
+        z_hat = self.entropy_bottleneck.decompress(z_strings, shape[1:])
         params = self.h_s(z_hat)
         return {"params": params}

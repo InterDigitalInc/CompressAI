@@ -139,7 +139,7 @@ class _LRPGaussianLatentCodec(GaussianConditionalLatentCodec):
     def decompress(
         self,
         strings: List[List[bytes]],
-        shape: Tuple[int, int],
+        shape: Tuple[int, ...],
         ctx_params: Tensor,
         **kwargs: Any,
     ) -> Dict[str, Any]:
@@ -696,7 +696,7 @@ class CCAModel(CompressionModel):
     def decompress(
         self,
         strings: Sequence[Sequence[bytes]],
-        shape: Tuple[int, int],
+        shape: Dict[str, Tuple[int, ...]],
     ) -> Dict[str, Tensor]:
         y_out = self.latent_codec.decompress(strings, shape)
         return {"x_hat": self.g_s(y_out["y_hat"]).clamp_(0, 1)}

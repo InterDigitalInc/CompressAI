@@ -128,7 +128,7 @@ class _LRPGaussianLatentCodec(GaussianConditionalLatentCodec):
     def decompress(
         self,
         strings: List[List[bytes]],
-        shape: Tuple[int, int],
+        shape: Tuple[int, ...],
         ctx_params: Tensor,
         **kwargs: Any,
     ) -> Dict[str, Any]:
