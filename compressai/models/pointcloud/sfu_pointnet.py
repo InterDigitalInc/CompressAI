@@ -123,11 +123,12 @@ class PointNetReconstructionPccModel(CompressionModel):
         y = self.g_a(x_t)
         y_out = self.latent_codec.compress(y)
         [y_strings] = y_out["strings"]
-        return {"strings": [y_strings], "shape": (1,)}
+        return {"strings": [y_strings], "shape": y_out["shape"]}
 
     def decompress(self, strings, shape):
         assert isinstance(strings, list) and len(strings) == 1
         [y_strings] = strings
-        y_hat = self.latent_codec.decompress([y_strings], shape)
+        y_out = self.latent_codec.decompress([y_strings], shape)
+        y_hat = y_out["y_hat"]
         x_hat = self.g_s(y_hat)
         return {"x_hat": x_hat}

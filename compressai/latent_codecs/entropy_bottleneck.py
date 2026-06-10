@@ -80,14 +80,14 @@ class EntropyBottleneckLatentCodec(LatentCodec):
         return {"likelihoods": {"y": y_likelihoods}, "y_hat": y_hat}
 
     def compress(self, y: Tensor) -> Dict[str, Any]:
-        shape = y.size()[-2:]
+        shape = y.shape[1:]
         y_strings = self.entropy_bottleneck.compress(y)
-        y_hat = self.entropy_bottleneck.decompress(y_strings, shape)
+        y_hat = self.entropy_bottleneck.decompress(y_strings, shape[1:])
         return {"strings": [y_strings], "shape": shape, "y_hat": y_hat}
 
     def decompress(
-        self, strings: List[List[bytes]], shape: Tuple[int, int], **kwargs
+        self, strings: List[List[bytes]], shape: Tuple[int, ...], **kwargs
     ) -> Dict[str, Any]:
         (y_strings,) = strings
-        y_hat = self.entropy_bottleneck.decompress(y_strings, shape)
+        y_hat = self.entropy_bottleneck.decompress(y_strings, shape[1:])
         return {"y_hat": y_hat}

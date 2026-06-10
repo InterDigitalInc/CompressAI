@@ -276,7 +276,7 @@ class CheckerboardLatentCodec(LatentCodec):
         assert all(len(x) == n for x in y_strings_)
 
         c, h, w = shape
-        y_i_shape = (h, w // 2)
+        y_i_shape = (c, h, w // 2)
         y_hat_ = side_params.new_zeros((2, n, c, h, w // 2))
         side_params_ = self.unembed(side_params)
 

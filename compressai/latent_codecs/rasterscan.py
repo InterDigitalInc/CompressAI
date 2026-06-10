@@ -123,17 +123,17 @@ class RasterScanLatentCodec(LatentCodec):
             )
             y_strings = encoder.flush()
             ds.append({"strings": [y_strings], "y_hat": y_hat.squeeze(0)})
-        return {**default_collate(ds), "shape": y.shape[2:4]}
+        return {**default_collate(ds), "shape": y.shape[1:]}
 
     def decompress(
         self,
         strings: List[List[bytes]],
-        shape: Tuple[int, int],
+        shape: Tuple[int, ...],
         ctx_params: Tensor,
         **kwargs,
     ) -> Dict[str, Any]:
         (y_strings,) = strings
-        y_height, y_width = shape
+        _, y_height, y_width = shape
         ds = []
         for i in range(len(y_strings)):
             decoder = RansDecoder()
