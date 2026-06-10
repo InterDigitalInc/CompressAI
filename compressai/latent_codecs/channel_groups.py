@@ -84,10 +84,7 @@ class ChannelGroupsLatentCodec(LatentCodec):
         if support_slices is None:
             support_slices = [range(k) for k in range(len(self.groups))]
         assert len(support_slices) == len(self.groups)
-        assert all(
-            all(0 <= j < k for j in s)
-            for k, s in enumerate(support_slices)
-        )
+        assert all(all(0 <= j < k for j in s) for k, s in enumerate(support_slices))
         self.support_slices = [tuple(support_slice) for support_slice in support_slices]
         self.channel_context = nn.ModuleDict(channel_context)
         self.latent_codec = nn.ModuleDict(latent_codec)

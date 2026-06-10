@@ -52,6 +52,7 @@ context with the rate-distortion objective.
 from __future__ import annotations
 
 import math
+
 from itertools import accumulate
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
