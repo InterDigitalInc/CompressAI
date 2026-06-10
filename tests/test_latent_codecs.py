@@ -27,6 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import pytest
 import torch
 import torch.nn as nn
 
@@ -41,21 +42,20 @@ class TestChannelGroupsLatentCodecExtensions:
         self,
         groups=(4, 4, 4),
         side_ch=8,
-        max_support_slices=-1,
+        support_slices=None,
     ):
         K = len(groups)
-        # Channel-context input is sum of (clamped) prev y_hat slice channels;
-        # use Identity which simply forwards the concatenated tensor unchanged.
+        effective_support = (
+            [list(range(k)) for k in range(K)]
+            if support_slices is None
+            else support_slices
+        )
         channel_context = {f"y{k}": nn.Identity() for k in range(1, K)}
 
         def _ctx_in(k):
             if k == 0:
                 return side_ch
-            if max_support_slices < 0:
-                count = k
-            else:
-                count = min(k, max_support_slices)
-            return side_ch + sum(groups[:count])
+            return side_ch + sum(groups[j] for j in effective_support[k])
 
         # Each leaf needs an entropy_parameters MLP sized to its own ctx input.
         latent_codec = {
@@ -68,23 +68,24 @@ class TestChannelGroupsLatentCodecExtensions:
             latent_codec=latent_codec,
             channel_context=channel_context,
             groups=list(groups),
-            max_support_slices=max_support_slices,
+            support_slices=support_slices,
         )
 
-    def test_default_select_support_uses_all_prior(self):
+    def test_default_support_slices_uses_all_prior(self):
         codec = self._make_codec()
-        slices = [torch.zeros(1, 4, 4, 4) for _ in range(3)]
-        assert codec._select_support(0, slices) == []
-        assert codec._select_support(1, slices) == slices[:1]
-        assert codec._select_support(3, slices) == slices[:3]
+        assert codec.support_slices == [(), (0,), (0, 1)]
 
-    def test_max_support_slices_clamps(self):
-        codec = self._make_codec(max_support_slices=2)
-        slices = [torch.zeros(1, 4, 4, 4) for _ in range(3)]
-        # k=3 with clamp=2 -> drop the most recent slice (index 2)
-        result = codec._select_support(3, slices)
-        assert len(result) == 2
-        assert result == slices[:2]
+    def test_explicit_support_slices_are_preserved(self):
+        support_slices = [[], [0], [0], [0, 2]]
+        codec = self._make_codec(
+            groups=(4, 4, 4, 4),
+            support_slices=support_slices,
+        )
+        assert codec.support_slices == [(), (0,), (0,), (0, 2)]
+
+    def test_support_slices_reject_current_or_future_groups(self):
+        with pytest.raises(AssertionError):
+            self._make_codec(groups=(4, 4), support_slices=[[], [1]])
 
     def test_default_forward_matches_pre_extension_behaviour(self):
         # With defaults the new constructor should be drop-in for ELIC-style use.
@@ -98,18 +99,15 @@ class TestChannelGroupsLatentCodecExtensions:
         assert out["y_hat"].shape == (2, M, 8, 8)
         assert out["likelihoods"]["y"].shape == (2, M, 8, 8)
 
-    def test_max_support_slices_changes_forward_output(self):
-        # Build a codec whose channel_context input width matches a clamped support;
-        # then verify that forward produces a different y_hat than the un-clamped version.
+    def test_explicit_support_slices_runs_forward(self):
         torch.manual_seed(3)
-        codec_clamp = self._make_codec(groups=(4, 4, 4, 4), max_support_slices=1)
-        # Reuse all leaf weights from clamp codec on a fresh "no clamp" codec for
-        # an apples-to-apples comparison; we expect clamp to drop information for
-        # slices k >= 2 only (their leaf input width differs, so we only need to
-        # check that clamp codec runs end-to-end).
+        codec = self._make_codec(
+            groups=(4, 4, 4, 4),
+            support_slices=[[], [0], [0], [0, 2]],
+        )
         y = torch.randn(2, 16, 8, 8)
         side_params = torch.randn(2, 8, 8, 8)
-        out = codec_clamp(y, side_params)
+        out = codec(y, side_params)
         assert out["y_hat"].shape == (2, 16, 8, 8)
 
 

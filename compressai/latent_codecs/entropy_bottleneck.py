@@ -83,6 +83,7 @@ class EntropyBottleneckLatentCodec(LatentCodec):
         shape = y.shape[1:]
         y_strings = self.entropy_bottleneck.compress(y)
         y_hat = self.entropy_bottleneck.decompress(y_strings, shape[1:])
+        assert y_hat.shape[1:] == shape
         return {"strings": [y_strings], "shape": shape, "y_hat": y_hat}
 
     def decompress(
@@ -90,4 +91,5 @@ class EntropyBottleneckLatentCodec(LatentCodec):
     ) -> Dict[str, Any]:
         (y_strings,) = strings
         y_hat = self.entropy_bottleneck.decompress(y_strings, shape[1:])
+        assert y_hat.shape[1:] == shape
         return {"y_hat": y_hat}

@@ -149,7 +149,7 @@ class _SideContextChannelGroupsLatentCodec(ChannelGroupsLatentCodec):
     ) -> Tensor:
         if k == 0:
             return self.channel_context["y0"](side_params)
-        support = self._select_support(k, y_hat_)
+        support = [y_hat_[i] for i in self.support_slices[k]]
         if not support:
             return self.channel_context[f"y{k}"](side_params)
         return self.channel_context[f"y{k}"](
@@ -428,6 +428,8 @@ class TCM(SimpleVAECompressionModel):
         def mean_support_ch(k: int) -> int:
             return M + slice_ch * support_count(k)
 
+        support_slices = [list(range(support_count(k))) for k in range(num_slices)]
+
         def swatten_factory(c_in: int, c_out: int) -> nn.Module:
             # Independent SWAtten per mean / scale path, mirroring upstream
             # atten_mean[k] / atten_scale[k].
@@ -485,7 +487,7 @@ class TCM(SimpleVAECompressionModel):
                     groups=groups,
                     channel_context=channel_context,
                     latent_codec=y_latent_codec,
-                    max_support_slices=max_support_slices,
+                    support_slices=support_slices,
                 ),
             },
         )

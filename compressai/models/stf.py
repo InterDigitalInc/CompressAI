@@ -153,7 +153,7 @@ class _SideContextChannelGroupsLatentCodec(ChannelGroupsLatentCodec):
     ) -> Tensor:
         if k == 0:
             return self.channel_context["y0"](side_params)
-        support = self._select_support(k, y_hat_)
+        support = [y_hat_[i] for i in self.support_slices[k]]
         if not support:
             return self.channel_context[f"y{k}"](side_params)
         return self.channel_context[f"y{k}"](
@@ -410,6 +410,8 @@ class WACNN(SimpleVAECompressionModel):
         def mean_support_ch(k: int) -> int:
             return M + slice_ch * support_count(k)
 
+        support_slices = [list(range(support_count(k))) for k in range(num_slices)]
+
         # Each head sees cat(side_params(2M), *prev_y_hat) and emits
         # cat(scale, mean, mean_support) for the LRP-aware leaf to consume.
         channel_context = {
@@ -450,7 +452,7 @@ class WACNN(SimpleVAECompressionModel):
                     groups=groups,
                     channel_context=channel_context,
                     latent_codec=y_latent_codec,
-                    max_support_slices=max_support_slices,
+                    support_slices=support_slices,
                 ),
             },
         )
@@ -648,6 +650,8 @@ class SymmetricalTransFormer(CompressionModel):
         def mean_support_ch(k: int) -> int:
             return M + slice_ch * support_count(k)
 
+        support_slices = [list(range(support_count(k))) for k in range(num_slices)]
+
         # Side-parameter channel-groups wiring, inlined ELIC-style (see WACNN
         # for the per-key shape rationale).
         channel_context = {
@@ -685,7 +689,7 @@ class SymmetricalTransFormer(CompressionModel):
                     groups=groups,
                     channel_context=channel_context,
                     latent_codec=y_latent_codec,
-                    max_support_slices=resolved_max_support,
+                    support_slices=support_slices,
                 ),
             },
         )

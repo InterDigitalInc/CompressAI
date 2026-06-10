@@ -52,9 +52,8 @@ context with the rate-distortion objective.
 from __future__ import annotations
 
 import math
-
 from itertools import accumulate
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import torch
 import torch.nn as nn
@@ -150,14 +149,8 @@ class _LRPGaussianLatentCodec(GaussianConditionalLatentCodec):
 
 
 class _SideContextChannelGroupsLatentCodec(ChannelGroupsLatentCodec):
-    def __init__(
-        self,
-        *args,
-        support_filter: Optional[Callable[[int, List[Tensor]], List[Tensor]]] = None,
-        **kwargs,
-    ) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.support_filter = support_filter
         if "y0" not in self.channel_context:
             raise ValueError("side-parameter channel groups require channel_context.y0")
 
@@ -166,18 +159,12 @@ class _SideContextChannelGroupsLatentCodec(ChannelGroupsLatentCodec):
     ) -> Tensor:
         if k == 0:
             return self.channel_context["y0"](side_params)
-        support = self._select_support(k, y_hat_)
+        support = [y_hat_[i] for i in self.support_slices[k]]
         if not support:
             return self.channel_context[f"y{k}"](side_params)
         return self.channel_context[f"y{k}"](
             self.merge_params(side_params, self.merge_y(*support))
         )
-
-    def _select_support(self, k: int, y_hat_: List[Tensor]) -> List[Tensor]:
-        prior = list(y_hat_[:k])
-        if self.support_filter is not None:
-            return list(self.support_filter(k, prior))
-        return super()._select_support(k, y_hat_)
 
 
 # ----------------------------------------------------------------------------
@@ -422,11 +409,10 @@ class _CCAAuxEntropyModel(nn.Module):
         def support_count(k: int) -> int:
             return max(k - 1, 0)
 
-        def support_filter(k: int, prior: List[Tensor]) -> List[Tensor]:
-            return prior[: max(k - 1, 0)]
-
         def mean_support_ch(k: int) -> int:
             return M + cumulative[support_count(k)]
+
+        support_slices = [list(range(support_count(k))) for k in range(self.num_slices)]
 
         def naf_factory(c_in: int, c_out: int) -> nn.Module:
             return _NAFTransform(c_in, c_out, em_hidden_channels, em_num_layers)
@@ -468,8 +454,7 @@ class _CCAAuxEntropyModel(nn.Module):
             groups=list(slice_sizes),
             channel_context=channel_context,
             latent_codec=y_latent_codec,
-            max_support_slices=-1,
-            support_filter=support_filter,
+            support_slices=support_slices,
         )
 
     def forward(
@@ -652,7 +637,6 @@ class CCAModel(CompressionModel):
                     groups=list(slice_sizes),
                     channel_context=channel_context,
                     latent_codec=y_latent_codec,
-                    max_support_slices=-1,
                 ),
             },
         )
