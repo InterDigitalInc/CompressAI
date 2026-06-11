@@ -56,6 +56,18 @@ from compressai.layers import (
     subpel_conv3x3,
 )
 from compressai.layers.attn import ConvTransBlock, SWAtten
+from compressai.models._helpers.auxt import (
+    aux_loss as _aggregate_aux_loss,
+)
+from compressai.models._helpers.auxt import (
+    build_iwls_branch,
+    build_wls_branch,
+    compute_analysis_aux_positions,
+    compute_synthesis_aux_positions,
+    forward_with_auxt,
+    has_auxt_state,
+    is_auxt_wavelet_buffer_key,
+)
 from compressai.models._helpers.channel_context import MeanScaleContextHead
 from compressai.models._helpers.slice_helpers import (
     infer_max_support_slices,
@@ -290,6 +302,7 @@ class TCM(SimpleVAECompressionModel):
         window_size: int = 8,
         hyper_window_size: int = 4,
         hyper_head_dim: int = 32,
+        use_auxt: bool = False,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
@@ -491,6 +504,69 @@ class TCM(SimpleVAECompressionModel):
                 ),
             },
         )
+        # ----- AuxT (Li et al., ICLR 2025) opt-in side branch -----
+        # When ``use_auxt=True``, AuxT_enc[i] is summed into ``g_a`` at
+        # ``_analysis_aux_positions`` (and AuxT_dec[i] into ``g_s`` at
+        # ``_synthesis_aux_positions``). The OLP modules inside each WLS /
+        # iWLS contribute an orthogonality regulariser that the host
+        # surfaces via :meth:`aux_loss`.
+        # All wiring lives in :mod:`compressai.models._helpers.auxt` so
+        # SAAF (and any future AuxT host) can reuse the same builders +
+        # walker without copy-pasting.
+        self._analysis_aux_positions = compute_analysis_aux_positions(config)
+        self._synthesis_aux_positions = compute_synthesis_aux_positions(config)
+        if use_auxt:
+            self.AuxT_enc = build_wls_branch(N, M)
+            self.AuxT_dec = build_iwls_branch(N, M)
+        else:
+            self.AuxT_enc = None
+            self.AuxT_dec = None
+
+    @property
+    def use_auxt(self) -> bool:
+        """``True`` when the AuxT side branch was constructed."""
+        return self.AuxT_enc is not None and self.AuxT_dec is not None
+
+    def _analysis_transform(self, x: Tensor) -> Tensor:
+        return forward_with_auxt(
+            self.g_a, self.AuxT_enc, self._analysis_aux_positions, x
+        )
+
+    def _synthesis_transform(self, y_hat: Tensor) -> Tensor:
+        return forward_with_auxt(
+            self.g_s, self.AuxT_dec, self._synthesis_aux_positions, y_hat
+        )
+
+    def aux_loss(self) -> Tensor:
+        """Orthogonality regulariser aggregated over every
+        :class:`~compressai.models._helpers.auxt.OLP` in this model.
+
+        Returns a 0-d Tensor with value ``0`` (on the same device / dtype
+        as the model parameters) when ``use_auxt=False``, so callers can
+        unconditionally add it to the training objective.
+        """
+        return _aggregate_aux_loss(self)
+
+    def forward(self, x: Tensor) -> Dict[str, Dict[str, Tensor] | Tensor]:
+        y = self._analysis_transform(x)
+        y_out = self.latent_codec(y)
+        return {
+            "x_hat": self._synthesis_transform(y_out["y_hat"]),
+            "likelihoods": y_out["likelihoods"],
+        }
+
+    def compress(self, x: Tensor) -> Dict[str, object]:
+        y = self._analysis_transform(x)
+        y_out = self.latent_codec.compress(y)
+        return {"strings": y_out["strings"], "shape": y_out["shape"]}
+
+    def decompress(
+        self,
+        strings: Sequence[Sequence[bytes]],
+        shape: Dict[str, Tuple[int, ...]] | Tuple[int, int],
+    ) -> Dict[str, Tensor]:
+        y_out = self.latent_codec.decompress(strings, shape)
+        return {"x_hat": self._synthesis_transform(y_out["y_hat"]).clamp_(0, 1)}
 
     @classmethod
     def from_state_dict(cls, state_dict: Dict[str, Tensor]) -> "TCM":
@@ -512,13 +588,20 @@ class TCM(SimpleVAECompressionModel):
             num_slices=num_slices,
             max_support_slices=max_support_slices,
             hyper_head_dim=_infer_hyper_head_dim(state_dict, N, 32),
+            use_auxt=has_auxt_state(state_dict),
         )
         # ConvTransBlock's WindowAttention registers
         # ``relative_position_index`` as a non-persistent buffer, so it is
-        # absent from saved state dicts. Tolerate the missing keys.
+        # absent from saved state dicts. AuxT WLS / iWLS rely on
+        # ``pytorch_wavelets`` for the DWT / IDWT kernels which may or may
+        # not be persisted depending on the saving model's pytorch_wavelets
+        # version. Tolerate both as missing keys.
         incompatible_keys = net.load_state_dict(state_dict, strict=False)
         allowed_missing = {
-            key for key in net.state_dict() if key.endswith("relative_position_index")
+            key
+            for key in net.state_dict()
+            if key.endswith("relative_position_index")
+            or is_auxt_wavelet_buffer_key(key)
         }
         missing_keys = set(incompatible_keys.missing_keys) - allowed_missing
         if missing_keys or incompatible_keys.unexpected_keys:

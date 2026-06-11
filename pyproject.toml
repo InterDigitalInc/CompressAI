@@ -84,6 +84,9 @@ pointcloud = [
 attn = [
   "timm",
 ]
+wavelet = [
+  "pytorch_wavelets",
+]
 
 # NOTE: Temporarily duplicated from [project.optional-dependencies] until
 # pip supports installing [dependency-groups].

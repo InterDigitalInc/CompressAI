@@ -34,6 +34,10 @@ import torch
 
 from torch import Tensor
 
+from compressai.models._helpers.auxt import (
+    is_auxt_upstream_wavelet_buffer_key,
+    normalize_upstream_auxt_key,
+)
 from compressai.models.tcm import TCM
 
 # ----------------------------------------------------------------------------
@@ -212,6 +216,16 @@ def convert_upstream_tcm_state_dict(
     cleaned: Dict[str, Tensor] = {}
     for key, value in state_dict.items():
         new_key = key[len("module.") :] if key.startswith("module.") else key
+        # Drop the upstream LIC_TCM custom DWT/IDWT kernel buffers — the
+        # ``pytorch_wavelets``-backed :class:`compressai.layers.wave.DWT2D`
+        # / :class:`IDWT2D` regenerate their kernels at construction.
+        if is_auxt_upstream_wavelet_buffer_key(new_key):
+            continue
+        # Upstream stores the OLP submodule as ``.OLP.`` (PascalCase to match
+        # the class name); compressai uses ``.olp.`` (lower attribute name).
+        normalized = normalize_upstream_auxt_key(new_key)
+        if normalized is not None:
+            new_key = normalized
         new_key, value = _rename_msa_keys(new_key, value)
         wrapper = _UPSTREAM_SWATTEN_WRAPPER.match(new_key)
         if wrapper:
