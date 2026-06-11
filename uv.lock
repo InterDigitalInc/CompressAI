@@ -682,6 +682,9 @@ tutorials = [
     { name = "ipywidgets" },
     { name = "jupyter" },
 ]
+wavelet = [
+    { name = "pytorch-wavelets" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -737,6 +740,7 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'dev'" },
     { name = "pytest-cov", marker = "extra == 'test'" },
     { name = "pytorch-msssim" },
+    { name = "pytorch-wavelets", marker = "extra == 'wavelet'" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "==0.8.6" },
     { name = "scipy" },
     { name = "setuptools", specifier = ">=68" },
@@ -753,7 +757,7 @@ requires-dist = [
     { name = "typing-extensions", specifier = ">=4.0.0" },
     { name = "wheel", specifier = ">=0.32.0" },
 ]
-provides-extras = ["test", "dev", "doc", "tutorials", "pointcloud", "attn"]
+provides-extras = ["test", "dev", "doc", "tutorials", "pointcloud", "attn", "wavelet"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -3688,6 +3692,22 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/69/43/fd181aef46e96ed025f5056efa1c45e63c93d377fbe7ea784a21ce058d03/pytorch_msssim-1.0.0.tar.gz", hash = "sha256:53273f03ce5c435f706f49feb5110a8afe90b2519484b0fe0df9639670106d0b", size = 10113, upload-time = "2023-05-25T17:15:57.146Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e2/8c/856047f955acc30179e9255fdc488059ca22f0938519523d53494f7cfee8/pytorch_msssim-1.0.0-py3-none-any.whl", hash = "sha256:0b4b7bbf7035fe9dc8084244237aac13b1f104852c45b63a7e9fab4363bede54", size = 7744, upload-time = "2023-05-25T17:15:55.809Z" },
+]
+
+[[package]]
+name = "pytorch-wavelets"
+version = "1.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy", version = "1.24.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "six" },
+    { name = "torch", version = "2.2.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "torch", version = "2.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3f/e3/1553046e97926b859edcab05d74b5b7543327c92b37c58919a3e49ff6151/pytorch_wavelets-1.3.0.tar.gz", hash = "sha256:8b5c63f87c2bb36e6b342a7bb294926bda5cd974614fb4848deab6ec2792f56f", size = 1029927, upload-time = "2023-04-13T06:26:52.086Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8d/65/b7da80705dc679999ef77c06ded71e060d4ea14ed80111c104223e130cc1/pytorch_wavelets-1.3.0-py3-none-any.whl", hash = "sha256:e4f8635872370d8de640ef7548edef4ef60d5c565553c463210e939c7901ee69", size = 54879, upload-time = "2023-04-13T06:26:45.63Z" },
 ]
 
 [[package]]
