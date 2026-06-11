@@ -204,6 +204,97 @@ def test_AttentionBlock():
     layer(torch.rand(1, 8, 4, 4))
 
 
+class TestMutiScaleDictionaryCrossAttentionGLU:
+    @staticmethod
+    def test_forward_shape():
+        from compressai.layers.attn.dictionary import (
+            MutiScaleDictionaryCrossAttentionGLU,
+        )
+
+        mod = MutiScaleDictionaryCrossAttentionGLU(
+            input_dim=192,
+            output_dim=320,
+            head_num=4,
+            dictionary_dim=128,
+        )
+        x = torch.randn(2, 192, 4, 4)
+        dictionary = torch.randn(2, 16, 128)
+        out = mod(x, dictionary)
+        assert out.shape == (2, 320, 4, 4)
+
+    @staticmethod
+    def test_state_dict_round_trip():
+        from compressai.layers.attn.dictionary import (
+            MutiScaleDictionaryCrossAttentionGLU,
+        )
+
+        mod = MutiScaleDictionaryCrossAttentionGLU(
+            input_dim=192,
+            output_dim=320,
+            head_num=4,
+            dictionary_dim=128,
+        )
+        mod2 = MutiScaleDictionaryCrossAttentionGLU(
+            input_dim=192,
+            output_dim=320,
+            head_num=4,
+            dictionary_dim=128,
+        )
+        mod2.load_state_dict(mod.state_dict(), strict=True)
+        x = torch.randn(2, 192, 4, 4)
+        dictionary = torch.randn(2, 16, 128)
+        assert torch.allclose(mod(x, dictionary), mod2(x, dictionary))
+
+    @staticmethod
+    def test_dictionary_dim_default_matches_head_num():
+        from compressai.layers.attn.dictionary import (
+            MutiScaleDictionaryCrossAttentionGLU,
+        )
+
+        # Default dictionary_dim = 32 * head_num
+        mod = MutiScaleDictionaryCrossAttentionGLU(
+            input_dim=64, output_dim=128, head_num=4
+        )
+        x = torch.randn(1, 64, 2, 2)
+        dictionary = torch.randn(1, 8, 128)
+        out = mod(x, dictionary)
+        assert out.shape == (1, 128, 2, 2)
+
+    @staticmethod
+    def test_dictionary_dim_must_divide_head_num():
+        from compressai.layers.attn.dictionary import (
+            MutiScaleDictionaryCrossAttentionGLU,
+        )
+
+        with pytest.raises(ValueError, match="divisible"):
+            MutiScaleDictionaryCrossAttentionGLU(
+                input_dim=32, output_dim=64, head_num=3, dictionary_dim=128
+            )
+
+
+class TestWavelet:
+    @staticmethod
+    def test_dwt_idwt_round_trip():
+        pytest.importorskip("pytorch_wavelets")
+        from compressai.layers.wave import DWT2D, IDWT2D
+
+        dwt = DWT2D(wave="haar")
+        idwt = IDWT2D(wave="haar")
+        x = torch.randn(2, 3, 16, 16)
+        sub = dwt(x)
+        # 4 subbands -> output channels = 4 * input
+        assert sub.shape == (2, 12, 8, 8)
+        rec = idwt(sub)
+        assert rec.shape == x.shape
+        assert (rec - x).abs().max().item() < 1e-5
+
+    @staticmethod
+    def test_is_pytorch_wavelets_available_returns_bool():
+        from compressai.layers.wave import is_pytorch_wavelets_available
+
+        assert isinstance(is_pytorch_wavelets_available(), bool)
+
+
 class TestQReLU:
     @staticmethod
     def test_QReLU():
