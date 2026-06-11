@@ -1,3 +1,13 @@
+from .dictionary import (
+    ConvolutionalGLU,
+    ConvWithDW,
+    DenseBlock,
+    DWConv,
+    MultiScaleAggregation,
+    MutiScaleDictionaryCrossAttentionGLU,
+    Scale,
+    SpatialAttentionModule,
+)
 from .swin import (
     WMSA,
     ConvTransBlock,
@@ -16,9 +26,17 @@ from .swin import (
 
 __all__ = [
     "ConvTransBlock",
+    "ConvWithDW",
+    "ConvolutionalGLU",
+    "DWConv",
+    "DenseBlock",
+    "MultiScaleAggregation",
+    "MutiScaleDictionaryCrossAttentionGLU",
     "PatchMerging",
     "PatchSplit",
     "SWAtten",
+    "Scale",
+    "SpatialAttentionModule",
     "SwinBlock",
     "WMSA",
     "WinNoShiftAttention",
