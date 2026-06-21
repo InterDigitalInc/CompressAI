@@ -83,6 +83,10 @@ __all__ = [
     "cheng2020_anchor",
     "cheng2020_attn",
     "dcae",
+    "mlic",
+    "mlicplus",
+    "mlicpp",
+    "mlicv2",
     "saaf",
     "stf",
     "stf_wacnn",
@@ -99,6 +103,10 @@ model_architectures = {
     "cheng2020-anchor": Cheng2020Anchor,
     "cheng2020-attn": Cheng2020Attention,
     "dcae": _LazyImport("compressai.models.dcae", "DCAE"),
+    "mlic": _LazyImport("compressai.models.mlic", "MLIC"),
+    "mlicplus": _LazyImport("compressai.models.mlic", "MLICPlus"),
+    "mlicpp": _LazyImport("compressai.models.mlic", "MLICPlusPlus"),
+    "mlicv2": _LazyImport("compressai.models.mlic", "MLICv2"),
     "saaf": _LazyImport("compressai.models.saaf", "SAAF"),
     # Resolved lazily so `compressai.zoo` is importable without `timm`.
     "stf": _LazyImport("compressai.models.stf", "SymmetricalTransFormer"),
@@ -533,6 +541,82 @@ def saaf(pretrained: bool = False, progress: bool = True, **kwargs):
     from compressai.models.saaf import SAAF
 
     return SAAF(**kwargs)
+
+
+def mlic(pretrained: bool = False, progress: bool = True, **kwargs):
+    r"""MLIC model from W. Jiang, J. Yang, Y. Zhai, P. Ning, F. Gao, R. Wang:
+    `"MLIC: Multi-Reference Entropy Model for Learned Image Compression"
+    <https://arxiv.org/abs/2211.07273>`_, ACM Multimedia 2023.
+
+    Args:
+        pretrained (bool): If True, returns a pre-trained model. Currently
+            unavailable; raises ``RuntimeError``.
+        progress (bool): If True, displays a progress bar of the download to
+            stderr.
+    """
+    del progress
+    if pretrained:
+        raise RuntimeError("Pre-trained MLIC weights are not yet hosted on S3.")
+    from compressai.models.mlic import MLIC
+
+    return MLIC(**kwargs)
+
+
+def mlicplus(pretrained: bool = False, progress: bool = True, **kwargs):
+    r"""MLIC+ model from W. Jiang, J. Yang, Y. Zhai, P. Ning, F. Gao, R. Wang:
+    `"MLIC: Multi-Reference Entropy Model for Learned Image Compression"
+    <https://arxiv.org/abs/2211.07273>`_, ACM Multimedia 2023.
+
+    Args:
+        pretrained (bool): If True, returns a pre-trained model. Currently
+            unavailable; raises ``RuntimeError``.
+        progress (bool): If True, displays a progress bar of the download to
+            stderr.
+    """
+    del progress
+    if pretrained:
+        raise RuntimeError("Pre-trained MLIC+ weights are not yet hosted on S3.")
+    from compressai.models.mlic import MLICPlus
+
+    return MLICPlus(**kwargs)
+
+
+def mlicpp(pretrained: bool = False, progress: bool = True, **kwargs):
+    r"""MLIC++ model from W. Jiang, J. Yang, Y. Zhai, F. Gao, R. Wang:
+    `"MLIC++: Linear Complexity Multi-Reference Entropy Modeling for Learned
+    Image Compression" <https://arxiv.org/abs/2307.15421>`_, ACM Trans.
+    Multimedia Comput. Commun. Appl. (TOMM), 2025; ICML 2023 Neural
+    Compression Workshop.
+
+    Args:
+        pretrained (bool): If True, returns a pre-trained model. Currently
+            unavailable; raises ``RuntimeError``.
+        progress (bool): If True, displays a progress bar of the download to
+            stderr.
+    """
+    del progress
+    if pretrained:
+        raise RuntimeError("Pre-trained MLIC++ weights are not yet hosted on S3.")
+    from compressai.models.mlic import MLICPlusPlus
+
+    return MLICPlusPlus(**kwargs)
+
+
+def mlicv2(pretrained: bool = False, progress: bool = True, **kwargs):
+    r"""MLICv2 model from W. Jiang, J. Yang, Y. Zhai, F. Gao, R. Wang.
+
+    Args:
+        pretrained (bool): If True, returns a pre-trained model. Currently
+            unavailable; raises ``RuntimeError``.
+        progress (bool): If True, displays a progress bar of the download to
+            stderr.
+    """
+    del progress
+    if pretrained:
+        raise RuntimeError("Pre-trained MLICv2 weights are not yet hosted on S3.")
+    from compressai.models.mlic import MLICv2
+
+    return MLICv2(**kwargs)
 
 
 def stf(pretrained: bool = False, progress: bool = True, **kwargs):

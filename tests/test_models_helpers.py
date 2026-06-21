@@ -192,6 +192,128 @@ class TestSliceHelpers:
         assert infer_max_support_slices(sd, latent_channels=64, num_slices=8) == 2
 
 
+class TestMlicModelSliceCodec:
+    def _make_mlicpp_codec(self):
+        pytest.importorskip("timm")
+        from compressai.models.mlic import MLICPlusPlus
+
+        return MLICPlusPlus(N=8, M=8, slice_num=2, context_window=3).latent_codec.y
+
+    def test_mlicpp_layout_uses_side_context_channel_groups(self):
+        from compressai.latent_codecs import (
+            ChannelGroupsLatentCodec,
+            EntropyBottleneckLatentCodec,
+            MultiContextCheckerboardLatentCodec,
+        )
+        from compressai.models.mlic import MLICPlusPlus
+
+        model = MLICPlusPlus(N=8, M=8, slice_num=2, context_window=3)
+        codec = model.latent_codec.y
+        assert isinstance(model.latent_codec.z, EntropyBottleneckLatentCodec)
+        assert model.latent_codec.z.quantizer == "ste"
+        assert isinstance(codec, ChannelGroupsLatentCodec)
+        assert type(codec).__name__ == "_SideContextChannelGroupsLatentCodec"
+        assert codec.groups == [4, 4]
+        assert codec.support_slices == [(), (0,)]
+        assert set(codec.channel_context.keys()) == {"y0", "y1"}
+        assert set(codec.latent_codec.keys()) == {"y0", "y1"}
+        assert isinstance(codec.latent_codec["y0"], MultiContextCheckerboardLatentCodec)
+        assert codec.latent_codec["y0"].anchor_parity == "odd"
+
+    def test_mlicpp_state_dict_paths_match_containerized_layout(self):
+        codec = self._make_mlicpp_codec()
+        keys = set(codec.state_dict().keys())
+        assert any(k.startswith("channel_context.y1.channel_part.") for k in keys)
+        assert any(k.startswith("channel_context.y1.global_inter_part.") for k in keys)
+        assert any(
+            k.startswith("latent_codec.y0.entropy_parameters_anchor.fusion.")
+            for k in keys
+        )
+        assert any(
+            k.startswith("latent_codec.y1.entropy_parameters_nonanchor.fusion.")
+            for k in keys
+        )
+        assert any(
+            k.startswith("latent_codec.y0.spatial_context_nonanchor.") for k in keys
+        )
+        assert not any(
+            k.startswith("latent_codec.y0.intra_channel_context_nonanchor.")
+            for k in keys
+        )
+        assert any(
+            k.startswith("latent_codec.y1.intra_channel_context_nonanchor.keys.")
+            for k in keys
+        )
+        assert any(k.startswith("latent_codec.y1.lrp_anchor.") for k in keys)
+        assert any(k.startswith("latent_codec.y1.lrp_nonanchor.") for k in keys)
+        assert any(
+            k.startswith("latent_codec.y1.y.gaussian_conditional.") for k in keys
+        )
+
+    def test_mlicpp_slice_codec_forward_runs(self):
+        torch.manual_seed(0)
+        codec = self._make_mlicpp_codec().eval()
+        y = torch.randn(2, 8, 8, 8)
+        side_params = torch.randn(2, 16, 8, 8)
+        with torch.no_grad():
+            out = codec(y, side_params)
+        assert out["y_hat"].shape == (2, 8, 8, 8)
+        assert out["likelihoods"]["y"].shape == (2, 8, 8, 8)
+
+    @pytest.mark.parametrize("variant", ["mlic", "mlic+"])
+    def test_mlic_family_variant_slice_codecs_forward(self, variant):
+        pytest.importorskip("timm")
+        from compressai.models.mlic import MLIC, MLICPlus
+
+        torch.manual_seed(2)
+        if variant == "mlic":
+            codec = MLIC(N=8, M=8, slice_num=2, local_kernel=3).latent_codec.y
+        else:
+            codec = MLICPlus(N=8, M=8, slice_num=2, context_window=3).latent_codec.y
+        codec = codec.eval()
+        y = torch.randn(2, 8, 8, 8)
+        side_params = torch.randn(2, 16, 8, 8)
+        with torch.no_grad():
+            out = codec(y, side_params)
+        assert out["y_hat"].shape == (2, 8, 8, 8)
+        assert out["likelihoods"]["y"].shape == (2, 8, 8, 8)
+
+    def test_mlicv2_layout_injects_hgcp_context_refinement_and_gsc(self):
+        pytest.importorskip("timm")
+        from compressai.models.mlic import MLICv2
+
+        codec = MLICv2(N=8, M=8, slice_num=2, context_window=3).latent_codec.y
+        keys = set(codec.state_dict().keys())
+
+        assert getattr(
+            codec.latent_codec["y0"].spatial_context_anchor, "requires_side_params"
+        )
+        assert codec.latent_codec["y0"].selective_predictor is not None
+        assert codec.latent_codec["y1"].selective_predictor is not None
+        assert any(
+            k.startswith("latent_codec.y0.spatial_context_anchor.hgcp.") for k in keys
+        )
+        assert any(
+            k.startswith("latent_codec.y0.selective_predictor.predictor.") for k in keys
+        )
+        assert any(
+            k.startswith("channel_context.y1.global_inter_part.context.keys.")
+            for k in keys
+        )
+        assert any(
+            k.startswith("channel_context.y1.global_inter_part.reweighting.")
+            for k in keys
+        )
+
+    def test_rejects_invalid_variant(self):
+        from compressai.models._helpers.multi_context_slice import (
+            _select_global_inter_factory,
+        )
+
+        with pytest.raises(ValueError, match="variant"):
+            _select_global_inter_factory("mlic++")
+
+
 class TestSharedDictionary:
     def test_dt_shape_and_state_dict_path(self):
         from compressai.models._helpers.dictionary_context import SharedDictionary

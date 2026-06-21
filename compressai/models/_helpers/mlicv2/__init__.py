@@ -1,5 +1,10 @@
 # Copyright (c) 2021-2025, InterDigital Communications, Inc
 # All rights reserved.
+#
+# This file adapts the MLIC family design from https://github.com/JiangWeibeta/MLIC
+# (originally distributed under the Apache License 2.0). Modifications by
+# InterDigital Communications, Inc. are released under the BSD 3-Clause Clear
+# License terms below.
 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted (subject to the limitations in the disclaimer
@@ -27,64 +32,15 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .image import (
-    bmshj2018_factorized,
-    bmshj2018_factorized_relu,
-    bmshj2018_hyperprior,
-    cca,
-    cheng2020_anchor,
-    cheng2020_attn,
-    dcae,
-    mbt2018,
-    mbt2018_mean,
-    mlic,
-    mlicplus,
-    mlicpp,
-    mlicv2,
-    saaf,
-    stf,
-    stf_wacnn,
-    tcm,
-)
-from .image_vbr import bmshj2018_hyperprior_vbr, mbt2018_mean_vbr, mbt2018_vbr
-from .pretrained import load_pretrained as load_state_dict
-from .video import ssf2020
+from .context import ContextReweighting, GSCModule, HGCPModule, RoPE2D
+from .transforms import SimpleTokenMixing, STMAnalysis, STMSynthesis
 
-image_models = {
-    "bmshj2018-factorized": bmshj2018_factorized,
-    "bmshj2018-factorized-relu": bmshj2018_factorized_relu,
-    "bmshj2018-hyperprior": bmshj2018_hyperprior,
-    "mbt2018-mean": mbt2018_mean,
-    "mbt2018": mbt2018,
-    "cheng2020-anchor": cheng2020_anchor,
-    "cheng2020-attn": cheng2020_attn,
-    "dcae": dcae,
-    "mlic": mlic,
-    "mlicplus": mlicplus,
-    "mlicpp": mlicpp,
-    "mlicv2": mlicv2,
-    "saaf": saaf,
-    "stf": stf,
-    "stf-wacnn": stf_wacnn,
-    "tcm": tcm,
-    "cca": cca,
-    "bmshj2018-hyperprior-vbr": bmshj2018_hyperprior_vbr,
-    "mbt2018-mean-vbr": mbt2018_mean_vbr,
-    "mbt2018-vbr": mbt2018_vbr,
-}
-
-# Not yet available.
-pointcloud_models = {
-    "hrtzxf2022-pcc-rec": None,
-    "sfu2023-pcc-rec-pointnet": None,
-    "sfu2024-pcc-rec-pointnet2-ssg": None,
-}
-
-video_models = {
-    "ssf2020": ssf2020,
-}
-
-models = {}
-models.update(image_models)
-models.update(pointcloud_models)
-models.update(video_models)
+__all__ = [
+    "ContextReweighting",
+    "GSCModule",
+    "HGCPModule",
+    "RoPE2D",
+    "STMAnalysis",
+    "STMSynthesis",
+    "SimpleTokenMixing",
+]
