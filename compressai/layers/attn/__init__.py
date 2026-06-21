@@ -4,7 +4,7 @@ from .dictionary import (
     DenseBlock,
     DWConv,
     MultiScaleAggregation,
-    MutiScaleDictionaryCrossAttentionGLU,
+    MultiScaleDictionaryCrossAttentionGLU,
     Scale,
     SpatialAttentionModule,
 )
@@ -31,7 +31,7 @@ __all__ = [
     "DWConv",
     "DenseBlock",
     "MultiScaleAggregation",
-    "MutiScaleDictionaryCrossAttentionGLU",
+    "MultiScaleDictionaryCrossAttentionGLU",
     "PatchMerging",
     "PatchSplit",
     "SWAtten",
