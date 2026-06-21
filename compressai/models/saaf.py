@@ -46,10 +46,6 @@ from compressai.latent_codecs import (
 )
 from compressai.layers.attn.dictionary import ConvolutionalGLU, Scale
 from compressai.layers.attn.swin import pad_to_window_multiple
-from compressai.layers.lic import (
-    ResidualBottleneckBlockWithStride,
-    ResidualBottleneckBlockWithUpsample,
-)
 from compressai.models._helpers.auxt import OLP
 from compressai.models._helpers.auxt import aux_loss as _aggregate_aux_loss
 from compressai.models._helpers.dictionary_context import (
@@ -170,6 +166,40 @@ def _group_count(channels: int, max_groups: int = 8) -> int:
         if channels % groups == 0:
             return groups
     return 1
+
+
+class _ResidualBottleneckBlockWithStride(nn.Module):
+    """SAAF stride-2 residual-bottleneck downsampling block."""
+
+    def __init__(self, in_ch: int, out_ch: int) -> None:
+        super().__init__()
+        self.conv = conv(in_ch, out_ch, kernel_size=5, stride=2)
+        self.res1 = ResidualBottleneckBlock(out_ch, out_ch)
+        self.res2 = ResidualBottleneckBlock(out_ch, out_ch)
+        self.res3 = ResidualBottleneckBlock(out_ch, out_ch)
+
+    def forward(self, input_tensor: Tensor) -> Tensor:
+        output = self.conv(input_tensor)
+        output = self.res1(output)
+        output = self.res2(output)
+        return self.res3(output)
+
+
+class _ResidualBottleneckBlockWithUpsample(nn.Module):
+    """SAAF residual-bottleneck upsampling block."""
+
+    def __init__(self, in_ch: int, out_ch: int) -> None:
+        super().__init__()
+        self.res1 = ResidualBottleneckBlock(in_ch, in_ch)
+        self.res2 = ResidualBottleneckBlock(in_ch, in_ch)
+        self.res3 = ResidualBottleneckBlock(in_ch, in_ch)
+        self.conv = deconv(in_ch, out_ch, kernel_size=5, stride=2)
+
+    def forward(self, input_tensor: Tensor) -> Tensor:
+        output = self.res1(input_tensor)
+        output = self.res2(output)
+        output = self.res3(output)
+        return self.conv(output)
 
 
 class _AdaptiveFrequencyBlock(nn.Module):
@@ -572,7 +602,7 @@ class SAAF(CompressionModel):
                 block=_SpatialAttentionLayer,
                 block_num=block_num[0],
             ),
-            ResidualBottleneckBlockWithStride(feature_dims[0], feature_dims[1]),
+            _ResidualBottleneckBlockWithStride(feature_dims[0], feature_dims[1]),
         ]
         self.m_down2 = [
             _SpatialAttentionBlock(
@@ -584,7 +614,7 @@ class SAAF(CompressionModel):
                 block=_SpatialAttentionLayer,
                 block_num=block_num[1],
             ),
-            ResidualBottleneckBlockWithStride(feature_dims[1], feature_dims[2]),
+            _ResidualBottleneckBlockWithStride(feature_dims[1], feature_dims[2]),
         ]
         self.m_down3 = [
             _SpatialAttentionBlock(
@@ -599,7 +629,7 @@ class SAAF(CompressionModel):
             conv(feature_dims[2], M, kernel_size=5, stride=2),
         ]
         self.g_a = nn.Sequential(
-            ResidualBottleneckBlockWithStride(input_image_channel, feature_dims[0]),
+            _ResidualBottleneckBlockWithStride(input_image_channel, feature_dims[0]),
             *self.m_down1,
             *self.m_down2,
             *self.m_down3,
@@ -623,7 +653,7 @@ class SAAF(CompressionModel):
                 block=_SpatialAttentionLayer,
                 block_num=block_num[2],
             ),
-            ResidualBottleneckBlockWithUpsample(feature_dims[2], feature_dims[1]),
+            _ResidualBottleneckBlockWithUpsample(feature_dims[2], feature_dims[1]),
         ]
         self.m_up2 = [
             _SpatialAttentionBlock(
@@ -635,7 +665,7 @@ class SAAF(CompressionModel):
                 block=_SpatialAttentionLayer,
                 block_num=block_num[1],
             ),
-            ResidualBottleneckBlockWithUpsample(feature_dims[1], feature_dims[0]),
+            _ResidualBottleneckBlockWithUpsample(feature_dims[1], feature_dims[0]),
         ]
         self.m_up3 = [
             _SpatialAttentionBlock(
@@ -647,7 +677,7 @@ class SAAF(CompressionModel):
                 block=_SpatialAttentionLayer,
                 block_num=block_num[0],
             ),
-            ResidualBottleneckBlockWithUpsample(feature_dims[0], output_image_channel),
+            _ResidualBottleneckBlockWithUpsample(feature_dims[0], output_image_channel),
         ]
         self.g_s = nn.Sequential(
             deconv(M, feature_dims[2], kernel_size=5, stride=2),
@@ -666,7 +696,7 @@ class SAAF(CompressionModel):
 
         # ----- h_a / h_mean_s / h_scale_s (same SAAF blocks, hyper config) -----
         h_a = nn.Sequential(
-            ResidualBottleneckBlockWithStride(M, N),
+            _ResidualBottleneckBlockWithStride(M, N),
             _SpatialAttentionBlock(
                 N,
                 N,
@@ -694,7 +724,7 @@ class SAAF(CompressionModel):
                 block=_SpatialAttentionLayer,
                 block_num=1,
             ),
-            ResidualBottleneckBlockWithUpsample(N, M),
+            _ResidualBottleneckBlockWithUpsample(N, M),
         )
         h_scale_s = nn.Sequential(
             deconv(hyper_channels, N, kernel_size=3, stride=2),
@@ -707,7 +737,7 @@ class SAAF(CompressionModel):
                 block=_SpatialAttentionLayer,
                 block_num=1,
             ),
-            ResidualBottleneckBlockWithUpsample(N, M),
+            _ResidualBottleneckBlockWithUpsample(N, M),
         )
 
         # ----- Shared dictionary + diffusion prior -----
