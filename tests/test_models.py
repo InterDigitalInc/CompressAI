@@ -579,13 +579,13 @@ class TestTcm:
             max_support_slices=2,
         )
         assert model.use_auxt is False
-        assert model.AuxT_enc is None
-        assert model.AuxT_dec is None
-        # aux_loss returns a 0-d Tensor with value 0 even without AuxT,
-        # so callers can unconditionally add it to the training objective.
+        assert not hasattr(model.g_a, "auxiliary_layers")
+        assert not hasattr(model.g_s, "auxiliary_layers")
+        # aux_loss remains a scalar without AuxT, carrying the base
+        # EntropyBottleneck auxiliary loss.
         loss = model.aux_loss()
         assert loss.dim() == 0
-        assert loss.item() == 0.0
+        assert torch.isfinite(loss)
 
     def test_tcm_use_auxt_construction_and_forward(self):
         pytest.importorskip("pytorch_wavelets")
@@ -600,12 +600,12 @@ class TestTcm:
             use_auxt=True,
         ).eval()
         assert model.use_auxt is True
-        assert model.AuxT_enc is not None and len(model.AuxT_enc) == 4
-        assert model.AuxT_dec is not None and len(model.AuxT_dec) == 4
+        assert len(model.g_a.auxiliary_layers) == 4
+        assert len(model.g_s.auxiliary_layers) == 4
         # Default config (2,2,2,2,2,2) -> 10-layer g_a / g_s with merge
         # positions (0, 3, 6, 9) and (2, 5, 8, 9) respectively.
-        assert model._analysis_aux_positions == (0, 3, 6, 9)
-        assert model._synthesis_aux_positions == (2, 5, 8, 9)
+        assert model.g_a.merge_positions == (0, 3, 6, 9)
+        assert model.g_s.merge_positions == (2, 5, 8, 9)
 
         x = torch.rand(1, 3, 64, 64)
         with torch.no_grad():
@@ -631,12 +631,17 @@ class TestTcm:
         ).eval()
         sd = model.state_dict()
         # AuxT submodule paths are present.
-        auxt_keys = {k for k in sd if k.startswith(("AuxT_enc.", "AuxT_dec."))}
+        auxt_keys = {
+            k
+            for k in sd
+            if k.startswith(("g_a.auxiliary_layers.", "g_s.auxiliary_layers."))
+        }
         assert any(".olp.linear.weight" in k for k in auxt_keys)
         assert any(".scaling_factors" in k for k in auxt_keys)
+        assert "g_a.transform.0.conv1.weight" in sd
 
         loaded = TCM.from_state_dict(sd).eval()
-        # use_auxt is auto-detected from the AuxT_enc/AuxT_dec keys.
+        # use_auxt is auto-detected from the wrapper auxiliary keys.
         assert loaded.use_auxt is True
         x = torch.rand(1, 3, 64, 64)
         with torch.no_grad():
@@ -652,6 +657,7 @@ class TestTcm:
         # the upstream-style ``.OLP.`` submodule and ``w_*`` / ``filters``
         # custom DWT/IDWT kernel buffers that should get dropped.
         upstream = {
+            "module.g_a.0.conv1.weight": torch.zeros(2),
             "module.cc_mean_transforms.0.0.weight": torch.zeros(2),
             "module.cc_scale_transforms.0.0.weight": torch.zeros(2),
             "module.lrp_transforms.0.0.weight": torch.zeros(2),
@@ -674,11 +680,14 @@ class TestTcm:
         converted = convert_upstream_tcm_state_dict(upstream)
 
         # ``.OLP.`` -> ``.olp.`` rename, ``module.`` prefix gone.
-        assert "AuxT_enc.0.olp.linear.weight" in converted
-        assert "AuxT_enc.0.olp.linear.bias" in converted
-        assert "AuxT_dec.0.olp.linear.weight" in converted
+        assert "g_a.auxiliary_layers.0.olp.linear.weight" in converted
+        assert "g_a.auxiliary_layers.0.olp.linear.bias" in converted
+        assert "g_s.auxiliary_layers.0.olp.linear.weight" in converted
         # scaling_factors carries through.
-        assert "AuxT_enc.0.scaling_factors" in converted
+        assert "g_a.auxiliary_layers.0.scaling_factors" in converted
+        # With AuxT present, the main transform becomes the wrapped transform.
+        assert "g_a.transform.0.conv1.weight" in converted
+        assert "g_a.0.conv1.weight" not in converted
         # Upstream-LIC_TCM-specific DWT/IDWT kernel buffers dropped.
         for suffix in ("w_ll", "w_lh", "w_hl", "w_hh"):
             assert not any(
@@ -686,7 +695,7 @@ class TestTcm:
             ), f"upstream DWT buffer {suffix} should have been dropped"
         assert not any(k.endswith(".idwt.filters") for k in converted)
         # Upstream-style PascalCase OLP keys should be gone.
-        assert "AuxT_enc.0.OLP.linear.weight" not in converted
+        assert "g_a.auxiliary_layers.0.OLP.linear.weight" not in converted
 
 
 class TestDcae:

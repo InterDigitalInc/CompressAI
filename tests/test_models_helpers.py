@@ -427,17 +427,23 @@ class TestAuxtStateDictHelpers:
     def test_has_auxt_state():
         from compressai.models._helpers.auxt import has_auxt_state
 
-        assert has_auxt_state({"AuxT_enc.0.olp.linear.weight": torch.zeros(2)})
-        assert has_auxt_state({"AuxT_dec.3.scaling_factors": torch.zeros(2)})
+        assert has_auxt_state(
+            {"g_a.auxiliary_layers.0.olp.linear.weight": torch.zeros(2)}
+        )
+        assert has_auxt_state(
+            {"g_s.auxiliary_layers.3.scaling_factors": torch.zeros(2)}
+        )
         assert not has_auxt_state({"g_a.0.weight": torch.zeros(2)})
 
     @staticmethod
     def test_is_auxt_wavelet_buffer_key():
         from compressai.models._helpers.auxt import is_auxt_wavelet_buffer_key
 
-        assert is_auxt_wavelet_buffer_key("AuxT_enc.0.dwt.transform.h0_col")
-        assert is_auxt_wavelet_buffer_key("AuxT_dec.0.idwt.inverse.g0_col")
-        assert not is_auxt_wavelet_buffer_key("AuxT_enc.0.olp.linear.weight")
+        assert is_auxt_wavelet_buffer_key("g_a.auxiliary_layers.0.dwt.transform.h0_col")
+        assert is_auxt_wavelet_buffer_key("g_s.auxiliary_layers.0.idwt.inverse.g0_col")
+        assert not is_auxt_wavelet_buffer_key(
+            "g_a.auxiliary_layers.0.olp.linear.weight"
+        )
         assert not is_auxt_wavelet_buffer_key("g_a.0.weight")
 
     @staticmethod
@@ -460,11 +466,11 @@ class TestAuxtStateDictHelpers:
 
         assert (
             normalize_upstream_auxt_key("AuxT_enc.0.OLP.linear.weight")
-            == "AuxT_enc.0.olp.linear.weight"
+            == "g_a.auxiliary_layers.0.olp.linear.weight"
         )
         assert (
             normalize_upstream_auxt_key("AuxT_dec.3.OLP.linear.bias")
-            == "AuxT_dec.3.olp.linear.bias"
+            == "g_s.auxiliary_layers.3.olp.linear.bias"
         )
         # Returns None for non-AuxT keys so callers can use a single check.
         assert normalize_upstream_auxt_key("g_a.0.weight") is None

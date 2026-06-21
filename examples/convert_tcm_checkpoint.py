@@ -213,6 +213,13 @@ def convert_upstream_tcm_state_dict(
     # alias ``atten_mean`` / ``atten_scale`` to the canonical
     # ``mean_support_transforms`` / ``scale_support_transforms`` names so the
     # per-slice rerooting in Pass 2 only has to handle one form.
+    has_auxt = any(
+        (key[len("module.") :] if key.startswith("module.") else key).startswith(
+            ("AuxT_enc.", "AuxT_dec.")
+        )
+        for key in state_dict
+    )
+
     cleaned: Dict[str, Tensor] = {}
     for key, value in state_dict.items():
         new_key = key[len("module.") :] if key.startswith("module.") else key
@@ -240,6 +247,13 @@ def convert_upstream_tcm_state_dict(
         new_key = new_key.replace(".ln2.", ".norm2.")
         new_key = new_key.replace(".mlp.0.", ".mlp.fc1.")
         new_key = new_key.replace(".mlp.2.", ".mlp.fc2.")
+        if (
+            has_auxt
+            and (new_key.startswith("g_a.") or new_key.startswith("g_s."))
+            and ".auxiliary_layers." not in new_key
+        ):
+            root, tail = new_key.split(".", 1)
+            new_key = f"{root}.transform.{tail}"
         if ".msa.output_proj." in new_key:
             _ensure_identity_attention_projection(cleaned, new_key, value)
         cleaned[new_key] = value
