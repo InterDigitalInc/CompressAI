@@ -343,6 +343,8 @@ document.write(`
     <span class="s2">&quot;mbt2018_mean&quot;</span><span class="p">,</span>
     <span class="s2">&quot;cheng2020_anchor&quot;</span><span class="p">,</span>
     <span class="s2">&quot;cheng2020_attn&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dcae&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;saaf&quot;</span><span class="p">,</span>
     <span class="s2">&quot;stf&quot;</span><span class="p">,</span>
     <span class="s2">&quot;stf_wacnn&quot;</span><span class="p">,</span>
     <span class="s2">&quot;tcm&quot;</span><span class="p">,</span>
@@ -357,6 +359,8 @@ document.write(`
     <span class="s2">&quot;mbt2018&quot;</span><span class="p">:</span> <span class="n">JointAutoregressiveHierarchicalPriors</span><span class="p">,</span>
     <span class="s2">&quot;cheng2020-anchor&quot;</span><span class="p">:</span> <span class="n">Cheng2020Anchor</span><span class="p">,</span>
     <span class="s2">&quot;cheng2020-attn&quot;</span><span class="p">:</span> <span class="n">Cheng2020Attention</span><span class="p">,</span>
+    <span class="s2">&quot;dcae&quot;</span><span class="p">:</span> <span class="n">_LazyImport</span><span class="p">(</span><span class="s2">&quot;compressai.models.dcae&quot;</span><span class="p">,</span> <span class="s2">&quot;DCAE&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;saaf&quot;</span><span class="p">:</span> <span class="n">_LazyImport</span><span class="p">(</span><span class="s2">&quot;compressai.models.saaf&quot;</span><span class="p">,</span> <span class="s2">&quot;SAAF&quot;</span><span class="p">),</span>
     <span class="c1"># Resolved lazily so `compressai.zoo` is importable without `timm`.</span>
     <span class="s2">&quot;stf&quot;</span><span class="p">:</span> <span class="n">_LazyImport</span><span class="p">(</span><span class="s2">&quot;compressai.models.stf&quot;</span><span class="p">,</span> <span class="s2">&quot;SymmetricalTransFormer&quot;</span><span class="p">),</span>
     <span class="s2">&quot;stf-wacnn&quot;</span><span class="p">:</span> <span class="n">_LazyImport</span><span class="p">(</span><span class="s2">&quot;compressai.models.stf&quot;</span><span class="p">,</span> <span class="s2">&quot;WACNN&quot;</span><span class="p">),</span>
@@ -750,6 +754,46 @@ document.write(`
     <span class="k">return</span> <span class="n">_load_model</span><span class="p">(</span>
         <span class="s2">&quot;cheng2020-attn&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">quality</span><span class="p">,</span> <span class="n">pretrained</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">dcae</span><span class="p">(</span><span class="n">pretrained</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;DCAE model from J. Lu, L. Zhang, X. Zhou, M. Li, W. Li, S. Gu:</span>
+<span class="sd">    `&quot;Learned Image Compression with Dictionary-based Entropy Model&quot;</span>
+<span class="sd">    &lt;https://arxiv.org/abs/2504.00496&gt;`_, IEEE/CVF Conf. on Computer</span>
+<span class="sd">    Vision and Pattern Recognition (CVPR), 2025.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pretrained (bool): If True, returns a pre-trained model. Currently</span>
+<span class="sd">            unavailable; raises ``RuntimeError``.</span>
+<span class="sd">        progress (bool): If True, displays a progress bar of the download to</span>
+<span class="sd">            stderr.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">del</span> <span class="n">progress</span>
+    <span class="k">if</span> <span class="n">pretrained</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Pre-trained DCAE weights are not yet hosted on S3.&quot;</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">compressai.models.dcae</span><span class="w"> </span><span class="kn">import</span> <span class="n">DCAE</span>
+
+    <span class="k">return</span> <span class="n">DCAE</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">saaf</span><span class="p">(</span><span class="n">pretrained</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;SAAF model from H. Ma, X. Shi, H. Sun, X. Yue, X. Liu, G. Wang,</span>
+<span class="sd">    W. Cai: &quot;Learned Image Compression via Sparse Attention and Adaptive</span>
+<span class="sd">    Frequency&quot;, IEEE/CVF Conf. on Computer Vision and Pattern Recognition</span>
+<span class="sd">    (CVPR), 2026.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pretrained (bool): If True, returns a pre-trained model. Currently</span>
+<span class="sd">            unavailable; raises ``RuntimeError``.</span>
+<span class="sd">        progress (bool): If True, displays a progress bar of the download to</span>
+<span class="sd">            stderr.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">del</span> <span class="n">progress</span>
+    <span class="k">if</span> <span class="n">pretrained</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Pre-trained SAAF weights are not yet hosted on S3.&quot;</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">compressai.models.saaf</span><span class="w"> </span><span class="kn">import</span> <span class="n">SAAF</span>
+
+    <span class="k">return</span> <span class="n">SAAF</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">stf</span><span class="p">(</span><span class="n">pretrained</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
