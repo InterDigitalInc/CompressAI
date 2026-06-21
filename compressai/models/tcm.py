@@ -58,15 +58,15 @@ from compressai.layers import (
 from compressai.layers.attn import ConvTransBlock, SWAtten
 from compressai.models._helpers.auxt import (
     AuxTTransform,
-    aux_loss as _aggregate_aux_loss,
-)
-from compressai.models._helpers.auxt import (
     build_iwls_branch,
     build_wls_branch,
     compute_analysis_aux_positions,
     compute_synthesis_aux_positions,
     has_auxt_state,
     is_auxt_wavelet_buffer_key,
+)
+from compressai.models._helpers.auxt import (
+    aux_loss as _aggregate_aux_loss,
 )
 from compressai.models._helpers.channel_context import MeanScaleContextHead
 from compressai.models._helpers.slice_helpers import (
