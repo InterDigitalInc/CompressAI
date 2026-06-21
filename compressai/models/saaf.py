@@ -859,15 +859,8 @@ class SAAF(CompressionModel):
         return x_main
 
     def aux_loss(self) -> Tensor:
-        """Aggregated :class:`OLP` orthogonality regulariser over every
-        ``_AdaptiveFrequencyBlock`` / ``_InverseAdaptiveFrequencyBlock``.
-
-        SAAF integrates AuxT unconditionally (unlike TCM ``use_auxt``), so
-        this is always a non-trivial scalar with random init. The host's
-        training loop adds it to the rate-distortion objective alongside
-        the ``diffusion_loss`` from :meth:`forward`.
-        """
-        return _aggregate_aux_loss(self)
+        """Auxiliary entropy-bottleneck loss plus OLP regulariser."""
+        return super().aux_loss() + _aggregate_aux_loss(self)
 
     def forward(self, x: Tensor) -> Dict[str, Union[Tensor, Dict[str, Tensor]]]:
         y = self._encode(x)
