@@ -57,6 +57,7 @@ from compressai.layers import (
 )
 from compressai.layers.attn import ConvTransBlock, SWAtten
 from compressai.models._helpers.auxt import (
+    AuxTTransform,
     aux_loss as _aggregate_aux_loss,
 )
 from compressai.models._helpers.auxt import (
@@ -64,7 +65,6 @@ from compressai.models._helpers.auxt import (
     build_wls_branch,
     compute_analysis_aux_positions,
     compute_synthesis_aux_positions,
-    forward_with_auxt,
     has_auxt_state,
     is_auxt_wavelet_buffer_key,
 )
@@ -184,11 +184,20 @@ def _group_consecutive(indices: Iterable[int]) -> List[List[int]]:
     return grouped
 
 
+def _transform_prefix(state_dict: Dict[str, Tensor], prefix: str) -> str:
+    wrapped_prefix = f"{prefix}.transform"
+    if any(key.startswith(f"{wrapped_prefix}.") for key in state_dict):
+        return wrapped_prefix
+    return prefix
+
+
 def _infer_stage_groups(state_dict: Dict[str, Tensor], prefix: str) -> List[List[int]]:
+    transform_prefix = _transform_prefix(state_dict, prefix)
+    index_offset = transform_prefix.count(".") + 1
     indices = {
-        int(key.split(".")[1])
+        int(key.split(".")[index_offset])
         for key in state_dict
-        if key.startswith(f"{prefix}.") and ".conv1_1.weight" in key
+        if key.startswith(f"{transform_prefix}.") and ".conv1_1.weight" in key
     }
     return _group_consecutive(indices)
 
@@ -204,11 +213,13 @@ def _infer_stage_depths(state_dict: Dict[str, Tensor]) -> Optional[List[int]]:
 def _infer_head_dims(state_dict: Dict[str, Tensor], N: int) -> Optional[List[int]]:
     head_dims: List[int] = []
     for prefix in ("g_a", "g_s"):
+        transform_prefix = _transform_prefix(state_dict, prefix)
         for group in _infer_stage_groups(state_dict, prefix):
             if not group:
                 continue
             table_key = (
-                f"{prefix}.{group[0]}.trans_block.msa.attn.relative_position_bias_table"
+                f"{transform_prefix}.{group[0]}."
+                "trans_block.msa.attn.relative_position_bias_table"
             )
             if table_key not in state_dict:
                 return None
@@ -219,6 +230,8 @@ def _infer_head_dims(state_dict: Dict[str, Tensor], N: int) -> Optional[List[int
 
 def _infer_hyper_head_dim(state_dict: Dict[str, Tensor], N: int, default: int) -> int:
     for key in (
+        "latent_codec.h_a.1.trans_block.msa.attn.relative_position_bias_table",
+        "latent_codec.h_s.h_mean_s.1.trans_block.msa.attn.relative_position_bias_table",
         "h_a.1.trans_block.msa.attn.relative_position_bias_table",
         "h_mean_s.1.trans_block.msa.attn.relative_position_bias_table",
     ):
@@ -504,73 +517,37 @@ class TCM(SimpleVAECompressionModel):
                 ),
             },
         )
-        # ----- AuxT (Li et al., ICLR 2025) opt-in side branch -----
-        # When ``use_auxt=True``, AuxT_enc[i] is summed into ``g_a`` at
-        # ``_analysis_aux_positions`` (and AuxT_dec[i] into ``g_s`` at
-        # ``_synthesis_aux_positions``). The OLP modules inside each WLS /
-        # iWLS contribute an orthogonality regulariser that the host
-        # surfaces via :meth:`aux_loss`.
-        # All wiring lives in :mod:`compressai.models._helpers.auxt` so
-        # SAAF (and any future AuxT host) can reuse the same builders +
-        # walker without copy-pasting.
-        self._analysis_aux_positions = compute_analysis_aux_positions(config)
-        self._synthesis_aux_positions = compute_synthesis_aux_positions(config)
         if use_auxt:
-            self.AuxT_enc = build_wls_branch(N, M)
-            self.AuxT_dec = build_iwls_branch(N, M)
-        else:
-            self.AuxT_enc = None
-            self.AuxT_dec = None
+            self.g_a = AuxTTransform(
+                self.g_a,
+                build_wls_branch(N, M),
+                compute_analysis_aux_positions(config),
+            )
+            self.g_s = AuxTTransform(
+                self.g_s,
+                build_iwls_branch(N, M),
+                compute_synthesis_aux_positions(config),
+            )
 
     @property
     def use_auxt(self) -> bool:
         """``True`` when the AuxT side branch was constructed."""
-        return self.AuxT_enc is not None and self.AuxT_dec is not None
-
-    def _analysis_transform(self, x: Tensor) -> Tensor:
-        return forward_with_auxt(
-            self.g_a, self.AuxT_enc, self._analysis_aux_positions, x
-        )
-
-    def _synthesis_transform(self, y_hat: Tensor) -> Tensor:
-        return forward_with_auxt(
-            self.g_s, self.AuxT_dec, self._synthesis_aux_positions, y_hat
+        return isinstance(self.g_a, AuxTTransform) and isinstance(
+            self.g_s, AuxTTransform
         )
 
     def aux_loss(self) -> Tensor:
-        """Orthogonality regulariser aggregated over every
-        :class:`~compressai.models._helpers.auxt.OLP` in this model.
+        """Auxiliary entropy-bottleneck loss plus AuxT OLP regulariser.
 
-        Returns a 0-d Tensor with value ``0`` (on the same device / dtype
-        as the model parameters) when ``use_auxt=False``, so callers can
-        unconditionally add it to the training objective.
+        The AuxT term is zero when ``use_auxt=False``, so callers can
+        unconditionally add the returned scalar to the training objective.
         """
-        return _aggregate_aux_loss(self)
-
-    def forward(self, x: Tensor) -> Dict[str, Dict[str, Tensor] | Tensor]:
-        y = self._analysis_transform(x)
-        y_out = self.latent_codec(y)
-        return {
-            "x_hat": self._synthesis_transform(y_out["y_hat"]),
-            "likelihoods": y_out["likelihoods"],
-        }
-
-    def compress(self, x: Tensor) -> Dict[str, object]:
-        y = self._analysis_transform(x)
-        y_out = self.latent_codec.compress(y)
-        return {"strings": y_out["strings"], "shape": y_out["shape"]}
-
-    def decompress(
-        self,
-        strings: Sequence[Sequence[bytes]],
-        shape: Dict[str, Tuple[int, ...]] | Tuple[int, int],
-    ) -> Dict[str, Tensor]:
-        y_out = self.latent_codec.decompress(strings, shape)
-        return {"x_hat": self._synthesis_transform(y_out["y_hat"]).clamp_(0, 1)}
+        return super().aux_loss() + _aggregate_aux_loss(self)
 
     @classmethod
     def from_state_dict(cls, state_dict: Dict[str, Tensor]) -> "TCM":
-        N = state_dict["g_a.0.conv1.weight"].size(0) // 2
+        g_a_prefix = _transform_prefix(state_dict, "g_a")
+        N = state_dict[f"{g_a_prefix}.0.conv1.weight"].size(0) // 2
         M = state_dict["latent_codec.h_a.0.conv1.weight"].size(1)
         config = _infer_stage_depths(state_dict) or [2, 2, 2, 2, 2, 2]
         head_dim = _infer_head_dims(state_dict, N) or [8, 16, 32, 32, 16, 8]

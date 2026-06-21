@@ -17,9 +17,9 @@ This module consolidates everything model-side that is AuxT-specific:
   helpers below stay importable without ``pytorch_wavelets``.
 - Side-branch builders + walker (:func:`build_wls_branch`,
   :func:`build_iwls_branch`, :func:`forward_with_auxt`,
-  :func:`compute_analysis_aux_positions`,
+  :class:`AuxTTransform`, :func:`compute_analysis_aux_positions`,
   :func:`compute_synthesis_aux_positions`) for hosts that integrate AuxT
-  as a parallel chain summed into ``g_a`` / ``g_s`` (TCM ``use_auxt`` and
+  as a parallel chain wrapped around ``g_a`` / ``g_s`` (TCM ``use_auxt`` and
   any future model with the same six-stage config).
 - :func:`aux_loss` — generic OLP regulariser aggregator used by both
   TCM-style (side-branch) and SAAF-style (integral) hosts.
@@ -47,6 +47,7 @@ import torch.nn.functional as F
 from torch import Tensor
 
 __all__ = [
+    "AuxTTransform",
     "OLP",
     "WLS",
     "aux_loss",
@@ -258,6 +259,38 @@ def forward_with_auxt(
     return output
 
 
+class AuxTTransform(nn.Module):
+    """Wrap a transform with an AuxT side branch.
+
+    The wrapper makes an AuxT-augmented transform look like the actual
+    ``g_a`` / ``g_s`` module, keeping model forward/compress/decompress
+    paths identical to non-AuxT hosts while storing AuxT parameters under
+    ``{g_a,g_s}.auxiliary_layers.*``.
+    """
+
+    transform: nn.Module
+    auxiliary_layers: nn.ModuleList
+
+    def __init__(
+        self,
+        transform: nn.Module,
+        auxiliary_layers: nn.ModuleList,
+        merge_positions: Sequence[int],
+    ) -> None:
+        super().__init__()
+        self.transform = transform
+        self.auxiliary_layers = auxiliary_layers
+        self.merge_positions = tuple(merge_positions)
+
+    def forward(self, input_tensor: Tensor) -> Tensor:
+        return forward_with_auxt(
+            self.transform,
+            self.auxiliary_layers,
+            self.merge_positions,
+            input_tensor,
+        )
+
+
 def compute_analysis_aux_positions(
     config: Sequence[int],
 ) -> Tuple[int, int, int, int]:
@@ -322,21 +355,22 @@ def aux_loss(model: nn.Module) -> Tensor:
 
 
 def has_auxt_state(state_dict: Dict[str, Tensor]) -> bool:
-    """``True`` when the state-dict carries any ``AuxT_enc.*`` /
-    ``AuxT_dec.*`` keys.
+    """``True`` when a native state-dict carries AuxT wrapper keys.
 
-    Hosts with an opt-in ``use_auxt`` parameter call this from
-    :meth:`from_state_dict` to auto-detect whether the checkpoint
-    requires AuxT branches.
+    TCM stores AuxT branches under ``g_a.auxiliary_layers.*`` and
+    ``g_s.auxiliary_layers.*``; converters are responsible for translating
+    upstream ``AuxT_enc.*`` / ``AuxT_dec.*`` keys to that final layout.
     """
     return any(
-        key.startswith("AuxT_enc.") or key.startswith("AuxT_dec.") for key in state_dict
+        key.startswith("g_a.auxiliary_layers.")
+        or key.startswith("g_s.auxiliary_layers.")
+        for key in state_dict
     )
 
 
 def is_auxt_wavelet_buffer_key(key: str) -> bool:
-    """Match ``pytorch_wavelets``' own DWT/IDWT kernel buffer paths
-    (``AuxT_enc.{k}.dwt.transform.h*`` / ``AuxT_dec.{k}.idwt.inverse.*``).
+    """Match ``pytorch_wavelets`` DWT/IDWT kernel buffer paths in the
+    native AuxT wrapper layout.
 
     Hosts that allow strict ``load_state_dict`` should add these to the
     "allowed missing" set: ``pytorch_wavelets`` re-registers the kernels
@@ -344,9 +378,11 @@ def is_auxt_wavelet_buffer_key(key: str) -> bool:
     state-dict but may be absent from a checkpoint saved by a version
     that did not persist them.
     """
-    if not (key.startswith("AuxT_enc.") or key.startswith("AuxT_dec.")):
-        return False
-    return ".dwt.transform." in key or ".idwt.inverse." in key
+    if key.startswith("g_a.auxiliary_layers."):
+        return ".dwt.transform." in key
+    if key.startswith("g_s.auxiliary_layers."):
+        return ".idwt.inverse." in key
+    return False
 
 
 def is_auxt_upstream_wavelet_buffer_key(key: str) -> bool:
@@ -366,14 +402,19 @@ def is_auxt_upstream_wavelet_buffer_key(key: str) -> bool:
 
 
 def normalize_upstream_auxt_key(key: str) -> Optional[str]:
-    """Translate an upstream PascalCase ``.OLP.`` attribute path to the
-    compressai-canonical ``.olp.`` form, leaving non-AuxT keys alone.
+    """Translate upstream AuxT keys to the native wrapper layout.
 
-    Returns ``None`` if the key is not an ``AuxT_enc.*`` / ``AuxT_dec.*``
-    key (so callers can use a single ``if normalized := ...`` check).
-    Pair with :func:`is_auxt_upstream_wavelet_buffer_key` to drop the
-    upstream-specific DWT/IDWT kernel buffers in the same convert pass.
+    Upstream LIC_TCM stores ``AuxT_enc.*`` / ``AuxT_dec.*`` at the model
+    root and names the projection module ``.OLP.``; CompressAI stores them
+    under ``g_a.auxiliary_layers.*`` / ``g_s.auxiliary_layers.*`` with
+    lowercase ``.olp.``. Returns ``None`` for non-AuxT keys.
     """
-    if not key.startswith(("AuxT_enc.", "AuxT_dec.")):
-        return None
-    return key.replace(".OLP.", ".olp.")
+    if key.startswith("AuxT_enc."):
+        return "g_a.auxiliary_layers." + key[len("AuxT_enc.") :].replace(
+            ".OLP.", ".olp."
+        )
+    if key.startswith("AuxT_dec."):
+        return "g_s.auxiliary_layers." + key[len("AuxT_dec.") :].replace(
+            ".OLP.", ".olp."
+        )
+    return None
