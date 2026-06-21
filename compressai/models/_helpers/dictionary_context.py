@@ -11,7 +11,7 @@ This module provides:
   a plain Python attribute so the parameter is not duplicated under K
   per-slice paths in the state-dict.
 - :class:`DictionaryMeanScaleContextHead` — per-slice channel-context head
-  that runs :class:`MutiScaleDictionaryCrossAttentionGLU` on its input,
+  that runs :class:`MultiScaleDictionaryCrossAttentionGLU` on its input,
   concatenates the cross-attention output with the input, and feeds the
   combined ``support`` tensor into separate ``mean_cc`` / ``scale_cc``
   Sequentials. Drops into
@@ -38,7 +38,7 @@ import torch.nn as nn
 
 from torch import Tensor
 
-from compressai.layers.attn.dictionary import MutiScaleDictionaryCrossAttentionGLU
+from compressai.layers.attn.dictionary import MultiScaleDictionaryCrossAttentionGLU
 from compressai.models._helpers.slice_helpers import make_entropy_transform
 
 __all__ = [
@@ -66,7 +66,7 @@ class SharedDictionary(nn.Module):
     def expand_for(self, batch_size: int) -> Tensor:
         """Broadcast ``dt`` to ``(batch_size, dict_num, dictionary_dim)``.
 
-        :class:`MutiScaleDictionaryCrossAttentionGLU` expects a per-batch
+        :class:`MultiScaleDictionaryCrossAttentionGLU` expects a per-batch
         dictionary tensor; we materialise a view here without copying.
         """
         return self.dt.unsqueeze(0).expand(batch_size, -1, -1)
@@ -103,13 +103,13 @@ class DictionaryMeanScaleContextHead(nn.Module):
     ``examples/convert_{dcae,saaf}_checkpoint.py`` handles this rename.
     """
 
-    cross_attention: MutiScaleDictionaryCrossAttentionGLU
+    cross_attention: MultiScaleDictionaryCrossAttentionGLU
     mean_cc: nn.Module
     scale_cc: nn.Module
 
     def __init__(
         self,
-        cross_attention: MutiScaleDictionaryCrossAttentionGLU,
+        cross_attention: MultiScaleDictionaryCrossAttentionGLU,
         mean_cc: nn.Module,
         scale_cc: nn.Module,
         *,
@@ -166,12 +166,12 @@ def build_dictionary_mean_scale_head(
         state-dict (one path: ``shared_dictionary.dt``, regardless of K).
     dict_output_ch
         Output channel count of
-        :class:`MutiScaleDictionaryCrossAttentionGLU`. DCAE / SAAF use
+        :class:`MultiScaleDictionaryCrossAttentionGLU`. DCAE / SAAF use
         ``M`` so the cross-attention contributes another M channels to the
         ``support`` tensor that ``mean_cc`` / ``scale_cc`` consume.
     cross_attention_kwargs
         Extra kwargs forwarded to
-        :class:`MutiScaleDictionaryCrossAttentionGLU` (``head_num``,
+        :class:`MultiScaleDictionaryCrossAttentionGLU` (``head_num``,
         ``mlp_rate``, ``qkv_bias``). ``dictionary_dim`` is filled in
         automatically from ``shared_dictionary.dt.size(1)``.
     widths
@@ -188,7 +188,7 @@ def build_dictionary_mean_scale_head(
     """
     cross_attention_kwargs = dict(cross_attention_kwargs or {})
     cross_attention_kwargs.setdefault("dictionary_dim", shared_dictionary.dt.size(1))
-    cross_attention = MutiScaleDictionaryCrossAttentionGLU(
+    cross_attention = MultiScaleDictionaryCrossAttentionGLU(
         input_dim=support_ch,
         output_dim=dict_output_ch,
         **cross_attention_kwargs,

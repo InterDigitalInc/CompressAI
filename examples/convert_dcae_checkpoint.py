@@ -183,7 +183,7 @@ def convert_upstream_dcae_state_dict(
         swap_first_conv=True,
     )
 
-    # cross_attention is a ModuleList of MutiScaleDictionaryCrossAttentionGLU; its
+    # cross_attention is a ModuleList of MultiScaleDictionaryCrossAttentionGLU; its
     # x_trans.weight is the only Linear that consumes the [scales, means, ...] input.
     for key, value in state_dict.items():
         if not key.startswith("dt_cross_attention."):

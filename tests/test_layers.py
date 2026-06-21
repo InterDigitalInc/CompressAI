@@ -204,14 +204,14 @@ def test_AttentionBlock():
     layer(torch.rand(1, 8, 4, 4))
 
 
-class TestMutiScaleDictionaryCrossAttentionGLU:
+class TestMultiScaleDictionaryCrossAttentionGLU:
     @staticmethod
     def test_forward_shape():
         from compressai.layers.attn.dictionary import (
-            MutiScaleDictionaryCrossAttentionGLU,
+            MultiScaleDictionaryCrossAttentionGLU,
         )
 
-        mod = MutiScaleDictionaryCrossAttentionGLU(
+        mod = MultiScaleDictionaryCrossAttentionGLU(
             input_dim=192,
             output_dim=320,
             head_num=4,
@@ -225,16 +225,16 @@ class TestMutiScaleDictionaryCrossAttentionGLU:
     @staticmethod
     def test_state_dict_round_trip():
         from compressai.layers.attn.dictionary import (
-            MutiScaleDictionaryCrossAttentionGLU,
+            MultiScaleDictionaryCrossAttentionGLU,
         )
 
-        mod = MutiScaleDictionaryCrossAttentionGLU(
+        mod = MultiScaleDictionaryCrossAttentionGLU(
             input_dim=192,
             output_dim=320,
             head_num=4,
             dictionary_dim=128,
         )
-        mod2 = MutiScaleDictionaryCrossAttentionGLU(
+        mod2 = MultiScaleDictionaryCrossAttentionGLU(
             input_dim=192,
             output_dim=320,
             head_num=4,
@@ -248,11 +248,11 @@ class TestMutiScaleDictionaryCrossAttentionGLU:
     @staticmethod
     def test_dictionary_dim_default_matches_head_num():
         from compressai.layers.attn.dictionary import (
-            MutiScaleDictionaryCrossAttentionGLU,
+            MultiScaleDictionaryCrossAttentionGLU,
         )
 
         # Default dictionary_dim = 32 * head_num
-        mod = MutiScaleDictionaryCrossAttentionGLU(
+        mod = MultiScaleDictionaryCrossAttentionGLU(
             input_dim=64, output_dim=128, head_num=4
         )
         x = torch.randn(1, 64, 2, 2)
@@ -263,11 +263,11 @@ class TestMutiScaleDictionaryCrossAttentionGLU:
     @staticmethod
     def test_dictionary_dim_must_divide_head_num():
         from compressai.layers.attn.dictionary import (
-            MutiScaleDictionaryCrossAttentionGLU,
+            MultiScaleDictionaryCrossAttentionGLU,
         )
 
         with pytest.raises(ValueError, match="divisible"):
-            MutiScaleDictionaryCrossAttentionGLU(
+            MultiScaleDictionaryCrossAttentionGLU(
                 input_dim=32, output_dim=64, head_num=3, dictionary_dim=128
             )
 

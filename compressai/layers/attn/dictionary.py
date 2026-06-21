@@ -28,7 +28,7 @@ __all__ = [
     "DWConv",
     "DenseBlock",
     "MultiScaleAggregation",
-    "MutiScaleDictionaryCrossAttentionGLU",
+    "MultiScaleDictionaryCrossAttentionGLU",
     "Scale",
     "SpatialAttentionModule",
 ]
@@ -177,7 +177,7 @@ class MultiScaleAggregation(nn.Module):
         return rearrange(output, "b c h w -> b h w c")
 
 
-class MutiScaleDictionaryCrossAttentionGLU(nn.Module):
+class MultiScaleDictionaryCrossAttentionGLU(nn.Module):
     """Cross-attend a per-slice support tensor against a shared dictionary.
 
     Used as the channel-context head body in DCAE / SAAF: ``input_tensor`` is
