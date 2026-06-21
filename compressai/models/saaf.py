@@ -4,25 +4,13 @@ H. Ma, X. Shi, H. Sun, X. Yue, X. Liu, G. Wang, W. Cai, "Learned Image
 Compression via Sparse Attention and Adaptive Frequency", IEEE/CVF Conf.
 on Computer Vision and Pattern Recognition (CVPR), 2026.
 
-Adapted from the upstream reference implementation; the entropy stack
-shares the containerized
-:class:`~compressai.latent_codecs.HyperpriorLatentCodec` /
-:class:`~compressai.latent_codecs.ChannelGroupsLatentCodec` wiring with
-DCAE and reuses
-:class:`~compressai.models._helpers.dictionary_context.DictionaryMeanScaleContextHead`.
+Adapted from the upstream reference implementation at
+https://github.com/huidong-ma/SAAF
+based on CompressAI, DCAE, and AuxT.
 
-Two SAAF-specific additions to the DCAE template:
-
-- An auxiliary encoder / decoder chain (``aux_enc`` / ``aux_dec``) of
-  :class:`_AdaptiveFrequencyBlock` /
-  :class:`_InverseAdaptiveFrequencyBlock` modules runs alongside ``g_a`` /
-  ``g_s`` and is summed into the main path at every stage boundary. Each
-  block carries an :class:`compressai.models._helpers.auxt.OLP` so the
-  AuxT regulariser is integral (not opt-in like TCM ``use_auxt``);
-  :meth:`SAAF.aux_loss` aggregates them via the shared helper.
-- A :class:`_DenoisingAsRegularizer` "diffusion prior" head produces a
-  scalar ``diffusion_loss`` during training that the host's training loop
-  adds to the rate-distortion objective.
+SAAF combines adaptive-frequency auxiliary transform branches
+(``aux_enc`` / ``aux_dec``) with a denoising regularizer that produces
+``diffusion_loss`` during training.
 """
 
 from __future__ import annotations
