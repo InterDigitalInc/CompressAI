@@ -1106,6 +1106,241 @@ class TestSaaf:
         assert "gaussian_conditional.scale_table" not in converted
 
 
+class TestMlic:
+    def test_mlic_forward_and_state_dict_round_trip(self):
+        pytest.importorskip("timm")
+        from compressai.models.mlic import MLIC
+
+        model = MLIC(N=8, M=12, slice_num=3, local_kernel=3).eval()
+        x = torch.rand(1, 3, 64, 64)
+        with torch.no_grad():
+            out = model(x)
+        assert out["x_hat"].shape == x.shape
+        assert "y" in out["likelihoods"]
+        assert "z" in out["likelihoods"]
+
+        sd_keys = set(model.state_dict().keys())
+        assert "latent_codec.h_a.reduction.0.weight" in sd_keys
+        assert "latent_codec.h_s.increase.0.weight" in sd_keys
+        assert "latent_codec.z.entropy_bottleneck.quantiles" in sd_keys
+        assert (
+            "latent_codec.y.channel_context.y1.channel_part.fushion.0.weight" in sd_keys
+        )
+        assert not any(
+            k.startswith("latent_codec.y.channel_context.y1.global_inter_part.")
+            for k in sd_keys
+        )
+        assert (
+            "latent_codec.y.latent_codec.y0.spatial_context_nonanchor.context.0.weight"
+            in sd_keys
+        )
+        assert (
+            "latent_codec.y.latent_codec.y1.intra_channel_context_nonanchor.keys.0.weight"
+            in sd_keys
+        )
+        assert (
+            "latent_codec.y.latent_codec.y0.y.gaussian_conditional.scale_table"
+            in sd_keys
+        )
+        assert "h_a.reduction.0.weight" not in sd_keys
+        assert not hasattr(model, "entropy_bottleneck")
+        assert not hasattr(model, "gaussian_conditional")
+
+        loaded = MLIC.from_state_dict(model.state_dict()).eval()
+        with torch.no_grad():
+            out_loaded = loaded(x)
+        assert torch.allclose(out["x_hat"], out_loaded["x_hat"])
+        assert torch.allclose(out["likelihoods"]["y"], out_loaded["likelihoods"]["y"])
+        assert torch.allclose(out["likelihoods"]["z"], out_loaded["likelihoods"]["z"])
+        assert loaded.N == 8
+        assert loaded.M == 12
+        assert loaded.slice_num == 3
+        assert loaded.local_kernel == 3
+        assert loaded.local_layers == 3
+
+    def test_mlicplus_forward_and_state_dict_round_trip(self):
+        pytest.importorskip("timm")
+        from compressai.models.mlic import MLICPlus
+
+        model = MLICPlus(N=8, M=16, slice_num=4, context_window=3).eval()
+        x = torch.rand(1, 3, 64, 64)
+        with torch.no_grad():
+            out = model(x)
+        assert out["x_hat"].shape == x.shape
+        assert "y" in out["likelihoods"]
+        assert "z" in out["likelihoods"]
+
+        sd_keys = set(model.state_dict().keys())
+        assert (
+            "latent_codec.y.channel_context.y1.global_inter_part.keys.0.weight"
+            in sd_keys
+        )
+        assert (
+            "latent_codec.y.latent_codec.y0.spatial_context_nonanchor.relative_position_table"
+            in sd_keys
+        )
+        assert (
+            "latent_codec.y.latent_codec.y1.intra_channel_context_nonanchor.keys.0.weight"
+            in sd_keys
+        )
+        assert (
+            "latent_codec.y.latent_codec.y0.lrp_anchor.lrp_transform.0.weight"
+            in sd_keys
+        )
+        assert "latent_codec.entropy_bottleneck.quantiles" not in sd_keys
+
+        loaded = MLICPlus.from_state_dict(model.state_dict()).eval()
+        with torch.no_grad():
+            out_loaded = loaded(x)
+        assert torch.allclose(out["x_hat"], out_loaded["x_hat"])
+        assert torch.allclose(out["likelihoods"]["y"], out_loaded["likelihoods"]["y"])
+        assert torch.allclose(out["likelihoods"]["z"], out_loaded["likelihoods"]["z"])
+        assert loaded.N == 8
+        assert loaded.M == 16
+        assert loaded.slice_num == 4
+        assert loaded.context_window == 3
+
+    def test_mlicpp_upstream_state_dict_conversion(self):
+        convert_upstream_mlicpp_state_dict = _load_convert_fn(
+            "convert_mlic_checkpoint.py", "convert_upstream_mlicpp_state_dict"
+        )
+
+        upstream = {
+            "h_a.reduction.0.weight": torch.zeros(2),
+            "h_s.increase.0.weight": torch.zeros(2),
+            "entropy_bottleneck.quantiles": torch.zeros(2),
+            "gaussian_conditional.scale_table": torch.zeros(2),
+            "local_context.0.relative_position_table": torch.zeros(2),
+            "channel_context.0.fushion.0.weight": torch.zeros(2),
+            "global_inter_context.1.keys.0.weight": torch.zeros(2),
+            "global_intra_context.1.keys.0.weight": torch.zeros(2),
+            "entropy_parameters_anchor.0.fusion.0.weight": torch.zeros(2),
+            "entropy_parameters_nonanchor.1.fusion.0.weight": torch.zeros(2),
+            "lrp_anchor.0.lrp_transform.0.weight": torch.zeros(2),
+            "lrp_nonanchor.1.lrp_transform.0.weight": torch.zeros(2),
+        }
+        converted = convert_upstream_mlicpp_state_dict(upstream)
+
+        assert "latent_codec.h_a.reduction.0.weight" in converted
+        assert "latent_codec.h_s.increase.0.weight" in converted
+        assert "latent_codec.z.entropy_bottleneck.quantiles" in converted
+        assert (
+            "latent_codec.y.latent_codec.y0.y.gaussian_conditional.scale_table"
+            in converted
+        )
+        assert (
+            "latent_codec.y.latent_codec.y1.y.gaussian_conditional.scale_table"
+            in converted
+        )
+        assert (
+            "latent_codec.y.latent_codec.y0.spatial_context_nonanchor.relative_position_table"
+            in converted
+        )
+        assert (
+            "latent_codec.y.channel_context.y0.channel_part.fushion.0.weight"
+            in converted
+        )
+        assert (
+            "latent_codec.y.channel_context.y1.global_inter_part.keys.0.weight"
+            in converted
+        )
+        assert (
+            "latent_codec.y.latent_codec.y1.intra_channel_context_nonanchor.keys.0.weight"
+            in converted
+        )
+        assert (
+            "latent_codec.y.latent_codec.y0.entropy_parameters_anchor.fusion.0.weight"
+            in converted
+        )
+        assert (
+            "latent_codec.y.latent_codec.y1.entropy_parameters_nonanchor.fusion.0.weight"
+            in converted
+        )
+        assert (
+            "latent_codec.y.latent_codec.y0.lrp_anchor.lrp_transform.0.weight"
+            in converted
+        )
+        assert (
+            "latent_codec.y.latent_codec.y1.lrp_nonanchor.lrp_transform.0.weight"
+            in converted
+        )
+
+        assert "h_a.reduction.0.weight" not in converted
+        assert "entropy_bottleneck.quantiles" not in converted
+        assert "gaussian_conditional.scale_table" not in converted
+        assert "local_context.0.relative_position_table" not in converted
+        assert "channel_context.0.fushion.0.weight" not in converted
+
+
+class TestMlicv2:
+    def test_forward_state_dict_round_trip_and_gsc_skip_rate(self):
+        pytest.importorskip("timm")
+        from compressai.models.mlic import MLICv2
+
+        model = MLICv2(N=8, M=16, slice_num=4, context_window=3).eval()
+        x = torch.rand(1, 3, 64, 64)
+        with torch.no_grad():
+            out = model(x)
+        assert out["x_hat"].shape == x.shape
+        assert "y" in out["likelihoods"]
+        assert "z" in out["likelihoods"]
+
+        sd_keys = set(model.state_dict().keys())
+        assert "g_a.analysis_transform.1.0.norm1.weight" in sd_keys
+        assert "g_s.synthesis_transform.0.0.norm1.weight" in sd_keys
+        assert (
+            "latent_codec.y.latent_codec.y0.spatial_context_anchor.hgcp.queries.0.weight"
+            in sd_keys
+        )
+        assert (
+            "latent_codec.y.latent_codec.y0.selective_predictor.predictor.0.weight"
+            in sd_keys
+        )
+        assert (
+            "latent_codec.y.channel_context.y1.global_inter_part.context.keys.0.weight"
+            in sd_keys
+        )
+        assert (
+            "latent_codec.y.channel_context.y1.global_inter_part.reweighting.queries.weight"
+            in sd_keys
+        )
+        assert (
+            "latent_codec.y.latent_codec.y1.intra_channel_context_nonanchor.context.keys.0.weight"
+            in sd_keys
+        )
+        assert (
+            "latent_codec.y.latent_codec.y1.intra_channel_context_nonanchor.rope.theta_x"
+            in sd_keys
+        )
+        assert "latent_codec.entropy_bottleneck.quantiles" not in sd_keys
+
+        predictor = model.latent_codec.y.latent_codec["y0"].selective_predictor
+        side_params = torch.randn(1, 32, 4, 4)
+        scales = torch.linspace(0.1, 0.5, steps=1 * 4 * 4 * 4).reshape(1, 4, 4, 4)
+        means = torch.zeros_like(scales)
+        with torch.no_grad():
+            selective = predictor(
+                side_params=side_params,
+                scales=scales,
+                means=means,
+                step="anchor",
+            )["selective_map"]
+        hard_ratio = (selective >= 0.5).float().mean().item()
+        assert 0.1 < hard_ratio < 0.9
+
+        loaded = MLICv2.from_state_dict(model.state_dict()).eval()
+        with torch.no_grad():
+            out_loaded = loaded(x)
+        assert torch.allclose(out["x_hat"], out_loaded["x_hat"])
+        assert torch.allclose(out["likelihoods"]["y"], out_loaded["likelihoods"]["y"])
+        assert torch.allclose(out["likelihoods"]["z"], out_loaded["likelihoods"]["z"])
+        assert loaded.N == 8
+        assert loaded.M == 16
+        assert loaded.slice_num == 4
+        assert loaded.context_window == 3
+        assert loaded.downsampling_factor == 64
+
+
 class TestCca:
     def test_cca_forward_and_state_dict_round_trip(self):
         from compressai.models.cca import CCAModel

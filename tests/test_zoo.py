@@ -45,8 +45,12 @@ from compressai.zoo import (
     cheng2020_attn,
     mbt2018,
     mbt2018_mean,
+    mlic,
+    mlicplus,
+    mlicpp,
+    mlicv2,
 )
-from compressai.zoo.image import _load_model
+from compressai.zoo.image import _load_model, model_architectures
 
 
 class TestLoadModel:
@@ -56,6 +60,34 @@ class TestLoadModel:
 
         with pytest.raises(ValueError):
             _load_model("mbt2018", "mse", 0)
+
+
+class TestMlicZoo:
+    def test_model_architectures_use_lazy_imports(self):
+        for name in ("mlic", "mlicplus", "mlicpp", "mlicv2"):
+            assert name in model_architectures
+            assert type(model_architectures[name]).__name__ == "_LazyImport"
+
+    def test_factories(self):
+        pytest.importorskip("timm")
+        from compressai.models.mlic import MLIC, MLICPlus, MLICPlusPlus, MLICv2
+
+        assert isinstance(mlic(N=8, M=12, slice_num=3, local_kernel=3), MLIC)
+        assert isinstance(mlicplus(N=8, M=16, slice_num=4, context_window=3), MLICPlus)
+        assert isinstance(
+            mlicpp(N=8, M=16, slice_num=4, context_window=3), MLICPlusPlus
+        )
+        assert isinstance(mlicv2(N=8, M=16, slice_num=4, context_window=3), MLICv2)
+
+    def test_pretrained_unavailable(self):
+        with pytest.raises(RuntimeError, match="Pre-trained MLIC"):
+            mlic(pretrained=True)
+        with pytest.raises(RuntimeError, match=r"Pre-trained MLIC\+"):
+            mlicplus(pretrained=True)
+        with pytest.raises(RuntimeError, match=r"Pre-trained MLIC\+\+"):
+            mlicpp(pretrained=True)
+        with pytest.raises(RuntimeError, match="Pre-trained MLICv2"):
+            mlicv2(pretrained=True)
 
 
 class TestBmshj2018Factorized:
