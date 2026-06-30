@@ -43,6 +43,14 @@ from .base import LatentCodec
 
 __all__ = [
     "CheckerboardLatentCodec",
+    "embed",
+    "embed_step",
+    "mask_all",
+    "mask_all_but_step",
+    "merge",
+    "step_parity",
+    "unembed",
+    "write_step",
 ]
 
 
@@ -297,84 +305,134 @@ class CheckerboardLatentCodec(LatentCodec):
         }
 
     def unembed(self, y: Tensor) -> Tensor:
-        """Separate single tensor into two even/odd checkerboard chunks.
-
-        .. code-block:: none
-
-            ■ □ ■ □         ■ ■   □ □
-            □ ■ □ ■   --->  ■ ■   □ □
-            ■ □ ■ □         ■ ■   □ □
-        """
-        n, c, h, w = y.shape
-        y_ = y.new_zeros((2, n, c, h, w // 2))
-        if self.anchor_parity == "even":
-            y_[0, ..., 0::2, :] = y[..., 0::2, 0::2]
-            y_[0, ..., 1::2, :] = y[..., 1::2, 1::2]
-            y_[1, ..., 0::2, :] = y[..., 0::2, 1::2]
-            y_[1, ..., 1::2, :] = y[..., 1::2, 0::2]
-        else:
-            y_[0, ..., 0::2, :] = y[..., 0::2, 1::2]
-            y_[0, ..., 1::2, :] = y[..., 1::2, 0::2]
-            y_[1, ..., 0::2, :] = y[..., 0::2, 0::2]
-            y_[1, ..., 1::2, :] = y[..., 1::2, 1::2]
-        return y_
+        return unembed(y, anchor_parity=self.anchor_parity)
 
     def embed(self, y_: Tensor) -> Tensor:
-        """Combine two even/odd checkerboard chunks into single tensor.
-
-        .. code-block:: none
-
-            ■ ■   □ □         ■ □ ■ □
-            ■ ■   □ □   --->  □ ■ □ ■
-            ■ ■   □ □         ■ □ ■ □
-        """
-        num_chunks, n, c, h, w_half = y_.shape
-        assert num_chunks == 2
-        y = y_.new_zeros((n, c, h, w_half * 2))
-        if self.anchor_parity == "even":
-            y[..., 0::2, 0::2] = y_[0, ..., 0::2, :]
-            y[..., 1::2, 1::2] = y_[0, ..., 1::2, :]
-            y[..., 0::2, 1::2] = y_[1, ..., 0::2, :]
-            y[..., 1::2, 0::2] = y_[1, ..., 1::2, :]
-        else:
-            y[..., 0::2, 1::2] = y_[0, ..., 0::2, :]
-            y[..., 1::2, 0::2] = y_[0, ..., 1::2, :]
-            y[..., 0::2, 0::2] = y_[1, ..., 0::2, :]
-            y[..., 1::2, 1::2] = y_[1, ..., 1::2, :]
-        return y
+        return embed(y_, anchor_parity=self.anchor_parity)
 
     def _copy(self, dest: Tensor, src: Tensor, step: str) -> None:
-        """Copy pixels in the current step."""
-        assert step in ("anchor", "non_anchor")
-        parity = self.anchor_parity if step == "anchor" else self.non_anchor_parity
-        if parity == "even":
-            dest[..., 0::2, 0::2] = src[..., 0::2, 0::2]
-            dest[..., 1::2, 1::2] = src[..., 1::2, 1::2]
-        else:
-            dest[..., 0::2, 1::2] = src[..., 0::2, 1::2]
-            dest[..., 1::2, 0::2] = src[..., 1::2, 0::2]
+        return write_step(dest, src, step, anchor_parity=self.anchor_parity)
 
     def _mask_all_but_step(self, y: Tensor, step: str) -> Tensor:
-        """Keep only pixels in the current step, and zero out the rest."""
-        y = y.clone()
-        parity = self.anchor_parity if step == "anchor" else self.non_anchor_parity
-        if parity == "even":
-            y[..., 0::2, 1::2] = 0
-            y[..., 1::2, 0::2] = 0
-        elif parity == "odd":
-            y[..., 0::2, 0::2] = 0
-            y[..., 1::2, 1::2] = 0
-        return y
+        return mask_all_but_step(y, step, anchor_parity=self.anchor_parity)
 
     def _mask_all(self, y: Tensor) -> Tensor:
-        y = y.clone()
-        y[:] = 0
-        return y
+        return mask_all(y)
 
     def merge(self, *args: Tensor) -> Tensor:
-        return torch.cat(args, dim=1)
+        return merge(*args)
 
     def quantize(self, y: Tensor) -> Tensor:
         mode = "noise" if self.training else "dequantize"
         y_hat = EntropyModel.quantize(None, y, mode)
         return y_hat
+
+
+def unembed(y: Tensor, *, anchor_parity: str) -> Tensor:
+    """Separate single tensor into two even/odd checkerboard chunks.
+
+    .. code-block:: none
+
+        ■ □ ■ □         ■ ■   □ □
+        □ ■ □ ■   --->  ■ ■   □ □
+        ■ □ ■ □         ■ ■   □ □
+    """
+    n, c, h, w = y.shape
+    y_ = y.new_zeros((2, n, c, h, w // 2))
+    if anchor_parity == "even":
+        y_[0, ..., 0::2, :] = y[..., 0::2, 0::2]
+        y_[0, ..., 1::2, :] = y[..., 1::2, 1::2]
+        y_[1, ..., 0::2, :] = y[..., 0::2, 1::2]
+        y_[1, ..., 1::2, :] = y[..., 1::2, 0::2]
+    elif anchor_parity == "odd":
+        y_[0, ..., 0::2, :] = y[..., 0::2, 1::2]
+        y_[0, ..., 1::2, :] = y[..., 1::2, 0::2]
+        y_[1, ..., 0::2, :] = y[..., 0::2, 0::2]
+        y_[1, ..., 1::2, :] = y[..., 1::2, 1::2]
+    else:
+        raise ValueError(f'Invalid anchor_parity "{anchor_parity}"')
+    return y_
+
+
+def embed(y_: Tensor, *, anchor_parity: str) -> Tensor:
+    """Combine two even/odd checkerboard chunks into single tensor.
+
+    .. code-block:: none
+
+        ■ ■   □ □         ■ □ ■ □
+        ■ ■   □ □   --->  □ ■ □ ■
+        ■ ■   □ □         ■ □ ■ □
+    """
+    num_chunks, n, c, h, w_half = y_.shape
+    assert num_chunks == 2
+    y = y_.new_zeros((n, c, h, w_half * 2))
+    if anchor_parity == "even":
+        y[..., 0::2, 0::2] = y_[0, ..., 0::2, :]
+        y[..., 1::2, 1::2] = y_[0, ..., 1::2, :]
+        y[..., 0::2, 1::2] = y_[1, ..., 0::2, :]
+        y[..., 1::2, 0::2] = y_[1, ..., 1::2, :]
+    elif anchor_parity == "odd":
+        y[..., 0::2, 1::2] = y_[0, ..., 0::2, :]
+        y[..., 1::2, 0::2] = y_[0, ..., 1::2, :]
+        y[..., 0::2, 0::2] = y_[1, ..., 0::2, :]
+        y[..., 1::2, 1::2] = y_[1, ..., 1::2, :]
+    else:
+        raise ValueError(f'Invalid anchor_parity "{anchor_parity}"')
+    return y
+
+
+def embed_step(
+    step_index: int, y_i: Tensor, width: int, *, anchor_parity: str
+) -> Tensor:
+    """Embed a per-step half-width tensor back into a full-grid tensor."""
+    n, c, h, _ = y_i.shape
+    y_ = y_i.new_zeros((2, n, c, h, width // 2))
+    y_[step_index] = y_i
+    return embed(y_, anchor_parity=anchor_parity)
+
+
+def step_parity(step: str, anchor_parity: str) -> str:
+    """Resolve a ``step`` ('anchor' / 'non_anchor') to a parity string."""
+    if anchor_parity not in ("even", "odd"):
+        raise ValueError(f'Invalid anchor_parity "{anchor_parity}"')
+    if step == "anchor":
+        return anchor_parity
+    if step == "non_anchor":
+        return "odd" if anchor_parity == "even" else "even"
+    raise ValueError(f'Invalid "step" value "{step}"')
+
+
+def write_step(dest: Tensor, src: Tensor, step: str, *, anchor_parity: str) -> None:
+    """Copy ``src`` pixels at the current step's positions into ``dest`` in-place."""
+    parity = step_parity(step, anchor_parity)
+    if parity == "even":
+        dest[..., 0::2, 0::2] = src[..., 0::2, 0::2]
+        dest[..., 1::2, 1::2] = src[..., 1::2, 1::2]
+    else:
+        dest[..., 0::2, 1::2] = src[..., 0::2, 1::2]
+        dest[..., 1::2, 0::2] = src[..., 1::2, 0::2]
+
+
+def mask_all_but_step(y: Tensor, step: str, *, anchor_parity: str) -> Tensor:
+    """Keep only pixels in the current step, and zero out the rest."""
+    y = y.clone()
+    parity = step_parity(step, anchor_parity)
+    if parity == "even":
+        y[..., 0::2, 1::2] = 0
+        y[..., 1::2, 0::2] = 0
+    elif parity == "odd":
+        y[..., 0::2, 0::2] = 0
+        y[..., 1::2, 1::2] = 0
+    return y
+
+
+def mask_all(y: Tensor) -> Tensor:
+    """Return a zero tensor with the same shape, dtype and device as ``y``."""
+    y = y.clone()
+    y[:] = 0
+    return y
+
+
+def merge(*args: Tensor) -> Tensor:
+    """Concatenate tensors along the channel dimension."""
+    return torch.cat(args, dim=1)

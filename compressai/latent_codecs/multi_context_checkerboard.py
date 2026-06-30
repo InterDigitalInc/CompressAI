@@ -38,8 +38,8 @@ from compressai.entropy_models import GaussianConditional
 from compressai.ops import quantize_ste
 from compressai.registry import register_module
 
-from . import _checkerboard_helpers as _ckb
 from . import _selective_checkerboard as _sel
+from . import checkerboard as _ckb
 from .base import LatentCodec
 from .gaussian_conditional import GaussianConditionalLatentCodec
 
