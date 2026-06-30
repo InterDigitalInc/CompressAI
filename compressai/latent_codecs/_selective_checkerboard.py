@@ -190,7 +190,7 @@ def compress_selected(
         y_hat[sample_index].reshape(-1)[mask] = y_hat_i.reshape(-1).to(y_hat.dtype)
         y_strings.append(y_string)
 
-    return {"strings": [y_strings], "shape": y.shape[2:4], "y_hat": y_hat}
+    return {"strings": [y_strings], "shape": y.shape[1:], "y_hat": y_hat}
 
 
 def decompress_selected(
