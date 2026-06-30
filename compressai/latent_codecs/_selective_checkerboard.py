@@ -36,7 +36,7 @@ from torch import Tensor
 
 from compressai.entropy_models import GaussianConditional
 
-from . import _checkerboard_helpers as _ckb
+from . import checkerboard as _ckb
 
 __all__ = [
     "apply_selective_y_hat",
