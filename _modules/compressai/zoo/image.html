@@ -344,6 +344,10 @@ document.write(`
     <span class="s2">&quot;cheng2020_anchor&quot;</span><span class="p">,</span>
     <span class="s2">&quot;cheng2020_attn&quot;</span><span class="p">,</span>
     <span class="s2">&quot;dcae&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mlic&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mlicplus&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mlicpp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mlicv2&quot;</span><span class="p">,</span>
     <span class="s2">&quot;saaf&quot;</span><span class="p">,</span>
     <span class="s2">&quot;stf&quot;</span><span class="p">,</span>
     <span class="s2">&quot;stf_wacnn&quot;</span><span class="p">,</span>
@@ -360,6 +364,10 @@ document.write(`
     <span class="s2">&quot;cheng2020-anchor&quot;</span><span class="p">:</span> <span class="n">Cheng2020Anchor</span><span class="p">,</span>
     <span class="s2">&quot;cheng2020-attn&quot;</span><span class="p">:</span> <span class="n">Cheng2020Attention</span><span class="p">,</span>
     <span class="s2">&quot;dcae&quot;</span><span class="p">:</span> <span class="n">_LazyImport</span><span class="p">(</span><span class="s2">&quot;compressai.models.dcae&quot;</span><span class="p">,</span> <span class="s2">&quot;DCAE&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;mlic&quot;</span><span class="p">:</span> <span class="n">_LazyImport</span><span class="p">(</span><span class="s2">&quot;compressai.models.mlic&quot;</span><span class="p">,</span> <span class="s2">&quot;MLIC&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;mlicplus&quot;</span><span class="p">:</span> <span class="n">_LazyImport</span><span class="p">(</span><span class="s2">&quot;compressai.models.mlic&quot;</span><span class="p">,</span> <span class="s2">&quot;MLICPlus&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;mlicpp&quot;</span><span class="p">:</span> <span class="n">_LazyImport</span><span class="p">(</span><span class="s2">&quot;compressai.models.mlic&quot;</span><span class="p">,</span> <span class="s2">&quot;MLICPlusPlus&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;mlicv2&quot;</span><span class="p">:</span> <span class="n">_LazyImport</span><span class="p">(</span><span class="s2">&quot;compressai.models.mlic&quot;</span><span class="p">,</span> <span class="s2">&quot;MLICv2&quot;</span><span class="p">),</span>
     <span class="s2">&quot;saaf&quot;</span><span class="p">:</span> <span class="n">_LazyImport</span><span class="p">(</span><span class="s2">&quot;compressai.models.saaf&quot;</span><span class="p">,</span> <span class="s2">&quot;SAAF&quot;</span><span class="p">),</span>
     <span class="c1"># Resolved lazily so `compressai.zoo` is importable without `timm`.</span>
     <span class="s2">&quot;stf&quot;</span><span class="p">:</span> <span class="n">_LazyImport</span><span class="p">(</span><span class="s2">&quot;compressai.models.stf&quot;</span><span class="p">,</span> <span class="s2">&quot;SymmetricalTransFormer&quot;</span><span class="p">),</span>
@@ -794,6 +802,82 @@ document.write(`
     <span class="kn">from</span><span class="w"> </span><span class="nn">compressai.models.saaf</span><span class="w"> </span><span class="kn">import</span> <span class="n">SAAF</span>
 
     <span class="k">return</span> <span class="n">SAAF</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mlic</span><span class="p">(</span><span class="n">pretrained</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;MLIC model from W. Jiang, J. Yang, Y. Zhai, P. Ning, F. Gao, R. Wang:</span>
+<span class="sd">    `&quot;MLIC: Multi-Reference Entropy Model for Learned Image Compression&quot;</span>
+<span class="sd">    &lt;https://arxiv.org/abs/2211.07273&gt;`_, ACM Multimedia 2023.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pretrained (bool): If True, returns a pre-trained model. Currently</span>
+<span class="sd">            unavailable; raises ``RuntimeError``.</span>
+<span class="sd">        progress (bool): If True, displays a progress bar of the download to</span>
+<span class="sd">            stderr.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">del</span> <span class="n">progress</span>
+    <span class="k">if</span> <span class="n">pretrained</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Pre-trained MLIC weights are not yet hosted on S3.&quot;</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">compressai.models.mlic</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLIC</span>
+
+    <span class="k">return</span> <span class="n">MLIC</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mlicplus</span><span class="p">(</span><span class="n">pretrained</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;MLIC+ model from W. Jiang, J. Yang, Y. Zhai, P. Ning, F. Gao, R. Wang:</span>
+<span class="sd">    `&quot;MLIC: Multi-Reference Entropy Model for Learned Image Compression&quot;</span>
+<span class="sd">    &lt;https://arxiv.org/abs/2211.07273&gt;`_, ACM Multimedia 2023.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pretrained (bool): If True, returns a pre-trained model. Currently</span>
+<span class="sd">            unavailable; raises ``RuntimeError``.</span>
+<span class="sd">        progress (bool): If True, displays a progress bar of the download to</span>
+<span class="sd">            stderr.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">del</span> <span class="n">progress</span>
+    <span class="k">if</span> <span class="n">pretrained</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Pre-trained MLIC+ weights are not yet hosted on S3.&quot;</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">compressai.models.mlic</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLICPlus</span>
+
+    <span class="k">return</span> <span class="n">MLICPlus</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mlicpp</span><span class="p">(</span><span class="n">pretrained</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;MLIC++ model from W. Jiang, J. Yang, Y. Zhai, F. Gao, R. Wang:</span>
+<span class="sd">    `&quot;MLIC++: Linear Complexity Multi-Reference Entropy Modeling for Learned</span>
+<span class="sd">    Image Compression&quot; &lt;https://arxiv.org/abs/2307.15421&gt;`_, ACM Trans.</span>
+<span class="sd">    Multimedia Comput. Commun. Appl. (TOMM), 2025; ICML 2023 Neural</span>
+<span class="sd">    Compression Workshop.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pretrained (bool): If True, returns a pre-trained model. Currently</span>
+<span class="sd">            unavailable; raises ``RuntimeError``.</span>
+<span class="sd">        progress (bool): If True, displays a progress bar of the download to</span>
+<span class="sd">            stderr.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">del</span> <span class="n">progress</span>
+    <span class="k">if</span> <span class="n">pretrained</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Pre-trained MLIC++ weights are not yet hosted on S3.&quot;</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">compressai.models.mlic</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLICPlusPlus</span>
+
+    <span class="k">return</span> <span class="n">MLICPlusPlus</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mlicv2</span><span class="p">(</span><span class="n">pretrained</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;MLICv2 model from W. Jiang, J. Yang, Y. Zhai, F. Gao, R. Wang.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pretrained (bool): If True, returns a pre-trained model. Currently</span>
+<span class="sd">            unavailable; raises ``RuntimeError``.</span>
+<span class="sd">        progress (bool): If True, displays a progress bar of the download to</span>
+<span class="sd">            stderr.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">del</span> <span class="n">progress</span>
+    <span class="k">if</span> <span class="n">pretrained</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Pre-trained MLICv2 weights are not yet hosted on S3.&quot;</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">compressai.models.mlic</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLICv2</span>
+
+    <span class="k">return</span> <span class="n">MLICv2</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">stf</span><span class="p">(</span><span class="n">pretrained</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
