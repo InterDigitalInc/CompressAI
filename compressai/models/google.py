@@ -724,7 +724,7 @@ class JointAutoregressiveHierarchicalPriors(MeanScaleHyperprior):
                 rv = decoder.decode_stream(
                     indexes.squeeze().tolist(), cdf, cdf_lengths, offsets
                 )
-                rv = torch.Tensor(rv).reshape(1, -1, 1, 1)
+                rv = torch.tensor(rv, dtype=means_hat.dtype, device=means_hat.device).reshape(1, -1, 1, 1)
                 rv = self.gaussian_conditional.dequantize(rv, means_hat)
 
                 hp = h + padding
