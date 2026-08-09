@@ -741,7 +741,7 @@ class SymmetricalTransFormer(CompressionModel):
         y_out = self.latent_codec.decompress(strings, shape)
         y_hat = y_out["y_hat"]
         height, width = y_hat.shape[2:]
-        return {"x_hat": self._synthesis_transform(y_hat, height, width).clamp_(0, 1)}
+        return {"x_hat": self._synthesis_transform(y_hat, height, width)}
 
     @classmethod
     def from_state_dict(cls, state_dict: Dict[str, Tensor]) -> "SymmetricalTransFormer":

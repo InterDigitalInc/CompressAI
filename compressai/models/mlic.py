@@ -340,7 +340,7 @@ class _BaseMLIC(CompressionModel):
         shape: Dict[str, Union[List[Tuple[int, ...]], Tuple[int, ...]]],
     ) -> Dict[str, Tensor]:
         y_out = self.latent_codec.decompress(strings, shape)
-        return {"x_hat": self.g_s(y_out["y_hat"]).clamp_(0, 1)}
+        return {"x_hat": self.g_s(y_out["y_hat"])}
 
     @classmethod
     def from_state_dict(cls, state_dict: Dict[str, Tensor]) -> "_BaseMLIC":
