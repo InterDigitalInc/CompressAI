@@ -633,7 +633,7 @@ class JointAutoregressiveHierarchicalPriors(MeanScaleHyperprior):
 
                 y_crop = y_crop[:, :, padding, padding]
                 y_q = self.gaussian_conditional.quantize(y_crop, "symbols", means_hat)
-                y_hat[:, :, h + padding, w + padding] = y_q + means_hat
+                y_hat[:, :, h + padding, w + padding] = self.gaussian_conditional.dequantize(y_q, means_hat)
 
                 symbols_list.extend(y_q.squeeze().tolist())
                 indexes_list.extend(indexes.squeeze().tolist())
