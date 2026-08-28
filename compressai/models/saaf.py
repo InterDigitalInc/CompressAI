@@ -878,7 +878,7 @@ class SAAF(CompressionModel):
         self, strings: Sequence[Sequence[bytes]], shape: Sequence[int]
     ) -> Dict[str, Tensor]:
         out = self.latent_codec.decompress(strings, shape)
-        return {"x_hat": self._decode(out["y_hat"]).clamp_(0, 1)}
+        return {"x_hat": self._decode(out["y_hat"])}
 
     @classmethod
     def from_state_dict(cls, state_dict: Dict[str, Tensor]) -> "SAAF":

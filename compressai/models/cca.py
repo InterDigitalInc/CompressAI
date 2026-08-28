@@ -684,7 +684,7 @@ class CCAModel(CompressionModel):
         shape: Dict[str, Tuple[int, ...]],
     ) -> Dict[str, Tensor]:
         y_out = self.latent_codec.decompress(strings, shape)
-        return {"x_hat": self.g_s(y_out["y_hat"]).clamp_(0, 1)}
+        return {"x_hat": self.g_s(y_out["y_hat"])}
 
     def update(
         self, scale_table: Optional[Tensor] = None, force: bool = False, **kwargs

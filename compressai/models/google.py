@@ -159,7 +159,7 @@ class FactorizedPrior(CompressionModel):
     def decompress(self, strings, shape):
         assert isinstance(strings, list) and len(strings) == 1
         y_hat = self.entropy_bottleneck.decompress(strings[0], shape)
-        x_hat = self.g_s(y_hat).clamp_(0, 1)
+        x_hat = self.g_s(y_hat)
         return {"x_hat": x_hat}
 
 
@@ -329,7 +329,7 @@ class ScaleHyperprior(CompressionModel):
         scales_hat = self.h_s(z_hat)
         indexes = self.gaussian_conditional.build_indexes(scales_hat)
         y_hat = self.gaussian_conditional.decompress(strings[0], indexes, z_hat.dtype)
-        x_hat = self.g_s(y_hat).clamp_(0, 1)
+        x_hat = self.g_s(y_hat)
         return {"x_hat": x_hat}
 
 
@@ -426,7 +426,7 @@ class MeanScaleHyperprior(ScaleHyperprior):
         y_hat = self.gaussian_conditional.decompress(
             strings[0], indexes, means=means_hat
         )
-        x_hat = self.g_s(y_hat).clamp_(0, 1)
+        x_hat = self.g_s(y_hat)
         return {"x_hat": x_hat}
 
 
@@ -688,7 +688,7 @@ class JointAutoregressiveHierarchicalPriors(MeanScaleHyperprior):
             )
 
         y_hat = F.pad(y_hat, (-padding, -padding, -padding, -padding))
-        x_hat = self.g_s(y_hat).clamp_(0, 1)
+        x_hat = self.g_s(y_hat)
         return {"x_hat": x_hat}
 
     def _decompress_ar(
