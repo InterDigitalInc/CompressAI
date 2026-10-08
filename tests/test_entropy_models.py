@@ -245,8 +245,9 @@ class TestEntropyBottleneck:
     #     assert torch.all(y1[1] == 0)  # not yet supported
 
     @pytest.mark.skipif(
-        version.parse(torch.__version__) < version.parse("2.0.0"),
-        reason="torch.compile only available for torch>=2.0",
+        version.parse(torch.__version__) < version.parse("2.1.0"),
+        reason="torch.compile requires torch>=2.0; torch 2.0.x dynamo cannot "
+        "trace Tensor.permute with tensor dims (EntropyBottleneck.forward)",
     )
     def test_compiling(self):
         entropy_bottleneck = EntropyBottleneck(128)
