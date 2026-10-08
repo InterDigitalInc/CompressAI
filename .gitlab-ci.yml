@@ -113,6 +113,10 @@ test:
         CUDA_VERSION_NAME=cu116
         TORCH_VERSION=1.13.1+cu116
         TORCHVISION_VERSION=0.14.1+cu116
+      elif [ "$PYTORCH_IMAGE" == "2.0.0-cuda11.8-cudnn8-devel" ]; then
+        CUDA_VERSION_NAME=cu118
+        TORCH_VERSION=2.0.0+cu118
+        TORCHVISION_VERSION=0.15.1+cu118
       elif [ "$PYTORCH_IMAGE" == "2.2.0-cuda11.8-cudnn8-devel" ]; then
         CUDA_VERSION_NAME=cu118
         TORCH_VERSION=2.2.0+cu118
@@ -173,6 +177,7 @@ test:
     matrix:
       - PYTORCH_IMAGE:
           - "1.13.1-cuda11.6-cudnn8-devel"
+          - "2.0.0-cuda11.8-cudnn8-devel"  # MPEG FCM CTTC (py3.10) stack
           - "2.2.0-cuda11.8-cudnn8-devel"
   tags:
     - docker
