@@ -44,7 +44,11 @@ dependencies = [
   "torch>=1.13.1",
   "torch>=2.6.0; python_version >= '3.12'",
   "torchvision>=0.14.1,<0.20; python_version < '3.9'",
-  "torchvision>=0.17.0; python_version >= '3.9'",
+  # torchvision 0.14.1-0.16.x are supported below Python 3.12 (exercised by the
+  # 1.13.1 and 2.0.0 CI images; 2.0.0/0.15.1 is the MPEG FCM CTTC py3.10 stack).
+  # torchvision 0.17 is the first release with Python 3.12 wheels.
+  "torchvision>=0.14.1; python_version >= '3.9' and python_version < '3.12'",
+  "torchvision>=0.17.0; python_version >= '3.12'",
   "tqdm",
   "typing-extensions>=4.0.0",
   "wheel>=0.32.0", # For --no-build-isolation.
