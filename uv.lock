@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.8, <14"
 resolution-markers = [
     "python_full_version >= '3.12'",
@@ -713,7 +713,8 @@ requires-dist = [
     { name = "torch", marker = "python_full_version >= '3.12'", specifier = ">=2.6.0" },
     { name = "torch-geometric", specifier = ">=2.3.0" },
     { name = "torchvision", marker = "python_full_version < '3.9'", specifier = ">=0.14.1,<0.20" },
-    { name = "torchvision", marker = "python_full_version >= '3.9'", specifier = ">=0.17.0" },
+    { name = "torchvision", marker = "python_full_version >= '3.9' and python_full_version < '3.12'", specifier = ">=0.14.1" },
+    { name = "torchvision", marker = "python_full_version >= '3.12'", specifier = ">=0.17.0" },
     { name = "tqdm" },
     { name = "typing-extensions", specifier = ">=4.0.0" },
     { name = "wheel", specifier = ">=0.32.0" },
