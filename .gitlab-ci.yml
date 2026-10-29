@@ -166,7 +166,7 @@ test:
       update_dict(base, delta)
       Path("pyproject.toml").write_text(tomlkit.dumps(base))
       EOF
-    - uv sync --group=test --reinstall
+    - uv sync --group=test --extra=attn --reinstall
     - *check-torch-cuda
     - |
       PYTEST_ARGS=(--cov=compressai --capture=no tests)
