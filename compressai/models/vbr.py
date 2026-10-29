@@ -922,7 +922,9 @@ class JointAutoregressiveHierarchicalPriorsVbr(
                     indexes.squeeze().tolist(), cdf, cdf_lengths, offsets
                 )
                 # TODO: move rv to gpu ?
-                rv = torch.tensor(rv, dtype=means_hat.dtype, device=means_hat.device).reshape(1, -1, 1, 1)
+                rv = torch.tensor(
+                    rv, dtype=means_hat.dtype, device=means_hat.device
+                ).reshape(1, -1, 1, 1)
                 if stage == 1:
                     rv = self.gaussian_conditional.dequantize(rv, means_hat)
 
