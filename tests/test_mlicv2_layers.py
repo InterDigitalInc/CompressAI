@@ -37,15 +37,20 @@ import torch.nn as nn
 
 import compressai.layers as layers
 
-from compressai.models._helpers.mlicv2 import (
-    ContextReweighting,
-    GSCModule,
-    HGCPModule,
-    RoPE2D,
-    SimpleTokenMixing,
-    STMAnalysis,
-    STMSynthesis,
-)
+try:
+    from compressai.models._helpers.mlicv2 import (
+        ContextReweighting,
+        GSCModule,
+        HGCPModule,
+        RoPE2D,
+        SimpleTokenMixing,
+        STMAnalysis,
+        STMSynthesis,
+    )
+except ModuleNotFoundError as err:
+    if err.name != "timm":
+        raise
+    pytestmark = pytest.mark.skip(reason="MLICv2 layers require the [attn] extra")
 
 
 def _round_trip_output(
