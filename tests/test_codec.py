@@ -83,7 +83,7 @@ class TestCompressDecompress:
         x_hat = rv["x_hat"]
         assert x_hat.size() == x.size()
 
-        mse = torch.mean((x - x_hat) ** 2)
+        mse = torch.mean((x - x_hat.clamp(0, 1)) ** 2)
         psnr = -10 * torch.log10(mse).item()
         assert 35 < psnr < 41
 

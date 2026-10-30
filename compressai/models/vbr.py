@@ -297,7 +297,7 @@ class ScaleHyperpriorVbr(ScaleHyperprior):
                 y_hat = signs * (q_abs + q_offsets)
                 y_ch_means = 0
                 y_hat = y_hat * rescale + y_ch_means
-        x_hat = self.g_s(y_hat).clamp_(0, 1)
+        x_hat = self.g_s(y_hat)
         return {"x_hat": x_hat}
 
 
@@ -499,7 +499,7 @@ class MeanScaleHyperpriorVbr(ScaleHyperpriorVbr, MeanScaleHyperprior):
 
                 y_hat = signs * (q_abs + q_offsets)
                 y_hat = y_hat * rescale + means_hat
-        x_hat = self.g_s(y_hat).clamp_(0, 1)
+        x_hat = self.g_s(y_hat)
         return {"x_hat": x_hat}
 
 
@@ -866,7 +866,7 @@ class JointAutoregressiveHierarchicalPriorsVbr(
             )
 
         y_hat = F.pad(y_hat, (-padding, -padding, -padding, -padding))
-        x_hat = self.g_s(y_hat).clamp_(0, 1)
+        x_hat = self.g_s(y_hat)
         return {"x_hat": x_hat}
 
     def _decompress_ar(  # noqa: C901
