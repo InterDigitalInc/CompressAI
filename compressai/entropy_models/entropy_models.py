@@ -27,6 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import math
 import warnings
 
 from typing import Any, Callable, List, Optional, Tuple, Union
@@ -313,17 +314,31 @@ class EntropyModel(nn.Module):
         cdf = self._quantized_cdf
         outputs = cdf.new_empty(indexes.size())
 
+        if len(strings) > 0:
+            # CDF tables are shared by all strings: convert them only once
+            cdf_list = cdf.tolist()
+            cdf_length = self._cdf_length.reshape(-1).int().tolist()
+            offset = self._offset.reshape(-1).int().tolist()
+            indexes = indexes.int()
+
         for i, s in enumerate(strings):
             values = self.entropy_coder.decode_with_indexes(
-                s,
-                indexes[i].reshape(-1).int().tolist(),
-                cdf.tolist(),
-                self._cdf_length.reshape(-1).int().tolist(),
-                self._offset.reshape(-1).int().tolist(),
+                s, indexes[i].reshape(-1).tolist(), cdf_list, cdf_length, offset
             )
-            outputs[i] = torch.tensor(
-                values, device=outputs.device, dtype=outputs.dtype
-            ).reshape(outputs[i].size())
+            # numpy converts large int lists much faster than torch.tensor
+            values = np.fromiter(values, dtype=np.int32, count=len(values))
+            outputs[i] = torch.from_numpy(values).reshape(outputs[i].size())
+
+        size = outputs.size()
+        if means is not None and means.dim() == len(size) > 3 and outputs.numel() > 0:
+            # Elementwise ops over many small dims are slow, dequantize on a
+            # flattened (N, C, -1) view instead
+            outputs = self.dequantize(
+                outputs.reshape(size[0], size[1], -1),
+                means.reshape(means.size(0), means.size(1), -1),
+                dtype,
+            )
+            return outputs.reshape(size)
         outputs = self.dequantize(outputs, means, dtype)
         return outputs
 
@@ -563,7 +578,13 @@ class EntropyBottleneck(EntropyModel):
 
     def decompress(self, strings, size):
         output_size = (len(strings), self._quantized_cdf.size(0), *size)
-        indexes = self._build_indexes(output_size).to(self._quantized_cdf.device)
+        if len(size) > 1 and all(isinstance(s, int) and s >= 0 for s in size):
+            # Repeating over a single flattened spatial dim is much faster
+            flat_size = (*output_size[:2], math.prod(size))
+            indexes = self._build_indexes(flat_size).reshape(output_size)
+        else:
+            indexes = self._build_indexes(output_size)
+        indexes = indexes.to(self._quantized_cdf.device)
         medians = self._extend_ndims(self._get_medians().detach(), len(size))
         medians = medians.expand(len(strings), *([-1] * (len(size) + 1)))
         return super().decompress(strings, indexes, medians.dtype, medians)
