@@ -813,12 +813,12 @@ class AV1(Codec):
         self.decoder_path = os.path.join(args.build_dir, "aomdec")
         return args
 
-    def _run_impl(self, img, quality):
+    def _run_impl(self, in_filepath, quality):
         if not 0 <= quality <= 63:
             raise ValueError(f"Invalid quality value: {quality} (0,63)")
 
         # Convert input image to yuv 444 file
-        arr = np.asarray(img)
+        arr = np.asarray(self._load_img(in_filepath))
         fd, yuv_path = mkstemp(suffix=".yuv")
         out_filepath = os.path.splitext(yuv_path)[0] + ".webm"
         bitdepth = 8
