@@ -35,7 +35,7 @@ import subprocess
 import sys
 import time
 
-from tempfile import mkstemp
+from tempfile import TemporaryDirectory, mkstemp
 from typing import Dict, List, Optional, Union
 
 import numpy as np
@@ -262,37 +262,36 @@ class BinaryCodec(Codec):
         pass
 
     def _run_impl(self, in_filepath, quality):
-        fd0, png_filepath = mkstemp(suffix=".png")
-        fd1, out_filepath = mkstemp(suffix=self.fmt)
+        with TemporaryDirectory() as tmpdir:
+            fd, png_filepath = mkstemp(suffix=".png", dir=tmpdir)
+            os.close(fd)
+            fd, out_filepath = mkstemp(suffix=self.fmt, dir=tmpdir)
+            os.close(fd)
 
-        # Encode
-        start = time.time()
-        run_command(self._get_encode_cmd(in_filepath, quality, out_filepath))
-        enc_time = time.time() - start
-        size = filesize(out_filepath)
+            # Encode
+            start = time.time()
+            run_command(self._get_encode_cmd(in_filepath, quality, out_filepath))
+            enc_time = time.time() - start
+            size = filesize(out_filepath)
 
-        # Decode
-        start = time.time()
-        run_command(self._get_decode_cmd(out_filepath, png_filepath))
-        dec_time = time.time() - start
+            # Decode
+            start = time.time()
+            run_command(self._get_decode_cmd(out_filepath, png_filepath))
+            dec_time = time.time() - start
 
-        # Read image
-        rec = read_image(png_filepath)
-        os.close(fd0)
-        os.remove(png_filepath)
-        os.close(fd1)
-        os.remove(out_filepath)
+            # Read image
+            rec = read_image(png_filepath)
 
-        img = self._load_img(in_filepath)
-        bpp_val = float(size) * 8 / (img.size[0] * img.size[1])
+            img = self._load_img(in_filepath)
+            bpp_val = float(size) * 8 / (img.size[0] * img.size[1])
 
-        out = {
-            "bpp": bpp_val,
-            "encoding_time": enc_time,
-            "decoding_time": dec_time,
-        }
+            out = {
+                "bpp": bpp_val,
+                "encoding_time": enc_time,
+                "decoding_time": dec_time,
+            }
 
-        return out, rec
+            return out, rec
 
     def _get_encode_cmd(self, in_filepath, quality, out_filepath):
         raise NotImplementedError()
